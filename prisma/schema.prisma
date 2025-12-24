@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum Arcana {
+  MAJOR
+  MINOR
+}
+
+enum Suit {
+  WANDS
+  CUPS
+  SWORDS
+  PENTACLES
+}
+
+enum TransactionType {
+  PURCHASE
+  READING
+  BONUS
+}
+
+// ============================================================================
+// AUTH MODELS (NextAuth)
+// ============================================================================
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  emailVerified    DateTime?
+  name             String?
+  image            String?
+  password         String?   // For credentials auth
+  freeReadingsLeft Int       @default(3)
+  credits          Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  readings     Reading[]
+  transactions CreditTransaction[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("password_reset_tokens")
+}
+
+// ============================================================================
+// APP MODELS
+// ============================================================================
+
+model Card {
+  id              String  @id @default(cuid())
+  name            String  @unique
+  nameEs          String
+  arcana          Arcana
+  suit            Suit?
+  number          Int
+  keywords        String[]
+  meaningUpright  String  @db.Text
+  meaningReversed String  @db.Text
+  imageUrl        String
+
+  @@unique([arcana, suit, number])
+  @@map("cards")
+}
+
+model SpreadType {
+  id            String @id @default(cuid())
+  name          String @unique
+  nameEs        String
+  description   String @db.Text
+  descriptionEs String @db.Text
+  cardCount     Int
+  positions     Json
+  creditCost    Int
+
+  readings Reading[]
+
+  @@map("spread_types")
+}
+
+model Reading {
+  id             String   @id @default(cuid())
+  userId         String
+  spreadTypeId   String
+  intention      String   @db.Text
+  cards          Json
+  interpretation String   @db.Text
+  isPublic       Boolean  @default(false)
+  shareId        String?  @unique
+  createdAt      DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spreadType SpreadType @relation(fields: [spreadTypeId], references: [id])
+
+  transaction CreditTransaction?
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("readings")
+}
+
+model CreditTransaction {
+  id              String          @id @default(cuid())
+  userId          String
+  amount          Int
+  type            TransactionType
+  readingId       String?         @unique
+  stripeSessionId String?
+  createdAt       DateTime        @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reading Reading? @relation(fields: [readingId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("credit_transactions")
+}

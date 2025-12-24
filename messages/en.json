@@ -1,0 +1,361 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "back": "Back",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "My space",
+    "newReading": "New reading",
+    "history": "History",
+    "credits": "Credits",
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out"
+  },
+  "landing": {
+    "hero": {
+      "title": "Discover your destiny",
+      "subtitle": "Tarot cards hold ancient secrets. Let them reveal the messages the universe has for you.",
+      "cta": "Start Reading",
+      "ctaSecondary": "Create Free Account",
+      "trustBadge": "3 free readings when you sign up - No credit card required"
+    },
+    "howItWorks": {
+      "title": "How does it work?",
+      "subtitle": "Your tarot reading in four simple steps",
+      "step1": {
+        "title": "Choose your spread",
+        "description": "Select from 4 types of spreads based on the depth you seek."
+      },
+      "step2": {
+        "title": "Focus your intention",
+        "description": "Formulate your question or situation with clarity and focus."
+      },
+      "step3": {
+        "title": "Reveal the cards",
+        "description": "The cards are selected and revealed one by one for you."
+      },
+      "step4": {
+        "title": "Receive your guidance",
+        "description": "Get a deep interpretation connecting the cards with your question."
+      }
+    },
+    "features": {
+      "title": "Why choose Arcana",
+      "cards": {
+        "title": "78 Complete Cards",
+        "description": "Traditional Rider-Waite deck with deep interpretations."
+      },
+      "spreads": {
+        "title": "Multiple Spreads",
+        "description": "From the classic 3-card to the powerful 10-card Celtic Cross."
+      },
+      "ai": {
+        "title": "AI Interpretation",
+        "description": "Personalized readings that connect the cards with your question."
+      }
+    },
+    "spreadsSection": {
+      "title": "Spread Types",
+      "subtitle": "From quick consultations to deep analysis, we have the perfect spread for every question.",
+      "viewAll": "View all spreads"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about tarot readings",
+      "q1": "What is a tarot reading?",
+      "a1": "A tarot reading is an ancient practice of self-knowledge where cards act as mirrors of your current situation, helping you reflect on your circumstances, emotions, and possible paths forward. It doesn't predict the future deterministically, but offers perspectives and guidance.",
+      "q2": "How does AI interpretation work?",
+      "a2": "Our AI has been trained with deep knowledge of traditional tarot symbolism. It analyzes the specific combination of cards that appear in your reading, their positions and orientations, to offer you a coherent and personalized interpretation that connects with your original question.",
+      "q3": "Are my readings private?",
+      "a3": "Absolutely. Your readings are completely private and only you can access them. We don't share your information with third parties and you can delete your history at any time. Your spiritual journey is yours alone."
+    },
+    "cta": {
+      "title": "Begin your spiritual journey",
+      "subtitle": "Sign up now and receive 3 free readings. Discover what the cards have in store for you.",
+      "button": "Create Free Account"
+    }
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "name": "Name",
+    "nameOptional": "Name (optional)",
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to your account to continue",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "Start with 3 free readings",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginButton": "Sign In",
+    "registerButton": "Create Account",
+    "termsText": "By signing up you accept our",
+    "termsLink": "terms of service",
+    "andText": "and",
+    "privacyLink": "privacy policy",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with",
+    "forgotPassword": "Forgot your password?",
+    "forgotPasswordTitle": "Reset your password",
+    "forgotPasswordSubtitle": "Enter your email and we'll send you a link to reset your password",
+    "sendResetLink": "Send reset link",
+    "resetLinkSent": "Check your email",
+    "resetLinkSentSubtitle": "If an account exists with that email, we've sent a password reset link.",
+    "backToLogin": "Back to login",
+    "resetPasswordTitle": "Create new password",
+    "resetPasswordSubtitle": "Enter your new password below",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "resetPassword": "Reset password",
+    "passwordResetSuccess": "Password reset successfully",
+    "passwordResetSuccessSubtitle": "You can now log in with your new password",
+    "errors": {
+      "invalidCredentials": "Invalid credentials",
+      "emailExists": "This email is already registered",
+      "weakPassword": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords do not match",
+      "invalidEmail": "Invalid email",
+      "createAccount": "Error creating account",
+      "loginAfterRegister": "Account created but there was an error signing in"
+    }
+  },
+  "dashboard": {
+    "welcome": "Hello, {name}",
+    "welcomeSubtitle": "Welcome to your reading space",
+    "freeReadings": "{count, plural, one {# free reading} other {# free readings}}",
+    "freeReadingsLabel": "Free Readings",
+    "credits": "{count} credits",
+    "creditsLabel": "Credits",
+    "totalReadingsLabel": "Total Readings",
+    "noCredits": "No credits",
+    "buyCredits": "Buy credits",
+    "startNewReading": "Start New Reading",
+    "recentReadings": "Recent Readings",
+    "noReadings": "You haven't done any readings yet",
+    "firstReading": "Start my first reading",
+    "startReading": "New Reading",
+    "viewAll": "View all",
+    "free": "Free"
+  },
+  "reading": {
+    "selectSpread": "Choose Your Spread",
+    "selectSpreadSubtitle": "Select the type of reading that best fits your question",
+    "cards": "{count} cards",
+    "cost": "{count} credit",
+    "costPlural": "{count} credits",
+    "free": "Free",
+    "freeWithReading": "You'll use 1 free reading",
+    "freeReadingsLeft": "{count} free reading{count, plural, one {} other {s}}",
+    "creditsAvailable": "{count} credits available",
+    "intentionTitle": "Your Intention",
+    "intentionSubtitle": "Formulate your question or describe the situation you'd like guidance on. The clearer your intention, the more accurate the reading will be.",
+    "intentionPlaceholder": "E.g.: What do I need to know about my current work situation? / I seek clarity about my relationship...",
+    "intentionHint": "{count} / 10 characters minimum",
+    "intentionTooShort": "Your intention must be at least 10 characters",
+    "startReading": "Start Reading",
+    "changeSpread": "Change spread",
+    "shuffling": "Shuffling the cards...",
+    "shufflingSubtitle": "Focusing on your intention while the cards are being mixed",
+    "revealing": "The Cards are Revealed",
+    "revealingSubtitle": "Watch as each card takes its place...",
+    "allRevealed": "All cards have been revealed",
+    "viewInterpretation": "View Interpretation",
+    "yourReading": "Your Reading",
+    "yourIntention": "Your Intention",
+    "interpretation": "Interpretation",
+    "position": "Position {number}",
+    "positions": "Positions:",
+    "more": "+{count} more",
+    "reversed": "Reversed",
+    "upright": "Upright",
+    "viewSaved": "View Saved Reading",
+    "newReading": "New Reading",
+    "anotherReading": "Do another reading",
+    "backToHistory": "Back to history",
+    "backToSpreads": "Back to spreads",
+    "cardsRevealed": "The Cards Revealed",
+    "meaning": "Meaning:",
+    "needCredits": "Insufficient credits",
+    "needCreditsMessage": "You need {cost} credits for this reading.",
+    "currentCredits": "You currently have {credits} credits",
+    "andFreeReadings": "and {count} free readings",
+    "needMoreCredits": "You need {count} more credits",
+    "buyCreditsQuestion": "Need more credits for advanced readings?",
+    "buyCreditsLink": "Buy credits",
+    "buyCredits": "Buy Credits",
+    "loadError": "Could not load spread type",
+    "createError": "Error creating reading",
+    "viewHistory": "View history",
+    "share": "Share",
+    "shareReading": "Share Reading",
+    "shareDescription": "Make this reading public so others can see it",
+    "makePublic": "Make Public",
+    "makePrivate": "Make Private",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied!",
+    "publicReading": "Public reading",
+    "privateReading": "Private reading",
+    "sharedBy": "Shared by",
+    "anonymous": "Anonymous"
+  },
+  "credits": {
+    "title": "Buy Credits",
+    "subtitle": "Credits allow you to perform tarot readings. Each spread type has a different cost based on its depth.",
+    "currentBalance": "Your current balance",
+    "popular": "Most popular",
+    "creditsUnit": "credits",
+    "readings": "{range} readings",
+    "buy": "Buy",
+    "processing": "Processing...",
+    "securePayment": "Secure payments processed by Stripe",
+    "spreadCosts": {
+      "threeCard": "3 Cards",
+      "simpleCross": "Simple Cross",
+      "horseshoe": "Horseshoe",
+      "celticCross": "Celtic Cross"
+    },
+    "success": {
+      "title": "Payment successful",
+      "subtitle": "Thank you for your purchase. Your credits are now available.",
+      "creditsAdded": "Credits added",
+      "amountPaid": "Amount paid",
+      "startReading": "Start a reading",
+      "viewCredits": "View my credits"
+    },
+    "error": {
+      "title": "Payment error",
+      "subtitle": "We couldn't verify your payment",
+      "sessionNotFound": "Payment session not found",
+      "sessionError": "Error getting session",
+      "verifyError": "Error verifying payment",
+      "retry": "Try again"
+    }
+  },
+  "history": {
+    "title": "Reading History",
+    "readingCount": "{count} reading{count, plural, one {} other {s}} total",
+    "empty": "You don't have any readings yet",
+    "emptyTitle": "You don't have any readings yet",
+    "emptySubtitle": "Begin your spiritual journey with your first tarot reading",
+    "startReading": "Start my first reading",
+    "newReading": "New Reading"
+  },
+  "spreads": {
+    "threeCard": {
+      "name": "Three Cards",
+      "description": "Past, Present, Future"
+    },
+    "simpleCross": {
+      "name": "Simple Cross",
+      "description": "Multidimensional view"
+    },
+    "horseshoe": {
+      "name": "Horseshoe",
+      "description": "Complete path"
+    },
+    "celticCross": {
+      "name": "Celtic Cross",
+      "description": "Deep analysis"
+    }
+  },
+  "footer": {
+    "tagline": "Tarot readings with artificial intelligence",
+    "rights": "All rights reserved",
+    "legal": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "about": "About"
+    }
+  },
+  "legal": {
+    "about": {
+      "title": "About Arcana",
+      "intro": "Arcana is a modern tarot reading platform that combines ancient wisdom with artificial intelligence to provide personalized spiritual guidance.",
+      "mission": {
+        "title": "Our Mission",
+        "content": "We believe that tarot is a powerful tool for self-reflection and personal growth. Our mission is to make this ancient practice accessible to everyone, providing thoughtful interpretations that resonate with your unique situation."
+      },
+      "how": {
+        "title": "How It Works",
+        "content": "Our platform uses advanced AI to analyze the cards drawn in your reading and provide interpretations that connect with your specific question or intention. Each reading is unique and personalized to your situation."
+      },
+      "disclaimer": {
+        "title": "Disclaimer",
+        "content": "Tarot readings are intended for entertainment and self-reflection purposes only. They should not be used as a substitute for professional advice in legal, financial, medical, or psychological matters."
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: December 2024",
+      "acceptance": {
+        "title": "Acceptance of Terms",
+        "content": "By accessing and using Arcana, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service."
+      },
+      "service": {
+        "title": "Service Description",
+        "content": "Arcana provides tarot readings powered by artificial intelligence for entertainment and self-reflection purposes. Our service is not intended to provide professional advice of any kind."
+      },
+      "accounts": {
+        "title": "User Accounts",
+        "content": "You are responsible for maintaining the confidentiality of your account credentials. You agree to notify us immediately of any unauthorized use of your account."
+      },
+      "credits": {
+        "title": "Credits and Payments",
+        "content": "Credits purchased on our platform are non-refundable. Credits do not expire but may be subject to terms updates. Free readings are provided as a promotional offer and may be modified or discontinued at any time."
+      },
+      "conduct": {
+        "title": "User Conduct",
+        "content": "You agree not to misuse our service, attempt to gain unauthorized access to our systems, or use the service for any illegal purposes."
+      },
+      "changes": {
+        "title": "Changes to Terms",
+        "content": "We reserve the right to modify these terms at any time. Continued use of the service after changes constitutes acceptance of the new terms."
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: December 2024",
+      "intro": "Your privacy is important to us. This policy explains how we collect, use, and protect your information.",
+      "collection": {
+        "title": "Information We Collect",
+        "content": "We collect information you provide directly to us, including your email address, name (optional), and the readings you perform. We also collect usage data to improve our service."
+      },
+      "use": {
+        "title": "How We Use Your Information",
+        "content": "We use your information to provide and improve our service, process transactions, send you updates (if you opt-in), and respond to your inquiries."
+      },
+      "storage": {
+        "title": "Data Storage",
+        "content": "Your readings are stored securely and are only accessible to you. We use industry-standard security measures to protect your data."
+      },
+      "sharing": {
+        "title": "Information Sharing",
+        "content": "We do not sell or share your personal information with third parties, except as necessary to provide our service (e.g., payment processing) or as required by law."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "We use cookies to maintain your session and remember your preferences. You can disable cookies in your browser settings, but this may affect the functionality of our service."
+      },
+      "rights": {
+        "title": "Your Rights",
+        "content": "You have the right to access, correct, or delete your personal information. You can also delete your reading history at any time from your account settings."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "content": "If you have any questions about this Privacy Policy, please contact us."
+      }
+    }
+  },
+  "metadata": {
+    "title": "Arcana - AI Tarot Readings",
+    "description": "Discover what the cards have for you. Personalized tarot readings with artificial intelligence."
+  }
+}

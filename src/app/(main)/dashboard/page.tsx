@@ -1,0 +1,258 @@
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { getTranslations, getLocale } from "next-intl/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import {
+  Button,
+  Card,
+  CardContent,
+  Badge,
+} from "@/components/ui";
+
+export default async function DashboardPage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const t = await getTranslations("dashboard");
+  const locale = await getLocale();
+
+  // Fetch user data and recent readings
+  const [user, recentReadings, spreadTypes] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        freeReadingsLeft: true,
+        credits: true,
+        name: true,
+      },
+    }),
+    prisma.reading.findMany({
+      where: { userId: session.user.id },
+      include: { spreadType: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    }),
+    prisma.spreadType.findMany({
+      orderBy: { cardCount: "asc" },
+    }),
+  ]);
+
+  const totalReadings = await prisma.reading.count({
+    where: { userId: session.user.id },
+  });
+
+  const displayName = user?.name || session.user.email?.split("@")[0] || "";
+
+  return (
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* Welcome Section */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-100">
+            {t("welcome", { name: displayName })}
+          </h1>
+          <p className="text-slate-400 mt-1">
+            {t("welcomeSubtitle")}
+          </p>
+        </div>
+        <Link href="/reading/new">
+          <Button size="lg">{t("startReading")}</Button>
+        </Link>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid sm:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-400">{t("freeReadingsLabel")}</p>
+                <p className="text-3xl font-bold text-emerald-400">
+                  {user?.freeReadingsLeft || 0}
+                </p>
+              </div>
+              <div className="text-4xl text-emerald-400/30">&#10022;</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-400">{t("creditsLabel")}</p>
+                <p className="text-3xl font-bold text-amber-400">
+                  {user?.credits || 0}
+                </p>
+              </div>
+              <div className="text-4xl text-amber-400/30">&#9733;</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-400">{t("totalReadingsLabel")}</p>
+                <p className="text-3xl font-bold text-purple-400">
+                  {totalReadings}
+                </p>
+              </div>
+              <div className="text-4xl text-purple-400/30">&#9788;</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions - Spread Types */}
+      <section>
+        <h2 className="text-xl font-semibold text-slate-100 mb-4">
+          {t("startNewReading")}
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {spreadTypes.map((spread) => {
+            const canAfford =
+              (user?.freeReadingsLeft || 0) > 0 ||
+              (user?.credits || 0) >= spread.creditCost;
+
+            const spreadName = locale === "en" ? spread.name : spread.nameEs;
+            const spreadDescription = locale === "en" ? spread.description : spread.descriptionEs;
+
+            return (
+              <Link key={spread.id} href={`/reading/new?spread=${spread.id}`}>
+                <Card
+                  variant="interactive"
+                  className={!canAfford ? "opacity-50" : ""}
+                >
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex gap-1">
+                        {Array.from({
+                          length: Math.min(spread.cardCount, 5),
+                        }).map((_, i) => (
+                          <div
+                            key={i}
+                            className="w-4 h-6 bg-gradient-to-b from-purple-700/50 to-purple-900/50 rounded-sm border border-purple-500/30"
+                          />
+                        ))}
+                        {spread.cardCount > 5 && (
+                          <span className="text-xs text-slate-500">
+                            +{spread.cardCount - 5}
+                          </span>
+                        )}
+                      </div>
+                      <Badge
+                        variant={
+                          (user?.freeReadingsLeft || 0) > 0
+                            ? "success"
+                            : "secondary"
+                        }
+                      >
+                        {(user?.freeReadingsLeft || 0) > 0
+                          ? t("free")
+                          : `${spread.creditCost} cr`}
+                      </Badge>
+                    </div>
+                    <h3 className="font-medium text-slate-100">
+                      {spreadName}
+                    </h3>
+                    <p className="text-sm text-slate-400 mt-1 line-clamp-2">
+                      {spreadDescription}
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Recent Readings */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-slate-100">
+            {t("recentReadings")}
+          </h2>
+          {totalReadings > 3 && (
+            <Link href="/history">
+              <Button variant="ghost" size="sm">
+                {t("viewAll")}
+              </Button>
+            </Link>
+          )}
+        </div>
+
+        {recentReadings.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <div className="text-5xl text-slate-700 mb-4">&#9788;</div>
+              <p className="text-slate-400">
+                {t("noReadings")}
+              </p>
+              <Link href="/reading/new" className="inline-block mt-4">
+                <Button variant="secondary">{t("firstReading")}</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4">
+            {recentReadings.map((reading) => {
+              const spreadName = locale === "en" ? reading.spreadType.name : reading.spreadType.nameEs;
+
+              return (
+                <Link key={reading.id} href={`/reading/${reading.id}`}>
+                  <Card variant="interactive">
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="primary">
+                              {spreadName}
+                            </Badge>
+                            <span className="text-xs text-slate-500">
+                              {new Date(reading.createdAt).toLocaleDateString(
+                                locale === "en" ? "en-US" : "es-ES",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}
+                            </span>
+                          </div>
+                          <p className="text-slate-300 line-clamp-2">
+                            {reading.intention}
+                          </p>
+                        </div>
+                        <div className="text-slate-500">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

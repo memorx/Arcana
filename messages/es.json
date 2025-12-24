@@ -1,0 +1,361 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salio mal",
+    "back": "Volver",
+    "continue": "Continuar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar"
+  },
+  "nav": {
+    "home": "Inicio",
+    "dashboard": "Mi espacio",
+    "newReading": "Nueva lectura",
+    "history": "Historial",
+    "credits": "Creditos",
+    "login": "Iniciar sesion",
+    "register": "Registrarse",
+    "logout": "Cerrar sesion"
+  },
+  "landing": {
+    "hero": {
+      "title": "Descubre tu destino",
+      "subtitle": "Las cartas del tarot guardan secretos ancestrales. Deja que revelen los mensajes que el universo tiene para ti.",
+      "cta": "Comenzar Lectura",
+      "ctaSecondary": "Crear Cuenta Gratis",
+      "trustBadge": "3 lecturas gratuitas al registrarte - Sin tarjeta de credito"
+    },
+    "howItWorks": {
+      "title": "Como funciona?",
+      "subtitle": "Tu lectura de tarot en cuatro simples pasos",
+      "step1": {
+        "title": "Elige tu tirada",
+        "description": "Selecciona entre 4 tipos de tiradas segun la profundidad que busques."
+      },
+      "step2": {
+        "title": "Enfoca tu intencion",
+        "description": "Formula tu pregunta o situacion con claridad y concentracion."
+      },
+      "step3": {
+        "title": "Revela las cartas",
+        "description": "Las cartas se seleccionan y revelan una a una para ti."
+      },
+      "step4": {
+        "title": "Recibe tu guia",
+        "description": "Obten una interpretacion profunda que conecta las cartas con tu pregunta."
+      }
+    },
+    "features": {
+      "title": "Por que elegir Arcana",
+      "cards": {
+        "title": "78 Cartas Completas",
+        "description": "Mazo tradicional Rider-Waite con interpretaciones profundas en espanol."
+      },
+      "spreads": {
+        "title": "Multiples Tiradas",
+        "description": "Desde la clasica de 3 cartas hasta la poderosa Cruz Celta de 10."
+      },
+      "ai": {
+        "title": "IA Interpretativa",
+        "description": "Lecturas personalizadas que conectan las cartas con tu pregunta."
+      }
+    },
+    "spreadsSection": {
+      "title": "Tipos de Tirada",
+      "subtitle": "Desde consultas rapidas hasta analisis profundos, tenemos la tirada perfecta para cada pregunta.",
+      "viewAll": "Ver todas las tiradas"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Todo lo que necesitas saber sobre las lecturas de tarot",
+      "q1": "Que es una lectura de tarot?",
+      "a1": "Una lectura de tarot es una practica ancestral de autoconocimiento donde las cartas actuan como espejos de tu situacion actual, ayudandote a reflexionar sobre tus circunstancias, emociones y posibles caminos a seguir. No predice el futuro de forma determinista, sino que ofrece perspectivas y guia.",
+      "q2": "Como funciona la interpretacion con IA?",
+      "a2": "Nuestra IA ha sido entrenada con conocimiento profundo del simbolismo del tarot tradicional. Analiza la combinacion especifica de cartas que aparecen en tu lectura, sus posiciones y orientaciones, para ofrecerte una interpretacion coherente y personalizada que conecta con tu pregunta original.",
+      "q3": "Mis lecturas son privadas?",
+      "a3": "Absolutamente. Tus lecturas son completamente privadas y solo tu puedes acceder a ellas. No compartimos tu informacion con terceros y puedes eliminar tu historial en cualquier momento. Tu viaje espiritual es solo tuyo."
+    },
+    "cta": {
+      "title": "Comienza tu viaje espiritual",
+      "subtitle": "Registrate ahora y recibe 3 lecturas gratuitas. Descubre lo que las cartas tienen preparado para ti.",
+      "button": "Crear Cuenta Gratis"
+    }
+  },
+  "auth": {
+    "email": "Correo electronico",
+    "password": "Contrasena",
+    "confirmPassword": "Confirmar contrasena",
+    "name": "Nombre",
+    "nameOptional": "Nombre (opcional)",
+    "loginTitle": "Bienvenido de vuelta",
+    "loginSubtitle": "Ingresa a tu cuenta para continuar",
+    "registerTitle": "Crea tu cuenta",
+    "registerSubtitle": "Comienza con 3 lecturas gratuitas",
+    "noAccount": "No tienes cuenta?",
+    "hasAccount": "Ya tienes cuenta?",
+    "loginButton": "Iniciar Sesion",
+    "registerButton": "Crear Cuenta",
+    "termsText": "Al registrarte aceptas nuestros",
+    "termsLink": "terminos de servicio",
+    "andText": "y",
+    "privacyLink": "politica de privacidad",
+    "continueWithGoogle": "Continuar con Google",
+    "orContinueWith": "o continuar con",
+    "forgotPassword": "Olvidaste tu contrasena?",
+    "forgotPasswordTitle": "Recupera tu contrasena",
+    "forgotPasswordSubtitle": "Ingresa tu email y te enviaremos un enlace para restablecer tu contrasena",
+    "sendResetLink": "Enviar enlace",
+    "resetLinkSent": "Revisa tu email",
+    "resetLinkSentSubtitle": "Si existe una cuenta con ese email, hemos enviado un enlace para restablecer tu contrasena.",
+    "backToLogin": "Volver al login",
+    "resetPasswordTitle": "Crea una nueva contrasena",
+    "resetPasswordSubtitle": "Ingresa tu nueva contrasena a continuacion",
+    "newPassword": "Nueva contrasena",
+    "confirmNewPassword": "Confirmar nueva contrasena",
+    "resetPassword": "Restablecer contrasena",
+    "passwordResetSuccess": "Contrasena restablecida",
+    "passwordResetSuccessSubtitle": "Ya puedes iniciar sesion con tu nueva contrasena",
+    "errors": {
+      "invalidCredentials": "Credenciales invalidas",
+      "emailExists": "Este email ya esta registrado",
+      "weakPassword": "La contrasena debe tener al menos 6 caracteres",
+      "passwordMismatch": "Las contrasenas no coinciden",
+      "invalidEmail": "Email invalido",
+      "createAccount": "Error al crear la cuenta",
+      "loginAfterRegister": "Cuenta creada pero hubo un error al iniciar sesion"
+    }
+  },
+  "dashboard": {
+    "welcome": "Hola, {name}",
+    "welcomeSubtitle": "Bienvenido a tu espacio de lecturas",
+    "freeReadings": "{count, plural, one {# lectura gratis} other {# lecturas gratis}}",
+    "freeReadingsLabel": "Lecturas Gratis",
+    "credits": "{count} creditos",
+    "creditsLabel": "Creditos",
+    "totalReadingsLabel": "Total Lecturas",
+    "noCredits": "Sin creditos",
+    "buyCredits": "Comprar creditos",
+    "startNewReading": "Iniciar Nueva Lectura",
+    "recentReadings": "Lecturas Recientes",
+    "noReadings": "Aun no has realizado ninguna lectura",
+    "firstReading": "Hacer mi primera lectura",
+    "startReading": "Nueva Lectura",
+    "viewAll": "Ver todas",
+    "free": "Gratis"
+  },
+  "reading": {
+    "selectSpread": "Elige tu Tirada",
+    "selectSpreadSubtitle": "Selecciona el tipo de lectura que mejor se adapte a tu pregunta",
+    "cards": "{count} cartas",
+    "cost": "{count} credito",
+    "costPlural": "{count} creditos",
+    "free": "Gratis",
+    "freeWithReading": "Usaras 1 lectura gratis",
+    "freeReadingsLeft": "{count} lectura{count, plural, one {} other {s}} gratis",
+    "creditsAvailable": "{count} creditos disponibles",
+    "intentionTitle": "Tu Intencion",
+    "intentionSubtitle": "Formula tu pregunta o describe la situacion sobre la que deseas recibir guia. Cuanto mas clara sea tu intencion, mas precisa sera la lectura.",
+    "intentionPlaceholder": "Ej: Que necesito saber sobre mi situacion laboral actual? / Busco claridad sobre mi relacion...",
+    "intentionHint": "{count} / 10 caracteres minimo",
+    "intentionTooShort": "Tu intencion debe tener al menos 10 caracteres",
+    "startReading": "Comenzar Lectura",
+    "changeSpread": "Cambiar tirada",
+    "shuffling": "Barajando las cartas...",
+    "shufflingSubtitle": "Concentrandote en tu intencion mientras las cartas se mezclan",
+    "revealing": "Las Cartas se Revelan",
+    "revealingSubtitle": "Observa como cada carta toma su lugar...",
+    "allRevealed": "Todas las cartas han sido reveladas",
+    "viewInterpretation": "Ver Interpretacion",
+    "yourReading": "Tu Lectura",
+    "yourIntention": "Tu Intencion",
+    "interpretation": "Interpretacion",
+    "position": "Posicion {number}",
+    "positions": "Posiciones:",
+    "more": "+{count} mas",
+    "reversed": "Invertida",
+    "upright": "Al derecho",
+    "viewSaved": "Ver Lectura Guardada",
+    "newReading": "Nueva Lectura",
+    "anotherReading": "Hacer otra lectura",
+    "backToHistory": "Volver al historial",
+    "backToSpreads": "Volver a tiradas",
+    "cardsRevealed": "Las Cartas Reveladas",
+    "meaning": "Significado:",
+    "needCredits": "Creditos insuficientes",
+    "needCreditsMessage": "Necesitas {cost} creditos para esta lectura.",
+    "currentCredits": "Actualmente tienes {credits} creditos",
+    "andFreeReadings": "y {count} lecturas gratis",
+    "needMoreCredits": "Necesitas {count} creditos mas",
+    "buyCreditsQuestion": "Necesitas mas creditos para hacer lecturas avanzadas?",
+    "buyCreditsLink": "Comprar creditos",
+    "buyCredits": "Comprar Creditos",
+    "loadError": "No se pudo cargar el tipo de tirada",
+    "createError": "Error al crear la lectura",
+    "viewHistory": "Ver historial",
+    "share": "Compartir",
+    "shareReading": "Compartir Lectura",
+    "shareDescription": "Haz publica esta lectura para que otros puedan verla",
+    "makePublic": "Hacer Publica",
+    "makePrivate": "Hacer Privada",
+    "copyLink": "Copiar Enlace",
+    "linkCopied": "Enlace copiado!",
+    "publicReading": "Lectura publica",
+    "privateReading": "Lectura privada",
+    "sharedBy": "Compartido por",
+    "anonymous": "Anonimo"
+  },
+  "credits": {
+    "title": "Comprar Creditos",
+    "subtitle": "Los creditos te permiten realizar lecturas de tarot. Cada tipo de tirada tiene un costo diferente segun su profundidad.",
+    "currentBalance": "Tu balance actual",
+    "popular": "Mas popular",
+    "creditsUnit": "creditos",
+    "readings": "{range} lecturas",
+    "buy": "Comprar",
+    "processing": "Procesando...",
+    "securePayment": "Pagos seguros procesados por Stripe",
+    "spreadCosts": {
+      "threeCard": "3 Cartas",
+      "simpleCross": "Cruz Simple",
+      "horseshoe": "Herradura",
+      "celticCross": "Cruz Celta"
+    },
+    "success": {
+      "title": "Pago exitoso",
+      "subtitle": "Gracias por tu compra. Tus creditos ya estan disponibles.",
+      "creditsAdded": "Creditos agregados",
+      "amountPaid": "Monto pagado",
+      "startReading": "Hacer una lectura",
+      "viewCredits": "Ver mis creditos"
+    },
+    "error": {
+      "title": "Error en el pago",
+      "subtitle": "No pudimos verificar tu pago",
+      "sessionNotFound": "No se encontro la sesion de pago",
+      "sessionError": "Error al obtener sesion",
+      "verifyError": "Error al verificar el pago",
+      "retry": "Volver a intentar"
+    }
+  },
+  "history": {
+    "title": "Historial de Lecturas",
+    "readingCount": "{count} lectura{count, plural, one {} other {s}} en total",
+    "empty": "No tienes lecturas aun",
+    "emptyTitle": "No tienes lecturas aun",
+    "emptySubtitle": "Comienza tu viaje espiritual con tu primera lectura de tarot",
+    "startReading": "Hacer mi primera lectura",
+    "newReading": "Nueva Lectura"
+  },
+  "spreads": {
+    "threeCard": {
+      "name": "Tres Cartas",
+      "description": "Pasado, Presente, Futuro"
+    },
+    "simpleCross": {
+      "name": "Cruz Simple",
+      "description": "Vision multidimensional"
+    },
+    "horseshoe": {
+      "name": "Herradura",
+      "description": "Camino completo"
+    },
+    "celticCross": {
+      "name": "Cruz Celta",
+      "description": "Analisis profundo"
+    }
+  },
+  "footer": {
+    "tagline": "Lecturas de tarot con inteligencia artificial",
+    "rights": "Todos los derechos reservados",
+    "legal": {
+      "privacy": "Privacidad",
+      "terms": "Terminos",
+      "about": "Nosotros"
+    }
+  },
+  "legal": {
+    "about": {
+      "title": "Sobre Arcana",
+      "intro": "Arcana es una plataforma moderna de lecturas de tarot que combina la sabiduria ancestral con inteligencia artificial para ofrecer guia espiritual personalizada.",
+      "mission": {
+        "title": "Nuestra Mision",
+        "content": "Creemos que el tarot es una herramienta poderosa para la reflexion personal y el crecimiento. Nuestra mision es hacer esta practica ancestral accesible para todos, proporcionando interpretaciones profundas que resuenen con tu situacion unica."
+      },
+      "how": {
+        "title": "Como Funciona",
+        "content": "Nuestra plataforma utiliza IA avanzada para analizar las cartas de tu lectura y proporcionar interpretaciones que conecten con tu pregunta o intencion especifica. Cada lectura es unica y personalizada para tu situacion."
+      },
+      "disclaimer": {
+        "title": "Aviso Legal",
+        "content": "Las lecturas de tarot estan destinadas unicamente a fines de entretenimiento y reflexion personal. No deben utilizarse como sustituto de asesoramiento profesional en asuntos legales, financieros, medicos o psicologicos."
+      }
+    },
+    "terms": {
+      "title": "Terminos de Servicio",
+      "lastUpdated": "Ultima actualizacion: Diciembre 2024",
+      "acceptance": {
+        "title": "Aceptacion de Terminos",
+        "content": "Al acceder y utilizar Arcana, aceptas estar sujeto a estos Terminos de Servicio. Si no estas de acuerdo con estos terminos, por favor no utilices nuestro servicio."
+      },
+      "service": {
+        "title": "Descripcion del Servicio",
+        "content": "Arcana ofrece lecturas de tarot impulsadas por inteligencia artificial con fines de entretenimiento y reflexion personal. Nuestro servicio no esta destinado a proporcionar asesoramiento profesional de ningun tipo."
+      },
+      "accounts": {
+        "title": "Cuentas de Usuario",
+        "content": "Eres responsable de mantener la confidencialidad de tus credenciales de cuenta. Aceptas notificarnos inmediatamente sobre cualquier uso no autorizado de tu cuenta."
+      },
+      "credits": {
+        "title": "Creditos y Pagos",
+        "content": "Los creditos comprados en nuestra plataforma no son reembolsables. Los creditos no expiran pero pueden estar sujetos a actualizaciones de terminos. Las lecturas gratuitas se proporcionan como oferta promocional y pueden modificarse o discontinuarse en cualquier momento."
+      },
+      "conduct": {
+        "title": "Conducta del Usuario",
+        "content": "Aceptas no hacer mal uso de nuestro servicio, intentar obtener acceso no autorizado a nuestros sistemas o utilizar el servicio para fines ilegales."
+      },
+      "changes": {
+        "title": "Cambios en los Terminos",
+        "content": "Nos reservamos el derecho de modificar estos terminos en cualquier momento. El uso continuado del servicio despues de los cambios constituye la aceptacion de los nuevos terminos."
+      }
+    },
+    "privacy": {
+      "title": "Politica de Privacidad",
+      "lastUpdated": "Ultima actualizacion: Diciembre 2024",
+      "intro": "Tu privacidad es importante para nosotros. Esta politica explica como recopilamos, usamos y protegemos tu informacion.",
+      "collection": {
+        "title": "Informacion que Recopilamos",
+        "content": "Recopilamos la informacion que nos proporcionas directamente, incluyendo tu direccion de correo electronico, nombre (opcional) y las lecturas que realizas. Tambien recopilamos datos de uso para mejorar nuestro servicio."
+      },
+      "use": {
+        "title": "Como Usamos tu Informacion",
+        "content": "Utilizamos tu informacion para proporcionar y mejorar nuestro servicio, procesar transacciones, enviarte actualizaciones (si lo deseas) y responder a tus consultas."
+      },
+      "storage": {
+        "title": "Almacenamiento de Datos",
+        "content": "Tus lecturas se almacenan de forma segura y solo tu puedes acceder a ellas. Utilizamos medidas de seguridad estandar de la industria para proteger tus datos."
+      },
+      "sharing": {
+        "title": "Compartir Informacion",
+        "content": "No vendemos ni compartimos tu informacion personal con terceros, excepto cuando sea necesario para proporcionar nuestro servicio (por ejemplo, procesamiento de pagos) o segun lo requiera la ley."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "Utilizamos cookies para mantener tu sesion y recordar tus preferencias. Puedes desactivar las cookies en la configuracion de tu navegador, pero esto puede afectar la funcionalidad de nuestro servicio."
+      },
+      "rights": {
+        "title": "Tus Derechos",
+        "content": "Tienes derecho a acceder, corregir o eliminar tu informacion personal. Tambien puedes eliminar tu historial de lecturas en cualquier momento desde la configuracion de tu cuenta."
+      },
+      "contact": {
+        "title": "Contactanos",
+        "content": "Si tienes alguna pregunta sobre esta Politica de Privacidad, por favor contactanos."
+      }
+    }
+  },
+  "metadata": {
+    "title": "Arcana - Lecturas de Tarot con IA",
+    "description": "Descubre lo que las cartas tienen para ti. Lecturas de tarot personalizadas con inteligencia artificial."
+  }
+}
