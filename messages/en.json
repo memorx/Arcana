@@ -514,5 +514,16 @@
     "limit": "Maximum 10 referrals per user",
     "loginRequired": "Login Required",
     "loginRequiredDesc": "Please log in to access your referral link"
+  },
+  "blog": {
+    "title": "Tarot Insights & Guides",
+    "subtitle": "Learn about tarot reading, card meanings, and spiritual guidance",
+    "article": "Article",
+    "readMore": "Read more",
+    "noPosts": "No articles published yet. Check back soon!",
+    "backToBlog": "Back to blog",
+    "ctaTitle": "Ready for Your Reading?",
+    "ctaDescription": "Put your knowledge into practice with a personalized tarot reading",
+    "ctaButton": "Start Free Reading"
   }
 }

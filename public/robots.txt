@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Disallow private/dynamic pages
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /reading/
+Disallow: /history
+Disallow: /profile/
+Disallow: /credits
+Disallow: /daily
+Disallow: /referral
+
+# Allow specific API routes for SEO
+Allow: /api/health
+
+# Sitemap location
+Sitemap: https://www.readarcana.com/sitemap.xml

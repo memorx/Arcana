@@ -514,5 +514,16 @@
     "limit": "Maximo 10 referidos por usuario",
     "loginRequired": "Inicio de Sesion Requerido",
     "loginRequiredDesc": "Por favor inicia sesion para acceder a tu enlace de referidos"
+  },
+  "blog": {
+    "title": "Guias e Insights del Tarot",
+    "subtitle": "Aprende sobre lectura del tarot, significados de cartas y guia espiritual",
+    "article": "Articulo",
+    "readMore": "Leer mas",
+    "noPosts": "Aun no hay articulos publicados. Vuelve pronto!",
+    "backToBlog": "Volver al blog",
+    "ctaTitle": "Listo para tu Lectura?",
+    "ctaDescription": "Pon tu conocimiento en practica con una lectura de tarot personalizada",
+    "ctaButton": "Comenzar Lectura Gratis"
   }
 }

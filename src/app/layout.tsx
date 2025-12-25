@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/providers";
@@ -69,6 +70,17 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        {/* Plausible Analytics - Privacy-friendly */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <Script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+            strategy="afterInteractive"
+          />
+        )}
+      </head>
       <body className="antialiased min-h-screen flex flex-col">
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
