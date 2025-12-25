@@ -3,8 +3,15 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTarotInterpretation } from "@/lib/anthropic";
 import { updateStreak } from "@/lib/streak";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 5 readings per minute per user
+  const { success, resetIn } = rateLimit(req, 5, 60000);
+  if (!success) {
+    return rateLimitResponse(resetIn);
+  }
+
   try {
     // Verify authentication
     const session = await auth();

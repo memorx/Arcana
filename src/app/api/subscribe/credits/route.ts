@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getSubscriptionPlanById } from "@/lib/pricing";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 3 attempts per minute
+  const { success, resetIn } = rateLimit(req, 3, 60000);
+  if (!success) {
+    return rateLimitResponse(resetIn);
+  }
+
   try {
     const session = await auth();
     if (!session?.user?.id) {

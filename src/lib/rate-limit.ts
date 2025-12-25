@@ -1,110 +1,76 @@
-// Simple in-memory rate limiter (for production, use Redis with @upstash/ratelimit)
+import { NextRequest } from "next/server";
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
+// Simple in-memory rate limiter
+// For production with multiple instances, use Redis
+const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
 
-const rateLimitStore = new Map<string, RateLimitEntry>();
-
-interface RateLimitConfig {
-  maxRequests: number;
-  windowMs: number;
-}
-
-const configs: Record<string, RateLimitConfig> = {
-  reading: { maxRequests: 10, windowMs: 60 * 60 * 1000 }, // 10 per hour
-  register: { maxRequests: 5, windowMs: 60 * 60 * 1000 }, // 5 per hour
-  api: { maxRequests: 100, windowMs: 60 * 1000 }, // 100 per minute
-};
-
-export function rateLimit(
-  identifier: string,
-  type: keyof typeof configs = "api"
-): { success: boolean; remaining: number; resetAt: number } {
-  const config = configs[type];
-  const now = Date.now();
-  const key = `${type}:${identifier}`;
-
-  // Clean up expired entries periodically
-  if (Math.random() < 0.01) {
-    for (const [k, v] of rateLimitStore.entries()) {
-      if (v.resetAt < now) {
-        rateLimitStore.delete(k);
+// Clean up old entries every 5 minutes
+if (typeof setInterval !== "undefined") {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now - value.lastReset > 300000) {
+        rateLimitMap.delete(key);
       }
     }
+  }, 300000);
+}
+
+export interface RateLimitResult {
+  success: boolean;
+  remaining: number;
+  resetIn: number;
+}
+
+export function rateLimit(
+  request: NextRequest,
+  limit: number = 10,
+  windowMs: number = 60000
+): RateLimitResult {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "anonymous";
+
+  const key = `${ip}:${request.nextUrl.pathname}`;
+  const now = Date.now();
+
+  const record = rateLimitMap.get(key);
+
+  if (!record || now - record.lastReset > windowMs) {
+    rateLimitMap.set(key, { count: 1, lastReset: now });
+    return { success: true, remaining: limit - 1, resetIn: windowMs };
   }
 
-  const entry = rateLimitStore.get(key);
-
-  if (!entry || entry.resetAt < now) {
-    // New window
-    rateLimitStore.set(key, {
-      count: 1,
-      resetAt: now + config.windowMs,
-    });
-    return {
-      success: true,
-      remaining: config.maxRequests - 1,
-      resetAt: now + config.windowMs,
-    };
-  }
-
-  if (entry.count >= config.maxRequests) {
+  if (record.count >= limit) {
     return {
       success: false,
       remaining: 0,
-      resetAt: entry.resetAt,
+      resetIn: windowMs - (now - record.lastReset),
     };
   }
 
-  entry.count++;
+  record.count++;
   return {
     success: true,
-    remaining: config.maxRequests - entry.count,
-    resetAt: entry.resetAt,
+    remaining: limit - record.count,
+    resetIn: windowMs - (now - record.lastReset),
   };
 }
 
-// Helper to get client IP from request
-export function getClientIP(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-  const realIP = request.headers.get("x-real-ip");
-  if (realIP) {
-    return realIP;
-  }
-  return "unknown";
-}
-
-// Middleware helper for rate limiting
-export function checkRateLimit(
-  request: Request,
-  type: keyof typeof configs = "api"
-) {
-  const ip = getClientIP(request);
-  const result = rateLimit(ip, type);
-
-  if (!result.success) {
-    return {
-      limited: true,
+// Helper for API responses
+export function rateLimitResponse(resetIn: number) {
+  return new Response(
+    JSON.stringify({
+      error: "Too many requests. Please try again later.",
+      retryAfter: Math.ceil(resetIn / 1000),
+    }),
+    {
+      status: 429,
       headers: {
-        "X-RateLimit-Limit": configs[type].maxRequests.toString(),
-        "X-RateLimit-Remaining": "0",
-        "X-RateLimit-Reset": result.resetAt.toString(),
-        "Retry-After": Math.ceil((result.resetAt - Date.now()) / 1000).toString(),
+        "Content-Type": "application/json",
+        "Retry-After": String(Math.ceil(resetIn / 1000)),
       },
-    };
-  }
-
-  return {
-    limited: false,
-    headers: {
-      "X-RateLimit-Limit": configs[type].maxRequests.toString(),
-      "X-RateLimit-Remaining": result.remaining.toString(),
-      "X-RateLimit-Reset": result.resetAt.toString(),
-    },
-  };
+    }
+  );
 }

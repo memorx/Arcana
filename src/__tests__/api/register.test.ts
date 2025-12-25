@@ -4,6 +4,12 @@
 import { POST } from "@/app/api/auth/register/route";
 import { NextRequest } from "next/server";
 
+// Mock rate limit
+jest.mock("@/lib/rate-limit", () => ({
+  rateLimit: jest.fn().mockReturnValue({ success: true, remaining: 9, resetIn: 60000 }),
+  rateLimitResponse: jest.fn(),
+}));
+
 // Mock Prisma
 jest.mock("@/lib/prisma", () => ({
   prisma: {

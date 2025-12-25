@@ -6,11 +6,15 @@ import { cn } from "@/lib/utils";
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  hint?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, type = "text", id, ...props }, ref) => {
+  ({ className, label, error, hint, type = "text", id, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
+    const errorId = error ? `${inputId}-error` : undefined;
+    const hintId = hint ? `${inputId}-hint` : undefined;
+    const describedBy = [errorId, hintId].filter(Boolean).join(" ") || undefined;
 
     return (
       <div className="w-full">
@@ -26,6 +30,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           type={type}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
           className={cn(
             "w-full px-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg",
             "text-slate-100 placeholder:text-slate-500",
@@ -36,8 +42,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           {...props}
         />
+        {hint && !error && (
+          <p id={hintId} className="mt-1.5 text-sm text-slate-500">
+            {hint}
+          </p>
+        )}
         {error && (
-          <p className="mt-1.5 text-sm text-red-400">{error}</p>
+          <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-400">
+            {error}
+          </p>
         )}
       </div>
     );

@@ -82,6 +82,14 @@ export default async function RootLayout({
         )}
       </head>
       <body className="antialiased min-h-screen flex flex-col">
+        {/* Skip Link for Accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+        >
+          {locale === "es" ? "Saltar al contenido" : "Skip to content"}
+        </a>
+
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
