@@ -361,5 +361,70 @@
   "metadata": {
     "title": "Arcana - Lecturas de Tarot con IA",
     "description": "Descubre lo que las cartas tienen para ti. Lecturas de tarot personalizadas con inteligencia artificial."
+  },
+  "subscribe": {
+    "title": "Oraculo Diario",
+    "subtitle": "Tu carta del dia, cada manana en tu inbox",
+    "description": "Recibe una carta de tarot personalizada cada dia, interpretada especificamente para tu signo zodiacal y area de enfoque.",
+    "price": "$3.99/mes",
+    "features": {
+      "personalized": "Personalizada a tu signo zodiacal",
+      "focusArea": "Alineada con tu area de vida",
+      "freeReading": "1 lectura completa gratis al mes",
+      "cancelAnytime": "Cancela cuando quieras"
+    },
+    "cta": "Comenzar mi Oraculo",
+    "setupFirst": "Completa tu perfil para personalizar tus lecturas",
+    "alreadySubscribed": "Ya estas suscrito!",
+    "manageSubscription": "Gestionar Suscripcion",
+    "cancelSubscription": "Cancelar Suscripcion",
+    "reactivate": "Reactivar",
+    "activeUntil": "Activa hasta {date}",
+    "success": {
+      "title": "Bienvenido al Oraculo Diario!",
+      "subtitle": "Tu suscripcion ya esta activa",
+      "nextSteps": "Recibiras tu primera carta diaria manana a tu hora preferida.",
+      "goToDaily": "Ver la carta de hoy"
+    }
+  },
+  "profile": {
+    "title": "Completa tu Perfil",
+    "subtitle": "Ayudanos a personalizar tus lecturas diarias",
+    "fullName": "Nombre Completo",
+    "fullNamePlaceholder": "Tu nombre completo",
+    "birthDate": "Fecha de Nacimiento",
+    "birthTime": "Hora de Nacimiento (opcional)",
+    "birthTimeTooltip": "Se usa para calcular tu ascendente y lecturas aun mas personalizadas",
+    "focusArea": "Area de Enfoque",
+    "focusAreaDescription": "En que area de tu vida te gustaria recibir guia?",
+    "emailTime": "Hora del Email",
+    "emailTimeDescription": "A que hora te gustaria recibir tu carta diaria?",
+    "zodiacSign": "Tu Signo Zodiacal",
+    "save": "Guardar Perfil",
+    "saving": "Guardando...",
+    "saved": "Perfil guardado!",
+    "continue": "Continuar a Suscripcion",
+    "focusAreas": {
+      "general": "Guia General",
+      "love": "Amor y Relaciones",
+      "career": "Carrera y Finanzas",
+      "spirituality": "Espiritualidad y Crecimiento",
+      "health": "Salud y Bienestar"
+    }
+  },
+  "daily": {
+    "title": "Tu Carta Diaria",
+    "todayCard": "Carta de Hoy",
+    "noCardYet": "Tu carta de hoy aun no ha sido sacada",
+    "cardWillArrive": "Llegara a las {time} a tu inbox",
+    "viewInterpretation": "Ver Interpretacion Completa",
+    "history": "Cartas Recientes",
+    "last7days": "Ultimos 7 dias",
+    "noSubscription": "Suscribete al Oraculo Diario",
+    "noSubscriptionDesc": "Recibe cartas diarias personalizadas en tu inbox",
+    "subscribeNow": "Suscribirme",
+    "preview": "Vista Previa",
+    "reversed": "Invertida",
+    "sentAt": "Enviada a las {time}"
   }
 }

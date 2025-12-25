@@ -361,5 +361,70 @@
   "metadata": {
     "title": "Arcana - AI Tarot Readings",
     "description": "Discover what the cards have for you. Personalized tarot readings with artificial intelligence."
+  },
+  "subscribe": {
+    "title": "Daily Oracle",
+    "subtitle": "Your daily card, every morning in your inbox",
+    "description": "Receive a personalized tarot card each day, interpreted specifically for your zodiac sign and life focus.",
+    "price": "$3.99/month",
+    "features": {
+      "personalized": "Personalized to your zodiac sign",
+      "focusArea": "Aligned with your life focus",
+      "freeReading": "1 free complete reading per month",
+      "cancelAnytime": "Cancel anytime"
+    },
+    "cta": "Start my Oracle",
+    "setupFirst": "Complete your profile to personalize your readings",
+    "alreadySubscribed": "You're subscribed!",
+    "manageSubscription": "Manage Subscription",
+    "cancelSubscription": "Cancel Subscription",
+    "reactivate": "Reactivate",
+    "activeUntil": "Active until {date}",
+    "success": {
+      "title": "Welcome to Daily Oracle!",
+      "subtitle": "Your subscription is now active",
+      "nextSteps": "You'll receive your first daily card tomorrow at your preferred time.",
+      "goToDaily": "See today's card"
+    }
+  },
+  "profile": {
+    "title": "Complete Your Profile",
+    "subtitle": "Help us personalize your daily readings",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Your full name",
+    "birthDate": "Birth Date",
+    "birthTime": "Birth Time (optional)",
+    "birthTimeTooltip": "Used to calculate your rising sign for even more personalized readings",
+    "focusArea": "Life Focus",
+    "focusAreaDescription": "What area of life would you like guidance on?",
+    "emailTime": "Preferred Email Time",
+    "emailTimeDescription": "When would you like to receive your daily card?",
+    "zodiacSign": "Your Zodiac Sign",
+    "save": "Save Profile",
+    "saving": "Saving...",
+    "saved": "Profile saved!",
+    "continue": "Continue to Subscribe",
+    "focusAreas": {
+      "general": "General Guidance",
+      "love": "Love & Relationships",
+      "career": "Career & Finances",
+      "spirituality": "Spirituality & Growth",
+      "health": "Health & Wellness"
+    }
+  },
+  "daily": {
+    "title": "Your Daily Card",
+    "todayCard": "Today's Card",
+    "noCardYet": "Your card for today hasn't been drawn yet",
+    "cardWillArrive": "It will arrive at {time} in your inbox",
+    "viewInterpretation": "View Full Interpretation",
+    "history": "Recent Cards",
+    "last7days": "Last 7 days",
+    "noSubscription": "Subscribe to Daily Oracle",
+    "noSubscriptionDesc": "Get personalized daily cards delivered to your inbox",
+    "subscribeNow": "Subscribe Now",
+    "preview": "Preview",
+    "reversed": "Reversed",
+    "sentAt": "Sent at {time}"
   }
 }
