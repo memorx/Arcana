@@ -84,3 +84,101 @@ ${cardsDescription}`;
 
   return textContent.text;
 }
+
+// ============================================================================
+// DAILY ORACLE INTERPRETATION
+// ============================================================================
+
+interface DailyInterpretationRequest {
+  cardName: string;
+  cardNameEs: string;
+  isReversed: boolean;
+  zodiacSign: string;
+  focusArea: string;
+  userName: string;
+  locale: string;
+}
+
+export async function generateDailyInterpretation(
+  request: DailyInterpretationRequest
+): Promise<string> {
+  const { cardName, cardNameEs, isReversed, zodiacSign, focusArea, userName, locale } = request;
+
+  const isSpanish = locale === "es";
+  const displayCard = isSpanish ? cardNameEs : cardName;
+
+  const focusAreaMap: Record<string, { en: string; es: string }> = {
+    general: { en: "general life guidance", es: "guía general de vida" },
+    love: { en: "love and relationships", es: "amor y relaciones" },
+    career: { en: "career and finances", es: "carrera y finanzas" },
+    spirituality: { en: "spiritual growth", es: "crecimiento espiritual" },
+    health: { en: "health and wellness", es: "salud y bienestar" },
+  };
+
+  const focus = focusAreaMap[focusArea] || focusAreaMap.general;
+
+  const systemPrompt = isSpanish
+    ? `Eres una guía de tarot sabia que ofrece mensajes diarios breves pero significativos.
+
+Tu estilo:
+- Cálido y personal, como si hablaras con un amigo
+- Conciso pero profundo (3-4 párrafos máximo)
+- Práctico - da un consejo o reflexión aplicable al día
+- Conecta la carta con el área de enfoque del usuario
+
+Estructura:
+1. Saludo breve mencionando la carta
+2. El mensaje central de la carta para hoy
+3. Cómo aplicarlo al área de enfoque
+4. Una frase de cierre inspiradora
+
+NO hagas predicciones específicas. Ofrece guía reflexiva.`
+    : `You are a wise tarot guide offering brief but meaningful daily messages.
+
+Your style:
+- Warm and personal, like speaking to a friend
+- Concise but profound (3-4 paragraphs max)
+- Practical - give applicable advice for the day
+- Connect the card to the user's focus area
+
+Structure:
+1. Brief greeting mentioning the card
+2. The card's central message for today
+3. How to apply it to their focus area
+4. An inspiring closing phrase
+
+Do NOT make specific predictions. Offer reflective guidance.`;
+
+  const userPrompt = isSpanish
+    ? `Carta del día para ${userName} (${zodiacSign}):
+${displayCard}${isReversed ? " (invertida)" : ""}
+
+Área de enfoque: ${focus.es}
+
+Escribe un mensaje personal y breve para comenzar el día.`
+    : `Daily card for ${userName} (${zodiacSign}):
+${displayCard}${isReversed ? " (reversed)" : ""}
+
+Focus area: ${focus.en}
+
+Write a personal, brief message to start the day.`;
+
+  const message = await anthropic.messages.create({
+    model: "claude-3-5-haiku-20241022", // Using Haiku for cost efficiency
+    max_tokens: 500,
+    messages: [
+      {
+        role: "user",
+        content: userPrompt,
+      },
+    ],
+    system: systemPrompt,
+  });
+
+  const textContent = message.content.find((block) => block.type === "text");
+  if (!textContent || textContent.type !== "text") {
+    throw new Error("No text content in response");
+  }
+
+  return textContent.text;
+}
