@@ -172,6 +172,8 @@ export async function GET(req: NextRequest) {
           interpretation,
           date: dateStr,
           locale,
+          zodiacSign: profile.zodiacSign,
+          keywords: selectedCard.keywords,
         });
 
         console.log(`[CRON] Sent daily reading to ${user.email}`);

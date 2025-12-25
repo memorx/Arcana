@@ -20,6 +20,17 @@ interface DailyReadingEmailParams {
   interpretation: string;
   date: string;
   locale: string;
+  zodiacSign: string;
+  keywords: string[];
+}
+
+function getZodiacEmoji(sign: string): string {
+  const emojis: Record<string, string> = {
+    Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋",
+    Leo: "♌", Virgo: "♍", Libra: "♎", Scorpio: "♏",
+    Sagittarius: "♐", Capricorn: "♑", Aquarius: "♒", Pisces: "♓"
+  };
+  return emojis[sign] || "✨";
 }
 
 export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
@@ -33,6 +44,8 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
     interpretation,
     date,
     locale,
+    zodiacSign,
+    keywords,
   } = params;
 
   const isSpanish = locale === "es";
@@ -76,7 +89,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
           <tr>
             <td style="padding: 25px 30px 10px; text-align: center;">
               <p style="color: #e2e8f0; font-size: 16px; margin: 0;">
-                ${isSpanish ? `Hola ${userName},` : `Hello ${userName},`}
+                ${isSpanish ? `Hola ${userName}` : `Hello ${userName}`} ${getZodiacEmoji(zodiacSign)}
               </p>
               <p style="color: #94a3b8; font-size: 14px; margin: 8px 0 0;">
                 ${date}
@@ -91,12 +104,15 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
                 <img
                   src="${cardImage}"
                   alt="${displayCardName}"
-                  style="max-width: 180px; height: auto; border-radius: 8px; ${isReversed ? "transform: rotate(180deg);" : ""}"
+                  style="max-width: 180px; height: auto; border-radius: 8px;"
                 />
               </div>
               <h2 style="color: #a78bfa; font-size: 22px; margin: 20px 0 8px; font-weight: normal;">
                 ${displayCardName}
               </h2>
+              <p style="color: #94a3b8; font-size: 12px; margin: 0 0 12px; letter-spacing: 1px;">
+                ${keywords.slice(0, 3).join(" • ")}
+              </p>
               ${
                 isReversed
                   ? `<div style="background: #dc2626; color: white; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; display: inline-block;">
