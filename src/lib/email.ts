@@ -169,3 +169,80 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
 
   return result;
 }
+
+interface PasswordResetEmailParams {
+  to: string;
+  resetUrl: string;
+  locale?: string;
+}
+
+export async function sendPasswordResetEmail(params: PasswordResetEmailParams) {
+  const { to, resetUrl, locale = "es" } = params;
+  const isSpanish = locale === "es";
+
+  const subject = isSpanish
+    ? "Restablece tu contraseña - Arcana"
+    : "Reset your password - Arcana";
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #0f172a;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="max-width: 500px; width: 100%; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-radius: 16px; overflow: hidden;">
+          <tr>
+            <td style="padding: 30px; text-align: center; border-bottom: 1px solid rgba(139, 92, 246, 0.2);">
+              <div style="font-size: 32px; margin-bottom: 8px;">&#9788;</div>
+              <div style="color: #f59e0b; font-size: 24px; font-weight: bold; letter-spacing: 2px;">ARCANA</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
+              <h1 style="color: #e2e8f0; font-size: 22px; margin: 0 0 16px; text-align: center;">
+                ${isSpanish ? "Restablece tu contraseña" : "Reset your password"}
+              </h1>
+              <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+                ${isSpanish
+                  ? "Recibimos una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón de abajo para continuar."
+                  : "We received a request to reset your account password. Click the button below to continue."}
+              </p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1a1a2e; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  ${isSpanish ? "Restablecer contraseña" : "Reset password"}
+                </a>
+              </div>
+              <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 24px 0 0;">
+                ${isSpanish
+                  ? "Este enlace expirará en 1 hora. Si no solicitaste restablecer tu contraseña, puedes ignorar este email."
+                  : "This link will expire in 1 hour. If you didn't request a password reset, you can ignore this email."}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 30px; text-align: center; background: rgba(0, 0, 0, 0.2);">
+              <p style="color: #64748b; font-size: 12px; margin: 0;">
+                Arcana - AI Tarot Readings
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+
+  return getResend().emails.send({
+    from: "Arcana <onboarding@resend.dev>",
+    to,
+    subject,
+    html,
+  });
+}

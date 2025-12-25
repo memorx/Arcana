@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   // Rate limit: 3 password reset attempts per 5 minutes
@@ -48,21 +49,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // In production, you would send an email here
-    // For now, log the reset link (development only)
     const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
 
-    if (process.env.NODE_ENV === "development") {
-      console.log("Password reset link:", resetUrl);
+    // Send password reset email
+    try {
+      await sendPasswordResetEmail({
+        to: email,
+        resetUrl,
+      });
+    } catch (emailError) {
+      console.error("Error sending password reset email:", emailError);
+      // Still return success to prevent email enumeration
     }
-
-    // TODO: Send email with reset link using a service like Resend, SendGrid, etc.
-    // Example:
-    // await sendEmail({
-    //   to: email,
-    //   subject: "Reset your password",
-    //   html: `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p>`
-    // });
 
     return NextResponse.json({ success: true });
   } catch (error) {

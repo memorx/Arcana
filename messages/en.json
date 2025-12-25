@@ -172,6 +172,14 @@
       "invalidEmail": "Invalid email",
       "createAccount": "Error creating account",
       "loginAfterRegister": "Account created but there was an error signing in"
+    },
+    "passwordReset": {
+      "subject": "Reset your password - Arcana",
+      "title": "Reset your password",
+      "description": "We received a request to reset your account password.",
+      "button": "Reset password",
+      "expiry": "This link will expire in 1 hour.",
+      "ignore": "If you didn't request this, you can ignore this email."
     }
   },
   "dashboard": {

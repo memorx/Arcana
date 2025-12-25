@@ -172,6 +172,14 @@
       "invalidEmail": "Email invalido",
       "createAccount": "Error al crear la cuenta",
       "loginAfterRegister": "Cuenta creada pero hubo un error al iniciar sesion"
+    },
+    "passwordReset": {
+      "subject": "Restablece tu contraseña - Arcana",
+      "title": "Restablece tu contraseña",
+      "description": "Recibimos una solicitud para restablecer la contraseña de tu cuenta.",
+      "button": "Restablecer contraseña",
+      "expiry": "Este enlace expirará en 1 hora.",
+      "ignore": "Si no solicitaste esto, ignora este email."
     }
   },
   "dashboard": {
