@@ -13,6 +13,7 @@ import {
   SavedReadingCard,
   ShareButton,
 } from "@/components/ui";
+import { PersonalNotes } from "@/components/reading/PersonalNotes";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -191,6 +192,12 @@ export default async function ReadingPage({ params }: PageProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Personal Notes */}
+      <PersonalNotes
+        readingId={id}
+        initialNotes={reading.personalNotes}
+      />
 
       {/* Actions */}
       <div className="flex justify-center gap-4 mt-8">

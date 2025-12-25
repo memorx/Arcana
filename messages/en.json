@@ -150,6 +150,10 @@
   "dashboard": {
     "welcome": "Hello, {name}",
     "welcomeSubtitle": "Welcome to your reading space",
+    "streak": {
+      "days": "day streak",
+      "best": "Best: {count} days"
+    },
     "freeReadings": "{count, plural, one {# free reading} other {# free readings}}",
     "freeReadingsLabel": "Free Readings",
     "credits": "{count} credits",
@@ -171,6 +175,17 @@
   },
   "reading": {
     "selectSpread": "Choose Your Spread",
+    "spreadCategories": {
+      "classic": "Classic Spreads",
+      "themed": "Themed Spreads"
+    },
+    "notes": {
+      "title": "My Reflections",
+      "placeholder": "What did this reading mean to you? What decisions did you make?",
+      "hint": "Your notes are saved automatically as you type",
+      "saving": "Saving...",
+      "saved": "Saved"
+    },
     "selectSpreadSubtitle": "Select the type of reading that best fits your question",
     "cards": "{count} cards",
     "cost": "{count} credit",
@@ -481,5 +496,23 @@
     "preview": "Preview",
     "reversed": "Reversed",
     "sentAt": "Sent at {time}"
+  },
+  "referral": {
+    "title": "Invite Friends, Earn Credits",
+    "subtitle": "Share the magic of Arcana and both of you get rewarded",
+    "howItWorks": "How it works",
+    "step1": "Share your unique referral link with friends",
+    "step2": "They sign up using your link",
+    "step3": "Both of you get 3 free credits!",
+    "yourLink": "Your Referral Link",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "friendsReferred": "Friends referred",
+    "creditsEarned": "Credits earned",
+    "shareText": "Discover AI-powered tarot readings with Arcana! Sign up with my link and we both get 3 free credits: {link}",
+    "twitterText": "I've been using Arcana for tarot readings and it's amazing! Sign up with my link and we both get free credits",
+    "limit": "Maximum 10 referrals per user",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "Please log in to access your referral link"
   }
 }

@@ -9,6 +9,7 @@ import {
   CardContent,
   Badge,
 } from "@/components/ui";
+import { StreakDisplay } from "@/components/dashboard/StreakDisplay";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -28,6 +29,8 @@ export default async function DashboardPage() {
         freeReadingsLeft: true,
         credits: true,
         name: true,
+        currentStreak: true,
+        longestStreak: true,
       },
     }),
     prisma.reading.findMany({
@@ -63,6 +66,14 @@ export default async function DashboardPage() {
           <Button size="lg">{t("startReading")}</Button>
         </Link>
       </div>
+
+      {/* Streak Display */}
+      {(user?.currentStreak || 0) > 0 && (
+        <StreakDisplay
+          currentStreak={user?.currentStreak || 0}
+          longestStreak={user?.longestStreak || 0}
+        />
+      )}
 
       {/* Stats Cards */}
       <div className="grid sm:grid-cols-3 gap-4">

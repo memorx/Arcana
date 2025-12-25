@@ -150,6 +150,10 @@
   "dashboard": {
     "welcome": "Hola, {name}",
     "welcomeSubtitle": "Bienvenido a tu espacio de lecturas",
+    "streak": {
+      "days": "dias seguidos",
+      "best": "Mejor: {count} dias"
+    },
     "freeReadings": "{count, plural, one {# lectura gratis} other {# lecturas gratis}}",
     "freeReadingsLabel": "Lecturas Gratis",
     "credits": "{count} creditos",
@@ -171,6 +175,17 @@
   },
   "reading": {
     "selectSpread": "Elige tu Tirada",
+    "spreadCategories": {
+      "classic": "Tiradas Clasicas",
+      "themed": "Tiradas Tematicas"
+    },
+    "notes": {
+      "title": "Mis Reflexiones",
+      "placeholder": "Que significo esta lectura para ti? Que decisiones tomaste?",
+      "hint": "Tus notas se guardan automaticamente mientras escribes",
+      "saving": "Guardando...",
+      "saved": "Guardado"
+    },
     "selectSpreadSubtitle": "Selecciona el tipo de lectura que mejor se adapte a tu pregunta",
     "cards": "{count} cartas",
     "cost": "{count} credito",
@@ -481,5 +496,23 @@
     "preview": "Vista Previa",
     "reversed": "Invertida",
     "sentAt": "Enviada a las {time}"
+  },
+  "referral": {
+    "title": "Invita Amigos, Gana Creditos",
+    "subtitle": "Comparte la magia de Arcana y ambos reciben recompensas",
+    "howItWorks": "Como funciona",
+    "step1": "Comparte tu enlace unico con amigos",
+    "step2": "Ellos se registran usando tu enlace",
+    "step3": "Ambos reciben 3 creditos gratis!",
+    "yourLink": "Tu Enlace de Referidos",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "friendsReferred": "Amigos referidos",
+    "creditsEarned": "Creditos ganados",
+    "shareText": "Descubre lecturas de tarot con IA en Arcana! Registrate con mi enlace y ambos obtenemos 3 creditos gratis: {link}",
+    "twitterText": "He estado usando Arcana para lecturas de tarot y es increible! Registrate con mi enlace y ambos obtenemos creditos gratis",
+    "limit": "Maximo 10 referidos por usuario",
+    "loginRequired": "Inicio de Sesion Requerido",
+    "loginRequiredDesc": "Por favor inicia sesion para acceder a tu enlace de referidos"
   }
 }

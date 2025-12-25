@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTarotInterpretation } from "@/lib/anthropic";
+import { updateStreak } from "@/lib/streak";
 
 export async function POST(req: NextRequest) {
   try {
@@ -164,6 +165,14 @@ export async function POST(req: NextRequest) {
       return newReading;
     });
 
+    // Update user streak (non-blocking, don't fail if this errors)
+    let streakInfo = null;
+    try {
+      streakInfo = await updateStreak(user.id);
+    } catch (error) {
+      console.error("Error updating streak:", error);
+    }
+
     // Prepare response with full card details
     const cardsWithDetails = readingCards.map((rc) => {
       const card = selectedCards.find((c) => c.id === rc.cardId)!;
@@ -196,6 +205,7 @@ export async function POST(req: NextRequest) {
       },
       cards: cardsWithDetails,
       usedFreeReading: useFreeReading,
+      streak: streakInfo,
     });
   } catch (error) {
     console.error("Error creating reading:", error);

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name } = await req.json();
+    const { email, password, name, referralCode } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -31,6 +31,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check if referral code is valid
+    let referrer = null;
+    if (referralCode) {
+      referrer = await prisma.user.findUnique({
+        where: { referralCode },
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
@@ -38,8 +46,45 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         name: name || null,
+        referredBy: referrer?.id || null,
       },
     });
+
+    // If referred, reward both users
+    if (referrer) {
+      await prisma.$transaction([
+        // Give referrer 2 credits
+        prisma.user.update({
+          where: { id: referrer.id },
+          data: {
+            credits: { increment: 2 },
+            referralCredits: { increment: 2 },
+            referralCount: { increment: 1 },
+          },
+        }),
+        // Create transaction for referrer
+        prisma.creditTransaction.create({
+          data: {
+            userId: referrer.id,
+            amount: 2,
+            type: "REFERRAL",
+          },
+        }),
+        // Give new user 1 bonus credit
+        prisma.user.update({
+          where: { id: user.id },
+          data: { credits: { increment: 1 } },
+        }),
+        // Create transaction for new user
+        prisma.creditTransaction.create({
+          data: {
+            userId: user.id,
+            amount: 1,
+            type: "BONUS",
+          },
+        }),
+      ]);
+    }
 
     return NextResponse.json({
       user: {
