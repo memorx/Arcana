@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId: session.user.id,
           amount: -plan.creditsCost,
-          type: "PURCHASE",
+          type: "SUBSCRIPTION",
         },
       });
 

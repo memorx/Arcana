@@ -28,6 +28,7 @@ enum TransactionType {
   READING
   BONUS
   REFERRAL
+  SUBSCRIPTION
 }
 
 // ============================================================================

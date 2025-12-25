@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
             data: {
               userId: sub.userId,
               amount: -creditsCost,
-              type: "PURCHASE",
+              type: "SUBSCRIPTION",
             },
           });
 
