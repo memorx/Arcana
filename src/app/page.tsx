@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Header, Footer } from "@/components/layout";
 import { Button, Card, CardContent } from "@/components/ui";
+import { ReadingCounter, DailyCardPreview, Testimonials } from "@/components/landing";
 
 export default async function Home() {
   const t = await getTranslations("landing");
   const tSpreads = await getTranslations("spreads");
+  const locale = await getLocale();
 
   const features = [
     {
@@ -64,6 +66,24 @@ export default async function Home() {
     {
       question: t("faq.q3"),
       answer: t("faq.a3"),
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: t("testimonials.t1.name"),
+      text: t("testimonials.t1.text"),
+      rating: 5,
+    },
+    {
+      name: t("testimonials.t2.name"),
+      text: t("testimonials.t2.text"),
+      rating: 5,
+    },
+    {
+      name: t("testimonials.t3.name"),
+      text: t("testimonials.t3.text"),
+      rating: 5,
     },
   ];
 
@@ -164,6 +184,24 @@ export default async function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Reading Counter */}
+        <section className="py-8 border-t border-slate-800/50">
+          <div className="container mx-auto px-4">
+            <ReadingCounter label={t("readingCounter")} />
+          </div>
+        </section>
+
+        {/* Daily Card Preview (for non-logged users) */}
+        <section className="py-16 border-t border-slate-800/50 bg-gradient-to-b from-purple-950/20 to-transparent">
+          <div className="container mx-auto px-4">
+            <DailyCardPreview
+              title={t("dailyCard.title")}
+              ctaText={t("dailyCard.cta")}
+              locale={locale}
+            />
           </div>
         </section>
 
@@ -284,6 +322,16 @@ export default async function Home() {
                 <Button variant="secondary">{t("spreadsSection.viewAll")}</Button>
               </Link>
             </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-20 border-t border-slate-800/50">
+          <div className="container mx-auto px-4">
+            <Testimonials
+              title={t("testimonials.title")}
+              testimonials={testimonials}
+            />
           </div>
         </section>
 

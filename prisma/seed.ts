@@ -2,6 +2,16 @@ import { PrismaClient, Arcana, Suit, TransactionType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Helper function to generate slugs from card names
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim();
+}
+
 // ============================================================================
 // MAJOR ARCANA (22 cards) - Rider-Waite-Smith deck from Wikimedia Commons
 // ============================================================================
@@ -1121,6 +1131,7 @@ async function main() {
     await prisma.card.create({
       data: {
         ...card,
+        slug: generateSlug(card.name),
         arcana: Arcana.MAJOR,
         suit: null,
       },
@@ -1134,6 +1145,7 @@ async function main() {
     await prisma.card.create({
       data: {
         ...card,
+        slug: generateSlug(card.name),
         arcana: Arcana.MINOR,
         suit: Suit.WANDS,
       },
@@ -1147,6 +1159,7 @@ async function main() {
     await prisma.card.create({
       data: {
         ...card,
+        slug: generateSlug(card.name),
         arcana: Arcana.MINOR,
         suit: Suit.CUPS,
       },
@@ -1160,6 +1173,7 @@ async function main() {
     await prisma.card.create({
       data: {
         ...card,
+        slug: generateSlug(card.name),
         arcana: Arcana.MINOR,
         suit: Suit.SWORDS,
       },
@@ -1173,6 +1187,7 @@ async function main() {
     await prisma.card.create({
       data: {
         ...card,
+        slug: generateSlug(card.name),
         arcana: Arcana.MINOR,
         suit: Suit.PENTACLES,
       },

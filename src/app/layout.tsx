@@ -5,18 +5,58 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Arcana - Lecturas de Tarot",
+  metadataBase: new URL("https://www.readarcana.com"),
+  title: {
+    default: "Arcana - AI Tarot Readings | Free Personalized Tarot",
+    template: "%s | Arcana",
+  },
   description:
-    "Descubre tu destino con lecturas de tarot personalizadas. Interpretaciones profundas guiadas por la sabiduría ancestral de las cartas.",
-  keywords: ["tarot", "lectura de cartas", "adivinacion", "espiritualidad"],
-  icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
-    apple: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
+    "Discover your path with AI-powered tarot readings. Get personalized interpretations of the classic Rider-Waite deck. 3 free readings when you sign up.",
+  keywords: [
+    "tarot",
+    "tarot reading",
+    "ai tarot",
+    "free tarot",
+    "tarot cards",
+    "divination",
+    "fortune telling",
+    "lectura de tarot",
+    "tarot gratis",
+  ],
+  authors: [{ name: "Arcana" }],
+  creator: "Arcana",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "es_MX",
+    url: "https://www.readarcana.com",
+    siteName: "Arcana",
+    title: "Arcana - AI Tarot Readings",
+    description: "Discover your path with AI-powered tarot readings.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Arcana Tarot",
+      },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Arcana - AI Tarot Readings",
+    description: "Discover your path with AI-powered tarot readings.",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icon-192.png", type: "image/png", sizes: "192x192" }],
+  },
+  manifest: "/manifest.json",
 };
 
 export default async function RootLayout({

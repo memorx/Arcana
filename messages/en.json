@@ -20,6 +20,26 @@
     "logout": "Log out"
   },
   "landing": {
+    "readingCounter": "readings performed",
+    "dailyCard": {
+      "title": "Your Card of the Day",
+      "cta": "Sign up for a complete reading"
+    },
+    "testimonials": {
+      "title": "What Our Users Say",
+      "t1": {
+        "name": "Maria G.",
+        "text": "The readings are surprisingly accurate. It helped me make an important decision."
+      },
+      "t2": {
+        "name": "Carlos R.",
+        "text": "I use Arcana every morning. My daily card gives me perspective for the day."
+      },
+      "t3": {
+        "name": "Ana L.",
+        "text": "Skeptical at first, but the interpretations are very deep and personalized."
+      }
+    },
     "hero": {
       "title": "Discover your destiny",
       "subtitle": "Tarot cards hold ancient secrets. Let them reveal the messages the universe has for you.",
@@ -361,6 +381,41 @@
   "metadata": {
     "title": "Arcana - AI Tarot Readings",
     "description": "Discover what the cards have for you. Personalized tarot readings with artificial intelligence."
+  },
+  "cards": {
+    "title": "Explore the Tarot",
+    "subtitle": "Discover the 78 cards of the Rider-Waite deck and their meanings",
+    "filters": {
+      "all": "All Cards",
+      "major": "Major Arcana",
+      "wands": "Wands",
+      "cups": "Cups",
+      "swords": "Swords",
+      "pentacles": "Pentacles"
+    },
+    "searchPlaceholder": "Search by name or keyword...",
+    "showing": "Showing {count} cards",
+    "noResults": "No cards found",
+    "clearFilters": "Clear filters",
+    "cta": {
+      "title": "Ready for a reading?",
+      "subtitle": "Discover what the cards have in store for you",
+      "button": "Start Reading"
+    }
+  },
+  "cardDetail": {
+    "backToCards": "Back to cards",
+    "keywords": "Keywords",
+    "appearsIn": "Frequently appears in readings about",
+    "upright": "Upright Meaning",
+    "uprightSubtitle": "When this card appears upright",
+    "reversed": "Reversed Meaning",
+    "reversedSubtitle": "When this card appears inverted",
+    "cta": {
+      "title": "What does {card} mean for you?",
+      "subtitle": "Get a personalized reading that connects this card with your unique situation",
+      "button": "Start Reading"
+    }
   },
   "subscribe": {
     "title": "Daily Oracle",

@@ -20,6 +20,26 @@
     "logout": "Cerrar sesion"
   },
   "landing": {
+    "readingCounter": "lecturas realizadas",
+    "dailyCard": {
+      "title": "Tu Carta del Dia",
+      "cta": "Registrate para una lectura completa"
+    },
+    "testimonials": {
+      "title": "Lo que dicen nuestros usuarios",
+      "t1": {
+        "name": "Maria G.",
+        "text": "Las lecturas son sorprendentemente precisas. Me ayudo a tomar una decision importante."
+      },
+      "t2": {
+        "name": "Carlos R.",
+        "text": "Uso Arcana todas las mananas. Mi carta del dia me da perspectiva para el dia."
+      },
+      "t3": {
+        "name": "Ana L.",
+        "text": "Esceptica al principio, pero las interpretaciones son muy profundas y personalizadas."
+      }
+    },
     "hero": {
       "title": "Descubre tu destino",
       "subtitle": "Las cartas del tarot guardan secretos ancestrales. Deja que revelen los mensajes que el universo tiene para ti.",
@@ -361,6 +381,41 @@
   "metadata": {
     "title": "Arcana - Lecturas de Tarot con IA",
     "description": "Descubre lo que las cartas tienen para ti. Lecturas de tarot personalizadas con inteligencia artificial."
+  },
+  "cards": {
+    "title": "Explora el Tarot",
+    "subtitle": "Descubre las 78 cartas del mazo Rider-Waite y sus significados",
+    "filters": {
+      "all": "Todas",
+      "major": "Arcanos Mayores",
+      "wands": "Bastos",
+      "cups": "Copas",
+      "swords": "Espadas",
+      "pentacles": "Oros"
+    },
+    "searchPlaceholder": "Buscar por nombre o palabra clave...",
+    "showing": "Mostrando {count} cartas",
+    "noResults": "No se encontraron cartas",
+    "clearFilters": "Limpiar filtros",
+    "cta": {
+      "title": "Listo para una lectura?",
+      "subtitle": "Descubre lo que las cartas tienen preparado para ti",
+      "button": "Comenzar Lectura"
+    }
+  },
+  "cardDetail": {
+    "backToCards": "Volver a las cartas",
+    "keywords": "Palabras Clave",
+    "appearsIn": "Aparece frecuentemente en lecturas sobre",
+    "upright": "Significado al Derecho",
+    "uprightSubtitle": "Cuando esta carta aparece al derecho",
+    "reversed": "Significado Invertido",
+    "reversedSubtitle": "Cuando esta carta aparece invertida",
+    "cta": {
+      "title": "Que significa {card} para ti?",
+      "subtitle": "Obtén una lectura personalizada que conecte esta carta con tu situacion unica",
+      "button": "Comenzar Lectura"
+    }
   },
   "subscribe": {
     "title": "Oraculo Diario",

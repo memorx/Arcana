@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Badge, LanguageSelector } from "@/components/ui";
+import { SoundToggle } from "@/components/SoundToggle";
 
 export function Header() {
   const { data: session, status } = useSession();
@@ -54,6 +55,9 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
+            {/* Sound Toggle */}
+            <SoundToggle />
+
             {/* Language Selector */}
             <LanguageSelector />
 
