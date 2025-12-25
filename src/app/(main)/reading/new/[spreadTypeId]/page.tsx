@@ -161,7 +161,7 @@ export default function ReadingFlowPage({
       const res = await fetch("/api/reading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ spreadTypeId, intention }),
+        body: JSON.stringify({ spreadTypeId, intention, locale }),
       });
 
       const data = await res.json();

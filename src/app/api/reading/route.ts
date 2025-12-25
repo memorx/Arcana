@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { spreadTypeId, intention } = await req.json();
+    const { spreadTypeId, intention, locale = "es" } = await req.json();
 
     // Validate input
     if (!spreadTypeId || !intention) {
@@ -104,9 +104,9 @@ export async function POST(req: NextRequest) {
 
       return {
         position: rc.position,
-        positionName: position.nameEs,
+        positionName: locale === "en" ? position.name : position.nameEs,
         positionDescription: position.description,
-        cardNameEs: card.nameEs,
+        cardName: locale === "en" ? card.name : card.nameEs,
         isReversed: rc.isReversed,
       };
     });
@@ -115,19 +115,28 @@ export async function POST(req: NextRequest) {
     let interpretation: string;
     try {
       interpretation = await generateTarotInterpretation({
-        spreadNameEs: spreadType.nameEs,
+        spreadName: locale === "en" ? spreadType.name : spreadType.nameEs,
         intention,
         cards: cardsForInterpretation,
+        locale,
       });
     } catch (error) {
       console.error("Error generating interpretation:", error);
       // Fallback interpretation if API fails
-      interpretation = `Tu lectura de ${spreadType.nameEs} ha sido completada.\n\nCartas reveladas:\n${cardsForInterpretation
-        .map(
-          (c) =>
-            `- Posicion ${c.position} (${c.positionName}): ${c.cardNameEs}${c.isReversed ? " (Invertida)" : ""}`
-        )
-        .join("\n")}\n\nLa interpretacion detallada no esta disponible en este momento. Por favor, reflexiona sobre el significado de cada carta en relacion a tu pregunta: "${intention}"`;
+      const spreadDisplayName = locale === "en" ? spreadType.name : spreadType.nameEs;
+      interpretation = locale === "en"
+        ? `Your ${spreadDisplayName} reading has been completed.\n\nCards revealed:\n${cardsForInterpretation
+            .map(
+              (c) =>
+                `- Position ${c.position} (${c.positionName}): ${c.cardName}${c.isReversed ? " (Reversed)" : ""}`
+            )
+            .join("\n")}\n\nDetailed interpretation is not available at this time. Please reflect on the meaning of each card in relation to your question: "${intention}"`
+        : `Tu lectura de ${spreadDisplayName} ha sido completada.\n\nCartas reveladas:\n${cardsForInterpretation
+            .map(
+              (c) =>
+                `- Posicion ${c.position} (${c.positionName}): ${c.cardName}${c.isReversed ? " (Invertida)" : ""}`
+            )
+            .join("\n")}\n\nLa interpretacion detallada no esta disponible en este momento. Por favor, reflexiona sobre el significado de cada carta en relacion a tu pregunta: "${intention}"`;
     }
 
     // Create reading and update user in a transaction

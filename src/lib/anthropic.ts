@@ -8,30 +8,35 @@ interface CardForInterpretation {
   position: number;
   positionName: string;
   positionDescription: string;
-  cardNameEs: string;
+  cardName: string;
   isReversed: boolean;
 }
 
 interface InterpretationRequest {
-  spreadNameEs: string;
+  spreadName: string;
   intention: string;
   cards: CardForInterpretation[];
+  locale: string;
 }
 
 export async function generateTarotInterpretation(
   request: InterpretationRequest
 ): Promise<string> {
-  const { spreadNameEs, intention, cards } = request;
+  const { spreadName, intention, cards, locale } = request;
+  const isSpanish = locale === "es";
 
   const cardsDescription = cards
     .map((card) => {
-      return `[Posición ${card.position}: ${card.positionName}]
-${card.cardNameEs}${card.isReversed ? " (invertida)" : ""}
-Esta posición representa: ${card.positionDescription}`;
+      const positionLabel = isSpanish ? "Posición" : "Position";
+      const reversedLabel = isSpanish ? "(invertida)" : "(reversed)";
+      const representsLabel = isSpanish ? "Esta posición representa" : "This position represents";
+      return `[${positionLabel} ${card.position}: ${card.positionName}]
+${card.cardName}${card.isReversed ? ` ${reversedLabel}` : ""}
+${representsLabel}: ${card.positionDescription}`;
     })
     .join("\n\n");
 
-  const systemPrompt = `Eres una guía de tarot sabia y cálida. No predices el futuro - ayudas a las personas a verse más claramente a sí mismas y sus situaciones.
+  const systemPromptEs = `Eres una guía de tarot sabia y cálida. No predices el futuro - ayudas a las personas a verse más claramente a sí mismas y sus situaciones.
 
 Tu filosofía:
 - El tarot es un espejo, no una bola de cristal
@@ -56,13 +61,43 @@ IMPORTANTE:
 - Nunca predecir muertes, enfermedades terminales, o tragedias específicas
 - Las cartas como La Torre, la Muerte, o el 10 de Espadas hablan de transformación y finales necesarios, no de catástrofes literales
 - Si la lectura es mayormente "difícil", enfócate en qué está pidiendo atención y qué puede aprenderse
-- Responde en el mismo idioma en que está escrita la intención del consultante`;
+- Responde siempre en español`;
+
+  const systemPromptEn = `You are a wise and warm tarot guide. You don't predict the future - you help people see themselves and their situations more clearly.
+
+Your philosophy:
+- Tarot is a mirror, not a crystal ball
+- The cards reveal patterns, not fixed destinies
+- Each person has agency over their life
+- Even "difficult" cards bring valuable messages
+
+Your style:
+- You speak directly to the person, as if face to face
+- You're warm but honest - you don't sugarcoat, but you don't alarm either
+- You use evocative language without falling into esoteric clichés
+- You connect the symbols of the cards with real, everyday situations
+- You ask reflective questions that invite introspection
+
+Structure your response like this:
+1. Start by acknowledging the person's intention/question (1-2 sentences)
+2. Give a general impression of what the cards suggest as a whole (1 paragraph)
+3. Explore each card in its position, connecting it to the question. Don't just list meanings - tell how each card dialogues with the others and with the situation
+4. Close with practical reflections and one or two questions the person can ask themselves
+
+IMPORTANT:
+- Never predict deaths, terminal illnesses, or specific tragedies
+- Cards like The Tower, Death, or the 10 of Swords speak of transformation and necessary endings, not literal catastrophes
+- If the reading is mostly "difficult", focus on what is asking for attention and what can be learned
+- Always respond in English`;
+
+  const systemPrompt = isSpanish ? systemPromptEs : systemPromptEn;
+  const spreadLabel = isSpanish ? "Tirada" : "Spread";
 
   const userPrompt = `${intention}
 
 ---
 
-Tirada: ${spreadNameEs}
+${spreadLabel}: ${spreadName}
 ${cardsDescription}`;
 
   const message = await anthropic.messages.create({
