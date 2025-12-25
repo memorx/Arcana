@@ -1,50 +1,42 @@
-import { auth } from "@/lib/auth";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
-// Routes that require authentication
-const protectedRoutes = ["/dashboard", "/reading", "/history", "/credits"];
+const protectedRoutes = ['/dashboard', '/reading', '/history', '/credits']
+const authRoutes = ['/login', '/register']
 
-// Routes that should redirect to dashboard if already authenticated
-const authRoutes = ["/login", "/register"];
+export async function middleware(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET
+  })
 
-export default auth((req) => {
-  const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
-  const pathname = nextUrl.pathname;
+  const { pathname } = request.nextUrl
 
-  // Check if the route is protected
-  const isProtectedRoute = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
-
-  // Check if the route is an auth route (login/register)
-  const isAuthRoute = authRoutes.some((route) => pathname === route);
-
-  // Redirect to login if accessing protected route without auth
-  if (isProtectedRoute && !isLoggedIn) {
-    const loginUrl = new URL("/login", nextUrl.origin);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+  // Si está en ruta protegida sin sesión -> login
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+  if (isProtectedRoute && !token) {
+    const url = new URL('/login', request.url)
+    url.searchParams.set('callbackUrl', pathname)
+    return NextResponse.redirect(url)
   }
 
-  // Redirect to dashboard if accessing auth routes while logged in
-  if (isAuthRoute && isLoggedIn) {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl.origin));
+  // Si está logueado y va a login/register -> dashboard
+  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
+  if (isAuthRoute && token) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  return NextResponse.next();
-});
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - api routes (except auth)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (images, etc)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico|cards|.*\\..*).+)",
-  ],
-};
+    '/dashboard/:path*',
+    '/reading/:path*',
+    '/history/:path*',
+    '/credits/:path*',
+    '/login',
+    '/register'
+  ]
+}
