@@ -1,14 +1,8 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Daily Oracle",
-  description:
-    "Your personalized daily tarot card. Receive guidance based on your zodiac sign and life focus every day.",
-  openGraph: {
-    title: "Daily Oracle | Arcana",
-    description:
-      "Get your personalized daily tarot card with AI-powered interpretations.",
-  },
+  title: "Daily Oracle | Arcana",
+  description: "Get your personalized daily tarot card reading based on your zodiac sign",
 };
 
 export default function DailyLayout({

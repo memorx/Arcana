@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "No autorizado" },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
@@ -27,14 +27,14 @@ export async function POST(req: NextRequest) {
     // Validate input
     if (!spreadTypeId || !intention) {
       return NextResponse.json(
-        { error: "spreadTypeId e intention son requeridos" },
+        { error: "spreadTypeId and intention are required" },
         { status: 400 }
       );
     }
 
     if (intention.length < 10) {
       return NextResponse.json(
-        { error: "La intencion debe tener al menos 10 caracteres" },
+        { error: "Intention must be at least 10 characters" },
         { status: 400 }
       );
     }
@@ -52,14 +52,14 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Usuario no encontrado" },
+        { error: "User not found" },
         { status: 404 }
       );
     }
 
     if (!spreadType) {
       return NextResponse.json(
-        { error: "Tipo de tirada no encontrado" },
+        { error: "Spread type not found" },
         { status: 404 }
       );
     }
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     if (!canAfford) {
       return NextResponse.json(
-        { error: "No tienes suficientes creditos para esta lectura" },
+        { error: "Not enough credits for this reading" },
         { status: 403 }
       );
     }
@@ -226,7 +226,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error creating reading:", error);
     return NextResponse.json(
-      { error: "Error al crear la lectura" },
+      { error: "Error creating reading" },
       { status: 500 }
     );
   }

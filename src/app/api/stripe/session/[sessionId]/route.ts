@@ -10,7 +10,7 @@ export async function GET(
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "No autorizado" },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
@@ -22,7 +22,7 @@ export async function GET(
     // Verify this session belongs to the current user
     if (checkoutSession.metadata?.userId !== session.user.id) {
       return NextResponse.json(
-        { error: "Sesion no encontrada" },
+        { error: "Session not found" },
         { status: 404 }
       );
     }
@@ -36,7 +36,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching session:", error);
     return NextResponse.json(
-      { error: "Error al obtener sesion" },
+      { error: "Error fetching session" },
       { status: 500 }
     );
   }

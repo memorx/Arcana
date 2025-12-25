@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "No autorizado" },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const pkg = getPackageById(packageId);
     if (!pkg) {
       return NextResponse.json(
-        { error: "Paquete no valido" },
+        { error: "Invalid package" },
         { status: 400 }
       );
     }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${pkg.credits} Creditos Arcana`,
+              name: `${pkg.credits} Arcana Credits`,
               description: pkg.description,
             },
             unit_amount: pkg.price,
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Checkout error:", error);
     return NextResponse.json(
-      { error: "Error al crear sesion de pago" },
+      { error: "Error creating checkout session" },
       { status: 500 }
     );
   }

@@ -14,7 +14,7 @@ export async function GET(
 
     if (!spreadType) {
       return NextResponse.json(
-        { error: "Tipo de tirada no encontrado" },
+        { error: "Spread type not found" },
         { status: 404 }
       );
     }
@@ -23,7 +23,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching spread type:", error);
     return NextResponse.json(
-      { error: "Error al obtener tipo de tirada" },
+      { error: "Error fetching spread type" },
       { status: 500 }
     );
   }

@@ -7,7 +7,7 @@ export async function GET() {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "No autorizado" },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
@@ -19,7 +19,7 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Usuario no encontrado" },
+        { error: "User not found" },
         { status: 404 }
       );
     }
@@ -31,7 +31,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching user credits:", error);
     return NextResponse.json(
-      { error: "Error al obtener creditos" },
+      { error: "Error fetching credits" },
       { status: 500 }
     );
   }

@@ -1,15 +1,8 @@
-import type { Metadata } from "next";
-
-export const dynamic = "force-dynamic";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Buy Credits",
-  description:
-    "Purchase credits for tarot readings. Choose from different packages to unlock personalized AI-powered readings.",
-  openGraph: {
-    title: "Buy Credits | Arcana",
-    description: "Purchase credits for personalized tarot readings.",
-  },
+  title: "Buy Credits | Arcana",
+  description: "Purchase credits to unlock tarot readings and spiritual guidance",
 };
 
 export default function CreditsLayout({

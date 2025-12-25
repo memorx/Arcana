@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const locale = await getLocale();
 
   // Fetch user data and recent readings
-  const [user, recentReadings, spreadTypes, userProfile] = await Promise.all([
+  const [user, recentReadings, spreadTypes, userProfile, subscription] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -45,7 +45,13 @@ export default async function DashboardPage() {
     prisma.userProfile.findUnique({
       where: { userId: session.user.id },
     }),
+    prisma.subscription.findUnique({
+      where: { userId: session.user.id },
+      select: { status: true },
+    }),
   ]);
+
+  const isSubscribed = subscription?.status === "active";
 
   const totalReadings = await prisma.reading.count({
     where: { userId: session.user.id },
@@ -142,22 +148,33 @@ export default async function DashboardPage() {
       </div>
 
       {/* Daily Oracle Promo */}
-      <Card className="bg-gradient-to-r from-purple-900/30 to-amber-900/30 border-purple-500/20">
+      <Card className={`bg-gradient-to-r ${isSubscribed ? "from-emerald-900/30 to-teal-900/30 border-emerald-500/20" : "from-purple-900/30 to-amber-900/30 border-purple-500/20"}`}>
         <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="text-4xl">&#10024;</span>
+            <span className="text-4xl">{isSubscribed ? "☀️" : "✨"}</span>
             <div>
-              <h2 className="text-lg font-semibold text-slate-100">{t("dailyOracleTitle")}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-slate-100">{t("dailyOracleTitle")}</h2>
+                {isSubscribed && (
+                  <Badge variant="success" className="text-xs">
+                    {locale === "en" ? "Active" : "Activo"}
+                  </Badge>
+                )}
+              </div>
               <p className="text-sm text-slate-400">{t("dailyOracleDesc")}</p>
             </div>
           </div>
           <div className="flex gap-3">
             <Link href="/daily" prefetch={true}>
-              <Button variant="secondary" size="sm">{t("viewDaily")}</Button>
+              <Button variant={isSubscribed ? "primary" : "secondary"} size="sm">
+                {isSubscribed ? (locale === "en" ? "Today's Card ✓" : "Carta de Hoy ✓") : t("viewDaily")}
+              </Button>
             </Link>
-            <Link href="/subscribe" prefetch={true}>
-              <Button size="sm">{t("subscribeCta")}</Button>
-            </Link>
+            {!isSubscribed && (
+              <Link href="/subscribe" prefetch={true}>
+                <Button size="sm">{t("subscribeCta")}</Button>
+              </Link>
+            )}
           </div>
         </CardContent>
       </Card>
