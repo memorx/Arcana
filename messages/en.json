@@ -17,7 +17,11 @@
     "credits": "Credits",
     "login": "Log in",
     "register": "Sign up",
-    "logout": "Log out"
+    "logout": "Log out",
+    "dailyCard": "Daily Card",
+    "subscribe": "Daily Oracle",
+    "profile": "My Profile",
+    "referral": "Refer Friends"
   },
   "landing": {
     "readingCounter": "readings performed",
@@ -101,6 +105,17 @@
       "title": "Begin your spiritual journey",
       "subtitle": "Sign up now and receive 3 free readings. Discover what the cards have in store for you.",
       "button": "Create Free Account"
+    },
+    "dailyOracle": {
+      "badge": "New",
+      "title": "Your Daily Card, Every Morning",
+      "description": "Start each day with cosmic guidance. Get a personalized tarot card delivered to your inbox, interpreted specifically for your zodiac sign and life focus.",
+      "feature1": "Personalized to your zodiac sign",
+      "feature2": "1 free complete reading per month",
+      "feature3": "Cancel anytime",
+      "cta": "Start Daily Oracle",
+      "emailPreview": "Your daily card awaits...",
+      "emailTime": "Delivered at your preferred time"
     }
   },
   "auth": {
@@ -171,7 +186,17 @@
     "viewAll": "View all",
     "free": "Free",
     "freeShort": "free",
-    "cards": "cards"
+    "cards": "cards",
+    "completeProfile": "Complete your profile",
+    "completeProfileDesc": "Add your birth date for personalized daily readings",
+    "setupProfile": "Set Up",
+    "dailyOracleTitle": "Daily Oracle",
+    "dailyOracleDesc": "Get a personalized card in your inbox every morning",
+    "viewDaily": "Today's Card",
+    "subscribeCta": "Subscribe $3.99/mo",
+    "referralTitle": "Invite friends, earn credits",
+    "referralDesc": "Get 2 credits for each friend who signs up",
+    "inviteFriends": "Invite Friends"
   },
   "reading": {
     "selectSpread": "Choose Your Spread",
@@ -308,10 +333,13 @@
   "footer": {
     "tagline": "Tarot readings with artificial intelligence",
     "rights": "All rights reserved",
+    "explore": "Card Explorer",
+    "blog": "Blog",
+    "dailyOracle": "Daily Oracle",
     "legal": {
+      "about": "About",
       "privacy": "Privacy",
-      "terms": "Terms",
-      "about": "About"
+      "terms": "Terms"
     }
   },
   "legal": {

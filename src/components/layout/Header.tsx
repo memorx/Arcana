@@ -179,6 +179,37 @@ export function Header() {
                           </Link>
                         </div>
 
+                        <div className="border-t border-slate-800 py-1">
+                          <Link
+                            href="/daily"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span>&#128302;</span> {t("dailyCard")}
+                          </Link>
+                          <Link
+                            href="/subscribe"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span>&#10024;</span> {t("subscribe")}
+                          </Link>
+                          <Link
+                            href="/profile/setup"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span>&#128100;</span> {t("profile")}
+                          </Link>
+                          <Link
+                            href="/referral"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span>&#127873;</span> {t("referral")}
+                          </Link>
+                        </div>
+
                         <div className="border-t border-slate-800 pt-1">
                           <button
                             onClick={() => signOut({ callbackUrl: "/" })}

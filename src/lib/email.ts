@@ -158,8 +158,10 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
 </html>
   `.trim();
 
+  // Use onboarding@resend.dev for testing until readarcana.com is verified in Resend
+  // Then change to: from: "Arcana <daily@readarcana.com>",
   const result = await getResend().emails.send({
-    from: "Arcana <daily@readarcana.com>",
+    from: "Arcana <onboarding@resend.dev>",
     to,
     subject,
     html,

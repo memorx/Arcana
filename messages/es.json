@@ -17,7 +17,11 @@
     "credits": "Creditos",
     "login": "Iniciar sesion",
     "register": "Registrarse",
-    "logout": "Cerrar sesion"
+    "logout": "Cerrar sesion",
+    "dailyCard": "Carta del Dia",
+    "subscribe": "Oraculo Diario",
+    "profile": "Mi Perfil",
+    "referral": "Invitar Amigos"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
@@ -101,6 +105,17 @@
       "title": "Comienza tu viaje espiritual",
       "subtitle": "Registrate ahora y recibe 3 lecturas gratuitas. Descubre lo que las cartas tienen preparado para ti.",
       "button": "Crear Cuenta Gratis"
+    },
+    "dailyOracle": {
+      "badge": "Nuevo",
+      "title": "Tu Carta del Dia, Cada Manana",
+      "description": "Comienza cada dia con guia cosmica. Recibe una carta de tarot personalizada en tu correo, interpretada especificamente para tu signo zodiacal y enfoque de vida.",
+      "feature1": "Personalizada a tu signo zodiacal",
+      "feature2": "1 lectura completa gratis al mes",
+      "feature3": "Cancela cuando quieras",
+      "cta": "Comenzar Oraculo Diario",
+      "emailPreview": "Tu carta del dia te espera...",
+      "emailTime": "Entregada a tu hora preferida"
     }
   },
   "auth": {
@@ -171,7 +186,17 @@
     "viewAll": "Ver todas",
     "free": "Gratis",
     "freeShort": "gratis",
-    "cards": "cartas"
+    "cards": "cartas",
+    "completeProfile": "Completa tu perfil",
+    "completeProfileDesc": "Agrega tu fecha de nacimiento para lecturas personalizadas",
+    "setupProfile": "Configurar",
+    "dailyOracleTitle": "Oraculo Diario",
+    "dailyOracleDesc": "Recibe una carta personalizada en tu correo cada manana",
+    "viewDaily": "Carta de Hoy",
+    "subscribeCta": "Suscribirse $3.99/mes",
+    "referralTitle": "Invita amigos, gana creditos",
+    "referralDesc": "Obten 2 creditos por cada amigo que se registre",
+    "inviteFriends": "Invitar Amigos"
   },
   "reading": {
     "selectSpread": "Elige tu Tirada",
@@ -308,10 +333,13 @@
   "footer": {
     "tagline": "Lecturas de tarot con inteligencia artificial",
     "rights": "Todos los derechos reservados",
+    "explore": "Explorar Cartas",
+    "blog": "Blog",
+    "dailyOracle": "Oraculo Diario",
     "legal": {
+      "about": "Acerca de",
       "privacy": "Privacidad",
-      "terms": "Terminos",
-      "about": "Nosotros"
+      "terms": "Terminos"
     }
   },
   "legal": {

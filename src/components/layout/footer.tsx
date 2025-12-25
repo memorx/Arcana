@@ -21,7 +21,31 @@ export function Footer() {
           </div>
 
           {/* Links */}
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+            <Link
+              href="/cards"
+              className="text-slate-400 hover:text-slate-100 transition-colors"
+            >
+              {t("explore")}
+            </Link>
+            <Link
+              href="/blog"
+              className="text-slate-400 hover:text-slate-100 transition-colors"
+            >
+              {t("blog")}
+            </Link>
+            <Link
+              href="/subscribe"
+              className="text-slate-400 hover:text-slate-100 transition-colors"
+            >
+              {t("dailyOracle")}
+            </Link>
+            <Link
+              href="/about"
+              className="text-slate-400 hover:text-slate-100 transition-colors"
+            >
+              {t("legal.about")}
+            </Link>
             <Link
               href="/privacy"
               className="text-slate-400 hover:text-slate-100 transition-colors"

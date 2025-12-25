@@ -22,10 +22,32 @@ async function main() {
       where: { id: card.id },
       data: { slug },
     });
-    console.log(`Updated: ${card.name} -> ${slug}`);
+    console.log(`Card: ${card.name} -> ${slug}`);
   }
 
-  console.log(`\nDone! Updated ${cards.length} cards.`);
+  console.log(`\nUpdated ${cards.length} cards.`);
+
+  // Update classic spreads with category
+  console.log("\nUpdating classic spreads with category...\n");
+
+  const classicSpreads = [
+    "Three Card Spread",
+    "Simple Cross",
+    "Horseshoe Spread",
+    "Celtic Cross",
+  ];
+
+  for (const name of classicSpreads) {
+    const result = await prisma.spreadType.updateMany({
+      where: { name },
+      data: { category: "classic" },
+    });
+    if (result.count > 0) {
+      console.log(`Updated category for: ${name}`);
+    }
+  }
+
+  console.log("\nDone! Slugs and categories updated.");
 }
 
 main()

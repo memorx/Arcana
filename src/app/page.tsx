@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Header, Footer } from "@/components/layout";
-import { Button, Card, CardContent } from "@/components/ui";
+import { Button, Card, CardContent, Badge } from "@/components/ui";
 import { ReadingCounter, DailyCardPreview, Testimonials } from "@/components/landing";
 
 export default async function Home() {
@@ -321,6 +321,55 @@ export default async function Home() {
               <Link href="/reading/new">
                 <Button variant="secondary">{t("spreadsSection.viewAll")}</Button>
               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Daily Oracle Section */}
+        <section className="py-20 border-t border-slate-800/50 bg-gradient-to-b from-purple-950/20 to-transparent">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <Badge variant="primary" className="mb-4">&#10024; {t("dailyOracle.badge")}</Badge>
+                  <h2 className="text-3xl font-bold text-slate-100 mb-4">
+                    {t("dailyOracle.title")}
+                  </h2>
+                  <p className="text-slate-400 mb-6">
+                    {t("dailyOracle.description")}
+                  </p>
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-center gap-3 text-slate-300">
+                      <span className="text-amber-400">&#10003;</span>
+                      {t("dailyOracle.feature1")}
+                    </li>
+                    <li className="flex items-center gap-3 text-slate-300">
+                      <span className="text-amber-400">&#10003;</span>
+                      {t("dailyOracle.feature2")}
+                    </li>
+                    <li className="flex items-center gap-3 text-slate-300">
+                      <span className="text-amber-400">&#10003;</span>
+                      {t("dailyOracle.feature3")}
+                    </li>
+                  </ul>
+                  <div className="flex items-center gap-4">
+                    <Link href="/subscribe">
+                      <Button size="lg">{t("dailyOracle.cta")}</Button>
+                    </Link>
+                    <span className="text-2xl font-bold text-amber-400">$3.99/mo</span>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-amber-500 blur-3xl opacity-20" />
+                    <Card className="relative p-6 text-center">
+                      <div className="text-6xl mb-4">&#128231;</div>
+                      <p className="text-slate-300 mb-2">{t("dailyOracle.emailPreview")}</p>
+                      <p className="text-sm text-slate-500">{t("dailyOracle.emailTime")}</p>
+                    </Card>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

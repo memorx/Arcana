@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const locale = await getLocale();
 
   // Fetch user data and recent readings
-  const [user, recentReadings, spreadTypes] = await Promise.all([
+  const [user, recentReadings, spreadTypes, userProfile] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -41,6 +41,9 @@ export default async function DashboardPage() {
     }),
     prisma.spreadType.findMany({
       orderBy: { cardCount: "asc" },
+    }),
+    prisma.userProfile.findUnique({
+      where: { userId: session.user.id },
     }),
   ]);
 
@@ -73,6 +76,24 @@ export default async function DashboardPage() {
           currentStreak={user?.currentStreak || 0}
           longestStreak={user?.longestStreak || 0}
         />
+      )}
+
+      {/* Complete Profile Prompt */}
+      {!userProfile && (
+        <Card className="border-amber-500/30 bg-amber-900/10">
+          <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">&#128100;</span>
+              <div>
+                <p className="font-medium text-slate-100">{t("completeProfile")}</p>
+                <p className="text-sm text-slate-400">{t("completeProfileDesc")}</p>
+              </div>
+            </div>
+            <Link href="/profile/setup">
+              <Button size="sm">{t("setupProfile")}</Button>
+            </Link>
+          </CardContent>
+        </Card>
       )}
 
       {/* Stats Cards */}
@@ -119,6 +140,43 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Daily Oracle Promo */}
+      <Card className="bg-gradient-to-r from-purple-900/30 to-amber-900/30 border-purple-500/20">
+        <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span className="text-4xl">&#10024;</span>
+            <div>
+              <h2 className="text-lg font-semibold text-slate-100">{t("dailyOracleTitle")}</h2>
+              <p className="text-sm text-slate-400">{t("dailyOracleDesc")}</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/daily">
+              <Button variant="secondary" size="sm">{t("viewDaily")}</Button>
+            </Link>
+            <Link href="/subscribe">
+              <Button size="sm">{t("subscribeCta")}</Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Referral Prompt */}
+      <Card className="bg-gradient-to-r from-emerald-900/20 to-teal-900/20 border-emerald-500/20">
+        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">&#127873;</span>
+            <div>
+              <p className="font-medium text-slate-100">{t("referralTitle")}</p>
+              <p className="text-sm text-slate-400">{t("referralDesc")}</p>
+            </div>
+          </div>
+          <Link href="/referral">
+            <Button variant="secondary" size="sm">{t("inviteFriends")}</Button>
+          </Link>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions - Spread Types */}
       <section>
