@@ -48,6 +48,8 @@ export interface SubscriptionPlan {
   nameEs: string;
   price: number; // cents USD
   priceDisplay: string;
+  creditsCost: number; // cost in credits per month
+  creditsCostDisplay: string;
   interval: 'month' | 'year';
   features: string[];
   featuresEs: string[];
@@ -61,6 +63,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     nameEs: 'Oráculo Diario',
     price: 399,
     priceDisplay: '$3.99/mo',
+    creditsCost: 10,
+    creditsCostDisplay: '10 credits/mo',
     interval: 'month',
     features: [
       'Personalized daily card reading',
@@ -102,4 +106,8 @@ export const EMAIL_TIMES = [
   { value: '08:00', label: '8:00 AM' },
   { value: '09:00', label: '9:00 AM' },
   { value: '10:00', label: '10:00 AM' },
+  { value: '12:00', label: '12:00 PM' },
+  { value: '18:00', label: '6:00 PM' },
+  { value: '20:00', label: '8:00 PM' },
+  { value: '22:00', label: '10:00 PM' },
 ] as const;

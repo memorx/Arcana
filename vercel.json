@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/daily-readings",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/renew-credit-subscriptions",
+      "schedule": "0 0 * * *"
     }
   ]
 }

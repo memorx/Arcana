@@ -107,7 +107,7 @@ export default function ProfileSetupPage() {
 
       setSuccess(true);
       setTimeout(() => {
-        router.push("/subscribe");
+        router.push("/dashboard");
       }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error saving profile");

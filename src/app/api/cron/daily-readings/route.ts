@@ -9,6 +9,7 @@ import { sendDailyReadingEmail } from "@/lib/email";
 export async function GET(req: NextRequest) {
   // Verify cron secret to prevent unauthorized access
   const authHeader = req.headers.get("authorization");
+  console.log(`[CRON] Auth header present: ${!!authHeader}`);
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -110,7 +111,7 @@ export async function GET(req: NextRequest) {
         const isReversed = Math.random() < 0.3;
 
         // Determine user's preferred locale (default to Spanish)
-        const locale = "es"; // You could add locale preference to UserProfile
+        const locale = profile.locale || "es";
 
         // Generate interpretation
         const interpretation = await generateDailyInterpretation({

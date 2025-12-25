@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         name: name || null,
-        referredBy: referrer?.id || null,
+        referredBy: referrer?.referralCode || null,
       },
     });
 

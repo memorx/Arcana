@@ -212,6 +212,7 @@ model UserProfile {
   fullName   String
   focusArea  String   @default("general") // love, career, spirituality, health, general
   emailTime  String   @default("08:00") // Hora preferida para recibir email
+  locale     String   @default("es") // "es" | "en"
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -223,7 +224,9 @@ model Subscription {
   userId               String    @unique
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan                 String    @default("daily_oracle") // daily_oracle
-  status               String    @default("active") // active, canceled, past_due
+  status               String    @default("active") // active, canceled, past_due, credits_exhausted
+  paymentMethod        String    @default("stripe") // "stripe" | "credits"
+  creditsCostPerMonth  Int       @default(10) // Costo mensual en creditos
   stripeSubscriptionId String?   @unique
   stripeCustomerId     String?
   currentPeriodStart   DateTime?

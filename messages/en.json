@@ -483,7 +483,15 @@
       "subtitle": "Your subscription is now active",
       "nextSteps": "You'll receive your first daily card tomorrow at your preferred time.",
       "goToDaily": "See today's card"
-    }
+    },
+    "orPayWithCredits": "or pay with credits",
+    "payWithCredits": "Pay with credits",
+    "creditsPerMonth": "credits/month",
+    "subscribeWithCredits": "Subscribe with Credits",
+    "needMoreCredits": "Need {count} more credits",
+    "buyCredits": "Buy credits",
+    "paidWithCredits": "Paid with credits",
+    "renewsAutomatically": "Renews automatically if you have enough credits"
   },
   "profile": {
     "title": "Complete Your Profile",

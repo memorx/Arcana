@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Header, Footer } from "@/components/layout";
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 
 interface ReferralData {
@@ -65,29 +64,19 @@ export default function ReferralPage() {
 
   if (status === "unauthenticated") {
     return (
-      <>
-        <Header />
-        <main className="flex-1 py-12">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl font-bold text-slate-100 mb-4">
-              {t("loginRequired")}
-            </h1>
-            <p className="text-slate-400">{t("loginRequiredDesc")}</p>
-          </div>
-        </main>
-        <Footer />
-      </>
+      <div className="text-center py-12">
+        <h1 className="text-3xl font-bold text-slate-100 mb-4">
+          {t("loginRequired")}
+        </h1>
+        <p className="text-slate-400">{t("loginRequiredDesc")}</p>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header />
-      <main className="flex-1 py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-12">
+    <div className="max-w-2xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-12">
               <div className="text-6xl mb-4">&#127873;</div>
               <h1 className="text-4xl font-bold mb-4">
                 <span className="bg-gradient-to-r from-purple-400 to-amber-400 bg-clip-text text-transparent">
@@ -196,13 +185,9 @@ export default function ReferralPage() {
             </Card>
 
             {/* Limit note */}
-            <p className="text-center text-sm text-slate-500 mt-6">
-              {t("limit")}
-            </p>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </>
+      <p className="text-center text-sm text-slate-500 mt-6">
+        {t("limit")}
+      </p>
+    </div>
   );
 }

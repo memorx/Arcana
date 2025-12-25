@@ -483,7 +483,15 @@
       "subtitle": "Tu suscripcion ya esta activa",
       "nextSteps": "Recibiras tu primera carta diaria manana a tu hora preferida.",
       "goToDaily": "Ver la carta de hoy"
-    }
+    },
+    "orPayWithCredits": "o paga con creditos",
+    "payWithCredits": "Pagar con creditos",
+    "creditsPerMonth": "creditos/mes",
+    "subscribeWithCredits": "Suscribirse con Creditos",
+    "needMoreCredits": "Necesitas {count} creditos mas",
+    "buyCredits": "Comprar creditos",
+    "paidWithCredits": "Pagado con creditos",
+    "renewsAutomatically": "Se renueva automaticamente si tienes creditos suficientes"
   },
   "profile": {
     "title": "Completa tu Perfil",

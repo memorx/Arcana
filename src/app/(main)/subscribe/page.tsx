@@ -27,6 +27,7 @@ interface Subscription {
   status: string;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
+  paymentMethod?: string;
 }
 
 export default function SubscribePage() {
@@ -37,17 +38,20 @@ export default function SubscribePage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessingCredits, setIsProcessingCredits] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [userCredits, setUserCredits] = useState(0);
 
   const plan = SUBSCRIPTION_PLANS[0]; // Daily Oracle plan
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, subRes] = await Promise.all([
+        const [profileRes, subRes, creditsRes] = await Promise.all([
           fetch("/api/profile"),
           fetch("/api/subscription"),
+          fetch("/api/user/credits"),
         ]);
 
         if (profileRes.ok) {
@@ -58,6 +62,11 @@ export default function SubscribePage() {
         if (subRes.ok) {
           const subData = await subRes.json();
           setSubscription(subData.subscription);
+        }
+
+        if (creditsRes.ok) {
+          const creditsData = await creditsRes.json();
+          setUserCredits(creditsData.credits || 0);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -95,6 +104,39 @@ export default function SubscribePage() {
       alert("Error processing subscription. Please try again.");
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleSubscribeWithCredits = async () => {
+    if (!profile) {
+      router.push("/profile/setup");
+      return;
+    }
+
+    setIsProcessingCredits(true);
+    try {
+      const res = await fetch("/api/subscribe/credits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId: plan.id }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        router.push("/subscribe/success?method=credits");
+      } else {
+        throw new Error(data.error || "Error");
+      }
+    } catch (error) {
+      console.error("Credits subscription error:", error);
+      alert(
+        locale === "en"
+          ? "Error processing subscription. Please try again."
+          : "Error procesando suscripcion. Intenta de nuevo."
+      );
+    } finally {
+      setIsProcessingCredits(false);
     }
   };
 
@@ -243,6 +285,50 @@ export default function SubscribePage() {
                 >
                   {t("cta")}
                 </Button>
+
+                {/* Divider */}
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-700" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-slate-900 px-2 text-slate-500">
+                      {t("orPayWithCredits")}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Credits option */}
+                <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-slate-300">{t("payWithCredits")}</span>
+                    <Badge variant="secondary">
+                      {plan.creditsCost} {t("creditsPerMonth")}
+                    </Badge>
+                  </div>
+                  <Button
+                    onClick={handleSubscribeWithCredits}
+                    variant="secondary"
+                    className="w-full"
+                    isLoading={isProcessingCredits}
+                    disabled={!profile || userCredits < plan.creditsCost}
+                  >
+                    {userCredits < plan.creditsCost
+                      ? t("needMoreCredits", { count: plan.creditsCost - userCredits })
+                      : t("subscribeWithCredits")}
+                  </Button>
+                  {userCredits < plan.creditsCost && (
+                    <Link
+                      href="/credits"
+                      className="block text-center text-sm text-purple-400 hover:text-purple-300 mt-2"
+                    >
+                      {t("buyCredits")}
+                    </Link>
+                  )}
+                  <p className="text-xs text-slate-500 text-center mt-2">
+                    {t("renewsAutomatically")}
+                  </p>
+                </div>
 
                 <Link
                   href="/profile/setup"
