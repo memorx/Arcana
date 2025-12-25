@@ -7,7 +7,19 @@
     "cancel": "Cancelar",
     "save": "Guardar",
     "delete": "Eliminar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "edit": "Editar",
+    "notFound": {
+      "title": "404",
+      "message": "Esta página no existe en el mazo...",
+      "goHome": "Ir al inicio"
+    },
+    "errorPage": {
+      "title": "Algo salió mal",
+      "message": "Las cartas se confundieron. Por favor, intenta de nuevo.",
+      "tryAgain": "Intentar de nuevo",
+      "goHome": "Ir al inicio"
+    }
   },
   "nav": {
     "home": "Inicio",
@@ -268,7 +280,11 @@
     "publicReading": "Lectura publica",
     "privateReading": "Lectura privada",
     "sharedBy": "Compartido por",
-    "anonymous": "Anonimo"
+    "anonymous": "Anonimo",
+    "shareCta": {
+      "title": "¿Quieres tu propia lectura?",
+      "subtitle": "Regístrate ahora y obtén 3 lecturas gratis"
+    }
   },
   "credits": {
     "title": "Comprar Creditos",
@@ -482,7 +498,13 @@
       "title": "Bienvenido al Oraculo Diario!",
       "subtitle": "Tu suscripcion ya esta activa",
       "nextSteps": "Recibiras tu primera carta diaria manana a tu hora preferida.",
-      "goToDaily": "Ver la carta de hoy"
+      "goToDaily": "Ver la carta de hoy",
+      "goToDashboard": "Ir al Dashboard",
+      "active": "Activa",
+      "tryAgain": "Intentar de nuevo",
+      "noSession": "No se encontró sesión",
+      "sessionNotFound": "Sesión no encontrada",
+      "verifyError": "Error al verificar suscripción"
     },
     "orPayWithCredits": "o paga con creditos",
     "payWithCredits": "Pagar con creditos",
@@ -531,7 +553,11 @@
     "subscribeNow": "Suscribirme",
     "preview": "Vista Previa",
     "reversed": "Invertida",
-    "sentAt": "Enviada a las {time}"
+    "sentAt": "Enviada a las {time}",
+    "creditsExhausted": "Suscripción Expirada",
+    "creditsExhaustedDesc": "Tu suscripción con créditos ha expirado. Agrega más créditos o vuelve a suscribirte para seguir recibiendo lecturas diarias.",
+    "buyCredits": "Comprar Créditos",
+    "resubscribe": "Volver a Suscribirse"
   },
   "referral": {
     "title": "Invita Amigos, Gana Creditos",

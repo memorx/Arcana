@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Header, Footer } from "@/components/layout";
 import { Card, CardContent, Button, Badge } from "@/components/ui";
 
 interface Props {
@@ -86,11 +85,8 @@ export default async function CardDetailPage({ params }: Props) {
   }
 
   return (
-    <>
-      <Header />
-      <main className="flex-1 py-12">
-        <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
+    <div className="container mx-auto px-4">
+      {/* Breadcrumb */}
           <div className="mb-8">
             <Link
               href="/cards"
@@ -244,13 +240,11 @@ export default async function CardDetailPage({ params }: Props) {
               </h2>
               <p className="text-slate-400 mb-6">{t("cta.subtitle")}</p>
               <Link href="/reading/new">
-                <Button size="lg">{t("cta.button")}</Button>
-              </Link>
-            </Card>
-          </div>
+              <Button size="lg">{t("cta.button")}</Button>
+            </Link>
+          </Card>
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </div>
   );
 }

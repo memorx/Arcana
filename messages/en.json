@@ -7,7 +7,19 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "notFound": {
+      "title": "404",
+      "message": "This page doesn't exist in the deck...",
+      "goHome": "Go Home"
+    },
+    "errorPage": {
+      "title": "Something went wrong",
+      "message": "The cards got confused. Please try again.",
+      "tryAgain": "Try Again",
+      "goHome": "Go Home"
+    }
   },
   "nav": {
     "home": "Home",
@@ -268,7 +280,11 @@
     "publicReading": "Public reading",
     "privateReading": "Private reading",
     "sharedBy": "Shared by",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "shareCta": {
+      "title": "Want your own reading?",
+      "subtitle": "Sign up now and get 3 free readings"
+    }
   },
   "credits": {
     "title": "Buy Credits",
@@ -482,7 +498,13 @@
       "title": "Welcome to Daily Oracle!",
       "subtitle": "Your subscription is now active",
       "nextSteps": "You'll receive your first daily card tomorrow at your preferred time.",
-      "goToDaily": "See today's card"
+      "goToDaily": "See today's card",
+      "goToDashboard": "Go to Dashboard",
+      "active": "Active",
+      "tryAgain": "Try Again",
+      "noSession": "No session found",
+      "sessionNotFound": "Session not found",
+      "verifyError": "Error verifying subscription"
     },
     "orPayWithCredits": "or pay with credits",
     "payWithCredits": "Pay with credits",
@@ -531,7 +553,11 @@
     "subscribeNow": "Subscribe Now",
     "preview": "Preview",
     "reversed": "Reversed",
-    "sentAt": "Sent at {time}"
+    "sentAt": "Sent at {time}",
+    "creditsExhausted": "Subscription Expired",
+    "creditsExhaustedDesc": "Your credit-based subscription has expired. Add more credits or resubscribe to continue receiving daily readings.",
+    "buyCredits": "Buy Credits",
+    "resubscribe": "Resubscribe"
   },
   "referral": {
     "title": "Invite Friends, Earn Credits",

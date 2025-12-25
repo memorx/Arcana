@@ -65,7 +65,7 @@ export default async function DashboardPage() {
             {t("welcomeSubtitle")}
           </p>
         </div>
-        <Link href="/reading/new">
+        <Link href="/reading/new" prefetch={true}>
           <Button size="lg">{t("startReading")}</Button>
         </Link>
       </div>
@@ -152,10 +152,10 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="flex gap-3">
-            <Link href="/daily">
+            <Link href="/daily" prefetch={true}>
               <Button variant="secondary" size="sm">{t("viewDaily")}</Button>
             </Link>
-            <Link href="/subscribe">
+            <Link href="/subscribe" prefetch={true}>
               <Button size="sm">{t("subscribeCta")}</Button>
             </Link>
           </div>

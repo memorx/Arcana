@@ -33,12 +33,14 @@ export function Header() {
               <>
                 <Link
                   href="/dashboard"
+                  prefetch={true}
                   className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
                 >
                   {t("dashboard")}
                 </Link>
                 <Link
                   href="/reading/new"
+                  prefetch={true}
                   className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
                 >
                   {t("newReading")}
@@ -225,12 +227,12 @@ export function Header() {
               </>
             ) : (
               <div className="flex items-center gap-3">
-                <Link href="/login">
+                <Link href="/login" prefetch={true}>
                   <Button variant="ghost" size="sm">
                     {t("login")}
                   </Button>
                 </Link>
-                <Link href="/register">
+                <Link href="/register" prefetch={true}>
                   <Button size="sm">{t("register")}</Button>
                 </Link>
               </div>

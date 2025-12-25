@@ -148,12 +148,12 @@ export default async function Home() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/reading/new">
+                <Link href="/reading/new" prefetch={true}>
                   <Button size="lg" className="text-base px-8">
                     {t("hero.cta")}
                   </Button>
                 </Link>
-                <Link href="/register">
+                <Link href="/register" prefetch={true}>
                   <Button variant="secondary" size="lg" className="text-base px-8">
                     {t("hero.ctaSecondary")}
                   </Button>
@@ -353,7 +353,7 @@ export default async function Home() {
                     </li>
                   </ul>
                   <div className="flex items-center gap-4">
-                    <Link href="/subscribe">
+                    <Link href="/subscribe" prefetch={true}>
                       <Button size="lg">{t("dailyOracle.cta")}</Button>
                     </Link>
                     <span className="text-2xl font-bold text-amber-400">$3.99/mo</span>
@@ -445,7 +445,7 @@ export default async function Home() {
               <p className="text-slate-300 mb-8 max-w-xl mx-auto">
                 {t("cta.subtitle")}
               </p>
-              <Link href="/register">
+              <Link href="/register" prefetch={true}>
                 <Button size="lg" className="px-10">
                   {t("cta.button")}
                 </Button>

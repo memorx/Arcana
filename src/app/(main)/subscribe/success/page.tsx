@@ -16,7 +16,7 @@ function SuccessContent() {
 
   useEffect(() => {
     if (!sessionId) {
-      setError("No session found");
+      setError(t("success.noSession"));
       setIsLoading(false);
       return;
     }
@@ -26,17 +26,17 @@ function SuccessContent() {
       try {
         const res = await fetch(`/api/stripe/session/${sessionId}`);
         if (!res.ok) {
-          throw new Error("Session not found");
+          throw new Error(t("success.sessionNotFound"));
         }
-      } catch (err) {
-        setError("Error verifying subscription");
+      } catch {
+        setError(t("success.verifyError"));
       } finally {
         setIsLoading(false);
       }
     };
 
     verifySession();
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   if (isLoading) {
     return (
@@ -58,7 +58,7 @@ function SuccessContent() {
             <div className="text-5xl mb-4">&#9888;</div>
             <p className="text-red-400 mb-4">{error}</p>
             <Link href="/subscribe">
-              <Button variant="secondary">Try Again</Button>
+              <Button variant="secondary">{t("success.tryAgain")}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -72,7 +72,7 @@ function SuccessContent() {
         <CardContent className="p-8">
           <div className="text-6xl mb-4">&#9788;</div>
           <Badge variant="success" className="mb-4">
-            Active
+            {t("success.active")}
           </Badge>
 
           <h1 className="text-2xl font-bold text-slate-100 mb-2">
@@ -92,7 +92,7 @@ function SuccessContent() {
             </Link>
             <Link href="/dashboard">
               <Button variant="secondary" className="w-full">
-                Go to Dashboard
+                {t("success.goToDashboard")}
               </Button>
             </Link>
           </div>

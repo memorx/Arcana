@@ -170,10 +170,10 @@ export default async function SharedReadingPage({ params }: PageProps) {
         {/* CTA */}
         <div className="text-center mt-12 p-8 bg-gradient-to-r from-purple-900/30 to-amber-900/20 rounded-lg border border-slate-800">
           <h2 className="text-xl font-semibold text-slate-100 mb-2">
-            Want your own reading?
+            {t("shareCta.title")}
           </h2>
           <p className="text-slate-400 mb-4">
-            Sign up now and get 3 free readings
+            {t("shareCta.subtitle")}
           </p>
           <Link href="/register">
             <Button size="lg">{t("anotherReading")}</Button>

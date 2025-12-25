@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Header, Footer } from "@/components/layout";
 import { Card, CardContent, Button } from "@/components/ui";
 
 interface TarotCard {
@@ -71,12 +70,9 @@ export default function CardsPage() {
   }, [cards, filter, search]);
 
   return (
-    <>
-      <Header />
-      <main className="flex-1 py-12">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-12">
+    <div className="container mx-auto px-4">
+      {/* Header */}
+      <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-purple-400 via-amber-400 to-purple-400 bg-clip-text text-transparent">
                 {t("title")}
@@ -199,20 +195,17 @@ export default function CardsPage() {
           )}
 
           {/* CTA */}
-          <div className="mt-16 text-center">
-            <Card variant="highlighted" className="inline-block p-8">
-              <h2 className="text-2xl font-bold text-slate-100 mb-4">
-                {t("cta.title")}
-              </h2>
-              <p className="text-slate-400 mb-6">{t("cta.subtitle")}</p>
-              <Link href="/reading/new">
-                <Button size="lg">{t("cta.button")}</Button>
-              </Link>
-            </Card>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </>
+      <div className="mt-16 text-center">
+        <Card variant="highlighted" className="inline-block p-8">
+          <h2 className="text-2xl font-bold text-slate-100 mb-4">
+            {t("cta.title")}
+          </h2>
+          <p className="text-slate-400 mb-6">{t("cta.subtitle")}</p>
+          <Link href="/reading/new">
+            <Button size="lg">{t("cta.button")}</Button>
+          </Link>
+        </Card>
+      </div>
+    </div>
   );
 }

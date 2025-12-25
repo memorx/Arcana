@@ -5,6 +5,7 @@ export interface CreditPackage {
   priceDisplay: string;
   popular: boolean;
   description: string;
+  descriptionEs: string;
 }
 
 export const CREDIT_PACKAGES: CreditPackage[] = [
@@ -14,7 +15,8 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     price: 199,
     priceDisplay: "$1.99",
     popular: false,
-    description: "2-5 lecturas",
+    description: "2-5 readings",
+    descriptionEs: "2-5 lecturas",
   },
   {
     id: "pack_15",
@@ -22,7 +24,8 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     price: 499,
     priceDisplay: "$4.99",
     popular: true,
-    description: "5-15 lecturas",
+    description: "5-15 readings",
+    descriptionEs: "5-15 lecturas",
   },
   {
     id: "pack_30",
@@ -30,7 +33,8 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     price: 899,
     priceDisplay: "$8.99",
     popular: false,
-    description: "10-30 lecturas",
+    description: "10-30 readings",
+    descriptionEs: "10-30 lecturas",
   },
 ];
 

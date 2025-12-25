@@ -34,6 +34,7 @@ interface Subscription {
   status: string;
   freeReadingsUsed: number;
   freeReadingsPerMonth: number;
+  paymentMethod?: string;
 }
 
 export default function DailyPage() {
@@ -88,6 +89,7 @@ export default function DailyPage() {
   };
 
   const hasActiveSubscription = subscription?.status === "active";
+  const isCreditsExhausted = subscription?.status === "credits_exhausted";
 
   if (isLoading) {
     return (
@@ -95,6 +97,29 @@ export default function DailyPage() {
         <div className="animate-pulse space-y-8">
           <div className="h-12 bg-slate-800 rounded w-1/3 mx-auto" />
           <div className="h-96 bg-slate-800 rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  // Credits exhausted - show resubscribe CTA
+  if (isCreditsExhausted) {
+    return (
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="text-6xl mb-6">&#128176;</div>
+        <h1 className="text-3xl font-bold text-slate-100 mb-4">
+          {t("creditsExhausted")}
+        </h1>
+        <p className="text-slate-400 mb-8">{t("creditsExhaustedDesc")}</p>
+        <div className="flex gap-4 justify-center flex-wrap">
+          <Link href="/credits">
+            <Button size="lg">{t("buyCredits")}</Button>
+          </Link>
+          <Link href="/subscribe">
+            <Button variant="secondary" size="lg">
+              {t("resubscribe")}
+            </Button>
+          </Link>
         </div>
       </div>
     );
