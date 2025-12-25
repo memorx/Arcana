@@ -73,12 +73,13 @@ export default async function NewReadingPage() {
             .map((spread) => {
               const canAfford =
                 freeReadingsLeft > 0 || credits >= spread.creditCost;
-              const positions = spread.positions as Array<{
+              const rawPositions = spread.positions;
+              const positions: Array<{
                 position: number;
                 name: string;
                 nameEs: string;
                 description: string;
-              }>;
+              }> = Array.isArray(rawPositions) ? rawPositions : [];
 
               const spreadName = locale === "en" ? spread.name : spread.nameEs;
               const spreadDescription = locale === "en" ? spread.description : spread.descriptionEs;
@@ -181,12 +182,13 @@ export default async function NewReadingPage() {
             .map((spread) => {
               const canAfford =
                 freeReadingsLeft > 0 || credits >= spread.creditCost;
-              const positions = spread.positions as Array<{
+              const rawPositions = spread.positions;
+              const positions: Array<{
                 position: number;
                 name: string;
                 nameEs: string;
                 description: string;
-              }>;
+              }> = Array.isArray(rawPositions) ? rawPositions : [];
 
               const spreadName = locale === "en" ? spread.name : spread.nameEs;
               const spreadDescription = locale === "en" ? spread.description : spread.descriptionEs;
