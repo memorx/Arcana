@@ -15,8 +15,8 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     price: 199,
     priceDisplay: "$1.99",
     popular: false,
-    description: "2-5 readings",
-    descriptionEs: "2-5 lecturas",
+    description: "Up to 5 readings",
+    descriptionEs: "Hasta 5 lecturas",
   },
   {
     id: "pack_15",
@@ -24,8 +24,8 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     price: 499,
     priceDisplay: "$4.99",
     popular: true,
-    description: "5-15 readings",
-    descriptionEs: "5-15 lecturas",
+    description: "Up to 15 readings",
+    descriptionEs: "Hasta 15 lecturas",
   },
   {
     id: "pack_30",
@@ -33,8 +33,8 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     price: 899,
     priceDisplay: "$8.99",
     popular: false,
-    description: "10-30 readings",
-    descriptionEs: "10-30 lecturas",
+    description: "Up to 30 readings",
+    descriptionEs: "Hasta 30 lecturas",
   },
 ];
 

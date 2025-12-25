@@ -38,7 +38,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
   const isSpanish = locale === "es";
 
   const subject = isSpanish
-    ? `Tu carta del dia: ${cardNameEs}`
+    ? `Tu carta del día: ${cardNameEs}`
     : `Your daily card: ${cardName}`;
 
   const displayCardName = isSpanish ? cardNameEs : cardName;
