@@ -136,7 +136,7 @@ export default async function ReadingPage({ params }: PageProps) {
           {readingCards.map((readingCard) => {
             const card = cardsMap.get(readingCard.cardId);
             const position = positions.find(
-              (p) => p.position === readingCard.position
+              (p) => Number(p.position) === Number(readingCard.position)
             );
 
             if (!card || !position) return null;

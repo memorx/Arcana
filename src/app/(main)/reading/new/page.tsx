@@ -98,7 +98,7 @@ export default async function NewReadingPage() {
                         {spreadName}
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        {spread.cardCount} {locale === "en" ? "cards" : "cartas"}
+                        {t("cards", { count: spread.cardCount })}
                       </CardDescription>
                     </div>
                     <Badge
@@ -107,7 +107,7 @@ export default async function NewReadingPage() {
                     >
                       {freeReadingsLeft > 0
                         ? t("free")
-                        : `${spread.creditCost} ${spread.creditCost !== 1 ? (locale === "en" ? "credits" : "creditos") : (locale === "en" ? "credit" : "credito")}`}
+                        : spread.creditCost !== 1 ? t("costPlural", { count: spread.creditCost }) : t("cost", { count: spread.creditCost })}
                     </Badge>
                   </div>
                 </CardHeader>

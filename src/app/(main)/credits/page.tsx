@@ -117,27 +117,33 @@ export default function CreditsPage() {
       </div>
 
       {/* Credit Packages */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6 items-center">
         {CREDIT_PACKAGES.map((pkg) => (
           <Card
             key={pkg.id}
             variant={pkg.popular ? "highlighted" : "default"}
-            className={`relative ${pkg.popular ? "ring-2 ring-purple-500" : ""}`}
+            className={`relative transition-all duration-300 ${
+              pkg.popular
+                ? "ring-2 ring-purple-500 md:scale-105 md:-my-4 shadow-xl shadow-purple-500/20"
+                : "hover:ring-1 hover:ring-slate-700"
+            }`}
           >
             {pkg.popular && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge variant="primary">{t("popular")}</Badge>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                <span className="bg-gradient-to-r from-purple-600 to-amber-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
+                  {t("popular")}
+                </span>
               </div>
             )}
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="text-4xl font-bold text-slate-100">
+            <CardHeader className={`text-center ${pkg.popular ? "pt-8" : ""} pb-2`}>
+              <CardTitle className={`font-bold text-slate-100 ${pkg.popular ? "text-5xl" : "text-4xl"}`}>
                 {pkg.credits}
               </CardTitle>
               <p className="text-slate-400 text-sm">{t("creditsUnit")}</p>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <div>
-                <p className="text-3xl font-bold text-amber-400">
+                <p className={`font-bold text-amber-400 ${pkg.popular ? "text-4xl" : "text-3xl"}`}>
                   {pkg.priceDisplay}
                 </p>
                 <p className="text-slate-500 text-sm">{pkg.description}</p>
@@ -146,7 +152,8 @@ export default function CreditsPage() {
               <Button
                 onClick={() => handlePurchase(pkg)}
                 disabled={purchasingId !== null}
-                className="w-full"
+                className={`w-full ${pkg.popular ? "shadow-lg shadow-amber-500/25" : ""}`}
+                size={pkg.popular ? "lg" : "md"}
                 variant={pkg.popular ? "primary" : "secondary"}
               >
                 {purchasingId === pkg.id ? (

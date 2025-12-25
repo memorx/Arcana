@@ -133,6 +133,8 @@
     "freeReadings": "{count, plural, one {# lectura gratis} other {# lecturas gratis}}",
     "freeReadingsLabel": "Lecturas Gratis",
     "credits": "{count} creditos",
+    "credit": "credito",
+    "creditPlural": "creditos",
     "creditsLabel": "Creditos",
     "totalReadingsLabel": "Total Lecturas",
     "noCredits": "Sin creditos",
@@ -143,7 +145,9 @@
     "firstReading": "Hacer mi primera lectura",
     "startReading": "Nueva Lectura",
     "viewAll": "Ver todas",
-    "free": "Gratis"
+    "free": "Gratis",
+    "freeShort": "gratis",
+    "cards": "cartas"
   },
   "reading": {
     "selectSpread": "Elige tu Tirada",

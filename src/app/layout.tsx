@@ -9,6 +9,14 @@ export const metadata: Metadata = {
   description:
     "Descubre tu destino con lecturas de tarot personalizadas. Interpretaciones profundas guiadas por la sabiduría ancestral de las cartas.",
   keywords: ["tarot", "lectura de cartas", "adivinacion", "espiritualidad"],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default async function RootLayout({

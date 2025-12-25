@@ -68,7 +68,7 @@ export function Header() {
                 >
                   {session.user.freeReadingsLeft > 0 && (
                     <Badge variant="success">
-                      {session.user.freeReadingsLeft} {t("credits") === "Credits" ? "free" : "gratis"}
+                      {session.user.freeReadingsLeft} {tDashboard("freeShort")}
                     </Badge>
                   )}
                   <Badge
@@ -136,7 +136,7 @@ export function Header() {
                         >
                           {session.user.freeReadingsLeft > 0 && (
                             <Badge variant="success">
-                              {session.user.freeReadingsLeft} {t("credits") === "Credits" ? "free" : "gratis"}
+                              {session.user.freeReadingsLeft} {tDashboard("freeShort")}
                             </Badge>
                           )}
                           <Badge

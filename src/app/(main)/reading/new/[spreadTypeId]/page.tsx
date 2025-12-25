@@ -71,6 +71,7 @@ export default function ReadingFlowPage({
   const { spreadTypeId } = use(params);
   const router = useRouter();
   const t = useTranslations("reading");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
 
   const [spreadType, setSpreadType] = useState<SpreadType | null>(null);
@@ -230,7 +231,7 @@ export default function ReadingFlowPage({
             <h1 className="text-3xl font-bold text-slate-100 mt-2">
               {getLocalizedName(spreadType)}
             </h1>
-            <p className="text-slate-400 mt-2">{spreadType.cardCount} {locale === "en" ? "cards" : "cartas"}</p>
+            <p className="text-slate-400 mt-2">{t("cards", { count: spreadType.cardCount })}</p>
           </div>
 
           {/* Spread Info */}
@@ -341,7 +342,7 @@ export default function ReadingFlowPage({
           {/* Cards Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {readingResult.cards.map((cardData) => {
-              const isRevealed = revealedCards.includes(cardData.position);
+              const isRevealed = revealedCards.includes(Number(cardData.position));
 
               return (
                 <div
@@ -542,7 +543,7 @@ export default function ReadingFlowPage({
                 onClick={() => setShowCreditsModal(false)}
                 className="w-full"
               >
-                {locale === "en" ? "Cancel" : "Cancelar"}
+                {tCommon("cancel")}
               </Button>
             </div>
           </div>
