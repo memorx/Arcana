@@ -74,12 +74,12 @@ export default async function NewReadingPage() {
               const canAfford =
                 freeReadingsLeft > 0 || credits >= spread.creditCost;
               const rawPositions = spread.positions;
-              const positions: Array<{
+              const positions = (Array.isArray(rawPositions) ? rawPositions : []) as Array<{
                 position: number;
                 name: string;
                 nameEs: string;
                 description: string;
-              }> = Array.isArray(rawPositions) ? rawPositions : [];
+              }>;
 
               const spreadName = locale === "en" ? spread.name : spread.nameEs;
               const spreadDescription = locale === "en" ? spread.description : spread.descriptionEs;
@@ -183,12 +183,12 @@ export default async function NewReadingPage() {
               const canAfford =
                 freeReadingsLeft > 0 || credits >= spread.creditCost;
               const rawPositions = spread.positions;
-              const positions: Array<{
+              const positions = (Array.isArray(rawPositions) ? rawPositions : []) as Array<{
                 position: number;
                 name: string;
                 nameEs: string;
                 description: string;
-              }> = Array.isArray(rawPositions) ? rawPositions : [];
+              }>;
 
               const spreadName = locale === "en" ? spread.name : spread.nameEs;
               const spreadDescription = locale === "en" ? spread.description : spread.descriptionEs;

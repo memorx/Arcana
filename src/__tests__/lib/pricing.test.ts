@@ -117,6 +117,7 @@ describe("CreditPackage type", () => {
       priceDisplay: "$2.99",
       popular: false,
       description: "Test package",
+      descriptionEs: "Paquete de prueba",
     };
 
     expect(pkg.id).toBe("test_pack");

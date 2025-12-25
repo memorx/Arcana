@@ -245,6 +245,5 @@ export default async function CardDetailPage({ params }: Props) {
           </Card>
         </div>
       </div>
-    </div>
   );
 }
