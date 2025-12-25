@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { fullName, birthDate, birthTime, focusArea, emailTime } = body;
+    const { fullName, birthDate, birthTime, focusArea, emailTime, locale } = body;
 
     // Validate required fields
     if (!fullName || !birthDate) {
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
         zodiacSign,
         focusArea: focusArea || "general",
         emailTime: emailTime || "08:00",
+        locale: locale || "es",
       },
       create: {
         userId: session.user.id,
@@ -65,6 +66,7 @@ export async function POST(req: NextRequest) {
         zodiacSign,
         focusArea: focusArea || "general",
         emailTime: emailTime || "08:00",
+        locale: locale || "es",
       },
     });
 

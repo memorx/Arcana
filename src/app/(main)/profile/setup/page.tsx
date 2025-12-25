@@ -97,6 +97,7 @@ export default function ProfileSetupPage() {
           birthTime: formData.birthTime || null,
           focusArea: formData.focusArea,
           emailTime: formData.emailTime,
+          locale,
         }),
       });
 
@@ -290,6 +291,11 @@ export default function ProfileSetupPage() {
                   </button>
                 ))}
               </div>
+              <p className="text-xs text-amber-400/70 mt-2">
+                {locale === "en"
+                  ? "⚠️ Times are in UTC. Mexico City is UTC-6."
+                  : "⚠️ Los horarios están en UTC. Ciudad de México es UTC-6."}
+              </p>
             </div>
 
             {/* Submit */}

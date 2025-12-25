@@ -52,6 +52,10 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
   <title>${subject}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Georgia', 'Times New Roman', serif; background-color: #0f172a;">
+  <!-- Preheader text -->
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
+    ${displayCardName} - ${isSpanish ? "Tu carta del día te espera ✨" : "Your daily card awaits ✨"}
+  </div>
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
     <tr>
       <td align="center" style="padding: 40px 20px;">
@@ -95,9 +99,9 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
               </h2>
               ${
                 isReversed
-                  ? `<span style="display: inline-block; background: #7c3aed; color: white; padding: 4px 16px; border-radius: 20px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
-                      ${isSpanish ? "Invertida" : "Reversed"}
-                     </span>`
+                  ? `<div style="background: #dc2626; color: white; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; display: inline-block;">
+                      ↺ ${isSpanish ? "INVERTIDA" : "REVERSED"}
+                     </div>`
                   : ""
               }
             </td>
@@ -119,7 +123,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
             <td style="padding: 20px 30px; text-align: center;">
               <a href="https://www.readarcana.com/daily"
                  style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1a1a2e; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
-                ${isSpanish ? "Ver mas en Arcana" : "See more in Arcana"}
+                ${isSpanish ? "Ver más en Arcana" : "See more in Arcana"}
               </a>
             </td>
           </tr>
@@ -128,7 +132,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
           <tr>
             <td style="padding: 20px 30px; text-align: center; border-top: 1px solid rgba(139, 92, 246, 0.2);">
               <p style="color: #94a3b8; font-size: 14px; margin: 0 0 12px;">
-                ${isSpanish ? "Quieres una lectura mas profunda?" : "Want a deeper reading?"}
+                ${isSpanish ? "¿Quieres una lectura más profunda?" : "Want a deeper reading?"}
               </p>
               <a href="https://www.readarcana.com/reading/new"
                  style="color: #a78bfa; font-size: 14px; text-decoration: none;">
@@ -143,9 +147,9 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
               <p style="color: #64748b; font-size: 12px; margin: 0 0 10px;">
                 Arcana - AI Tarot Readings
               </p>
-              <a href="https://www.readarcana.com/subscribe"
+              <a href="https://www.readarcana.com/api/stripe/portal"
                  style="color: #64748b; font-size: 11px; text-decoration: underline;">
-                ${isSpanish ? "Gestionar suscripcion" : "Manage subscription"}
+                ${isSpanish ? "Gestionar suscripción" : "Manage subscription"}
               </a>
             </td>
           </tr>
