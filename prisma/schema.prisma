@@ -45,10 +45,13 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  accounts     Account[]
-  sessions     Session[]
-  readings     Reading[]
-  transactions CreditTransaction[]
+  accounts      Account[]
+  sessions      Session[]
+  readings      Reading[]
+  transactions  CreditTransaction[]
+  profile       UserProfile?
+  subscription  Subscription?
+  dailyReadings DailyReading[]
 
   @@map("users")
 }
@@ -120,6 +123,8 @@ model Card {
   meaningReversed String  @db.Text
   imageUrl        String
 
+  dailyReadings DailyReading[]
+
   @@unique([arcana, suit, number])
   @@map("cards")
 }
@@ -175,4 +180,63 @@ model CreditTransaction {
   @@index([userId])
   @@index([createdAt])
   @@map("credit_transactions")
+}
+
+// ============================================================================
+// DAILY ORACLE MODELS
+// ============================================================================
+
+model UserProfile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  birthDate  DateTime
+  birthTime  String?  // HH:mm format, opcional
+  zodiacSign String   // Calculado automaticamente
+  fullName   String
+  focusArea  String   @default("general") // love, career, spirituality, health, general
+  emailTime  String   @default("08:00") // Hora preferida para recibir email
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                 String    @default("daily_oracle") // daily_oracle
+  status               String    @default("active") // active, canceled, past_due
+  stripeSubscriptionId String?   @unique
+  stripeCustomerId     String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  freeReadingsPerMonth Int       @default(1)
+  freeReadingsUsed     Int       @default(0)
+  lastResetDate        DateTime  @default(now())
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@map("subscriptions")
+}
+
+model DailyReading {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date           DateTime  @db.Date
+  cardId         String
+  card           Card      @relation(fields: [cardId], references: [id])
+  isReversed     Boolean   @default(false)
+  interpretation String    @db.Text
+  sentAt         DateTime?
+  openedAt       DateTime? // Para tracking si lo abrio
+  createdAt      DateTime  @default(now())
+
+  @@unique([userId, date]) // Una carta por dia por usuario
+  @@index([userId])
+  @@index([date])
+  @@map("daily_readings")
 }
