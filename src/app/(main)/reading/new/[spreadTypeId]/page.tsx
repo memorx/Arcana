@@ -281,6 +281,7 @@ export default function ReadingFlowPage({
               <Button
                 onClick={handleStartReading}
                 disabled={intention.length < 10 || isSubmitting}
+                isLoading={isSubmitting}
                 className="w-full mt-4"
                 size="lg"
               >
