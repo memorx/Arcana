@@ -305,7 +305,7 @@ export default function ProfileSetupPage() {
               size="lg"
               isLoading={isSaving}
             >
-              {isSaving ? t("saving") : t("continue")}
+              {isSaving ? t("saving") : t("save")}
             </Button>
           </form>
         </CardContent>
