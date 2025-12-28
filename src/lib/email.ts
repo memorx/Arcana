@@ -179,7 +179,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
   `.trim();
 
   const result = await getResend().emails.send({
-    from: "Arcana <daily@send.readarcana.com>",
+    from: "Arcana <daily@readarcana.com>",
     to,
     subject,
     html,
@@ -258,7 +258,7 @@ export async function sendPasswordResetEmail(params: PasswordResetEmailParams) {
   `.trim();
 
   return getResend().emails.send({
-    from: "Arcana <noreply@send.readarcana.com>",
+    from: "Arcana <noreply@readarcana.com>",
     to,
     subject,
     html,
