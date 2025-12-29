@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Badge, LanguageSelector } from "@/components/ui";
 import { SoundToggle } from "@/components/SoundToggle";
@@ -10,8 +10,35 @@ import { SoundToggle } from "@/components/SoundToggle";
 export function Header() {
   const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [freeReadings, setFreeReadings] = useState<number | null>(null);
   const t = useTranslations("nav");
   const tDashboard = useTranslations("dashboard");
+
+  // Fetch actual credits from API (not cached JWT)
+  useEffect(() => {
+    if (status === "authenticated") {
+      const fetchCredits = async () => {
+        try {
+          const res = await fetch("/api/user/credits");
+          if (res.ok) {
+            const data = await res.json();
+            setCredits(data.credits);
+            setFreeReadings(data.freeReadingsLeft);
+          }
+        } catch {
+          // Fall back to session values if API fails
+          setCredits(session?.user?.credits ?? 0);
+          setFreeReadings(session?.user?.freeReadingsLeft ?? 0);
+        }
+      };
+      fetchCredits();
+    }
+  }, [status, session?.user?.credits, session?.user?.freeReadingsLeft]);
+
+  // Use fetched values or fall back to session
+  const displayCredits = credits ?? session?.user?.credits ?? 0;
+  const displayFreeReadings = freeReadings ?? session?.user?.freeReadingsLeft ?? 0;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl">
@@ -72,20 +99,20 @@ export function Header() {
                   href="/credits"
                   className="hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity"
                 >
-                  {session.user.freeReadingsLeft > 0 && (
+                  {displayFreeReadings > 0 && (
                     <Badge variant="success">
-                      {session.user.freeReadingsLeft} {tDashboard("freeShort")}
+                      {displayFreeReadings} {tDashboard("freeShort")}
                     </Badge>
                   )}
                   <Badge
                     variant={
-                      session.user.credits === 0 &&
-                      session.user.freeReadingsLeft === 0
+                      displayCredits === 0 &&
+                      displayFreeReadings === 0
                         ? "warning"
                         : "secondary"
                     }
                   >
-                    {tDashboard("credits", { count: session.user.credits })}
+                    {tDashboard("credits", { count: displayCredits })}
                   </Badge>
                 </Link>
 
@@ -144,20 +171,20 @@ export function Header() {
                           className="sm:hidden px-4 py-2 border-b border-slate-800 flex gap-2 hover:bg-slate-800/50"
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          {session.user.freeReadingsLeft > 0 && (
+                          {displayFreeReadings > 0 && (
                             <Badge variant="success">
-                              {session.user.freeReadingsLeft} {tDashboard("freeShort")}
+                              {displayFreeReadings} {tDashboard("freeShort")}
                             </Badge>
                           )}
                           <Badge
                             variant={
-                              session.user.credits === 0 &&
-                              session.user.freeReadingsLeft === 0
+                              displayCredits === 0 &&
+                              displayFreeReadings === 0
                                 ? "warning"
                                 : "secondary"
                             }
                           >
-                            {tDashboard("credits", { count: session.user.credits })}
+                            {tDashboard("credits", { count: displayCredits })}
                           </Badge>
                         </Link>
 

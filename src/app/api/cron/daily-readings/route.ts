@@ -158,16 +158,13 @@ export async function GET(req: NextRequest) {
           }
         );
 
-        // Construct card image URL
-        const cardImageUrl = `https://www.readarcana.com${selectedCard.imageUrl}`;
-
         // Send email
         await sendDailyReadingEmail({
           to: user.email,
           userName: profile.fullName.split(" ")[0],
           cardName: selectedCard.name,
           cardNameEs: selectedCard.nameEs,
-          cardImage: cardImageUrl,
+          cardImage: selectedCard.imageUrl,
           isReversed,
           interpretation,
           date: dateStr,

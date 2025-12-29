@@ -118,20 +118,31 @@ export default function ReadingFlowPage({
   // Handle card revealing animation
   useEffect(() => {
     if (step === "revealing" && readingResult) {
-      const totalCards = readingResult.cards.length;
+      const positions = readingResult.cards.map((c) => c.position);
       let currentIndex = 0;
 
-      const revealInterval = setInterval(() => {
-        if (currentIndex < totalCards) {
-          setRevealedCards((prev) => [...prev, currentIndex + 1]);
-          currentIndex++;
-        } else {
-          clearInterval(revealInterval);
-          setTimeout(() => setAllRevealed(true), 500);
-        }
-      }, 800);
+      // Reveal first card immediately
+      if (positions.length > 0) {
+        setRevealedCards([positions[0]]);
+        currentIndex = 1;
+      }
 
-      return () => clearInterval(revealInterval);
+      // Reveal remaining cards with delay
+      if (positions.length > 1) {
+        const revealInterval = setInterval(() => {
+          if (currentIndex < positions.length) {
+            setRevealedCards((prev) => [...prev, positions[currentIndex]]);
+            currentIndex++;
+          } else {
+            clearInterval(revealInterval);
+            setTimeout(() => setAllRevealed(true), 500);
+          }
+        }, 800);
+
+        return () => clearInterval(revealInterval);
+      } else {
+        setTimeout(() => setAllRevealed(true), 500);
+      }
     }
   }, [step, readingResult]);
 
