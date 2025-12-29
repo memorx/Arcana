@@ -264,3 +264,80 @@ export async function sendPasswordResetEmail(params: PasswordResetEmailParams) {
     html,
   });
 }
+
+interface SubscriptionExpiredEmailParams {
+  to: string;
+  userName: string;
+  locale?: string;
+}
+
+export async function sendSubscriptionExpiredEmail(params: SubscriptionExpiredEmailParams) {
+  const { to, userName, locale = "es" } = params;
+  const isSpanish = locale === "es";
+
+  const subject = isSpanish
+    ? "Tu suscripción Daily Oracle ha expirado - Arcana"
+    : "Your Daily Oracle subscription has expired - Arcana";
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Georgia', serif; background-color: #0f172a;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="max-width: 500px; width: 100%; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-radius: 16px; overflow: hidden;">
+          <tr>
+            <td style="padding: 30px; text-align: center; border-bottom: 1px solid rgba(139, 92, 246, 0.2);">
+              <div style="font-size: 32px; margin-bottom: 8px;">&#9788;</div>
+              <div style="color: #f59e0b; font-size: 24px; font-weight: bold; letter-spacing: 2px;">ARCANA</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
+              <h1 style="color: #e2e8f0; font-size: 22px; margin: 0 0 16px; text-align: center;">
+                ${isSpanish ? `Hola ${userName}` : `Hello ${userName}`}
+              </h1>
+              <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+                ${isSpanish
+                  ? "Tu suscripción a Daily Oracle no pudo renovarse porque no tienes suficientes créditos. No te preocupes, puedes reactivarla fácilmente."
+                  : "Your Daily Oracle subscription could not be renewed because you don't have enough credits. Don't worry, you can easily reactivate it."}
+              </p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="https://www.readarcana.com/credits" style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1a1a2e; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  ${isSpanish ? "Comprar créditos" : "Buy credits"}
+                </a>
+              </div>
+              <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 24px 0 0; text-align: center;">
+                ${isSpanish
+                  ? "Una vez que tengas créditos, puedes volver a suscribirte desde tu dashboard."
+                  : "Once you have credits, you can resubscribe from your dashboard."}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 30px; text-align: center; background: rgba(0, 0, 0, 0.2);">
+              <p style="color: #64748b; font-size: 12px; margin: 0;">
+                Arcana - AI Tarot Readings
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+
+  return getResend().emails.send({
+    from: "Arcana <noreply@readarcana.com>",
+    to,
+    subject,
+    html,
+  });
+}
