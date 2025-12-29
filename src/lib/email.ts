@@ -24,6 +24,13 @@ interface DailyReadingEmailParams {
   keywords: string[];
 }
 
+// Use Next.js image optimization as a proxy to avoid email clients blocking external images
+function getProxiedImageUrl(originalUrl: string): string {
+  const baseUrl = "https://www.readarcana.com";
+  const encodedUrl = encodeURIComponent(originalUrl);
+  return `${baseUrl}/_next/image?url=${encodedUrl}&w=384&q=80`;
+}
+
 function getZodiacEmoji(sign: string): string {
   const emojis: Record<string, string> = {
     Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋",
@@ -102,7 +109,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
             <td style="padding: 20px 30px; text-align: center;">
               <div style="display: inline-block; padding: 20px; background: rgba(139, 92, 246, 0.1); border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.2);">
                 <img
-                  src="${cardImage}"
+                  src="${getProxiedImageUrl(cardImage)}"
                   alt="${displayCardName}"
                   style="max-width: 180px; height: auto; border-radius: 8px;"
                 />
