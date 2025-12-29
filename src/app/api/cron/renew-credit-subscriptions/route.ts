@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSubscriptionPlanById } from "@/lib/pricing";
+import { sendSubscriptionExpiredEmail } from "@/lib/email";
 
 // Runs daily at midnight to check for expiring credit subscriptions
 export async function GET(req: NextRequest) {
@@ -28,7 +29,8 @@ export async function GET(req: NextRequest) {
       },
       include: {
         user: {
-          select: { id: true, credits: true, email: true },
+          select: { id: true, credits: true, email: true, name: true },
+          include: { profile: { select: { fullName: true, locale: true } } },
         },
       },
     });
@@ -86,7 +88,20 @@ export async function GET(req: NextRequest) {
         console.log(`[CRON RENEW] Subscription expired for ${sub.user.email} - not enough credits`);
         failed++;
 
-        // TODO: Send email notification about expired subscription
+        // Send email notification about expired subscription
+        const userName = sub.user.profile?.fullName?.split(" ")[0] || sub.user.name || "there";
+        const locale = sub.user.profile?.locale || "es";
+
+        try {
+          await sendSubscriptionExpiredEmail({
+            to: sub.user.email,
+            userName,
+            locale,
+          });
+          console.log(`[CRON RENEW] Sent expiration email to ${sub.user.email}`);
+        } catch (emailError) {
+          console.error(`[CRON RENEW] Failed to send expiration email to ${sub.user.email}:`, emailError);
+        }
       }
     }
 

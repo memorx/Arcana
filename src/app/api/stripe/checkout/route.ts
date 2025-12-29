@@ -23,7 +23,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    // Validate origin to prevent open redirect
+    const allowedOrigins = [
+      process.env.NEXTAUTH_URL,
+      "https://www.readarcana.com",
+      "https://readarcana.com",
+      "http://localhost:3000",
+    ].filter(Boolean);
+
+    const requestOrigin = req.headers.get("origin");
+    const origin = allowedOrigins.includes(requestOrigin || "")
+      ? requestOrigin
+      : process.env.NEXTAUTH_URL || "https://www.readarcana.com";
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
