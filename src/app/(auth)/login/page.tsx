@@ -33,13 +33,14 @@ function LoginForm() {
 
       if (result?.error) {
         setFormError(t("errors.invalidCredentials"));
+        setIsLoading(false);
       } else {
+        // Keep loading state while navigating to dashboard
         router.push(callbackUrl);
         router.refresh();
       }
     } catch {
       setFormError(t("errors.invalidCredentials"));
-    } finally {
       setIsLoading(false);
     }
   };
