@@ -1,7 +1,7 @@
 export interface CreditPackage {
   id: string;
   credits: number;
-  price: number; // cents USD
+  price: number; // centavos MXN
   priceDisplay: string;
   popular: boolean;
   description: string;
@@ -12,8 +12,8 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
   {
     id: "pack_5",
     credits: 5,
-    price: 199,
-    priceDisplay: "$1.99",
+    price: 3900,
+    priceDisplay: "$39 MXN",
     popular: false,
     description: "Up to 5 readings",
     descriptionEs: "Hasta 5 lecturas",
@@ -21,20 +21,20 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
   {
     id: "pack_15",
     credits: 15,
-    price: 499,
-    priceDisplay: "$4.99",
+    price: 9900,
+    priceDisplay: "$99 MXN",
     popular: true,
     description: "Up to 15 readings",
     descriptionEs: "Hasta 15 lecturas",
   },
   {
-    id: "pack_30",
-    credits: 30,
-    price: 899,
-    priceDisplay: "$8.99",
+    id: "pack_50",
+    credits: 50,
+    price: 29900,
+    priceDisplay: "$299 MXN",
     popular: false,
-    description: "Up to 30 readings",
-    descriptionEs: "Hasta 30 lecturas",
+    description: "Up to 50 readings",
+    descriptionEs: "Hasta 50 lecturas",
   },
 ];
 
@@ -50,7 +50,7 @@ export interface SubscriptionPlan {
   id: string;
   name: string;
   nameEs: string;
-  price: number; // cents USD
+  price: number; // centavos MXN
   priceDisplay: string;
   creditsCost: number; // cost in credits per month
   creditsCostDisplay: string;
@@ -65,8 +65,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     id: 'daily_oracle',
     name: 'Daily Oracle',
     nameEs: 'Oráculo Diario',
-    price: 399,
-    priceDisplay: '$3.99/mo',
+    price: 7900,
+    priceDisplay: '$79 MXN/mes',
     creditsCost: 10,
     creditsCostDisplay: '10 credits/mo',
     interval: 'month',
