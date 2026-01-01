@@ -68,13 +68,14 @@ function RegisterForm() {
 
       if (result?.error) {
         setError(t("errors.loginAfterRegister"));
+        setIsLoading(false);
       } else {
+        // Keep loading state while navigating to dashboard
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
       setError(t("errors.createAccount"));
-    } finally {
       setIsLoading(false);
     }
   };
