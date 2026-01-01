@@ -107,12 +107,12 @@ export default function ProfileSetupPage() {
       }
 
       setSuccess(true);
+      // Keep loading state while showing success and navigating
       setTimeout(() => {
         router.push("/dashboard");
       }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error saving profile");
-    } finally {
       setIsSaving(false);
     }
   };
