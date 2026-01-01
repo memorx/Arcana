@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: "usd",
+            currency: "mxn",
             product_data: {
               name: `${pkg.credits} Arcana Credits`,
               description: pkg.description,
