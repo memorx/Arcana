@@ -585,6 +585,12 @@
     "loginRequired": "Login Required",
     "loginRequiredDesc": "Please log in to access your referral link"
   },
+  "pwa": {
+    "installTitle": "Install Arcana",
+    "installPrompt": "Add to your home screen for quick access and offline features!",
+    "install": "Install App",
+    "later": "Later"
+  },
   "blog": {
     "title": "Tarot Insights & Guides",
     "subtitle": "Learn about tarot reading, card meanings, and spiritual guidance",

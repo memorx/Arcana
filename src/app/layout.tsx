@@ -71,6 +71,12 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <head>
+        {/* PWA Meta Tags for iOS */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Arcana" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+
         {/* Plausible Analytics - Privacy-friendly */}
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <Script
