@@ -585,6 +585,12 @@
     "loginRequired": "Inicio de Sesion Requerido",
     "loginRequiredDesc": "Por favor inicia sesion para acceder a tu enlace de referidos"
   },
+  "pwa": {
+    "installTitle": "Instala Arcana",
+    "installPrompt": "Agrega a tu pantalla de inicio para acceso rapido y funciones offline!",
+    "install": "Instalar App",
+    "later": "Despues"
+  },
   "blog": {
     "title": "Guias e Insights del Tarot",
     "subtitle": "Aprende sobre lectura del tarot, significados de cartas y guia espiritual",

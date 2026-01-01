@@ -1,23 +1,67 @@
 {
   "name": "Arcana - AI Tarot Readings",
   "short_name": "Arcana",
-  "description": "Personalized AI tarot readings",
-  "start_url": "/",
+  "description": "Personalized AI tarot readings in English and Spanish",
+  "start_url": "/dashboard",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0f0a19",
   "theme_color": "#7c3aed",
+  "categories": ["lifestyle", "entertainment"],
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/reading.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Reading",
+      "short_name": "Reading",
+      "url": "/reading/new",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Daily Oracle",
+      "short_name": "Daily",
+      "url": "/daily",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
