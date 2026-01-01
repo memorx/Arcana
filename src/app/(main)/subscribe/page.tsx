@@ -124,6 +124,7 @@ export default function SubscribePage() {
       const data = await res.json();
 
       if (res.ok) {
+        // Keep loading state while navigating
         router.push("/subscribe/success?method=credits");
       } else {
         throw new Error(data.error || "Error");
@@ -135,7 +136,6 @@ export default function SubscribePage() {
           ? "Error processing subscription. Please try again."
           : "Error procesando suscripcion. Intenta de nuevo."
       );
-    } finally {
       setIsProcessingCredits(false);
     }
   };
