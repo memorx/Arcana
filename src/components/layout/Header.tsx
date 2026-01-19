@@ -241,6 +241,13 @@ export function Header() {
                           >
                             <span>&#127873;</span> {t("referral")}
                           </Link>
+                          <Link
+                            href="/settings"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span>&#9881;</span> {t("settings")}
+                          </Link>
                         </div>
 
                         <div className="border-t border-slate-800 pt-1">
