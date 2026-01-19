@@ -33,7 +33,8 @@
     "dailyCard": "Daily Card",
     "subscribe": "Daily Oracle",
     "profile": "My Profile",
-    "referral": "Refer Friends"
+    "referral": "Refer Friends",
+    "settings": "Settings"
   },
   "landing": {
     "readingCounter": "readings performed",
@@ -601,5 +602,22 @@
     "ctaTitle": "Ready for Your Reading?",
     "ctaDescription": "Put your knowledge into practice with a personalized tarot reading",
     "ctaButton": "Start Free Reading"
+  },
+  "settings": {
+    "title": "Settings",
+    "accountInfo": "Account Information",
+    "email": "Email",
+    "name": "Name",
+    "memberSince": "Member since",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteWarning": "This will permanently delete your account and all your data including readings, profile, and subscription.",
+    "deleteConfirmTitle": "Are you sure?",
+    "deleteConfirmText": "Type DELETE to confirm",
+    "deleteConfirmPlaceholder": "Type DELETE",
+    "deleting": "Deleting...",
+    "cancel": "Cancel",
+    "deleteError": "Error deleting account. Please try again.",
+    "notAuthenticated": "You must be logged in to access settings."
   }
 }

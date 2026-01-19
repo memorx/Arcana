@@ -33,7 +33,8 @@
     "dailyCard": "Carta del Dia",
     "subscribe": "Oraculo Diario",
     "profile": "Mi Perfil",
-    "referral": "Invitar Amigos"
+    "referral": "Invitar Amigos",
+    "settings": "Configuracion"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
@@ -601,5 +602,22 @@
     "ctaTitle": "Listo para tu Lectura?",
     "ctaDescription": "Pon tu conocimiento en practica con una lectura de tarot personalizada",
     "ctaButton": "Comenzar Lectura Gratis"
+  },
+  "settings": {
+    "title": "Configuracion",
+    "accountInfo": "Informacion de la Cuenta",
+    "email": "Correo electronico",
+    "name": "Nombre",
+    "memberSince": "Miembro desde",
+    "dangerZone": "Zona de Peligro",
+    "deleteAccount": "Eliminar Cuenta",
+    "deleteWarning": "Esto eliminara permanentemente tu cuenta y todos tus datos incluyendo lecturas, perfil y suscripcion.",
+    "deleteConfirmTitle": "Estas seguro?",
+    "deleteConfirmText": "Escribe ELIMINAR para confirmar",
+    "deleteConfirmPlaceholder": "Escribe ELIMINAR",
+    "deleting": "Eliminando...",
+    "cancel": "Cancelar",
+    "deleteError": "Error al eliminar la cuenta. Por favor intenta de nuevo.",
+    "notAuthenticated": "Debes iniciar sesion para acceder a la configuracion."
   }
 }
