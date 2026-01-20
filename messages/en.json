@@ -43,7 +43,8 @@
     "readingCounter": "readings performed",
     "dailyCard": {
       "title": "Your Card of the Day",
-      "cta": "Sign up for a complete reading"
+      "cta": "Sign up for a complete reading",
+      "ctaAuthenticated": "Get a full reading"
     },
     "testimonials": {
       "title": "What Our Users Say",
@@ -65,6 +66,7 @@
       "subtitle": "Tarot cards hold ancient secrets. Let them reveal the messages the universe has for you.",
       "cta": "Start Reading",
       "ctaSecondary": "Create Free Account",
+      "ctaAuthenticated": "Go to My Space",
       "trustBadge": "3 free readings when you sign up - No credit card required"
     },
     "howItWorks": {
@@ -120,7 +122,10 @@
     "cta": {
       "title": "Begin your spiritual journey",
       "subtitle": "Sign up now and receive 3 free readings. Discover what the cards have in store for you.",
-      "button": "Create Free Account"
+      "button": "Create Free Account",
+      "titleAuthenticated": "Ready for your next reading?",
+      "subtitleAuthenticated": "The cards are waiting to reveal new insights just for you.",
+      "buttonAuthenticated": "Start New Reading"
     },
     "dailyOracle": {
       "badge": "New",

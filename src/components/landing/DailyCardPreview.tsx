@@ -16,6 +16,7 @@ interface Card {
 interface DailyCardPreviewProps {
   title: string;
   ctaText: string;
+  ctaHref?: string;
   locale: string;
 }
 
@@ -30,7 +31,7 @@ function getTodaysSeed() {
   return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 }
 
-export function DailyCardPreview({ title, ctaText, locale }: DailyCardPreviewProps) {
+export function DailyCardPreview({ title, ctaText, ctaHref = "/register", locale }: DailyCardPreviewProps) {
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -135,7 +136,7 @@ export function DailyCardPreview({ title, ctaText, locale }: DailyCardPreviewPro
               </p>
 
               <div className="mt-6">
-                <Link href="/register">
+                <Link href={ctaHref}>
                   <Button size="lg" className="w-full md:w-auto">
                     {ctaText}
                   </Button>

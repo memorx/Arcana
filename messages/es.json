@@ -43,7 +43,8 @@
     "readingCounter": "lecturas realizadas",
     "dailyCard": {
       "title": "Tu Carta del Dia",
-      "cta": "Registrate para una lectura completa"
+      "cta": "Registrate para una lectura completa",
+      "ctaAuthenticated": "Obtener lectura completa"
     },
     "testimonials": {
       "title": "Lo que dicen nuestros usuarios",
@@ -65,6 +66,7 @@
       "subtitle": "Las cartas del tarot guardan secretos ancestrales. Deja que revelen los mensajes que el universo tiene para ti.",
       "cta": "Comenzar Lectura",
       "ctaSecondary": "Crear Cuenta Gratis",
+      "ctaAuthenticated": "Ir a Mi Espacio",
       "trustBadge": "3 lecturas gratuitas al registrarte - Sin tarjeta de credito"
     },
     "howItWorks": {
@@ -120,7 +122,10 @@
     "cta": {
       "title": "Comienza tu viaje espiritual",
       "subtitle": "Registrate ahora y recibe 3 lecturas gratuitas. Descubre lo que las cartas tienen preparado para ti.",
-      "button": "Crear Cuenta Gratis"
+      "button": "Crear Cuenta Gratis",
+      "titleAuthenticated": "Listo para tu proxima lectura?",
+      "subtitleAuthenticated": "Las cartas esperan revelarte nuevos mensajes.",
+      "buttonAuthenticated": "Comenzar Nueva Lectura"
     },
     "dailyOracle": {
       "badge": "Nuevo",
