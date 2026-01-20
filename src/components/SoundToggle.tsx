@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useSounds } from "@/lib/sounds";
 
 interface SoundToggleProps {
@@ -8,6 +9,7 @@ interface SoundToggleProps {
 }
 
 export function SoundToggle({ className = "" }: SoundToggleProps) {
+  const t = useTranslations("sound");
   const { isEnabled, toggle } = useSounds();
   const [enabled, setEnabled] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -26,12 +28,14 @@ export function SoundToggle({ className = "" }: SoundToggleProps) {
     return null;
   }
 
+  const label = enabled ? t("disable") : t("enable");
+
   return (
     <button
       onClick={handleToggle}
       className={`p-2 rounded-lg hover:bg-slate-800 transition-colors ${className}`}
-      title={enabled ? "Disable sounds" : "Enable sounds"}
-      aria-label={enabled ? "Disable sounds" : "Enable sounds"}
+      title={label}
+      aria-label={label}
     >
       {enabled ? (
         <svg

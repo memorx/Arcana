@@ -711,6 +711,10 @@
     },
     "continue": "Continuar"
   },
+  "sound": {
+    "enable": "Activar sonidos",
+    "disable": "Desactivar sonidos"
+  },
   "settings": {
     "title": "Configuracion",
     "accountInfo": "Informacion de la Cuenta",
