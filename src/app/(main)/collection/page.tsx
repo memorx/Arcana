@@ -197,6 +197,7 @@ export default function CollectionPage() {
                               fill
                               className="object-cover"
                               sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 12vw"
+                              unoptimized
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity">
                               <div className="absolute bottom-0 left-0 right-0 p-2">
@@ -220,6 +221,7 @@ export default function CollectionPage() {
                               fill
                               className="object-cover filter grayscale blur-sm"
                               sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 12vw"
+                              unoptimized
                             />
                           </div>
                         </div>

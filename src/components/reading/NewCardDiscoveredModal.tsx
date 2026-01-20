@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { Modal, ModalBody, Button } from "@/components/ui";
+import { CardPlaceholder } from "@/components/ui/CardPlaceholder";
 
 interface DiscoveredCard {
   id: string;
@@ -28,14 +29,20 @@ export function NewCardDiscoveredModal({
   const t = useTranslations("collection");
   const locale = useLocale();
   const [showShimmer, setShowShimmer] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (isOpen) {
       setShowShimmer(true);
+      setImageErrors({});
       const timer = setTimeout(() => setShowShimmer(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+
+  const handleImageError = (cardId: string) => {
+    setImageErrors(prev => ({ ...prev, [cardId]: true }));
+  };
 
   if (cards.length === 0) return null;
 
@@ -72,16 +79,28 @@ export function NewCardDiscoveredModal({
                   showShimmer ? "animate-pulse" : ""
                 }`}
               >
-                <Image
-                  src={card.imageUrl}
-                  alt={getCardName(card)}
-                  fill
-                  className="object-cover"
-                  sizes="96px"
-                />
+                {imageErrors[card.id] ? (
+                  <CardPlaceholder
+                    cardName={getCardName(card)}
+                    arcana={card.arcana as "MAJOR" | "MINOR"}
+                    suit={card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null}
+                    number={0}
+                    className="w-24 h-36"
+                  />
+                ) : (
+                  <Image
+                    src={card.imageUrl}
+                    alt={getCardName(card)}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                    onError={() => handleImageError(card.id)}
+                    unoptimized
+                  />
+                )}
 
                 {/* Shimmer overlay */}
-                {showShimmer && (
+                {showShimmer && !imageErrors[card.id] && (
                   <div className="absolute inset-0 overflow-hidden">
                     <div
                       className="absolute inset-0 -translate-x-full animate-shimmer"

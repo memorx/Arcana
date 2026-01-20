@@ -121,6 +121,7 @@ export default async function CardDetailPage({ params }: Props) {
                     fill
                     className="object-cover"
                     priority
+                    unoptimized
                   />
                 </div>
               </div>
