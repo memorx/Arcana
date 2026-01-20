@@ -1,14 +1,26 @@
 import { prisma } from "@/lib/prisma";
+import { STREAK_MILESTONES } from "@/lib/streak-utils";
+
+// Re-export utilities for convenience
+export { STREAK_MILESTONES, getNextMilestone, getMilestoneProgress } from "@/lib/streak-utils";
+export type { StreakMilestone } from "@/lib/streak-utils";
+
+export interface StreakRewardInfo {
+  milestone: number;
+  creditsAwarded: number;
+}
+
+export interface StreakUpdateResult {
+  currentStreak: number;
+  longestStreak: number;
+  reward: StreakRewardInfo | null;
+}
 
 /**
  * Update user's streak after completing a reading
- * Returns bonus credits if streak milestone reached
+ * Returns reward info if a new milestone was reached
  */
-export async function updateStreak(userId: string): Promise<{
-  currentStreak: number;
-  longestStreak: number;
-  bonusCredits: number;
-}> {
+export async function updateStreak(userId: string): Promise<StreakUpdateResult> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -26,7 +38,6 @@ export async function updateStreak(userId: string): Promise<{
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   let newStreak = 1;
-  let bonusCredits = 0;
 
   if (user.lastReadingDate) {
     const lastDate = new Date(user.lastReadingDate);
@@ -48,40 +59,99 @@ export async function updateStreak(userId: string): Promise<{
     }
   }
 
-  // Check for milestone bonuses
-  if (newStreak === 7 && user.currentStreak < 7) {
-    bonusCredits = 1; // 7-day streak bonus
-  } else if (newStreak === 30 && user.currentStreak < 30) {
-    bonusCredits = 3; // 30-day streak bonus
-  }
-
   const newLongestStreak = Math.max(newStreak, user.longestStreak);
 
-  // Update user
+  // Check for new milestone rewards
+  let reward: StreakRewardInfo | null = null;
+
+  // Only check for rewards if streak actually increased
+  if (newStreak > user.currentStreak) {
+    // Find if we crossed any milestone
+    const crossedMilestone = STREAK_MILESTONES.find(
+      (m) => newStreak >= m.days && user.currentStreak < m.days
+    );
+
+    if (crossedMilestone) {
+      // Check if this milestone was already claimed
+      const existingReward = await prisma.streakReward.findUnique({
+        where: {
+          userId_milestone: {
+            userId,
+            milestone: crossedMilestone.days,
+          },
+        },
+      });
+
+      if (!existingReward) {
+        // Award the reward in a transaction
+        await prisma.$transaction(async (tx) => {
+          // Update user streak and add credits
+          await tx.user.update({
+            where: { id: userId },
+            data: {
+              currentStreak: newStreak,
+              longestStreak: newLongestStreak,
+              lastReadingDate: now,
+              credits: { increment: crossedMilestone.credits },
+            },
+          });
+
+          // Create streak reward record
+          await tx.streakReward.create({
+            data: {
+              userId,
+              milestone: crossedMilestone.days,
+              creditsAwarded: crossedMilestone.credits,
+            },
+          });
+
+          // Create credit transaction
+          await tx.creditTransaction.create({
+            data: {
+              userId,
+              amount: crossedMilestone.credits,
+              type: "BONUS",
+            },
+          });
+        });
+
+        reward = {
+          milestone: crossedMilestone.days,
+          creditsAwarded: crossedMilestone.credits,
+        };
+
+        return {
+          currentStreak: newStreak,
+          longestStreak: newLongestStreak,
+          reward,
+        };
+      }
+    }
+  }
+
+  // No reward - just update streak
   await prisma.user.update({
     where: { id: userId },
     data: {
       currentStreak: newStreak,
       longestStreak: newLongestStreak,
       lastReadingDate: now,
-      credits: bonusCredits > 0 ? { increment: bonusCredits } : undefined,
     },
   });
-
-  // If bonus credits, create transaction
-  if (bonusCredits > 0) {
-    await prisma.creditTransaction.create({
-      data: {
-        userId,
-        amount: bonusCredits,
-        type: "BONUS",
-      },
-    });
-  }
 
   return {
     currentStreak: newStreak,
     longestStreak: newLongestStreak,
-    bonusCredits,
+    reward: null,
   };
+}
+
+/**
+ * Get claimed rewards for a user
+ */
+export async function getClaimedRewards(userId: string) {
+  return prisma.streakReward.findMany({
+    where: { userId },
+    orderBy: { milestone: "asc" },
+  });
 }

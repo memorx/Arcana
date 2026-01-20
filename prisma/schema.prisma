@@ -65,6 +65,7 @@ model User {
   profile       UserProfile?
   subscription  Subscription?
   dailyReadings DailyReading[]
+  streakRewards StreakReward[]
 
   @@map("users")
 }
@@ -283,4 +284,21 @@ model BlogPost {
   @@index([published])
   @@index([publishedAt])
   @@map("blog_posts")
+}
+
+// ============================================================================
+// STREAK REWARDS
+// ============================================================================
+
+model StreakReward {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestone      Int      // 3, 7, 14, 30, 60, 100
+  creditsAwarded Int
+  claimedAt      DateTime @default(now())
+
+  @@unique([userId, milestone])
+  @@index([userId])
+  @@map("streak_rewards")
 }

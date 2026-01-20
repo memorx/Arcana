@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCard, TarotCardStatic, CardBack } from "@/components/ui";
+import { StreakRewardModal } from "@/components/dashboard/StreakRewardModal";
 
 interface SpreadType {
   id: string;
@@ -49,6 +50,17 @@ interface ReadingCard {
   positionInfo: PositionInfo;
 }
 
+interface StreakRewardInfo {
+  milestone: number;
+  creditsAwarded: number;
+}
+
+interface StreakInfo {
+  currentStreak: number;
+  longestStreak: number;
+  reward: StreakRewardInfo | null;
+}
+
 interface ReadingResult {
   reading: {
     id: string;
@@ -59,6 +71,7 @@ interface ReadingResult {
   };
   cards: ReadingCard[];
   usedFreeReading: boolean;
+  streak?: StreakInfo;
 }
 
 type Step = "intention" | "shuffling" | "revealing" | "interpretation";
@@ -86,6 +99,8 @@ export default function ReadingFlowPage({
   const [userCredits, setUserCredits] = useState<number>(0);
   const [freeReadings, setFreeReadings] = useState<number>(0);
   const [showCreditsModal, setShowCreditsModal] = useState(false);
+  const [streakReward, setStreakReward] = useState<StreakRewardInfo | null>(null);
+  const [showStreakRewardModal, setShowStreakRewardModal] = useState(false);
 
   // Fetch spread type and user credits on mount
   useEffect(() => {
@@ -146,6 +161,17 @@ export default function ReadingFlowPage({
     }
   }, [step, readingResult]);
 
+  // Show streak reward modal after all cards are revealed
+  useEffect(() => {
+    if (allRevealed && streakReward) {
+      // Small delay for better UX
+      const timer = setTimeout(() => {
+        setShowStreakRewardModal(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [allRevealed, streakReward]);
+
   // Check if user can afford the reading
   const canAffordReading = freeReadings > 0 || userCredits >= (spreadType?.creditCost || 0);
 
@@ -183,6 +209,11 @@ export default function ReadingFlowPage({
 
       setReadingResult(data);
       setStep("revealing");
+
+      // Check if there's a streak reward to show
+      if (data.streak?.reward) {
+        setStreakReward(data.streak.reward);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t("createError"));
       setStep("intention");
@@ -561,6 +592,19 @@ export default function ReadingFlowPage({
           </div>
         </ModalBody>
       </Modal>
+
+      {/* Streak Reward Modal */}
+      {streakReward && (
+        <StreakRewardModal
+          isOpen={showStreakRewardModal}
+          onClose={() => {
+            setShowStreakRewardModal(false);
+            setStreakReward(null);
+          }}
+          milestone={streakReward.milestone}
+          creditsAwarded={streakReward.creditsAwarded}
+        />
+      )}
     </div>
   );
 }
