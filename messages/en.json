@@ -36,7 +36,8 @@
     "profile": "My Profile",
     "referral": "Refer Friends",
     "settings": "Settings",
-    "achievements": "Achievements"
+    "achievements": "Achievements",
+    "challenges": "Challenges"
   },
   "landing": {
     "readingCounter": "readings performed",
@@ -660,6 +661,44 @@
     "unlockModal": {
       "title": "Achievement Unlocked!",
       "earned": "You earned {credits} credits"
+    },
+    "continue": "Continue"
+  },
+  "levels": {
+    "level": "Level",
+    "total": "total",
+    "viewProgress": "View Progress",
+    "nextLevel": "Next",
+    "maxLevel": "Max level reached!",
+    "levelUp": "Level Up!",
+    "newLevel": "You are now {level}!",
+    "reward": "Reward",
+    "credits": "credits",
+    "keepGoing": "Keep going! Your journey continues.",
+    "maxLevelMessage": "You've reached the pinnacle of mastery!",
+    "continue": "Continue",
+    "names": {
+      "novice": "Novice",
+      "apprentice": "Apprentice",
+      "adept": "Adept",
+      "master": "Master",
+      "oracle": "Oracle"
+    }
+  },
+  "challenges": {
+    "title": "Challenges",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "credits": "credits",
+    "resetsIn": "Resets in {time}",
+    "noChallenges": "No challenges available",
+    "viewAll": "View All",
+    "allCompleted": "All challenges completed!",
+    "completedModal": {
+      "title": "Challenge Complete!",
+      "earned": "You earned {credits} credits from challenges"
     },
     "continue": "Continue"
   },

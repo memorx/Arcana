@@ -58,6 +58,10 @@ model User {
   longestStreak    Int       @default(0)
   lastReadingDate  DateTime?
 
+  // Level system
+  xp               Int       @default(0)
+  level            Int       @default(1)
+
   accounts       Account[]
   sessions       Session[]
   readings       Reading[]
@@ -68,6 +72,7 @@ model User {
   streakRewards  StreakReward[]
   cardCollection UserCardCollection[]
   achievements   UserAchievement[]
+  challenges     UserChallenge[]
 
   @@map("users")
 }
@@ -358,4 +363,47 @@ model UserAchievement {
   @@index([userId])
   @@index([unlockedAt])
   @@map("user_achievements")
+}
+
+// ============================================================================
+// CHALLENGES
+// ============================================================================
+
+model Challenge {
+  id               String   @id @default(cuid())
+  key              String   @unique // "weekly_explorer", "monthly_dedicated"
+  name             String
+  nameEs           String
+  description      String
+  descriptionEs    String
+  icon             String   // Emoji
+  type             String   // "weekly" | "monthly"
+  target           Int      // Número objetivo (5, 20, etc.)
+  creditReward     Int
+  requirement      String   // "readings", "spread_types", "streak", "cards_discovered", "specific_spread"
+  requirementValue String?  // Para specific_spread: spreadTypeId
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  userChallenges UserChallenge[]
+
+  @@map("challenges")
+}
+
+model UserChallenge {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  progress    Int       @default(0)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  periodStart DateTime  // Inicio del período (lunes o día 1)
+  periodEnd   DateTime  // Fin del período
+
+  @@unique([userId, challengeId, periodStart])
+  @@index([userId])
+  @@index([periodStart])
+  @@map("user_challenges")
 }

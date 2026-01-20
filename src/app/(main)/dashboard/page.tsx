@@ -12,6 +12,8 @@ import {
 import { StreakDisplay } from "@/components/dashboard/StreakDisplay";
 import { CollectionWidget } from "@/components/dashboard/CollectionWidget";
 import { AchievementsWidget } from "@/components/dashboard/AchievementsWidget";
+import { LevelWidget } from "@/components/dashboard/LevelWidget";
+import { ChallengesWidget } from "@/components/dashboard/ChallengesWidget";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -86,11 +88,17 @@ export default async function DashboardPage() {
         />
       )}
 
+      {/* Level Widget */}
+      <LevelWidget userId={session.user.id} />
+
       {/* Collection Widget */}
       <CollectionWidget userId={session.user.id} />
 
       {/* Achievements Widget */}
       <AchievementsWidget userId={session.user.id} />
+
+      {/* Challenges Widget */}
+      <ChallengesWidget userId={session.user.id} />
 
       {/* Complete Profile Prompt */}
       {!userProfile && (
