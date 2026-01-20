@@ -3,8 +3,11 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Header, Footer } from "@/components/layout";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
 import { ReadingCounter, DailyCardPreview, Testimonials } from "@/components/landing";
+import { auth } from "@/lib/auth";
 
 export default async function Home() {
+  const session = await auth();
+  const isAuthenticated = !!session?.user;
   const t = await getTranslations("landing");
   const tSpreads = await getTranslations("spreads");
   const locale = await getLocale();
@@ -153,11 +156,20 @@ export default async function Home() {
                     {t("hero.cta")}
                   </Button>
                 </Link>
-                <Link href="/register" prefetch={true}>
-                  <Button variant="secondary" size="lg" className="text-base px-8">
-                    {t("hero.ctaSecondary")}
-                  </Button>
-                </Link>
+                {!isAuthenticated && (
+                  <Link href="/register" prefetch={true}>
+                    <Button variant="secondary" size="lg" className="text-base px-8">
+                      {t("hero.ctaSecondary")}
+                    </Button>
+                  </Link>
+                )}
+                {isAuthenticated && (
+                  <Link href="/dashboard" prefetch={true}>
+                    <Button variant="secondary" size="lg" className="text-base px-8">
+                      {t("hero.ctaAuthenticated")}
+                    </Button>
+                  </Link>
+                )}
               </div>
 
               {/* Trust badge */}
@@ -194,12 +206,13 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Daily Card Preview (for non-logged users) */}
+        {/* Daily Card Preview */}
         <section className="py-16 border-t border-slate-800/50 bg-gradient-to-b from-purple-950/20 to-transparent">
           <div className="container mx-auto px-4">
             <DailyCardPreview
               title={t("dailyCard.title")}
-              ctaText={t("dailyCard.cta")}
+              ctaText={isAuthenticated ? t("dailyCard.ctaAuthenticated") : t("dailyCard.cta")}
+              ctaHref={isAuthenticated ? "/reading/new" : "/register"}
               locale={locale}
             />
           </div>
@@ -440,14 +453,14 @@ export default async function Home() {
               className="max-w-3xl mx-auto text-center p-12"
             >
               <h2 className="text-3xl font-bold mb-4 text-slate-100">
-                {t("cta.title")}
+                {isAuthenticated ? t("cta.titleAuthenticated") : t("cta.title")}
               </h2>
               <p className="text-slate-300 mb-8 max-w-xl mx-auto">
-                {t("cta.subtitle")}
+                {isAuthenticated ? t("cta.subtitleAuthenticated") : t("cta.subtitle")}
               </p>
-              <Link href="/register" prefetch={true}>
+              <Link href={isAuthenticated ? "/reading/new" : "/register"} prefetch={true}>
                 <Button size="lg" className="px-10">
-                  {t("cta.button")}
+                  {isAuthenticated ? t("cta.buttonAuthenticated") : t("cta.button")}
                 </Button>
               </Link>
             </Card>
