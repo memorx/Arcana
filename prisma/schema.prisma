@@ -58,14 +58,15 @@ model User {
   longestStreak    Int       @default(0)
   lastReadingDate  DateTime?
 
-  accounts      Account[]
-  sessions      Session[]
-  readings      Reading[]
-  transactions  CreditTransaction[]
-  profile       UserProfile?
-  subscription  Subscription?
-  dailyReadings DailyReading[]
-  streakRewards StreakReward[]
+  accounts       Account[]
+  sessions       Session[]
+  readings       Reading[]
+  transactions   CreditTransaction[]
+  profile        UserProfile?
+  subscription   Subscription?
+  dailyReadings  DailyReading[]
+  streakRewards  StreakReward[]
+  cardCollection UserCardCollection[]
 
   @@map("users")
 }
@@ -138,7 +139,8 @@ model Card {
   meaningReversed String   @db.Text
   imageUrl        String
 
-  dailyReadings DailyReading[]
+  dailyReadings  DailyReading[]
+  userCollection UserCardCollection[]
 
   @@unique([arcana, suit, number])
   @@map("cards")
@@ -301,4 +303,22 @@ model StreakReward {
   @@unique([userId, milestone])
   @@index([userId])
   @@map("streak_rewards")
+}
+
+// ============================================================================
+// CARD COLLECTION
+// ============================================================================
+
+model UserCardCollection {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardId       String
+  card         Card     @relation(fields: [cardId], references: [id])
+  discoveredAt DateTime @default(now())
+
+  @@unique([userId, cardId])
+  @@index([userId])
+  @@index([discoveredAt])
+  @@map("user_card_collections")
 }

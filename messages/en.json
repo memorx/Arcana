@@ -31,6 +31,7 @@
     "register": "Sign up",
     "logout": "Log out",
     "dailyCard": "Daily Card",
+    "collection": "Collection",
     "subscribe": "Daily Oracle",
     "profile": "My Profile",
     "referral": "Refer Friends",
@@ -612,6 +613,31 @@
     "continue": "Awesome!",
     "nextMilestone": "Next reward at {days} days",
     "allCompleted": "All milestones completed!"
+  },
+  "collection": {
+    "title": "Your Collection",
+    "progress": "{count} of {total} cards discovered",
+    "majorArcana": "Major Arcana",
+    "wands": "Wands",
+    "cups": "Cups",
+    "swords": "Swords",
+    "pentacles": "Pentacles",
+    "locked": "Keep doing readings to discover this card",
+    "newCard": "New card discovered!",
+    "newCards": "You discovered {count} new cards!",
+    "recentlyDiscovered": "Recently Discovered",
+    "addedToCollection": "Added to your collection!",
+    "continue": "Continue",
+    "viewAll": "View All",
+    "noCardsYet": "Start a reading to discover cards",
+    "filters": {
+      "all": "All"
+    },
+    "cta": {
+      "title": "Complete Your Collection",
+      "subtitle": "Do more readings to discover all 78 cards",
+      "button": "Start Reading"
+    }
   },
   "settings": {
     "title": "Settings",

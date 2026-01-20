@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCard, TarotCardStatic, CardBack } from "@/components/ui";
 import { StreakRewardModal } from "@/components/dashboard/StreakRewardModal";
+import { NewCardDiscoveredModal } from "@/components/reading/NewCardDiscoveredModal";
 
 interface SpreadType {
   id: string;
@@ -61,6 +62,15 @@ interface StreakInfo {
   reward: StreakRewardInfo | null;
 }
 
+interface DiscoveredCardInfo {
+  id: string;
+  name: string;
+  nameEs: string;
+  imageUrl: string;
+  arcana: string;
+  suit: string | null;
+}
+
 interface ReadingResult {
   reading: {
     id: string;
@@ -72,6 +82,7 @@ interface ReadingResult {
   cards: ReadingCard[];
   usedFreeReading: boolean;
   streak?: StreakInfo;
+  newlyDiscoveredCards?: DiscoveredCardInfo[];
 }
 
 type Step = "intention" | "shuffling" | "revealing" | "interpretation";
@@ -101,6 +112,8 @@ export default function ReadingFlowPage({
   const [showCreditsModal, setShowCreditsModal] = useState(false);
   const [streakReward, setStreakReward] = useState<StreakRewardInfo | null>(null);
   const [showStreakRewardModal, setShowStreakRewardModal] = useState(false);
+  const [discoveredCards, setDiscoveredCards] = useState<DiscoveredCardInfo[]>([]);
+  const [showDiscoveredModal, setShowDiscoveredModal] = useState(false);
 
   // Fetch spread type and user credits on mount
   useEffect(() => {
@@ -161,16 +174,25 @@ export default function ReadingFlowPage({
     }
   }, [step, readingResult]);
 
-  // Show streak reward modal after all cards are revealed
+  // Show discovered cards modal after all cards are revealed
   useEffect(() => {
-    if (allRevealed && streakReward) {
-      // Small delay for better UX
+    if (allRevealed && discoveredCards.length > 0 && !showDiscoveredModal && !showStreakRewardModal) {
+      const timer = setTimeout(() => {
+        setShowDiscoveredModal(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [allRevealed, discoveredCards, showDiscoveredModal, showStreakRewardModal]);
+
+  // Show streak reward modal after discovered cards modal is closed
+  useEffect(() => {
+    if (allRevealed && streakReward && !showDiscoveredModal && discoveredCards.length === 0) {
       const timer = setTimeout(() => {
         setShowStreakRewardModal(true);
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, streakReward]);
+  }, [allRevealed, streakReward, showDiscoveredModal, discoveredCards.length]);
 
   // Check if user can afford the reading
   const canAffordReading = freeReadings > 0 || userCredits >= (spreadType?.creditCost || 0);
@@ -209,6 +231,11 @@ export default function ReadingFlowPage({
 
       setReadingResult(data);
       setStep("revealing");
+
+      // Check if there are newly discovered cards
+      if (data.newlyDiscoveredCards?.length > 0) {
+        setDiscoveredCards(data.newlyDiscoveredCards);
+      }
 
       // Check if there's a streak reward to show
       if (data.streak?.reward) {
@@ -592,6 +619,22 @@ export default function ReadingFlowPage({
           </div>
         </ModalBody>
       </Modal>
+
+      {/* Discovered Cards Modal */}
+      {discoveredCards.length > 0 && (
+        <NewCardDiscoveredModal
+          isOpen={showDiscoveredModal}
+          onClose={() => {
+            setShowDiscoveredModal(false);
+            setDiscoveredCards([]);
+            // If there's a streak reward, show it after closing discovered modal
+            if (streakReward) {
+              setTimeout(() => setShowStreakRewardModal(true), 300);
+            }
+          }}
+          cards={discoveredCards}
+        />
+      )}
 
       {/* Streak Reward Modal */}
       {streakReward && (

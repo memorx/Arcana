@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTarotInterpretation } from "@/lib/anthropic";
 import { updateStreak } from "@/lib/streak";
+import { discoverCardsFromReading } from "@/lib/collection";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
@@ -193,6 +194,22 @@ export async function POST(req: NextRequest) {
       console.error("Error updating streak:", error);
     }
 
+    // Discover new cards for collection (non-blocking)
+    let newlyDiscoveredCards: Array<{
+      id: string;
+      name: string;
+      nameEs: string;
+      imageUrl: string;
+      arcana: string;
+      suit: string | null;
+    }> = [];
+    try {
+      const cardIds = readingCards.map((rc) => rc.cardId);
+      newlyDiscoveredCards = await discoverCardsFromReading(user.id, cardIds);
+    } catch (error) {
+      console.error("Error discovering cards:", error);
+    }
+
     // Prepare response with full card details
     const cardsWithDetails = readingCards.map((rc) => {
       const card = selectedCards.find((c) => c.id === rc.cardId)!;
@@ -226,6 +243,7 @@ export async function POST(req: NextRequest) {
       cards: cardsWithDetails,
       usedFreeReading: useFreeReading,
       streak: streakInfo,
+      newlyDiscoveredCards,
     });
   } catch (error) {
     console.error("Error creating reading:", error);
