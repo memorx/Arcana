@@ -7,6 +7,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCard, TarotCardStatic, CardBack } from "@/components/ui";
 import { StreakRewardModal } from "@/components/dashboard/StreakRewardModal";
 import { NewCardDiscoveredModal } from "@/components/reading/NewCardDiscoveredModal";
+import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 
 interface SpreadType {
   id: string;
@@ -71,6 +72,18 @@ interface DiscoveredCardInfo {
   suit: string | null;
 }
 
+interface UnlockedAchievementInfo {
+  id: string;
+  key: string;
+  name: string;
+  nameEs: string;
+  description: string;
+  descriptionEs: string;
+  icon: string;
+  category: string;
+  creditReward: number;
+}
+
 interface ReadingResult {
   reading: {
     id: string;
@@ -83,6 +96,7 @@ interface ReadingResult {
   usedFreeReading: boolean;
   streak?: StreakInfo;
   newlyDiscoveredCards?: DiscoveredCardInfo[];
+  unlockedAchievements?: UnlockedAchievementInfo[];
 }
 
 type Step = "intention" | "shuffling" | "revealing" | "interpretation";
@@ -114,6 +128,8 @@ export default function ReadingFlowPage({
   const [showStreakRewardModal, setShowStreakRewardModal] = useState(false);
   const [discoveredCards, setDiscoveredCards] = useState<DiscoveredCardInfo[]>([]);
   const [showDiscoveredModal, setShowDiscoveredModal] = useState(false);
+  const [unlockedAchievements, setUnlockedAchievements] = useState<UnlockedAchievementInfo[]>([]);
+  const [showAchievementsModal, setShowAchievementsModal] = useState(false);
 
   // Fetch spread type and user credits on mount
   useEffect(() => {
@@ -174,25 +190,35 @@ export default function ReadingFlowPage({
     }
   }, [step, readingResult]);
 
-  // Show discovered cards modal after all cards are revealed
+  // Show discovered cards modal after all cards are revealed (first in chain)
   useEffect(() => {
-    if (allRevealed && discoveredCards.length > 0 && !showDiscoveredModal && !showStreakRewardModal) {
+    if (allRevealed && discoveredCards.length > 0 && !showDiscoveredModal && !showAchievementsModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowDiscoveredModal(true);
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, discoveredCards, showDiscoveredModal, showStreakRewardModal]);
+  }, [allRevealed, discoveredCards, showDiscoveredModal, showAchievementsModal, showStreakRewardModal]);
 
-  // Show streak reward modal after discovered cards modal is closed
+  // Show achievements modal after discovered cards modal is closed (second in chain)
   useEffect(() => {
-    if (allRevealed && streakReward && !showDiscoveredModal && discoveredCards.length === 0) {
+    if (allRevealed && unlockedAchievements.length > 0 && discoveredCards.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
-        setShowStreakRewardModal(true);
-      }, 1000);
+        setShowAchievementsModal(true);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, streakReward, showDiscoveredModal, discoveredCards.length]);
+  }, [allRevealed, unlockedAchievements, discoveredCards.length, showDiscoveredModal, showAchievementsModal, showStreakRewardModal]);
+
+  // Show streak reward modal after achievements modal is closed (third in chain)
+  useEffect(() => {
+    if (allRevealed && streakReward && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showStreakRewardModal) {
+      const timer = setTimeout(() => {
+        setShowStreakRewardModal(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [allRevealed, streakReward, discoveredCards.length, unlockedAchievements.length, showDiscoveredModal, showAchievementsModal, showStreakRewardModal]);
 
   // Check if user can afford the reading
   const canAffordReading = freeReadings > 0 || userCredits >= (spreadType?.creditCost || 0);
@@ -235,6 +261,11 @@ export default function ReadingFlowPage({
       // Check if there are newly discovered cards
       if (data.newlyDiscoveredCards?.length > 0) {
         setDiscoveredCards(data.newlyDiscoveredCards);
+      }
+
+      // Check if there are newly unlocked achievements
+      if (data.unlockedAchievements?.length > 0) {
+        setUnlockedAchievements(data.unlockedAchievements);
       }
 
       // Check if there's a streak reward to show
@@ -627,12 +658,22 @@ export default function ReadingFlowPage({
           onClose={() => {
             setShowDiscoveredModal(false);
             setDiscoveredCards([]);
-            // If there's a streak reward, show it after closing discovered modal
-            if (streakReward) {
-              setTimeout(() => setShowStreakRewardModal(true), 300);
-            }
+            // Chain continues via useEffect
           }}
           cards={discoveredCards}
+        />
+      )}
+
+      {/* Achievements Modal */}
+      {unlockedAchievements.length > 0 && (
+        <AchievementUnlockedModal
+          isOpen={showAchievementsModal}
+          onClose={() => {
+            setShowAchievementsModal(false);
+            setUnlockedAchievements([]);
+            // Chain continues via useEffect
+          }}
+          achievements={unlockedAchievements}
         />
       )}
 

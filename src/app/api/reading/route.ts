@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { generateTarotInterpretation } from "@/lib/anthropic";
 import { updateStreak } from "@/lib/streak";
 import { discoverCardsFromReading } from "@/lib/collection";
+import { checkAndUnlockAchievements } from "@/lib/achievements";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
@@ -210,6 +211,24 @@ export async function POST(req: NextRequest) {
       console.error("Error discovering cards:", error);
     }
 
+    // Check for newly unlocked achievements (non-blocking)
+    let unlockedAchievements: Array<{
+      id: string;
+      key: string;
+      name: string;
+      nameEs: string;
+      description: string;
+      descriptionEs: string;
+      icon: string;
+      category: string;
+      creditReward: number;
+    }> = [];
+    try {
+      unlockedAchievements = await checkAndUnlockAchievements(user.id);
+    } catch (error) {
+      console.error("Error checking achievements:", error);
+    }
+
     // Prepare response with full card details
     const cardsWithDetails = readingCards.map((rc) => {
       const card = selectedCards.find((c) => c.id === rc.cardId)!;
@@ -244,6 +263,7 @@ export async function POST(req: NextRequest) {
       usedFreeReading: useFreeReading,
       streak: streakInfo,
       newlyDiscoveredCards,
+      unlockedAchievements,
     });
   } catch (error) {
     console.error("Error creating reading:", error);
