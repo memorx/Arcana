@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Badge, LanguageSelector, Tooltip } from "@/components/ui";
+import { Button, Badge, LanguageSelector } from "@/components/ui";
 import { SoundToggle } from "@/components/SoundToggle";
 import { LEVELS } from "@/lib/levels";
 
