@@ -27,6 +27,17 @@ const SIZES = {
   lg: { width: 120, height: 180, className: "w-[120px] h-[180px]" },
 };
 
+function CardSkeleton({ className }: { className: string }) {
+  return (
+    <div className={`relative ${className} rounded-lg overflow-hidden border-2 border-amber-500/30 bg-slate-800`}>
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 to-slate-900/50 animate-pulse" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+      </div>
+    </div>
+  );
+}
+
 export function TarotCard({
   card,
   isReversed = false,
@@ -37,6 +48,7 @@ export function TarotCard({
   className = "",
 }: TarotCardProps) {
   const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const sizeConfig = SIZES[size];
   const displayName = locale === "en" ? card.name : card.nameEs;
 
@@ -63,12 +75,20 @@ export function TarotCard({
         >
           {hasImage ? (
             <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-amber-500/30">
+              {isLoading && (
+                <CardSkeleton className={sizeConfig.className} />
+              )}
               <Image
                 src={card.imageUrl!}
                 alt={displayName}
                 fill
-                className="object-cover"
-                onError={() => setImageError(true)}
+                className={`object-cover transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
+                onLoad={() => setIsLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setIsLoading(false);
+                }}
+                unoptimized
               />
             </div>
           ) : (
@@ -116,6 +136,7 @@ export function TarotCardStatic({
   className = "",
 }: Omit<TarotCardProps, "isRevealed">) {
   const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const sizeConfig = SIZES[size];
   const displayName = locale === "en" ? card.name : card.nameEs;
   const hasImage = card.imageUrl && !imageError;
@@ -130,12 +151,20 @@ export function TarotCardStatic({
       >
         {hasImage ? (
           <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-amber-500/30">
+            {isLoading && (
+              <CardSkeleton className={sizeConfig.className} />
+            )}
             <Image
               src={card.imageUrl!}
               alt={displayName}
               fill
-              className="object-cover"
-              onError={() => setImageError(true)}
+              className={`object-cover transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
+              onLoad={() => setIsLoading(false)}
+              onError={() => {
+                setImageError(true);
+                setIsLoading(false);
+              }}
+              unoptimized
             />
           </div>
         ) : (

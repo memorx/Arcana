@@ -64,6 +64,7 @@ export async function CollectionWidget({ userId }: CollectionWidgetProps) {
                     width={48}
                     height={72}
                     className="object-cover"
+                    unoptimized
                   />
                 </Link>
               ))}

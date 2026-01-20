@@ -120,6 +120,7 @@ export function DailyCardPreview({ title, ctaText, locale }: DailyCardPreviewPro
                   alt={displayName}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               </div>
               <p className="text-center mt-3 font-semibold text-purple-300">
