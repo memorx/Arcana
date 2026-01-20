@@ -182,7 +182,11 @@ export async function POST(req: NextRequest) {
     });
 
     // Update user streak (non-blocking, don't fail if this errors)
-    let streakInfo = null;
+    let streakInfo: {
+      currentStreak: number;
+      longestStreak: number;
+      reward: { milestone: number; creditsAwarded: number } | null;
+    } | null = null;
     try {
       streakInfo = await updateStreak(user.id);
     } catch (error) {

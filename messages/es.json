@@ -603,6 +603,16 @@
     "ctaDescription": "Pon tu conocimiento en practica con una lectura de tarot personalizada",
     "ctaButton": "Comenzar Lectura Gratis"
   },
+  "streakReward": {
+    "title": "Recompensa de Racha!",
+    "days": "{count} dias de racha!",
+    "earned": "Has ganado",
+    "credits": "creditos",
+    "keepGoing": "Sigue asi! Tu dedicacion esta dando frutos.",
+    "continue": "Genial!",
+    "nextMilestone": "Proxima recompensa en {days} dias",
+    "allCompleted": "Todos los hitos completados!"
+  },
   "settings": {
     "title": "Configuracion",
     "accountInfo": "Informacion de la Cuenta",

@@ -603,6 +603,16 @@
     "ctaDescription": "Put your knowledge into practice with a personalized tarot reading",
     "ctaButton": "Start Free Reading"
   },
+  "streakReward": {
+    "title": "Streak Reward!",
+    "days": "{count} day streak!",
+    "earned": "You earned",
+    "credits": "credits",
+    "keepGoing": "Keep up the great work! Your dedication is paying off.",
+    "continue": "Awesome!",
+    "nextMilestone": "Next reward at {days} days",
+    "allCompleted": "All milestones completed!"
+  },
   "settings": {
     "title": "Settings",
     "accountInfo": "Account Information",
