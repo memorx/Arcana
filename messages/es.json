@@ -35,7 +35,8 @@
     "subscribe": "Oraculo Diario",
     "profile": "Mi Perfil",
     "referral": "Invitar Amigos",
-    "settings": "Configuracion"
+    "settings": "Configuracion",
+    "achievements": "Logros"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
@@ -638,6 +639,29 @@
       "subtitle": "Haz mas lecturas para descubrir las 78 cartas",
       "button": "Iniciar Lectura"
     }
+  },
+  "achievements": {
+    "title": "Logros",
+    "progress": "{unlocked} de {total} desbloqueados",
+    "unlocked": "Desbloqueado",
+    "locked": "Bloqueado",
+    "credits": "creditos",
+    "latest": "Ultimo",
+    "next": "Siguiente",
+    "viewAll": "Ver Todos",
+    "allCompleted": "Todos los logros completados!",
+    "categories": {
+      "readings": "Lecturas",
+      "collection": "Coleccion",
+      "streak": "Rachas",
+      "time": "Por Tiempo",
+      "subscription": "Suscripcion"
+    },
+    "unlockModal": {
+      "title": "Logro Desbloqueado!",
+      "earned": "Has ganado {credits} creditos"
+    },
+    "continue": "Continuar"
   },
   "settings": {
     "title": "Configuracion",

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui";
 import { StreakDisplay } from "@/components/dashboard/StreakDisplay";
 import { CollectionWidget } from "@/components/dashboard/CollectionWidget";
+import { AchievementsWidget } from "@/components/dashboard/AchievementsWidget";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -87,6 +88,9 @@ export default async function DashboardPage() {
 
       {/* Collection Widget */}
       <CollectionWidget userId={session.user.id} />
+
+      {/* Achievements Widget */}
+      <AchievementsWidget userId={session.user.id} />
 
       {/* Complete Profile Prompt */}
       {!userProfile && (

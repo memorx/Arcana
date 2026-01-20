@@ -67,6 +67,7 @@ model User {
   dailyReadings  DailyReading[]
   streakRewards  StreakReward[]
   cardCollection UserCardCollection[]
+  achievements   UserAchievement[]
 
   @@map("users")
 }
@@ -321,4 +322,40 @@ model UserCardCollection {
   @@index([userId])
   @@index([discoveredAt])
   @@map("user_card_collections")
+}
+
+// ============================================================================
+// ACHIEVEMENTS
+// ============================================================================
+
+model Achievement {
+  id            String   @id @default(cuid())
+  key           String   @unique // "first_reading", "seeker", etc.
+  name          String   // Display name en inglés
+  nameEs        String   // Display name en español
+  description   String   // Descripción en inglés
+  descriptionEs String   // Descripción en español
+  icon          String   // Emoji
+  category      String   // "readings", "collection", "time", "streak", "subscription"
+  requirement   Int      // Número requerido (1, 10, 50, 78, etc.)
+  creditReward  Int      // Créditos que otorga
+  createdAt     DateTime @default(now())
+
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([unlockedAt])
+  @@map("user_achievements")
 }

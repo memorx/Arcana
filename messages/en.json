@@ -35,7 +35,8 @@
     "subscribe": "Daily Oracle",
     "profile": "My Profile",
     "referral": "Refer Friends",
-    "settings": "Settings"
+    "settings": "Settings",
+    "achievements": "Achievements"
   },
   "landing": {
     "readingCounter": "readings performed",
@@ -638,6 +639,29 @@
       "subtitle": "Do more readings to discover all 78 cards",
       "button": "Start Reading"
     }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "progress": "{unlocked} of {total} unlocked",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "credits": "credits",
+    "latest": "Latest",
+    "next": "Next",
+    "viewAll": "View All",
+    "allCompleted": "All achievements completed!",
+    "categories": {
+      "readings": "Readings",
+      "collection": "Collection",
+      "streak": "Streaks",
+      "time": "Time-Based",
+      "subscription": "Subscription"
+    },
+    "unlockModal": {
+      "title": "Achievement Unlocked!",
+      "earned": "You earned {credits} credits"
+    },
+    "continue": "Continue"
   },
   "settings": {
     "title": "Settings",
