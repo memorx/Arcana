@@ -54,7 +54,28 @@ export function NewCardDiscoveredModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="overflow-visible">
-      <ModalBody className="text-center py-8">
+      <ModalBody className="text-center py-8 relative">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 p-2 rounded-full hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200"
+          aria-label="Close"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
         {/* Header */}
         <div className="mb-6">
           <span className="text-5xl mb-4 block">&#10024;</span>

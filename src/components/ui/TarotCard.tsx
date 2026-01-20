@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
 import { CardPlaceholder, CardBack } from "./CardPlaceholder";
 
 interface TarotCardProps {
@@ -44,9 +45,12 @@ export function TarotCard({
   isRevealed = true,
   showReversedBadge = true,
   size = "md",
-  locale = "es",
+  locale: localeProp,
   className = "",
 }: TarotCardProps) {
+  const t = useTranslations("reading");
+  const currentLocale = useLocale();
+  const locale = localeProp || currentLocale;
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const sizeConfig = SIZES[size];
@@ -118,7 +122,7 @@ export function TarotCard({
       {isRevealed && isReversed && showReversedBadge && (
         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 z-10">
           <span className="inline-block px-2 py-0.5 bg-orange-500/90 text-white text-[10px] font-medium rounded-full shadow-lg">
-            {locale === "en" ? "Reversed" : "Invertida"}
+            {t("reversed")}
           </span>
         </div>
       )}
@@ -132,9 +136,12 @@ export function TarotCardStatic({
   isReversed = false,
   showReversedBadge = true,
   size = "md",
-  locale = "es",
+  locale: localeProp,
   className = "",
 }: Omit<TarotCardProps, "isRevealed">) {
+  const t = useTranslations("reading");
+  const currentLocale = useLocale();
+  const locale = localeProp || currentLocale;
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const sizeConfig = SIZES[size];
@@ -181,7 +188,7 @@ export function TarotCardStatic({
       {isReversed && showReversedBadge && (
         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 z-10">
           <span className="inline-block px-2 py-0.5 bg-orange-500/90 text-white text-[10px] font-medium rounded-full shadow-lg">
-            {locale === "en" ? "Reversed" : "Invertida"}
+            {t("reversed")}
           </span>
         </div>
       )}
