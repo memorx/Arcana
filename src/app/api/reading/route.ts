@@ -5,6 +5,9 @@ import { generateTarotInterpretation } from "@/lib/anthropic";
 import { updateStreak } from "@/lib/streak";
 import { discoverCardsFromReading } from "@/lib/collection";
 import { checkAndUnlockAchievements } from "@/lib/achievements";
+import { addXP, type LevelUpResult } from "@/lib/xp";
+import { getXPForReading, XP_REWARDS } from "@/lib/levels";
+import { updateChallengeProgress, type CompletedChallenge } from "@/lib/challenges";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
@@ -229,6 +232,80 @@ export async function POST(req: NextRequest) {
       console.error("Error checking achievements:", error);
     }
 
+    // Calculate and award XP (non-blocking)
+    let levelUp: LevelUpResult | null = null;
+    try {
+      // Calculate total XP from this reading
+      let totalXP = getXPForReading(spreadType.cardCount);
+
+      // Add XP for newly discovered cards
+      totalXP += newlyDiscoveredCards.length * XP_REWARDS.NEW_CARD;
+
+      // Add XP for unlocked achievements
+      totalXP += unlockedAchievements.length * XP_REWARDS.ACHIEVEMENT;
+
+      // Add XP for streak continuation (only if streak increased)
+      if (streakInfo && streakInfo.currentStreak > 1) {
+        // Check if this is a new streak day (not same day reading)
+        const userBefore = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { lastReadingDate: true },
+        });
+        const lastDate = userBefore?.lastReadingDate;
+        const today = new Date();
+        const isNewStreakDay = !lastDate ||
+          new Date(lastDate).toDateString() !== today.toDateString();
+
+        if (isNewStreakDay && streakInfo.currentStreak > 1) {
+          totalXP += XP_REWARDS.STREAK_DAY;
+        }
+      }
+
+      // Award XP and check for level up
+      const xpResult = await addXP(user.id, totalXP, "reading_completion");
+      levelUp = xpResult.levelUp;
+    } catch (error) {
+      console.error("Error awarding XP:", error);
+    }
+
+    // Update challenge progress (non-blocking)
+    let completedChallenges: CompletedChallenge[] = [];
+    try {
+      // Update for reading completed
+      const readingChallenges = await updateChallengeProgress(user.id, "reading_completed");
+      completedChallenges.push(...readingChallenges);
+
+      // Update for spread type used
+      const spreadChallenges = await updateChallengeProgress(user.id, "spread_used", {
+        spreadTypeId: spreadType.id,
+        spreadName: spreadType.name,
+      });
+      completedChallenges.push(...spreadChallenges);
+
+      // Update for cards discovered
+      if (newlyDiscoveredCards.length > 0) {
+        const cardChallenges = await updateChallengeProgress(user.id, "cards_discovered", {
+          cardsDiscovered: newlyDiscoveredCards.length,
+        });
+        completedChallenges.push(...cardChallenges);
+      }
+
+      // Update for streak
+      if (streakInfo) {
+        const streakChallenges = await updateChallengeProgress(user.id, "streak_updated", {
+          currentStreak: streakInfo.currentStreak,
+        });
+        completedChallenges.push(...streakChallenges);
+      }
+
+      // Remove duplicates (in case same challenge completed by multiple actions)
+      completedChallenges = completedChallenges.filter(
+        (c, i, arr) => arr.findIndex((x) => x.id === c.id) === i
+      );
+    } catch (error) {
+      console.error("Error updating challenges:", error);
+    }
+
     // Prepare response with full card details
     const cardsWithDetails = readingCards.map((rc) => {
       const card = selectedCards.find((c) => c.id === rc.cardId)!;
@@ -264,6 +341,14 @@ export async function POST(req: NextRequest) {
       streak: streakInfo,
       newlyDiscoveredCards,
       unlockedAchievements,
+      levelUp: levelUp ? {
+        newLevel: levelUp.newLevel,
+        levelName: levelUp.levelDefinition.name,
+        levelNameEs: levelUp.levelDefinition.nameEs,
+        levelIcon: levelUp.levelDefinition.icon,
+        creditsAwarded: levelUp.creditsAwarded,
+      } : null,
+      completedChallenges,
     });
   } catch (error) {
     console.error("Error creating reading:", error);

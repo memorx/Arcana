@@ -8,6 +8,8 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHe
 import { StreakRewardModal } from "@/components/dashboard/StreakRewardModal";
 import { NewCardDiscoveredModal } from "@/components/reading/NewCardDiscoveredModal";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
+import { LevelUpModal } from "@/components/levels/LevelUpModal";
+import { ChallengeCompletedModal } from "@/components/challenges/ChallengeCompletedModal";
 
 interface SpreadType {
   id: string;
@@ -84,6 +86,23 @@ interface UnlockedAchievementInfo {
   creditReward: number;
 }
 
+interface LevelUpInfo {
+  newLevel: number;
+  levelName: string;
+  levelNameEs: string;
+  levelIcon: string;
+  creditsAwarded: number;
+}
+
+interface CompletedChallengeInfo {
+  id: string;
+  key: string;
+  name: string;
+  nameEs: string;
+  icon: string;
+  creditReward: number;
+}
+
 interface ReadingResult {
   reading: {
     id: string;
@@ -97,6 +116,8 @@ interface ReadingResult {
   streak?: StreakInfo;
   newlyDiscoveredCards?: DiscoveredCardInfo[];
   unlockedAchievements?: UnlockedAchievementInfo[];
+  levelUp?: LevelUpInfo;
+  completedChallenges?: CompletedChallengeInfo[];
 }
 
 type Step = "intention" | "shuffling" | "revealing" | "interpretation";
@@ -130,6 +151,10 @@ export default function ReadingFlowPage({
   const [showDiscoveredModal, setShowDiscoveredModal] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<UnlockedAchievementInfo[]>([]);
   const [showAchievementsModal, setShowAchievementsModal] = useState(false);
+  const [levelUpInfo, setLevelUpInfo] = useState<LevelUpInfo | null>(null);
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [completedChallenges, setCompletedChallenges] = useState<CompletedChallengeInfo[]>([]);
+  const [showChallengesModal, setShowChallengesModal] = useState(false);
 
   // Fetch spread type and user credits on mount
   useEffect(() => {
@@ -192,33 +217,53 @@ export default function ReadingFlowPage({
 
   // Show discovered cards modal after all cards are revealed (first in chain)
   useEffect(() => {
-    if (allRevealed && discoveredCards.length > 0 && !showDiscoveredModal && !showAchievementsModal && !showStreakRewardModal) {
+    if (allRevealed && discoveredCards.length > 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowDiscoveredModal(true);
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, discoveredCards, showDiscoveredModal, showAchievementsModal, showStreakRewardModal]);
+  }, [allRevealed, discoveredCards, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
   // Show achievements modal after discovered cards modal is closed (second in chain)
   useEffect(() => {
-    if (allRevealed && unlockedAchievements.length > 0 && discoveredCards.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showStreakRewardModal) {
+    if (allRevealed && unlockedAchievements.length > 0 && discoveredCards.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowAchievementsModal(true);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, unlockedAchievements, discoveredCards.length, showDiscoveredModal, showAchievementsModal, showStreakRewardModal]);
+  }, [allRevealed, unlockedAchievements, discoveredCards.length, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
-  // Show streak reward modal after achievements modal is closed (third in chain)
+  // Show level up modal after achievements modal is closed (third in chain)
   useEffect(() => {
-    if (allRevealed && streakReward && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showStreakRewardModal) {
+    if (allRevealed && levelUpInfo && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+      const timer = setTimeout(() => {
+        setShowLevelUpModal(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [allRevealed, levelUpInfo, discoveredCards.length, unlockedAchievements.length, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+
+  // Show challenges modal after level up modal is closed (fourth in chain)
+  useEffect(() => {
+    if (allRevealed && completedChallenges.length > 0 && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !levelUpInfo && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+      const timer = setTimeout(() => {
+        setShowChallengesModal(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [allRevealed, completedChallenges, discoveredCards.length, unlockedAchievements.length, levelUpInfo, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+
+  // Show streak reward modal after challenges modal is closed (fifth in chain)
+  useEffect(() => {
+    if (allRevealed && streakReward && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !levelUpInfo && completedChallenges.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowStreakRewardModal(true);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, streakReward, discoveredCards.length, unlockedAchievements.length, showDiscoveredModal, showAchievementsModal, showStreakRewardModal]);
+  }, [allRevealed, streakReward, discoveredCards.length, unlockedAchievements.length, levelUpInfo, completedChallenges.length, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
   // Check if user can afford the reading
   const canAffordReading = freeReadings > 0 || userCredits >= (spreadType?.creditCost || 0);
@@ -271,6 +316,16 @@ export default function ReadingFlowPage({
       // Check if there's a streak reward to show
       if (data.streak?.reward) {
         setStreakReward(data.streak.reward);
+      }
+
+      // Check if user leveled up
+      if (data.levelUp) {
+        setLevelUpInfo(data.levelUp);
+      }
+
+      // Check if any challenges were completed
+      if (data.completedChallenges?.length > 0) {
+        setCompletedChallenges(data.completedChallenges);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t("createError"));
@@ -674,6 +729,36 @@ export default function ReadingFlowPage({
             // Chain continues via useEffect
           }}
           achievements={unlockedAchievements}
+        />
+      )}
+
+      {/* Level Up Modal */}
+      {levelUpInfo && (
+        <LevelUpModal
+          isOpen={showLevelUpModal}
+          onClose={() => {
+            setShowLevelUpModal(false);
+            setLevelUpInfo(null);
+            // Chain continues via useEffect
+          }}
+          newLevel={levelUpInfo.newLevel}
+          levelName={levelUpInfo.levelName}
+          levelNameEs={levelUpInfo.levelNameEs}
+          levelIcon={levelUpInfo.levelIcon}
+          creditsAwarded={levelUpInfo.creditsAwarded}
+        />
+      )}
+
+      {/* Challenges Completed Modal */}
+      {completedChallenges.length > 0 && (
+        <ChallengeCompletedModal
+          isOpen={showChallengesModal}
+          onClose={() => {
+            setShowChallengesModal(false);
+            setCompletedChallenges([]);
+            // Chain continues via useEffect
+          }}
+          challenges={completedChallenges}
         />
       )}
 

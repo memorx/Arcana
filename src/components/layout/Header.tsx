@@ -4,27 +4,33 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Badge, LanguageSelector } from "@/components/ui";
+import { Button, Badge, LanguageSelector, Tooltip } from "@/components/ui";
 import { SoundToggle } from "@/components/SoundToggle";
+import { LEVELS } from "@/lib/levels";
 
 export function Header() {
   const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [freeReadings, setFreeReadings] = useState<number | null>(null);
+  const [userLevel, setUserLevel] = useState<number>(1);
   const t = useTranslations("nav");
   const tDashboard = useTranslations("dashboard");
+  const tLevels = useTranslations("levels");
 
-  // Fetch actual credits from API (not cached JWT)
+  // Fetch actual credits and level from API (not cached JWT)
   useEffect(() => {
     if (status === "authenticated") {
-      const fetchCredits = async () => {
+      const fetchUserData = async () => {
         try {
           const res = await fetch("/api/user/credits");
           if (res.ok) {
             const data = await res.json();
             setCredits(data.credits);
             setFreeReadings(data.freeReadingsLeft);
+            if (data.level) {
+              setUserLevel(data.level);
+            }
           }
         } catch {
           // Fall back to session values if API fails
@@ -32,7 +38,7 @@ export function Header() {
           setFreeReadings(session?.user?.freeReadingsLeft ?? 0);
         }
       };
-      fetchCredits();
+      fetchUserData();
     }
   }, [status, session?.user?.credits, session?.user?.freeReadingsLeft]);
 
@@ -125,10 +131,19 @@ export function Header() {
                     aria-expanded={isMenuOpen}
                     aria-haspopup="true"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-amber-500 flex items-center justify-center text-sm font-medium text-white">
-                      {session.user.name?.[0]?.toUpperCase() ||
-                        session.user.email?.[0]?.toUpperCase() ||
-                        "?"}
+                    <div className="relative">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-amber-500 flex items-center justify-center text-sm font-medium text-white">
+                        {session.user.name?.[0]?.toUpperCase() ||
+                          session.user.email?.[0]?.toUpperCase() ||
+                          "?"}
+                      </div>
+                      {/* Level badge */}
+                      <div
+                        className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-amber-400"
+                        title={`${tLevels("level")} ${userLevel}: ${LEVELS[userLevel - 1]?.name || ""}`}
+                      >
+                        {userLevel}
+                      </div>
                     </div>
                     <svg
                       aria-hidden="true"
@@ -233,6 +248,13 @@ export function Header() {
                             onClick={() => setIsMenuOpen(false)}
                           >
                             <span>&#127942;</span> {t("achievements")}
+                          </Link>
+                          <Link
+                            href="/challenges"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span>&#127919;</span> {t("challenges")}
                           </Link>
                           <Link
                             href="/subscribe"

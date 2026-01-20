@@ -14,7 +14,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { credits: true, freeReadingsLeft: true },
+      select: { credits: true, freeReadingsLeft: true, level: true, xp: true },
     });
 
     if (!user) {
@@ -27,6 +27,8 @@ export async function GET() {
     return NextResponse.json({
       credits: user.credits,
       freeReadingsLeft: user.freeReadingsLeft,
+      level: user.level,
+      xp: user.xp,
     });
   } catch (error) {
     console.error("Error fetching user credits:", error);

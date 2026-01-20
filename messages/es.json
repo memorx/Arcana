@@ -36,7 +36,8 @@
     "profile": "Mi Perfil",
     "referral": "Invitar Amigos",
     "settings": "Configuracion",
-    "achievements": "Logros"
+    "achievements": "Logros",
+    "challenges": "Desafios"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
@@ -660,6 +661,44 @@
     "unlockModal": {
       "title": "Logro Desbloqueado!",
       "earned": "Has ganado {credits} creditos"
+    },
+    "continue": "Continuar"
+  },
+  "levels": {
+    "level": "Nivel",
+    "total": "total",
+    "viewProgress": "Ver Progreso",
+    "nextLevel": "Siguiente",
+    "maxLevel": "Nivel maximo alcanzado!",
+    "levelUp": "Subiste de Nivel!",
+    "newLevel": "Ahora eres {level}!",
+    "reward": "Recompensa",
+    "credits": "creditos",
+    "keepGoing": "Sigue asi! Tu viaje continua.",
+    "maxLevelMessage": "Has alcanzado la cima de la maestria!",
+    "continue": "Continuar",
+    "names": {
+      "novice": "Novato",
+      "apprentice": "Aprendiz",
+      "adept": "Adepto",
+      "master": "Maestro",
+      "oracle": "Oraculo"
+    }
+  },
+  "challenges": {
+    "title": "Desafios",
+    "weekly": "Semanales",
+    "monthly": "Mensuales",
+    "completed": "Completado",
+    "inProgress": "En Progreso",
+    "credits": "creditos",
+    "resetsIn": "Reinicia en {time}",
+    "noChallenges": "No hay desafios disponibles",
+    "viewAll": "Ver Todos",
+    "allCompleted": "Todos los desafios completados!",
+    "completedModal": {
+      "title": "Desafio Completado!",
+      "earned": "Has ganado {credits} creditos de desafios"
     },
     "continue": "Continuar"
   },
