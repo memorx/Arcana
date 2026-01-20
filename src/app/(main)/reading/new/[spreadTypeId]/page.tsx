@@ -184,36 +184,19 @@ export default function ReadingFlowPage({
     fetchData();
   }, [spreadTypeId, t]);
 
-  // Handle card revealing animation
-  useEffect(() => {
-    if (step === "revealing" && readingResult) {
-      const positions = readingResult.cards.map((c) => c.position);
-      let currentIndex = 0;
+  // Handle manual card reveal
+  const handleRevealCard = (position: number) => {
+    if (revealedCards.includes(position)) return;
 
-      // Reveal first card immediately
-      if (positions.length > 0) {
-        setRevealedCards([positions[0]]);
-        currentIndex = 1;
-      }
-
-      // Reveal remaining cards with delay
-      if (positions.length > 1) {
-        const revealInterval = setInterval(() => {
-          if (currentIndex < positions.length) {
-            setRevealedCards((prev) => [...prev, positions[currentIndex]]);
-            currentIndex++;
-          } else {
-            clearInterval(revealInterval);
-            setTimeout(() => setAllRevealed(true), 500);
-          }
-        }, 800);
-
-        return () => clearInterval(revealInterval);
-      } else {
+    setRevealedCards((prev) => {
+      const newRevealed = [...prev, position];
+      // Check if all cards are now revealed
+      if (readingResult && newRevealed.length === readingResult.cards.length) {
         setTimeout(() => setAllRevealed(true), 500);
       }
-    }
-  }, [step, readingResult]);
+      return newRevealed;
+    });
+  };
 
   // Show discovered cards modal after all cards are revealed (first in chain)
   useEffect(() => {
@@ -490,9 +473,17 @@ export default function ReadingFlowPage({
             </h2>
             <p className="text-slate-400">
               {allRevealed
-                ? t("allRevealed")
-                : t("revealingSubtitle")}
+                ? t("allCardsRevealed")
+                : t("tapToReveal")}
             </p>
+            {!allRevealed && (
+              <p className="text-purple-400 text-sm mt-2">
+                {t("cardsRevealedCount", {
+                  count: revealedCards.length,
+                  total: readingResult.cards.length,
+                })}
+              </p>
+            )}
           </div>
 
           {/* Cards Grid */}
@@ -503,9 +494,7 @@ export default function ReadingFlowPage({
               return (
                 <div
                   key={cardData.position}
-                  className={`transition-all duration-500 ${
-                    isRevealed ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                  }`}
+                  className="transition-all duration-300"
                 >
                   <Card className="overflow-hidden h-full">
                     <div className="bg-gradient-to-r from-purple-900/30 to-amber-900/20 px-4 py-2 border-b border-slate-800">
@@ -546,7 +535,15 @@ export default function ReadingFlowPage({
                           </div>
                         </>
                       ) : (
-                        <CardBack className="w-20 h-[120px]" />
+                        <div
+                          onClick={() => handleRevealCard(Number(cardData.position))}
+                          className="cursor-pointer transition-all duration-200 hover:scale-105 hover:brightness-110 active:scale-95"
+                        >
+                          <CardBack className="w-20 h-[120px]" />
+                          <p className="text-xs text-purple-400/70 mt-2 text-center animate-pulse">
+                            {t("tapCard")}
+                          </p>
+                        </div>
                       )}
                     </CardContent>
                   </Card>
