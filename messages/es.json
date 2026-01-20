@@ -31,6 +31,7 @@
     "register": "Registrarse",
     "logout": "Cerrar sesion",
     "dailyCard": "Carta del Dia",
+    "collection": "Coleccion",
     "subscribe": "Oraculo Diario",
     "profile": "Mi Perfil",
     "referral": "Invitar Amigos",
@@ -612,6 +613,31 @@
     "continue": "Genial!",
     "nextMilestone": "Proxima recompensa en {days} dias",
     "allCompleted": "Todos los hitos completados!"
+  },
+  "collection": {
+    "title": "Tu Coleccion",
+    "progress": "{count} de {total} cartas descubiertas",
+    "majorArcana": "Arcanos Mayores",
+    "wands": "Bastos",
+    "cups": "Copas",
+    "swords": "Espadas",
+    "pentacles": "Oros",
+    "locked": "Sigue haciendo lecturas para descubrir esta carta",
+    "newCard": "Nueva carta descubierta!",
+    "newCards": "Descubriste {count} cartas nuevas!",
+    "recentlyDiscovered": "Descubiertas Recientemente",
+    "addedToCollection": "Agregada a tu coleccion!",
+    "continue": "Continuar",
+    "viewAll": "Ver Todas",
+    "noCardsYet": "Haz una lectura para descubrir cartas",
+    "filters": {
+      "all": "Todas"
+    },
+    "cta": {
+      "title": "Completa tu Coleccion",
+      "subtitle": "Haz mas lecturas para descubrir las 78 cartas",
+      "button": "Iniciar Lectura"
+    }
   },
   "settings": {
     "title": "Configuracion",

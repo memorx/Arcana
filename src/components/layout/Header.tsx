@@ -221,6 +221,13 @@ export function Header() {
                             <span>&#128302;</span> {t("dailyCard")}
                           </Link>
                           <Link
+                            href="/collection"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span>&#127183;</span> {t("collection")}
+                          </Link>
+                          <Link
                             href="/subscribe"
                             className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
                             onClick={() => setIsMenuOpen(false)}

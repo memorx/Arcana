@@ -10,6 +10,7 @@ import {
   Badge,
 } from "@/components/ui";
 import { StreakDisplay } from "@/components/dashboard/StreakDisplay";
+import { CollectionWidget } from "@/components/dashboard/CollectionWidget";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -83,6 +84,9 @@ export default async function DashboardPage() {
           longestStreak={user?.longestStreak || 0}
         />
       )}
+
+      {/* Collection Widget */}
+      <CollectionWidget userId={session.user.id} />
 
       {/* Complete Profile Prompt */}
       {!userProfile && (
