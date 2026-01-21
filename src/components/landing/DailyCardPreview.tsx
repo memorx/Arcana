@@ -11,6 +11,7 @@ interface Card {
   nameEs: string;
   imageUrl: string;
   meaningUpright: string;
+  meaningUprightEn: string | null;
 }
 
 interface DailyCardPreviewProps {
@@ -94,7 +95,11 @@ export function DailyCardPreview({ title, ctaText, ctaHref = "/register", locale
   const displayName = locale === "es" ? card.nameEs : card.name;
 
   // Get a short excerpt of the meaning (first 2 sentences)
-  const shortMeaning = card.meaningUpright
+  // Use English meaning if available and locale is English, otherwise fallback to Spanish
+  const meaningText = locale === "en" && card.meaningUprightEn
+    ? card.meaningUprightEn
+    : card.meaningUpright;
+  const shortMeaning = meaningText
     .split(".")
     .slice(0, 2)
     .join(".") + ".";

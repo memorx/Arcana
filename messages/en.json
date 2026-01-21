@@ -2,6 +2,7 @@
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
+    "errorTryAgain": "Error. Try again.",
     "back": "Back",
     "continue": "Continue",
     "cancel": "Cancel",
@@ -9,6 +10,8 @@
     "delete": "Delete",
     "confirm": "Confirm",
     "edit": "Edit",
+    "active": "Active",
+    "skipToContent": "Skip to content",
     "notFound": {
       "title": "404",
       "message": "This page doesn't exist in the deck...",
@@ -37,7 +40,9 @@
     "referral": "Refer Friends",
     "settings": "Settings",
     "achievements": "Achievements",
-    "challenges": "Challenges"
+    "challenges": "Challenges",
+    "closeMenu": "Close menu",
+    "openMenu": "Open user menu"
   },
   "landing": {
     "readingCounter": "readings performed",
@@ -144,6 +149,7 @@
     "password": "Password",
     "confirmPassword": "Confirm password",
     "name": "Name",
+    "namePlaceholder": "Your name",
     "nameOptional": "Name (optional)",
     "loginTitle": "Welcome back",
     "loginSubtitle": "Sign in to your account to continue",
@@ -222,6 +228,7 @@
     "dailyOracleTitle": "Daily Oracle",
     "dailyOracleDesc": "Get a personalized card in your inbox every morning",
     "viewDaily": "Today's Card",
+    "todayCardDone": "Today's Card ✓",
     "subscribeCta": "Subscribe $79 MXN/mo",
     "referralTitle": "Invite friends, earn credits",
     "referralDesc": "Get 2 credits for each friend who signs up",
@@ -247,6 +254,9 @@
     "free": "Free",
     "freeWithReading": "You'll use 1 free reading",
     "freeReadingsLeft": "{count} free reading{count, plural, one {} other {s}}",
+    "freeReadingsLabel": "free readings",
+    "freeReadingLabel": "free reading",
+    "creditsAvailableLabel": "credits available",
     "creditsAvailable": "{count} credits available",
     "intentionTitle": "Your Intention",
     "intentionSubtitle": "Formulate your question or describe the situation you'd like guidance on. The clearer your intention, the more accurate the reading will be.",
@@ -343,6 +353,8 @@
   "history": {
     "title": "Reading History",
     "readingCount": "{count} reading{count, plural, one {} other {s}} total",
+    "readingTotal": "reading total",
+    "readingsTotal": "readings total",
     "empty": "You don't have any readings yet",
     "emptyTitle": "You don't have any readings yet",
     "emptySubtitle": "Begin your spiritual journey with your first tarot reading",
@@ -491,6 +503,12 @@
     "uprightSubtitle": "When this card appears upright",
     "reversed": "Reversed Meaning",
     "reversedSubtitle": "When this card appears inverted",
+    "focusAreas": {
+      "love": "Love",
+      "career": "Career",
+      "spirituality": "Spirituality",
+      "general": "General"
+    },
     "cta": {
       "title": "What does {card} mean for you?",
       "subtitle": "Get a personalized reading that connects this card with your unique situation",
@@ -534,7 +552,8 @@
     "needMoreCredits": "Need {count} more credits",
     "buyCredits": "Buy credits",
     "paidWithCredits": "Paid with credits",
-    "renewsAutomatically": "Renews automatically if you have enough credits"
+    "renewsAutomatically": "Renews automatically if you have enough credits",
+    "subscriptionError": "Error processing subscription. Please try again."
   },
   "profile": {
     "title": "Complete Your Profile",
@@ -726,6 +745,7 @@
     "deleteWarning": "This will permanently delete your account and all your data including readings, profile, and subscription.",
     "deleteConfirmTitle": "Are you sure?",
     "deleteConfirmText": "Type DELETE to confirm",
+    "deleteConfirmWord": "DELETE",
     "deleteConfirmPlaceholder": "Type DELETE",
     "deleting": "Deleting...",
     "cancel": "Cancel",

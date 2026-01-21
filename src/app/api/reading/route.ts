@@ -206,10 +206,24 @@ export async function POST(req: NextRequest) {
       imageUrl: string;
       arcana: string;
       suit: string | null;
+      keywords: string[];
+      meaningUpright: string;
+      meaningReversed: string;
+      meaningUprightEn: string | null;
+      meaningReversedEn: string | null;
+      isReversed: boolean;
     }> = [];
     try {
       const cardIds = readingCards.map((rc) => rc.cardId);
-      newlyDiscoveredCards = await discoverCardsFromReading(user.id, cardIds);
+      const discoveredCards = await discoverCardsFromReading(user.id, cardIds);
+      // Add isReversed info from readingCards
+      newlyDiscoveredCards = discoveredCards.map((card) => {
+        const readingCard = readingCards.find((rc) => rc.cardId === card.id);
+        return {
+          ...card,
+          isReversed: readingCard?.isReversed ?? false,
+        };
+      });
     } catch (error) {
       console.error("Error discovering cards:", error);
     }

@@ -58,8 +58,8 @@ export default async function HistoryPage() {
           </h1>
           <p className="text-slate-400 mt-1">
             {readings.length} {readings.length === 1
-              ? (locale === "en" ? "reading total" : "lectura en total")
-              : (locale === "en" ? "readings total" : "lecturas en total")}
+              ? t("readingTotal")
+              : t("readingsTotal")}
           </p>
         </div>
         <Link href="/reading/new">

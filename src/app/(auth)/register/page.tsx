@@ -101,7 +101,7 @@ function RegisterForm() {
           <Input
             label={t("nameOptional")}
             type="text"
-            placeholder="Tu nombre"
+            placeholder={t("namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />

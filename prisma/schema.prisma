@@ -133,17 +133,19 @@ model PasswordResetToken {
 // ============================================================================
 
 model Card {
-  id              String   @id @default(cuid())
-  name            String   @unique
-  nameEs          String
-  slug            String?  @unique
-  arcana          Arcana
-  suit            Suit?
-  number          Int
-  keywords        String[]
-  meaningUpright  String   @db.Text
-  meaningReversed String   @db.Text
-  imageUrl        String
+  id                 String   @id @default(cuid())
+  name               String   @unique
+  nameEs             String
+  slug               String?  @unique
+  arcana             Arcana
+  suit               Suit?
+  number             Int
+  keywords           String[]
+  meaningUpright     String   @db.Text
+  meaningReversed    String   @db.Text
+  meaningUprightEn   String?  @db.Text
+  meaningReversedEn  String?  @db.Text
+  imageUrl           String
 
   dailyReadings  DailyReading[]
   userCollection UserCardCollection[]

@@ -43,7 +43,7 @@ export default function SettingsPage() {
     return null;
   }
 
-  const expectedConfirmText = locale === "es" ? "ELIMINAR" : "DELETE";
+  const expectedConfirmText = t("deleteConfirmWord");
   const isConfirmValid = confirmText.toUpperCase() === expectedConfirmText;
 
   const handleDeleteAccount = async () => {

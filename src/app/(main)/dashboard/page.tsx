@@ -23,6 +23,7 @@ export default async function DashboardPage() {
   }
 
   const t = await getTranslations("dashboard");
+  const tCommon = await getTranslations("common");
   const locale = await getLocale();
 
   // Fetch user data and recent readings
@@ -173,7 +174,7 @@ export default async function DashboardPage() {
                 <h2 className="text-lg font-semibold text-slate-100">{t("dailyOracleTitle")}</h2>
                 {isSubscribed && (
                   <Badge variant="success" className="text-xs">
-                    {locale === "en" ? "Active" : "Activo"}
+                    {tCommon("active")}
                   </Badge>
                 )}
               </div>
@@ -183,7 +184,7 @@ export default async function DashboardPage() {
           <div className="flex gap-3">
             <Link href="/daily" prefetch={true}>
               <Button variant={isSubscribed ? "primary" : "secondary"} size="sm">
-                {isSubscribed ? (locale === "en" ? "Today's Card ✓" : "Carta de Hoy ✓") : t("viewDaily")}
+                {isSubscribed ? t("todayCardDone") : t("viewDaily")}
               </Button>
             </Link>
             {!isSubscribed && (

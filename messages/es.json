@@ -2,6 +2,7 @@
   "common": {
     "loading": "Cargando...",
     "error": "Algo salio mal",
+    "errorTryAgain": "Error. Intenta de nuevo.",
     "back": "Volver",
     "continue": "Continuar",
     "cancel": "Cancelar",
@@ -9,6 +10,8 @@
     "delete": "Eliminar",
     "confirm": "Confirmar",
     "edit": "Editar",
+    "active": "Activo",
+    "skipToContent": "Saltar al contenido",
     "notFound": {
       "title": "404",
       "message": "Esta página no existe en el mazo...",
@@ -37,7 +40,9 @@
     "referral": "Invitar Amigos",
     "settings": "Configuracion",
     "achievements": "Logros",
-    "challenges": "Desafios"
+    "challenges": "Desafios",
+    "closeMenu": "Cerrar menu",
+    "openMenu": "Abrir menu de usuario"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
@@ -144,6 +149,7 @@
     "password": "Contrasena",
     "confirmPassword": "Confirmar contrasena",
     "name": "Nombre",
+    "namePlaceholder": "Tu nombre",
     "nameOptional": "Nombre (opcional)",
     "loginTitle": "Bienvenido de vuelta",
     "loginSubtitle": "Ingresa a tu cuenta para continuar",
@@ -222,6 +228,7 @@
     "dailyOracleTitle": "Oraculo Diario",
     "dailyOracleDesc": "Recibe una carta personalizada en tu correo cada manana",
     "viewDaily": "Carta de Hoy",
+    "todayCardDone": "Carta de Hoy ✓",
     "subscribeCta": "Suscribirse $79 MXN/mes",
     "referralTitle": "Invita amigos, gana creditos",
     "referralDesc": "Obten 2 creditos por cada amigo que se registre",
@@ -247,6 +254,9 @@
     "free": "Gratis",
     "freeWithReading": "Usaras 1 lectura gratis",
     "freeReadingsLeft": "{count} lectura{count, plural, one {} other {s}} gratis",
+    "freeReadingsLabel": "lecturas gratis",
+    "freeReadingLabel": "lectura gratis",
+    "creditsAvailableLabel": "creditos disponibles",
     "creditsAvailable": "{count} creditos disponibles",
     "intentionTitle": "Tu Intencion",
     "intentionSubtitle": "Formula tu pregunta o describe la situacion sobre la que deseas recibir guia. Cuanto mas clara sea tu intencion, mas precisa sera la lectura.",
@@ -343,6 +353,8 @@
   "history": {
     "title": "Historial de Lecturas",
     "readingCount": "{count} lectura{count, plural, one {} other {s}} en total",
+    "readingTotal": "lectura en total",
+    "readingsTotal": "lecturas en total",
     "empty": "No tienes lecturas aun",
     "emptyTitle": "No tienes lecturas aun",
     "emptySubtitle": "Comienza tu viaje espiritual con tu primera lectura de tarot",
@@ -491,6 +503,12 @@
     "uprightSubtitle": "Cuando esta carta aparece al derecho",
     "reversed": "Significado Invertido",
     "reversedSubtitle": "Cuando esta carta aparece invertida",
+    "focusAreas": {
+      "love": "Amor",
+      "career": "Carrera",
+      "spirituality": "Espiritualidad",
+      "general": "General"
+    },
     "cta": {
       "title": "Que significa {card} para ti?",
       "subtitle": "Obtén una lectura personalizada que conecte esta carta con tu situacion unica",
@@ -534,7 +552,8 @@
     "needMoreCredits": "Necesitas {count} creditos mas",
     "buyCredits": "Comprar creditos",
     "paidWithCredits": "Pagado con creditos",
-    "renewsAutomatically": "Se renueva automaticamente si tienes creditos suficientes"
+    "renewsAutomatically": "Se renueva automaticamente si tienes creditos suficientes",
+    "subscriptionError": "Error procesando suscripcion. Intenta de nuevo."
   },
   "profile": {
     "title": "Completa tu Perfil",
@@ -726,6 +745,7 @@
     "deleteWarning": "Esto eliminara permanentemente tu cuenta y todos tus datos incluyendo lecturas, perfil y suscripcion.",
     "deleteConfirmTitle": "Estas seguro?",
     "deleteConfirmText": "Escribe ELIMINAR para confirmar",
+    "deleteConfirmWord": "ELIMINAR",
     "deleteConfirmPlaceholder": "Escribe ELIMINAR",
     "deleting": "Eliminando...",
     "cancel": "Cancelar",

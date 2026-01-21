@@ -51,12 +51,12 @@ export default async function NewReadingPage() {
           {freeReadingsLeft > 0 && (
             <Badge variant="success" className="text-sm px-3 py-1">
               {freeReadingsLeft} {freeReadingsLeft !== 1
-                ? (locale === "en" ? "free readings" : "lecturas gratis")
-                : (locale === "en" ? "free reading" : "lectura gratis")}
+                ? t("freeReadingsLabel")
+                : t("freeReadingLabel")}
             </Badge>
           )}
           <Badge variant="secondary" className="text-sm px-3 py-1">
-            {credits} {locale === "en" ? "credits available" : "creditos disponibles"}
+            {credits} {t("creditsAvailableLabel")}
           </Badge>
         </div>
       </div>

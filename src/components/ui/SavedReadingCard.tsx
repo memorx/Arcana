@@ -14,6 +14,8 @@ interface SavedReadingCardProps {
     imageUrl: string | null;
     meaningUpright: string;
     meaningReversed: string;
+    meaningUprightEn?: string | null;
+    meaningReversedEn?: string | null;
     keywords: string[];
   };
   position: {
@@ -84,7 +86,13 @@ export function SavedReadingCard({
               {translations.meaning}
             </p>
             <p className="text-sm text-slate-400">
-              {isReversed ? card.meaningReversed : card.meaningUpright}
+              {isReversed
+                ? (locale === "en" && card.meaningReversedEn
+                    ? card.meaningReversedEn
+                    : card.meaningReversed)
+                : (locale === "en" && card.meaningUprightEn
+                    ? card.meaningUprightEn
+                    : card.meaningUpright)}
             </p>
           </div>
 
