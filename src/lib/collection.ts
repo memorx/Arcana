@@ -7,6 +7,11 @@ export interface DiscoveredCard {
   imageUrl: string;
   arcana: string;
   suit: string | null;
+  keywords: string[];
+  meaningUpright: string;
+  meaningReversed: string;
+  meaningUprightEn: string | null;
+  meaningReversedEn: string | null;
 }
 
 /**
@@ -43,6 +48,11 @@ export async function discoverCardsFromReading(
       imageUrl: true,
       arcana: true,
       suit: true,
+      keywords: true,
+      meaningUpright: true,
+      meaningReversed: true,
+      meaningUprightEn: true,
+      meaningReversedEn: true,
     },
   });
 
@@ -78,13 +88,22 @@ export async function getCollectionStats(userId: string): Promise<{
   };
 }
 
+export interface RecentlyDiscoveredCard {
+  id: string;
+  name: string;
+  nameEs: string;
+  imageUrl: string;
+  arcana: string;
+  suit: string | null;
+}
+
 /**
  * Get user's recently discovered cards
  */
 export async function getRecentlyDiscovered(
   userId: string,
   limit: number = 3
-): Promise<DiscoveredCard[]> {
+): Promise<RecentlyDiscoveredCard[]> {
   const recent = await prisma.userCardCollection.findMany({
     where: { userId },
     orderBy: { discoveredAt: "desc" },

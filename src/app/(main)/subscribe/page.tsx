@@ -101,7 +101,7 @@ export default function SubscribePage() {
       }
     } catch (error) {
       console.error("Subscription error:", error);
-      alert("Error processing subscription. Please try again.");
+      alert(t("subscriptionError"));
     } finally {
       setIsProcessing(false);
     }
@@ -131,11 +131,7 @@ export default function SubscribePage() {
       }
     } catch (error) {
       console.error("Credits subscription error:", error);
-      alert(
-        locale === "en"
-          ? "Error processing subscription. Please try again."
-          : "Error procesando suscripcion. Intenta de nuevo."
-      );
+      alert(t("subscriptionError"));
       setIsProcessingCredits(false);
     }
   };

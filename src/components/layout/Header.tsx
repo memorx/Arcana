@@ -127,7 +127,7 @@ export function Header() {
                   <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-800/50 transition-colors"
-                    aria-label={isMenuOpen ? "Close menu" : "Open user menu"}
+                    aria-label={isMenuOpen ? t("closeMenu") : t("openMenu")}
                     aria-expanded={isMenuOpen}
                     aria-haspopup="true"
                   >

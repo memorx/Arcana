@@ -36,6 +36,8 @@ interface CardData {
   keywords: string[];
   meaningUpright: string;
   meaningReversed: string;
+  meaningUprightEn: string | null;
+  meaningReversedEn: string | null;
   imageUrl: string;
 }
 
@@ -72,6 +74,12 @@ interface DiscoveredCardInfo {
   imageUrl: string;
   arcana: string;
   suit: string | null;
+  keywords: string[];
+  meaningUpright: string;
+  meaningReversed: string;
+  meaningUprightEn: string | null;
+  meaningReversedEn: string | null;
+  isReversed: boolean;
 }
 
 interface UnlockedAchievementInfo {

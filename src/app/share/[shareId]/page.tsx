@@ -132,6 +132,8 @@ export default async function SharedReadingPage({ params }: PageProps) {
                     imageUrl: card.imageUrl,
                     meaningUpright: card.meaningUpright,
                     meaningReversed: card.meaningReversed,
+                    meaningUprightEn: card.meaningUprightEn,
+                    meaningReversedEn: card.meaningReversedEn,
                     keywords: card.keywords,
                   }}
                   position={position}

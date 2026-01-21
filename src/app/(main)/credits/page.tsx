@@ -7,6 +7,7 @@ import { CREDIT_PACKAGES, CreditPackage } from "@/lib/pricing";
 
 export default function CreditsPage() {
   const t = useTranslations("credits");
+  const tCommon = useTranslations("common");
   const tDashboard = useTranslations("dashboard");
   const [userCredits, setUserCredits] = useState<number | null>(null);
   const [freeReadings, setFreeReadings] = useState<number | null>(null);
@@ -50,7 +51,7 @@ export default function CreditsPage() {
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      alert("Error. Try again.");
+      alert(tCommon("errorTryAgain"));
     } finally {
       setPurchasingId(null);
     }

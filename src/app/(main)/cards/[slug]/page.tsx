@@ -63,7 +63,7 @@ export default async function CardDetailPage({ params }: Props) {
     keywordString.includes("relacion") ||
     keywordString.includes("union")
   ) {
-    focusAreas.push(locale === "es" ? "Amor" : "Love");
+    focusAreas.push(t("focusAreas.love"));
   }
   if (
     keywordString.includes("trabajo") ||
@@ -71,17 +71,17 @@ export default async function CardDetailPage({ params }: Props) {
     keywordString.includes("dinero") ||
     keywordString.includes("abundancia")
   ) {
-    focusAreas.push(locale === "es" ? "Carrera" : "Career");
+    focusAreas.push(t("focusAreas.career"));
   }
   if (
     keywordString.includes("espiritual") ||
     keywordString.includes("intuicion") ||
     keywordString.includes("sabidur")
   ) {
-    focusAreas.push(locale === "es" ? "Espiritualidad" : "Spirituality");
+    focusAreas.push(t("focusAreas.spirituality"));
   }
   if (focusAreas.length === 0) {
-    focusAreas.push(locale === "es" ? "General" : "General");
+    focusAreas.push(t("focusAreas.general"));
   }
 
   return (
@@ -203,7 +203,9 @@ export default async function CardDetailPage({ params }: Props) {
               </div>
               <CardContent className="p-6">
                 <p className="text-slate-300 leading-relaxed">
-                  {card.meaningUpright}
+                  {locale === "en" && card.meaningUprightEn
+                    ? card.meaningUprightEn
+                    : card.meaningUpright}
                 </p>
               </CardContent>
             </Card>
@@ -227,7 +229,9 @@ export default async function CardDetailPage({ params }: Props) {
               </div>
               <CardContent className="p-6">
                 <p className="text-slate-300 leading-relaxed">
-                  {card.meaningReversed}
+                  {locale === "en" && card.meaningReversedEn
+                    ? card.meaningReversedEn
+                    : card.meaningReversed}
                 </p>
               </CardContent>
             </Card>

@@ -40,6 +40,8 @@ export interface CardWithDetails {
   keywords: string[];
   meaningUpright: string;
   meaningReversed: string;
+  meaningUprightEn: string | null;
+  meaningReversedEn: string | null;
   imageUrl: string;
 }
 
