@@ -10,6 +10,7 @@ import { NewCardDiscoveredModal } from "@/components/reading/NewCardDiscoveredMo
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import { LevelUpModal } from "@/components/levels/LevelUpModal";
 import { ChallengeCompletedModal } from "@/components/challenges/ChallengeCompletedModal";
+import { GoldenCardModal } from "@/components/golden";
 
 interface SpreadType {
   id: string;
@@ -52,8 +53,20 @@ interface ReadingCard {
   position: number;
   cardId: string;
   isReversed: boolean;
+  isGolden: boolean;
   card: CardData;
   positionInfo: PositionInfo;
+}
+
+interface GoldenCardInfo {
+  id: string;
+  name: string;
+  nameEs: string;
+  imageUrl: string;
+  arcana: string;
+  suit: string | null;
+  isNew: boolean;
+  creditsAwarded: number;
 }
 
 interface StreakRewardInfo {
@@ -123,6 +136,7 @@ interface ReadingResult {
   usedFreeReading: boolean;
   streak?: StreakInfo;
   newlyDiscoveredCards?: DiscoveredCardInfo[];
+  goldenCards?: GoldenCardInfo[];
   unlockedAchievements?: UnlockedAchievementInfo[];
   levelUp?: LevelUpInfo;
   completedChallenges?: CompletedChallengeInfo[];
@@ -163,6 +177,8 @@ export default function ReadingFlowPage({
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
   const [completedChallenges, setCompletedChallenges] = useState<CompletedChallengeInfo[]>([]);
   const [showChallengesModal, setShowChallengesModal] = useState(false);
+  const [goldenCards, setGoldenCards] = useState<GoldenCardInfo[]>([]);
+  const [showGoldenModal, setShowGoldenModal] = useState(false);
 
   // Fetch spread type and user credits on mount
   useEffect(() => {
@@ -206,55 +222,65 @@ export default function ReadingFlowPage({
     });
   };
 
-  // Show discovered cards modal after all cards are revealed (first in chain)
+  // Show golden cards modal after all cards are revealed (first in chain - most exciting!)
   useEffect(() => {
-    if (allRevealed && discoveredCards.length > 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+    if (allRevealed && goldenCards.length > 0 && !showGoldenModal && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
-        setShowDiscoveredModal(true);
+        setShowGoldenModal(true);
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, discoveredCards, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+  }, [allRevealed, goldenCards, showGoldenModal, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
-  // Show achievements modal after discovered cards modal is closed (second in chain)
+  // Show discovered cards modal after golden cards modal is closed (second in chain)
   useEffect(() => {
-    if (allRevealed && unlockedAchievements.length > 0 && discoveredCards.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+    if (allRevealed && discoveredCards.length > 0 && goldenCards.length === 0 && !showGoldenModal && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+      const timer = setTimeout(() => {
+        setShowDiscoveredModal(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [allRevealed, discoveredCards, goldenCards.length, showGoldenModal, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+
+  // Show achievements modal after discovered cards modal is closed (third in chain)
+  useEffect(() => {
+    if (allRevealed && unlockedAchievements.length > 0 && goldenCards.length === 0 && discoveredCards.length === 0 && !showGoldenModal && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowAchievementsModal(true);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, unlockedAchievements, discoveredCards.length, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+  }, [allRevealed, unlockedAchievements, goldenCards.length, discoveredCards.length, showGoldenModal, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
-  // Show level up modal after achievements modal is closed (third in chain)
+  // Show level up modal after achievements modal is closed (fourth in chain)
   useEffect(() => {
-    if (allRevealed && levelUpInfo && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+    if (allRevealed && levelUpInfo && goldenCards.length === 0 && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !showGoldenModal && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowLevelUpModal(true);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, levelUpInfo, discoveredCards.length, unlockedAchievements.length, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+  }, [allRevealed, levelUpInfo, goldenCards.length, discoveredCards.length, unlockedAchievements.length, showGoldenModal, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
-  // Show challenges modal after level up modal is closed (fourth in chain)
+  // Show challenges modal after level up modal is closed (fifth in chain)
   useEffect(() => {
-    if (allRevealed && completedChallenges.length > 0 && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !levelUpInfo && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+    if (allRevealed && completedChallenges.length > 0 && goldenCards.length === 0 && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !levelUpInfo && !showGoldenModal && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowChallengesModal(true);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, completedChallenges, discoveredCards.length, unlockedAchievements.length, levelUpInfo, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+  }, [allRevealed, completedChallenges, goldenCards.length, discoveredCards.length, unlockedAchievements.length, levelUpInfo, showGoldenModal, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
-  // Show streak reward modal after challenges modal is closed (fifth in chain)
+  // Show streak reward modal after challenges modal is closed (sixth in chain)
   useEffect(() => {
-    if (allRevealed && streakReward && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !levelUpInfo && completedChallenges.length === 0 && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
+    if (allRevealed && streakReward && goldenCards.length === 0 && discoveredCards.length === 0 && unlockedAchievements.length === 0 && !levelUpInfo && completedChallenges.length === 0 && !showGoldenModal && !showDiscoveredModal && !showAchievementsModal && !showLevelUpModal && !showChallengesModal && !showStreakRewardModal) {
       const timer = setTimeout(() => {
         setShowStreakRewardModal(true);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [allRevealed, streakReward, discoveredCards.length, unlockedAchievements.length, levelUpInfo, completedChallenges.length, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
+  }, [allRevealed, streakReward, goldenCards.length, discoveredCards.length, unlockedAchievements.length, levelUpInfo, completedChallenges.length, showGoldenModal, showDiscoveredModal, showAchievementsModal, showLevelUpModal, showChallengesModal, showStreakRewardModal]);
 
   // Check if user can afford the reading
   const canAffordReading = freeReadings > 0 || userCredits >= (spreadType?.creditCost || 0);
@@ -317,6 +343,11 @@ export default function ReadingFlowPage({
       // Check if any challenges were completed
       if (data.completedChallenges?.length > 0) {
         setCompletedChallenges(data.completedChallenges);
+      }
+
+      // Check if any golden cards were found
+      if (data.goldenCards?.length > 0) {
+        setGoldenCards(data.goldenCards);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t("createError"));
@@ -526,6 +557,7 @@ export default function ReadingFlowPage({
                               imageUrl: cardData.card.imageUrl,
                             }}
                             isReversed={cardData.isReversed}
+                            isGolden={cardData.isGolden}
                             showReversedBadge={false}
                             size="md"
                             locale={locale}
@@ -617,6 +649,7 @@ export default function ReadingFlowPage({
                         imageUrl: cardData.card.imageUrl,
                       }}
                       isReversed={cardData.isReversed}
+                      isGolden={cardData.isGolden}
                       showReversedBadge={false}
                       size="sm"
                       locale={locale}
@@ -628,6 +661,9 @@ export default function ReadingFlowPage({
                       </h3>
                       {cardData.isReversed && (
                         <span className="text-xs text-orange-400">{t("reversed")}</span>
+                      )}
+                      {cardData.isGolden && (
+                        <span className="text-xs text-amber-400 ml-1">&#10024;</span>
                       )}
                     </div>
                   </CardContent>
@@ -710,6 +746,19 @@ export default function ReadingFlowPage({
           </div>
         </ModalBody>
       </Modal>
+
+      {/* Golden Cards Modal */}
+      {goldenCards.length > 0 && (
+        <GoldenCardModal
+          isOpen={showGoldenModal}
+          onClose={() => {
+            setShowGoldenModal(false);
+            setGoldenCards([]);
+            // Chain continues via useEffect
+          }}
+          cards={goldenCards}
+        />
+      )}
 
       {/* Discovered Cards Modal */}
       {discoveredCards.length > 0 && (

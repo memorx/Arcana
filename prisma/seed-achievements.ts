@@ -144,6 +144,41 @@ const achievements = [
     requirement: 1,
     creditReward: 3,
   },
+
+  // Por Cartas Doradas
+  {
+    key: "first_gold",
+    name: "First Gold",
+    nameEs: "Primer Oro",
+    description: "Find your first golden card",
+    descriptionEs: "Encuentra tu primera carta dorada",
+    icon: "✨",
+    category: "golden",
+    requirement: 1,
+    creditReward: 2,
+  },
+  {
+    key: "golden_collector",
+    name: "Golden Collector",
+    nameEs: "Coleccionista Dorado",
+    description: "Collect 10 unique golden cards",
+    descriptionEs: "Colecciona 10 cartas doradas únicas",
+    icon: "🌟",
+    category: "golden",
+    requirement: 10,
+    creditReward: 5,
+  },
+  {
+    key: "midas_touch",
+    name: "Midas Touch",
+    nameEs: "Toque de Midas",
+    description: "Collect all 22 Major Arcana as golden",
+    descriptionEs: "Colecciona los 22 Arcanos Mayores dorados",
+    icon: "👑",
+    category: "golden",
+    requirement: 22,
+    creditReward: 25,
+  },
 ];
 
 async function seedAchievements() {

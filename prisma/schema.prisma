@@ -62,17 +62,21 @@ model User {
   xp               Int       @default(0)
   level            Int       @default(1)
 
-  accounts       Account[]
-  sessions       Session[]
-  readings       Reading[]
-  transactions   CreditTransaction[]
-  profile        UserProfile?
-  subscription   Subscription?
-  dailyReadings  DailyReading[]
-  streakRewards  StreakReward[]
-  cardCollection UserCardCollection[]
-  achievements   UserAchievement[]
-  challenges     UserChallenge[]
+  // Golden cards system
+  goldenCardsCount Int       @default(0)
+
+  accounts             Account[]
+  sessions             Session[]
+  readings             Reading[]
+  transactions         CreditTransaction[]
+  profile              UserProfile?
+  subscription         Subscription?
+  dailyReadings        DailyReading[]
+  streakRewards        StreakReward[]
+  cardCollection       UserCardCollection[]
+  goldenCardCollection UserGoldenCardCollection[]
+  achievements         UserAchievement[]
+  challenges           UserChallenge[]
 
   @@map("users")
 }
@@ -147,8 +151,9 @@ model Card {
   meaningReversedEn  String?  @db.Text
   imageUrl           String
 
-  dailyReadings  DailyReading[]
-  userCollection UserCardCollection[]
+  dailyReadings        DailyReading[]
+  userCollection       UserCardCollection[]
+  goldenCardCollection UserGoldenCardCollection[]
 
   @@unique([arcana, suit, number])
   @@map("cards")
@@ -329,6 +334,25 @@ model UserCardCollection {
   @@index([userId])
   @@index([discoveredAt])
   @@map("user_card_collections")
+}
+
+// ============================================================================
+// GOLDEN CARD COLLECTION
+// ============================================================================
+
+model UserGoldenCardCollection {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardId       String
+  card         Card     @relation(fields: [cardId], references: [id])
+  discoveredAt DateTime @default(now())
+  readingId    String?  // Reference to the reading where it was discovered
+
+  @@unique([userId, cardId])
+  @@index([userId])
+  @@index([discoveredAt])
+  @@map("user_golden_card_collections")
 }
 
 // ============================================================================
