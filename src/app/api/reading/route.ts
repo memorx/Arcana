@@ -9,6 +9,7 @@ import { addXP, type LevelUpResult } from "@/lib/xp";
 import { getXPForReading, XP_REWARDS } from "@/lib/levels";
 import { updateChallengeProgress, type CompletedChallenge } from "@/lib/challenges";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { rollForGoldenCard, processGoldenCards, type GoldenCardInfo } from "@/lib/golden-cards";
 
 export async function POST(req: NextRequest) {
   // Rate limit: 5 readings per minute per user
@@ -87,11 +88,12 @@ export async function POST(req: NextRequest) {
     const shuffled = [...allCards].sort(() => Math.random() - 0.5);
     const selectedCards = shuffled.slice(0, spreadType.cardCount);
 
-    // Determine reversed status for each card (30% probability)
+    // Determine reversed status (30% probability) and golden status (1% probability)
     const readingCards = selectedCards.map((card, index) => ({
       position: index + 1,
       cardId: card.id,
       isReversed: Math.random() < 0.3,
+      isGolden: rollForGoldenCard(), // 1% chance - rolled server-side to prevent manipulation
     }));
 
     // Get position information
@@ -196,6 +198,20 @@ export async function POST(req: NextRequest) {
       streakInfo = await updateStreak(user.id);
     } catch (error) {
       console.error("Error updating streak:", error);
+    }
+
+    // Process golden cards (non-blocking)
+    let goldenCards: GoldenCardInfo[] = [];
+    try {
+      const goldenCardIds = readingCards
+        .filter((rc) => rc.isGolden)
+        .map((rc) => rc.cardId);
+
+      if (goldenCardIds.length > 0) {
+        goldenCards = await processGoldenCards(user.id, goldenCardIds, reading.id);
+      }
+    } catch (error) {
+      console.error("Error processing golden cards:", error);
     }
 
     // Discover new cards for collection (non-blocking)
@@ -354,6 +370,7 @@ export async function POST(req: NextRequest) {
       usedFreeReading: useFreeReading,
       streak: streakInfo,
       newlyDiscoveredCards,
+      goldenCards, // Golden cards found in this reading
       unlockedAchievements,
       levelUp: levelUp ? {
         newLevel: levelUp.newLevel,

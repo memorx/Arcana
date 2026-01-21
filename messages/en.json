@@ -684,13 +684,31 @@
       "collection": "Collection",
       "streak": "Streaks",
       "time": "Time-Based",
-      "subscription": "Subscription"
+      "subscription": "Subscription",
+      "golden": "Golden Cards"
     },
     "unlockModal": {
       "title": "Achievement Unlocked!",
       "earned": "You earned {credits} credits"
     },
     "continue": "Continue"
+  },
+  "goldenCards": {
+    "title": "GOLDEN CARD!",
+    "titleMultiple": "{count} GOLDEN CARDS!",
+    "subtitle": "A rare treasure has appeared!",
+    "new": "New",
+    "creditsEarned": "You earned free credits!",
+    "credits": "credits",
+    "addedToCollection": "Added to your golden collection!",
+    "continue": "Continue",
+    "collectionTitle": "Golden Collection",
+    "collectionProgress": "{count} of {total} golden cards",
+    "totalFound": "Total golden cards found: {count}",
+    "goldenBadge": "Golden",
+    "golden": "Golden",
+    "goldenCardsShort": "Golden Cards",
+    "chance": "1% chance per card"
   },
   "levels": {
     "level": "Level",

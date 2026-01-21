@@ -684,13 +684,31 @@
       "collection": "Coleccion",
       "streak": "Rachas",
       "time": "Por Tiempo",
-      "subscription": "Suscripcion"
+      "subscription": "Suscripcion",
+      "golden": "Cartas Doradas"
     },
     "unlockModal": {
       "title": "Logro Desbloqueado!",
       "earned": "Has ganado {credits} creditos"
     },
     "continue": "Continuar"
+  },
+  "goldenCards": {
+    "title": "CARTA DORADA!",
+    "titleMultiple": "{count} CARTAS DORADAS!",
+    "subtitle": "Un tesoro raro ha aparecido!",
+    "new": "Nueva",
+    "creditsEarned": "Ganaste creditos gratis!",
+    "credits": "creditos",
+    "addedToCollection": "Agregada a tu coleccion dorada!",
+    "continue": "Continuar",
+    "collectionTitle": "Coleccion Dorada",
+    "collectionProgress": "{count} de {total} cartas doradas",
+    "totalFound": "Total de cartas doradas encontradas: {count}",
+    "goldenBadge": "Dorada",
+    "golden": "Dorada",
+    "goldenCardsShort": "Cartas Doradas",
+    "chance": "1% de probabilidad por carta"
   },
   "levels": {
     "level": "Nivel",

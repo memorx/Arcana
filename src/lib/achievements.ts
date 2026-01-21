@@ -120,6 +120,13 @@ function checkAchievementCondition(
       }
       return false;
 
+    case "golden":
+      if (achievement.key === "midas_touch") {
+        // All major arcana as golden (22 cards)
+        return stats.goldenMajorArcanaDiscovered >= achievement.requirement;
+      }
+      return stats.goldenCardsDiscovered >= achievement.requirement;
+
     default:
       return false;
   }
@@ -132,6 +139,8 @@ interface UserStats {
   currentStreak: number;
   longestStreak: number;
   hasActiveSubscription: boolean;
+  goldenCardsDiscovered: number;
+  goldenMajorArcanaDiscovered: number;
 }
 
 /**
@@ -142,12 +151,21 @@ async function getUserStats(userId: string): Promise<UserStats> {
     readingsCount,
     collectionStats,
     majorArcanaCount,
+    goldenCardsCount,
+    goldenMajorArcanaCount,
     user,
     subscription,
   ] = await Promise.all([
     prisma.reading.count({ where: { userId } }),
     prisma.userCardCollection.count({ where: { userId } }),
     prisma.userCardCollection.count({
+      where: {
+        userId,
+        card: { arcana: "MAJOR" },
+      },
+    }),
+    prisma.userGoldenCardCollection.count({ where: { userId } }),
+    prisma.userGoldenCardCollection.count({
       where: {
         userId,
         card: { arcana: "MAJOR" },
@@ -170,6 +188,8 @@ async function getUserStats(userId: string): Promise<UserStats> {
     currentStreak: user?.currentStreak || 0,
     longestStreak: user?.longestStreak || 0,
     hasActiveSubscription: subscription?.status === "active",
+    goldenCardsDiscovered: goldenCardsCount,
+    goldenMajorArcanaDiscovered: goldenMajorArcanaCount,
   };
 }
 
@@ -282,6 +302,12 @@ function getAchievementProgress(
     case "time":
       // Time achievements are binary - either unlocked or not
       return 0;
+
+    case "golden":
+      if (achievement.key === "midas_touch") {
+        return Math.min(stats.goldenMajorArcanaDiscovered, achievement.requirement);
+      }
+      return Math.min(stats.goldenCardsDiscovered, achievement.requirement);
 
     default:
       return 0;
