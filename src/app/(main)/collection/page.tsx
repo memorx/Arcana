@@ -217,7 +217,7 @@ export default function CollectionPage() {
       {/* Cards Grid */}
       {!loading && (
         <div className="space-y-10">
-          {Object.entries(groupedCards).map(([key, sectionCards]) => (
+          {(Object.entries(groupedCards) as [string, CollectionCard[]][]).map(([key, sectionCards]) => (
             <section key={key}>
               {filter === "all" && (
                 <h2 className="text-xl font-semibold text-slate-200 mb-4 flex items-center gap-2">
