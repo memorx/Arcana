@@ -1250,7 +1250,7 @@
       "birthDateRequired": "Enter their birth date.",
       "birthDateInvalid": "That date doesn't look right.",
       "birthDateFuture": "The birth date can't be in the future.",
-      "birthDateTooOld": "Use a date from 1900 onwards.",
+      "birthDateTooOld": "Use a date from 1924 onwards.",
       "nameTooLong": "Use up to 60 characters.",
       "fullNameTooLong": "Use up to 80 characters.",
       "insufficientCredits": "You don't have enough credits for this reading.",

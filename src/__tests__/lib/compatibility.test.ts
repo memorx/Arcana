@@ -14,6 +14,7 @@ import {
   computeCompatibility,
   getNumberPairing,
   getStoredOverall,
+  MIN_BIRTH_YEAR,
   parseBirthDateInput,
   parseCompatibilitySummary,
   toIsoDay,
@@ -315,10 +316,14 @@ describe("parseBirthDateInput", () => {
     },
   );
 
-  it("rejects non-strings and dates before 1900", () => {
+  it("rejects non-strings and dates before 1924, where the lunar table starts", () => {
+    expect(MIN_BIRTH_YEAR).toBe(1924);
     expect(parseBirthDateInput(19900715, today)).toEqual({ ok: false, error: "invalid" });
     expect(parseBirthDateInput(undefined, today)).toEqual({ ok: false, error: "invalid" });
     expect(parseBirthDateInput("1899-12-31", today)).toEqual({ ok: false, error: "too_old" });
+    expect(parseBirthDateInput("1923-12-31", today)).toEqual({ ok: false, error: "too_old" });
+    expect(parseBirthDateInput("1924-01-01", today).ok).toBe(true);
+    expect(parseBirthDateInput("1924-02-05", today)).toEqual({ ok: true, date: utc(1924, 2, 5) });
     expect(parseBirthDateInput("2024-02-29", today).ok).toBe(true);
   });
 });

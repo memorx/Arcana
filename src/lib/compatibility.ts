@@ -391,13 +391,18 @@ export function computeCompatibility(me: CompatibilityPerson, partner: Compatibi
 // Partner birth date (form and API input)
 // ---------------------------------------------------------------------------
 
-export const MIN_BIRTH_YEAR = 1900;
+/**
+ * First accepted birth year. The Lunar New Year table (LUNAR_NEW_YEAR in
+ * systems/chinese-zodiac) starts in 1924; before that the Chinese sign is
+ * only approximate. The form's MIN_DATE must match.
+ */
+export const MIN_BIRTH_YEAR = 1924;
 
 export type BirthDateError = "invalid" | "future" | "too_old";
 
 /**
  * Parses "YYYY-MM-DD" into midnight UTC. Rejects malformed or impossible dates
- * (2023-02-30), dates before 1900 and dates after today (UTC).
+ * (2023-02-30), dates before MIN_BIRTH_YEAR and dates after today (UTC).
  */
 export function parseBirthDateInput(
   value: unknown,

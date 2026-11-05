@@ -24,7 +24,8 @@ type FormError =
 
 const NAME_MAX = 60;
 const FULL_NAME_MAX = 80;
-const MIN_DATE = "1900-01-01";
+/** Same limit as MIN_BIRTH_YEAR in lib/compatibility (the lunar table starts in 1924). */
+const MIN_DATE = "1924-01-01";
 
 /** Today as "YYYY-MM-DD" in the person's own time zone (for the date picker). */
 function localToday(): string {

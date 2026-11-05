@@ -1250,7 +1250,7 @@
       "birthDateRequired": "Escribe su fecha de nacimiento.",
       "birthDateInvalid": "Esa fecha no parece correcta.",
       "birthDateFuture": "La fecha de nacimiento no puede estar en el futuro.",
-      "birthDateTooOld": "Usa una fecha a partir de 1900.",
+      "birthDateTooOld": "Usa una fecha a partir de 1924.",
       "nameTooLong": "Usa hasta 60 caracteres.",
       "fullNameTooLong": "Usa hasta 80 caracteres.",
       "insufficientCredits": "No tienes créditos suficientes para esta lectura.",

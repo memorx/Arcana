@@ -64,6 +64,15 @@ describe("CompatibilityForm", () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
+  it("rejects a birth date before 1924", () => {
+    render(<CompatibilityForm credits={5} cost={2} />);
+    fill({ date: "1923-12-31" });
+    submit();
+    expect(screen.getByText("errors.birthDateTooOld")).toBeInTheDocument();
+    expect(mockFetch).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("form.partnerBirthDate")).toHaveAttribute("min", "1924-01-01");
+  });
+
   it("sends the form and opens the new reading", async () => {
     respond(201, { reading: { id: "compat-1" } });
     render(<CompatibilityForm credits={5} cost={2} />);
