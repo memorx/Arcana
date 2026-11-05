@@ -13,11 +13,11 @@ Rama `capataz/lote-A` (worktree `C:/Users/guill/dev/arcana-lotes/lote-A`), base 
 - **F-26** `index.ts`: `getArcanaBlueprint`, `describeBlueprintForAI`, `getDayEnergies`, `describeDayEnergies`, y re-exporta todos los módulos (`import { … } from "@/lib/systems"`). · Test `index.test.ts`: el blueprint coincide módulo por módulo; valores de 1990-07-15 (Cáncer, Caballo de Metal, 12 Cóatl, camino 5, Hierofante); **`describeBlueprintForAI` ≤ 900 caracteres y sin `undefined`/`null`/`NaN` en es y en**, barriendo ~3,500 fechas de 1925 a 2030 con nombres vacíos, con acentos y de 400 caracteres (el texto completo mide ~550–600; el recorte nunca se activa); factor oculto y El Loco; energías del día en 2 líneas (3 con fecha de nacimiento) durante todo 2026 en ambos idiomas. · Commit `bbb5de4`.
 - **F-27** Cada módulo tiene su suite, más `content.test.ts` (commit `9b50313`), que recorre las más de 400 parejas `{ en, es }` de toda la librería (≈465): no vacías, sin espacios dobles ni saltos de línea, español con acentos (ninguna terminación "-cion", "dia", "Mexico"), sin clichés ni predicciones ("universo", "cósmico", "vibración", "destinado", "te pasará", "los aztecas creían"), descripciones de 2–3 frases, y el tonalpohualli presentado como tradición viva. Sin dependencias nuevas (`package.json` y `package-lock.json` intactos).
 
-Muestra real de `describeBlueprintForAI(…, "es")` (1990-07-15, 598 caracteres):
+Muestra real de `describeBlueprintForAI(…, "es")` (1990-07-15, ~600 caracteres; con la etiqueta "regente:" de la revisión):
 
 ```
 Mapa Arcano (nacimiento 1990-07-15).
-- Zodiaco occidental: Cáncer (agua, cardinal; regente Luna). Cuidado, memoria, intuición.
+- Zodiaco occidental: Cáncer (agua, cardinal; regente: Luna). Cuidado, memoria, intuición.
 - Zodiaco chino: Caballo de Metal (Yang). Libertad, energía, franqueza.
 - Tonalpohualli (tradición mexica): 12 Cóatl · 12 Serpiente, trecena Ce Océlotl. La fuerza vital que se mueve pegada a la tierra: la sabiduría, la renovación y la fertilidad.
 - Numerología: camino de vida 5 (la libertad), expresión 9, alma 3, personalidad 6, cumpleaños 6, año personal 5.
@@ -197,6 +197,38 @@ Commits de la rama `capataz/lote-A` (sobre `dda10e2`):
 | F-25 | `0e3bb44` | feat(systems): add mean moon phases and next full/new moon (F-25) |
 | F-26 | `bbb5de4` | feat(systems): add arcana blueprint and day energies entry point (F-26) |
 | F-27 | `9b50313` | test(systems): check bilingual content integrity across modules (F-27) |
-| — | (este) | docs(systems): add lote A report |
+| — | `5fe470a` | docs(systems): add lote A report |
+| Revisión | `69ddee8` | fix(systems): apply review corrections (F-20..F-27) |
+
+### Correcciones de revisión (commit `69ddee8`)
+
+Todo dentro de `src/lib/systems/**` y `src/__tests__/lib/systems/**`; `jest.config.ts` sin tocar.
+
+Aplicadas:
+- **C1** `index.test.ts` › "time-zone independence":
+  - Espía `Date.prototype.getDate/getMonth/getFullYear/getDay` con `mockImplementation` que lanza (dentro de `try/finally` con `mockRestore`).
+  - Comprueba que el espía de verdad lanza y llama `getChineseSign`, `getTonalli`, `getLifePathNumber`, `getBirthCards` y `getMoonPhase` con `utc(1990,7,15)`. Ninguna lee campos locales.
+  - `getWesternSign` queda **excluida**: el envoltorio le pasa a `zodiac.ts` una fecha local y `zodiac.ts` usa `getMonth/getDate` locales, así que dispararía el espía. En su lugar va `getWesternSign(utc(1990,3,21,0,0)).key === "Aries"` y `getWesternSign(utc(1990,3,20,23,59)).key === "Pisces"`.
+  - Los tests de huso señalados se conservan (regla 3) con un comentario: sólo discriminan fuera de UTC, y la prueba independiente del huso está en `index.test.ts`.
+- **C2** El test de 2000-01-01 ya no repite la fórmula: `getTonalli(utc(2000,1,1)).label.es === "11 Ehécatl · 11 Viento"`. **Lo verifiqué a mano**: d = 2451545 − 584283 = 1867262; (d+3) mod 13 = 10 → 11; (d+19) mod 20 = 1 → Ehécatl. Coincide con 11 Ik'. El test pasa sin ajustar nada.
+- **C3** `it.each` con las 13 fechas de Año Nuevo: el día mismo es del año nuevo y el anterior del año previo. Las 13 coinciden con la tabla.
+- **C4–C14** Textos aplicados tal cual: Aries "test itself"; 3 "what it experiences: through words…"; Acuario es/en; Tauro "apego"; Capricornio "desde joven"; "se avivan mutuamente", "se nutren mutuamente", "Cuando el fuego y el agua se encuentran, hay vapor…"; Rata "Agudeza, inventiva, encanto."; Perro "está con los suyos y del lado de lo justo… siempre dispuesto a defender…" (la tercera frase se queda igual y fluye); 5 "sentirse vivo"; 22 "El gran constructor"; "La lección de fondo", "afinidad silenciosa", "Un momento de calma".
+- **N1** Etiquetas "ruler:" / "regente:" e `index.test.ts` actualizado.
+- **N2** Comentario de `moon.ts` corregido: JD 2451550.1 ≈ 2000-01-06 14:24 UTC, luna nueva media de Meeus; la real fue a las 18:14 UTC. Lo escribí en inglés, como el resto de los comentarios del código.
+- **N3** Tabla sin extender. El test se renombró a "outside the table it uses the Lichun approximation (February 4th)" y el comentario de `FALLBACK_NEW_YEAR` dice APPROXIMATION.
+- **N4** Dos tests nuevos:
+  - Rasgos de 800 caracteres: el texto queda ≤ 900, termina en "." y no incluye los rasgos.
+  - Nombre de 1000 caracteres: corta en exactamente 900 con "…".
+- **N5** Filtro de acentos ampliado con `\b(tambien|despues|segun|corazon|razon|asi|aqui|traves)\b`. No aparece ninguno.
+- **N6** "les haces espacio"; "sobre la marcha"; "Lo que le toca es…" (Buey, Serpiente, Gallo); "siempre dispuesto a ayudar"; "de la oportunidad"; "no reforzar"; "El reto…" (Aries y los dos "mismo elemento/animal"); "después de que la cortan".
+- **N7** "bloom"; "feels for others" (Piscis, 9); "helps us cross thresholds"; "reads the room"; "The invitation for it is…" (Buey, Serpiente, Gallo).
+- **N8** El Mago: "will, skill, making things real" / "voluntad, habilidad, concreción".
+- **N9** Comentario de trecenas: "(Codex Borbonicus; trecenas 1–2 from Borgia/Aubin)".
+
+Agregado por coherencia (no pedido): el inglés paralelo de N6 ("The challenge is…" en Aries y en "same element"; "reinforce" en "same animal").
+
+No aplicado: nada.
+
+Resultado después de la revisión: `npx jest src/__tests__/lib/systems` → **8 suites, 215 tests verdes** (198 + 13 de C3 + 2 de N4 + 2 de C1). `npx tsc --noEmit` → **0 errores en systems**; siguen sólo los 8 de línea base en `src/__tests__/lib/streak.test.ts`.
 
 `git diff --stat dda10e2..9b50313`: 17 archivos nuevos, 3352 líneas, todos bajo `src/lib/systems/` y `src/__tests__/lib/systems/`.
