@@ -38,7 +38,7 @@ collection) to keep people coming back.
 
 ## Run it locally
 
-Requires Node 22+ and a PostgreSQL database (a free Supabase project works).
+Requires Node 20+ and a PostgreSQL database (a free Supabase project works).
 
 ```bash
 npm install
