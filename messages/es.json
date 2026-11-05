@@ -778,5 +778,33 @@
     "granted": "Te dejamos {credits} créditos de regalo en tu cuenta. Que este año te traiga buenas preguntas.",
     "alreadyGranted": "Tus {credits} créditos de regalo ya están en tu cuenta.",
     "cta": "Haz tu lectura de cumpleaños"
+  },
+  "pulse": {
+    "kicker": "Pulso colectivo",
+    "title": "Hoy en Arcana salió más <hl>{card}</hl>",
+    "share": "Apareció en el {percentage}% de las lecturas del día.",
+    "also": "También salieron hoy:",
+    "anonymous": "Anónimo: sólo contamos cartas, nunca quién las sacó.",
+    "moreThanTarot": {
+      "title": "Más que tarot",
+      "subtitle": "Otras formas de leerte, en el mismo lugar que tus cartas.",
+      "cta": "Explorar",
+      "blueprint": {
+        "title": "Mapa Arcano",
+        "description": "Cinco sistemas a partir de tu fecha de nacimiento: cartas natales del tarot, zodiaco occidental y chino, tonalli mexica y numerología."
+      },
+      "calendar": {
+        "title": "Calendario Arcano",
+        "description": "Cada día con su signo del tonalpohualli, su fase lunar y tu día personal."
+      },
+      "manual": {
+        "title": "Tu mazo",
+        "description": "Tira con tus cartas físicas, dinos cuáles salieron y Arcana las interpreta."
+      },
+      "compatibility": {
+        "title": "Lectura de dos",
+        "description": "Cómo se encuentran dos personas en los zodiacos, la numerología y el tonalli, con tres cartas para el vínculo."
+      }
+    }
   }
 }
