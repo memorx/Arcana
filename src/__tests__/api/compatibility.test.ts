@@ -295,14 +295,32 @@ describe("POST /api/compatibility", () => {
 
   it("writes in English when the interface is in English", async () => {
     givenUser(5);
-    givenTransaction(1);
+    const tx = givenTransaction(1);
 
     await POST(post({ ...validBody, locale: "en" }));
 
     const aiCall = mockComplete.mock.calls[0][0];
     expect(aiCall.system).toContain("Always respond in English");
     expect(aiCall.user).toContain("Reading for two");
-    expect(aiCall.user).toContain("The Magician"); // card names in English
+    // The drawn cards go to the prompt with their English names
+    const drawn = tx.compatibilityReading.create.mock.calls[0][0].data.summary.cards;
+    for (const card of drawn) {
+      expect(aiCall.user).toContain(`] ${card.name}`);
+      expect(aiCall.user).not.toContain(card.nameEs);
+    }
+  });
+
+  it("sends the Spanish card names in Spanish", async () => {
+    givenUser(5);
+    const tx = givenTransaction(1);
+
+    await POST(post(validBody));
+
+    const drawn = tx.compatibilityReading.create.mock.calls[0][0].data.summary.cards;
+    const user = mockComplete.mock.calls[0][0].user;
+    for (const card of drawn) {
+      expect(user).toContain(`] ${card.nameEs}`);
+    }
   });
 
   it("falls back to the profile language when the request has none", async () => {
