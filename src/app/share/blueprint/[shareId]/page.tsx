@@ -20,7 +20,9 @@ interface PageProps {
 /**
  * Loads a shared map. Only what the public page shows leaves this function:
  * the first name, the five badges' inputs and the synthesis if it still
- * matches the profile (never the full name or the birth date).
+ * matches the profile. The full name and the exact birth date are never sent,
+ * but the five badges together are enough to work the birth date out, which
+ * is why sharing the map asks for confirmation first (BlueprintShare).
  */
 const loadSharedBlueprint = cache(async (shareId: string) => {
   if (!/^[A-Za-z0-9_-]{6,32}$/.test(shareId)) return null;
