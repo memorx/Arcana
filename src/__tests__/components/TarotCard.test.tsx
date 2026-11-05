@@ -37,16 +37,18 @@ describe("TarotCard", () => {
     expect(screen.getByAltText("El Loco")).toBeInTheDocument();
   });
 
+  // The badge label comes from next-intl (`reading.reversed`); jest.setup.ts mocks
+  // useTranslations to return the key itself, so the rendered text is "reversed".
   it("shows reversed badge when card is reversed and revealed", () => {
     render(<TarotCard card={mockCard} isReversed={true} isRevealed={true} />);
-    expect(screen.getByText("Invertida")).toBeInTheDocument();
+    expect(screen.getByText("reversed")).toBeInTheDocument();
   });
 
-  it("shows English reversed text when locale is en", () => {
+  it("shows the translated reversed label when locale is en", () => {
     render(
       <TarotCard card={mockCard} isReversed={true} isRevealed={true} locale="en" />
     );
-    expect(screen.getByText("Reversed")).toBeInTheDocument();
+    expect(screen.getByText("reversed")).toBeInTheDocument();
   });
 
   it("does not show reversed badge when showReversedBadge is false", () => {
@@ -58,13 +60,12 @@ describe("TarotCard", () => {
         showReversedBadge={false}
       />
     );
-    expect(screen.queryByText("Invertida")).not.toBeInTheDocument();
-    expect(screen.queryByText("Reversed")).not.toBeInTheDocument();
+    expect(screen.queryByText("reversed")).not.toBeInTheDocument();
   });
 
   it("does not show reversed badge when not revealed", () => {
     render(<TarotCard card={mockCard} isReversed={true} isRevealed={false} />);
-    expect(screen.queryByText("Invertida")).not.toBeInTheDocument();
+    expect(screen.queryByText("reversed")).not.toBeInTheDocument();
   });
 
   it("renders with different sizes", () => {
@@ -101,7 +102,7 @@ describe("TarotCardStatic", () => {
 
   it("shows reversed badge when card is reversed", () => {
     render(<TarotCardStatic card={mockCard} isReversed={true} />);
-    expect(screen.getByText("Invertida")).toBeInTheDocument();
+    expect(screen.getByText("reversed")).toBeInTheDocument();
   });
 
   it("applies rotation when reversed", () => {

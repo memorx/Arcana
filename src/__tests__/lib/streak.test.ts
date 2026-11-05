@@ -3,8 +3,8 @@
  */
 
 // Mock Prisma before importing streak
-jest.mock("@/lib/prisma", () => ({
-  prisma: {
+jest.mock("@/lib/prisma", () => {
+  const prismaMock = {
     user: {
       findUnique: jest.fn(),
       update: jest.fn(),
@@ -12,8 +12,14 @@ jest.mock("@/lib/prisma", () => ({
     creditTransaction: {
       create: jest.fn(),
     },
-  },
-}));
+    streakReward: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+    },
+    $transaction: jest.fn(),
+  };
+  return { prisma: prismaMock };
+});
 
 import { updateStreak } from "@/lib/streak";
 import { prisma } from "@/lib/prisma";
@@ -28,6 +34,12 @@ describe("updateStreak", () => {
     // Reset mock implementations
     (mockPrisma.user.update as jest.Mock).mockResolvedValue({});
     (mockPrisma.creditTransaction.create as jest.Mock).mockResolvedValue({});
+    (mockPrisma.streakReward.findUnique as jest.Mock).mockResolvedValue(null);
+    (mockPrisma.streakReward.create as jest.Mock).mockResolvedValue({});
+    // Run the transaction callback against the same mocked client
+    (mockPrisma.$transaction as jest.Mock).mockImplementation(
+      async (callback: (tx: typeof prisma) => Promise<unknown>) => callback(mockPrisma)
+    );
   });
 
   it("throws error if user not found", async () => {
@@ -47,7 +59,7 @@ describe("updateStreak", () => {
 
     expect(result.currentStreak).toBe(1);
     expect(result.longestStreak).toBe(1);
-    expect(result.bonusCredits).toBe(0);
+    expect(result.reward).toBeNull();
   });
 
   it("keeps same streak for multiple readings on same day", async () => {
@@ -63,7 +75,7 @@ describe("updateStreak", () => {
 
     expect(result.currentStreak).toBe(5); // Unchanged
     expect(result.longestStreak).toBe(10);
-    expect(result.bonusCredits).toBe(0);
+    expect(result.reward).toBeNull();
   });
 
   it("increments streak for consecutive day", async () => {
@@ -80,7 +92,7 @@ describe("updateStreak", () => {
 
     expect(result.currentStreak).toBe(4);
     expect(result.longestStreak).toBe(5); // Not exceeded
-    expect(result.bonusCredits).toBe(0);
+    expect(result.reward).toBeNull();
   });
 
   it("resets streak after gap of more than 1 day", async () => {
@@ -97,7 +109,7 @@ describe("updateStreak", () => {
 
     expect(result.currentStreak).toBe(1); // Reset
     expect(result.longestStreak).toBe(15); // Preserved
-    expect(result.bonusCredits).toBe(0);
+    expect(result.reward).toBeNull();
   });
 
   it("updates longest streak when exceeded", async () => {
@@ -116,8 +128,10 @@ describe("updateStreak", () => {
     expect(result.longestStreak).toBe(6); // Updated
   });
 
+  // Milestone rewards come from STREAK_MILESTONES in src/lib/streak-utils.ts
+  // (3 days → 1, 7 → 3, 14 → 5, 30 → 10, 60 → 20, 100 → 50 credits)
   describe("milestone bonuses", () => {
-    it("awards 1 credit for reaching 7-day streak", async () => {
+    it("awards 3 credits for reaching 7-day streak", async () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
 
@@ -130,28 +144,33 @@ describe("updateStreak", () => {
       const result = await updateStreak(userId);
 
       expect(result.currentStreak).toBe(7);
-      expect(result.bonusCredits).toBe(1);
+      expect(result.reward).toEqual({ milestone: 7, creditsAwarded: 3 });
 
       // Verify credit transaction was created
       expect(mockPrisma.creditTransaction.create).toHaveBeenCalledWith({
         data: {
           userId,
-          amount: 1,
+          amount: 3,
           type: "BONUS",
         },
+      });
+
+      // Verify the milestone was recorded so it can't be claimed twice
+      expect(mockPrisma.streakReward.create).toHaveBeenCalledWith({
+        data: { userId, milestone: 7, creditsAwarded: 3 },
       });
 
       // Verify user credits were incremented
       expect(mockPrisma.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            credits: { increment: 1 },
+            credits: { increment: 3 },
           }),
         })
       );
     });
 
-    it("awards 3 credits for reaching 30-day streak", async () => {
+    it("awards 10 credits for reaching 30-day streak", async () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
 
@@ -164,12 +183,12 @@ describe("updateStreak", () => {
       const result = await updateStreak(userId);
 
       expect(result.currentStreak).toBe(30);
-      expect(result.bonusCredits).toBe(3);
+      expect(result.reward).toEqual({ milestone: 30, creditsAwarded: 10 });
 
       expect(mockPrisma.creditTransaction.create).toHaveBeenCalledWith({
         data: {
           userId,
-          amount: 3,
+          amount: 10,
           type: "BONUS",
         },
       });
@@ -187,7 +206,28 @@ describe("updateStreak", () => {
       const result = await updateStreak(userId);
 
       expect(result.currentStreak).toBe(7);
-      expect(result.bonusCredits).toBe(0);
+      expect(result.reward).toBeNull();
+      expect(mockPrisma.creditTransaction.create).not.toHaveBeenCalled();
+    });
+
+    it("does not award bonus if the milestone reward was already claimed", async () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+        currentStreak: 6, // Will become 7 again (streak was lost and rebuilt)
+        longestStreak: 20,
+        lastReadingDate: yesterday,
+      });
+      (mockPrisma.streakReward.findUnique as jest.Mock).mockResolvedValue({
+        id: "reward-1",
+        milestone: 7,
+      });
+
+      const result = await updateStreak(userId);
+
+      expect(result.currentStreak).toBe(7);
+      expect(result.reward).toBeNull();
       expect(mockPrisma.creditTransaction.create).not.toHaveBeenCalled();
     });
 
@@ -204,7 +244,7 @@ describe("updateStreak", () => {
       const result = await updateStreak(userId);
 
       expect(result.currentStreak).toBe(11);
-      expect(result.bonusCredits).toBe(0);
+      expect(result.reward).toBeNull();
       expect(mockPrisma.creditTransaction.create).not.toHaveBeenCalled();
     });
   });
