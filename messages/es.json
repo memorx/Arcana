@@ -772,5 +772,154 @@
     "cancel": "Cancelar",
     "deleteError": "Error al eliminar la cuenta. Por favor intenta de nuevo.",
     "notAuthenticated": "Debes iniciar sesion para acceder a la configuracion."
+  },
+  "blueprint": {
+    "meta": {
+      "title": "Mi Mapa Arcano",
+      "description": "Tus cartas natales del tarot, tu zodiaco occidental y chino, tu tonalpohualli mexica y tu numerología, leídos juntos."
+    },
+    "eyebrow": "Mapa Arcano",
+    "title": "El Mapa Arcano de {name}",
+    "titleNoName": "Tu Mapa Arcano",
+    "subtitle": "Cinco sistemas leídos juntos a partir de tu fecha de nacimiento y tu nombre: el tarot, los zodiacos occidental y chino, el tonalpohualli mexica y la numerología.",
+    "bornOn": "Nacimiento: {date}",
+    "moonAtBirth": "Luna al nacer: {phase}",
+    "badgesLabel": "Tus cinco signos",
+    "toSynthesis": "Ir a tu síntesis",
+    "systemsTitle": "Tus cinco sistemas",
+    "noProfile": {
+      "title": "Tu Mapa Arcano empieza con tu fecha de nacimiento",
+      "description": "Agrega tu nombre y tu fecha de nacimiento en tu perfil y armamos tus cartas natales del tarot, tus signos y tus números.",
+      "cta": "Completar mi perfil"
+    },
+    "badges": {
+      "western": "Zodiaco occidental",
+      "chinese": "Zodiaco chino",
+      "tonalli": "Tonalpohualli",
+      "lifePath": "Numerología",
+      "lifePathValue": "Camino de vida {number}",
+      "birthCard": "Carta natal del tarot"
+    },
+    "systems": {
+      "western": {
+        "title": "Zodiaco occidental",
+        "ruler": "Regente: {ruler}",
+        "card": "Carta del signo"
+      },
+      "chinese": {
+        "title": "Zodiaco chino",
+        "year": "Año lunar {year}",
+        "allies": "Afines",
+        "secretFriend": "Amigo secreto"
+      },
+      "tonalli": {
+        "title": "Tonalpohualli",
+        "subtitle": "Signo mexica del día en que naciste",
+        "trecena": "Trecena",
+        "direction": "Rumbo",
+        "patron": "Patrono",
+        "lordOfNight": "Señor de la noche"
+      },
+      "numerology": {
+        "title": "Numerología",
+        "lifePathTitle": "Camino de vida {number}: {name}",
+        "expression": "Expresión",
+        "soulUrge": "Alma",
+        "personality": "Personalidad",
+        "birthday": "Cumpleaños",
+        "personalYear": "Año personal {year}"
+      },
+      "tarot": {
+        "title": "Cartas natales del tarot",
+        "description": "Salen de sumar el día, el mes y el año en que naciste (método de Mary K. Greer). La carta de personalidad habla de cómo te muestras; la del alma, de lo que te mueve por dentro.",
+        "roles": {
+          "personalitySoul": "Personalidad y alma",
+          "personality": "Personalidad",
+          "soul": "Alma",
+          "hidden": "Factor oculto"
+        }
+      }
+    },
+    "synthesis": {
+      "title": "Tu síntesis",
+      "subtitle": "Dónde se encuentran tus cinco sistemas y dónde tiran hacia lados distintos.",
+      "intro": "Arcana lee tus cinco sistemas juntos y te escribe un retrato: en qué coinciden, una tensión que vale la pena vivir y tres preguntas para tu año. Es gratis.",
+      "generate": "Generar mi síntesis",
+      "regenerate": "Actualizar mi síntesis",
+      "retry": "Intentar de nuevo",
+      "free": "Gratis · tarda hasta un minuto",
+      "stale": "Tu perfil cambió desde tu última síntesis, así que ya no corresponde a tu mapa. Genera una nueva cuando quieras.",
+      "questionsTitle": "Preguntas para tu año",
+      "disclaimer": "Un espejo para reflexionar, no una predicción.",
+      "languageNote": "Escrita en {language}, el idioma de tu perfil.",
+      "languages": {
+        "en": "inglés",
+        "es": "español"
+      },
+      "loadingSr": "Escribiendo tu síntesis. Puede tardar hasta un minuto.",
+      "loadingHint": "Puede tardar hasta un minuto.",
+      "loading": {
+        "western": "Leyendo tu signo occidental…",
+        "chinese": "Mirando tu año chino…",
+        "tonalli": "Contando tu tonalli…",
+        "numerology": "Sumando tus números…",
+        "cards": "Escuchando tus cartas natales…",
+        "writing": "Escribiendo tu síntesis…"
+      },
+      "errors": {
+        "unavailable": "No pudimos escribir tu síntesis en este momento. Inténtalo de nuevo en un rato.",
+        "refused": "No pudimos escribir esta síntesis. Inténtalo más tarde.",
+        "rateLimited": "Fueron muchos intentos seguidos. Espera un minuto y vuelve a intentarlo.",
+        "profile": "Primero necesitamos tu fecha de nacimiento. Completa tu perfil y regresa.",
+        "generic": "Algo salió mal. Inténtalo de nuevo."
+      }
+    },
+    "share": {
+      "title": "Comparte tu mapa",
+      "note": "Quien tenga el enlace verá tu nombre de pila, tus cinco signos y tu síntesis.",
+      "create": "Crear enlace para compartir",
+      "linkLabel": "Enlace público de tu Mapa Arcano",
+      "copy": "Copiar",
+      "copied": "¡Copiado!",
+      "copyAria": "Copiar enlace",
+      "native": "Compartir…",
+      "nativeTitle": "Mi Mapa Arcano",
+      "stop": "Dejar de compartir",
+      "errors": {
+        "synthesisRequired": "Primero genera tu síntesis y luego podrás compartir tu mapa.",
+        "rateLimited": "Fueron muchos intentos seguidos. Espera un minuto y vuelve a intentarlo.",
+        "generic": "No pudimos actualizar el enlace. Inténtalo de nuevo."
+      }
+    },
+    "public": {
+      "metaTitle": "El Mapa Arcano de {name}",
+      "metaTitleNoName": "Un Mapa Arcano",
+      "metaDescription": "Cartas natales del tarot, zodiaco occidental y chino, tonalpohualli mexica y numerología, leídos juntos.",
+      "eyebrow": "Mapa Arcano",
+      "title": "El Mapa Arcano de {name}",
+      "titleNoName": "Un Mapa Arcano",
+      "intro": "Cinco sistemas leídos juntos: el tarot, los zodiacos occidental y chino, el tonalpohualli mexica y la numerología.",
+      "synthesisTitle": "La síntesis",
+      "noSynthesis": "Este mapa no tiene síntesis por ahora.",
+      "ctaTitle": "Descubre tu Mapa Arcano",
+      "ctaText": "Con tu fecha de nacimiento y tu nombre basta para reunir tus cinco sistemas.",
+      "cta": "Descubre tu Mapa Arcano",
+      "login": "Ya tengo cuenta"
+    },
+    "widget": {
+      "title": "Mi Mapa Arcano",
+      "cta": "Ver mi mapa",
+      "synthesisReady": "Tu síntesis está lista.",
+      "synthesisPending": "Genera tu síntesis, es gratis.",
+      "setupTitle": "Tu Mapa Arcano",
+      "setupText": "Agrega tu fecha de nacimiento y mira tus cinco sistemas juntos.",
+      "setupCta": "Completar mi perfil"
+    },
+    "setup": {
+      "readyTitle": "Tu Mapa Arcano está listo",
+      "readyText": "Tus cartas natales del tarot, tus signos y tus números, leídos juntos.",
+      "viewMap": "Ver mi Mapa Arcano",
+      "dashboard": "Ir a mi espacio"
+    }
   }
 }

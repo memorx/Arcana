@@ -772,5 +772,154 @@
     "cancel": "Cancel",
     "deleteError": "Error deleting account. Please try again.",
     "notAuthenticated": "You must be logged in to access settings."
+  },
+  "blueprint": {
+    "meta": {
+      "title": "My Arcana Map",
+      "description": "Your tarot birth cards, Western and Chinese zodiac, Mexica tonalpohualli and numerology, read together."
+    },
+    "eyebrow": "Arcana Map",
+    "title": "{name}'s Arcana Map",
+    "titleNoName": "Your Arcana Map",
+    "subtitle": "Five systems read together from your date of birth and your name: tarot, the Western and Chinese zodiacs, the Mexica tonalpohualli and numerology.",
+    "bornOn": "Born {date}",
+    "moonAtBirth": "Moon at birth: {phase}",
+    "badgesLabel": "Your five signs",
+    "toSynthesis": "Go to your synthesis",
+    "systemsTitle": "Your five systems",
+    "noProfile": {
+      "title": "Your Arcana Map starts with your date of birth",
+      "description": "Add your name and date of birth to your profile and we'll put together your tarot birth cards, your signs and your numbers.",
+      "cta": "Complete my profile"
+    },
+    "badges": {
+      "western": "Western zodiac",
+      "chinese": "Chinese zodiac",
+      "tonalli": "Tonalpohualli",
+      "lifePath": "Numerology",
+      "lifePathValue": "Life path {number}",
+      "birthCard": "Tarot birth card"
+    },
+    "systems": {
+      "western": {
+        "title": "Western zodiac",
+        "ruler": "Ruler: {ruler}",
+        "card": "Card of the sign"
+      },
+      "chinese": {
+        "title": "Chinese zodiac",
+        "year": "Lunar year {year}",
+        "allies": "Allies",
+        "secretFriend": "Secret friend"
+      },
+      "tonalli": {
+        "title": "Tonalpohualli",
+        "subtitle": "Mexica sign of the day you were born",
+        "trecena": "Trecena",
+        "direction": "Direction",
+        "patron": "Patron",
+        "lordOfNight": "Lord of the night"
+      },
+      "numerology": {
+        "title": "Numerology",
+        "lifePathTitle": "Life path {number}: {name}",
+        "expression": "Expression",
+        "soulUrge": "Soul urge",
+        "personality": "Personality",
+        "birthday": "Birthday",
+        "personalYear": "Personal year {year}"
+      },
+      "tarot": {
+        "title": "Tarot birth cards",
+        "description": "They come from adding the day, month and year you were born (Mary K. Greer's method). The personality card speaks of how you show yourself; the soul card, of what moves you inside.",
+        "roles": {
+          "personalitySoul": "Personality and soul",
+          "personality": "Personality",
+          "soul": "Soul",
+          "hidden": "Hidden factor"
+        }
+      }
+    },
+    "synthesis": {
+      "title": "Your synthesis",
+      "subtitle": "Where your five systems meet, and where they pull in different directions.",
+      "intro": "Arcana reads your five systems together and writes you a portrait: what they agree on, one tension worth living with, and three questions for your year. It's free.",
+      "generate": "Create my synthesis",
+      "regenerate": "Update my synthesis",
+      "retry": "Try again",
+      "free": "Free · takes up to a minute",
+      "stale": "Your profile changed since your last synthesis, so it no longer matches your map. Create a new one whenever you like.",
+      "questionsTitle": "Questions for your year",
+      "disclaimer": "A mirror for reflection, not a prediction.",
+      "languageNote": "Written in {language}, your profile's language.",
+      "languages": {
+        "en": "English",
+        "es": "Spanish"
+      },
+      "loadingSr": "Writing your synthesis. This can take up to a minute.",
+      "loadingHint": "This can take up to a minute.",
+      "loading": {
+        "western": "Reading your Western sign…",
+        "chinese": "Looking at your Chinese year…",
+        "tonalli": "Counting your tonalli…",
+        "numerology": "Adding up your numbers…",
+        "cards": "Listening to your birth cards…",
+        "writing": "Writing your synthesis…"
+      },
+      "errors": {
+        "unavailable": "We couldn't write your synthesis right now. Please try again in a moment.",
+        "refused": "We couldn't write this synthesis. Please try again later.",
+        "rateLimited": "Too many tries in a row. Wait a minute and try again.",
+        "profile": "We need your date of birth first. Complete your profile and come back.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "share": {
+      "title": "Share your map",
+      "note": "Anyone with the link will see your first name, your five signs and your synthesis.",
+      "create": "Create a link to share",
+      "linkLabel": "Public link to your Arcana Map",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "copyAria": "Copy link",
+      "native": "Share…",
+      "nativeTitle": "My Arcana Map",
+      "stop": "Stop sharing",
+      "errors": {
+        "synthesisRequired": "Create your synthesis first, then you can share your map.",
+        "rateLimited": "Too many tries in a row. Wait a minute and try again.",
+        "generic": "We couldn't update the link. Please try again."
+      }
+    },
+    "public": {
+      "metaTitle": "{name}'s Arcana Map",
+      "metaTitleNoName": "An Arcana Map",
+      "metaDescription": "Tarot birth cards, Western and Chinese zodiac, Mexica tonalpohualli and numerology, read together.",
+      "eyebrow": "Arcana Map",
+      "title": "{name}'s Arcana Map",
+      "titleNoName": "An Arcana Map",
+      "intro": "Five systems read together: tarot, the Western and Chinese zodiacs, the Mexica tonalpohualli and numerology.",
+      "synthesisTitle": "The synthesis",
+      "noSynthesis": "This map doesn't have a synthesis right now.",
+      "ctaTitle": "Discover your Arcana Map",
+      "ctaText": "Your date of birth and your name are enough to put your five systems together.",
+      "cta": "Discover your Arcana Map",
+      "login": "I already have an account"
+    },
+    "widget": {
+      "title": "My Arcana Map",
+      "cta": "View my map",
+      "synthesisReady": "Your synthesis is ready.",
+      "synthesisPending": "Create your synthesis, it's free.",
+      "setupTitle": "Your Arcana Map",
+      "setupText": "Add your date of birth and see your five systems together.",
+      "setupCta": "Complete my profile"
+    },
+    "setup": {
+      "readyTitle": "Your Arcana Map is ready",
+      "readyText": "Your tarot birth cards, your signs and your numbers, read together.",
+      "viewMap": "View my Arcana Map",
+      "dashboard": "Go to my space"
+    }
   }
 }
