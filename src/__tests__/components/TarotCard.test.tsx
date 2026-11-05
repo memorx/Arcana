@@ -49,6 +49,8 @@ describe("TarotCard", () => {
       <TarotCard card={mockCard} isReversed={true} isRevealed={true} locale="en" />
     );
     expect(screen.getByText("reversed")).toBeInTheDocument();
+    // what makes it the English case: the revealed reversed card is named in English
+    expect(screen.getByAltText("The Fool")).toBeInTheDocument();
   });
 
   it("does not show reversed badge when showReversedBadge is false", () => {

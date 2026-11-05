@@ -1,7 +1,16 @@
 /**
  * @jest-environment node
  */
+jest.mock("node:crypto", () => {
+  // Real crypto; timingSafeEqual wrapped so the test can see what it compares (F-91)
+  const actual = jest.requireActual("node:crypto");
+  return { ...actual, timingSafeEqual: jest.fn(actual.timingSafeEqual) };
+});
+
+import { timingSafeEqual } from "node:crypto";
 import { verifyCronRequest } from "@/lib/cron-auth";
+
+const mockTimingSafeEqual = timingSafeEqual as jest.Mock;
 
 const request = (authorization?: string) =>
   new Request("http://localhost:3000/api/cron/daily-readings", {
@@ -79,6 +88,24 @@ describe("verifyCronRequest", () => {
 
     it("rejects 'Bearer undefined'", () => {
       expect(verifyCronRequest(request("Bearer undefined"))!.status).toBe(401);
+    });
+
+    it.each([
+      ["the right token", "Bearer s3cret-value"],
+      ["a shorter token", "Bearer s3cret"],
+      ["a longer token", "Bearer s3cret-value-and-more"],
+      ["no header", undefined],
+    ])("compares %s with timingSafeEqual over two 32-byte buffers", (_label, authorization) => {
+      mockTimingSafeEqual.mockClear();
+
+      verifyCronRequest(request(authorization));
+
+      expect(mockTimingSafeEqual).toHaveBeenCalledTimes(1);
+      const [received, expected] = mockTimingSafeEqual.mock.calls[0];
+      expect(Buffer.isBuffer(received)).toBe(true);
+      expect(Buffer.isBuffer(expected)).toBe(true);
+      expect(received).toHaveLength(32);
+      expect(expected).toHaveLength(32);
     });
   });
 });
