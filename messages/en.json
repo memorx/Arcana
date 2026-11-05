@@ -42,7 +42,11 @@
     "achievements": "Achievements",
     "challenges": "Challenges",
     "closeMenu": "Close menu",
-    "openMenu": "Open user menu"
+    "openMenu": "Open user menu",
+    "blueprint": "My Arcana Map",
+    "calendar": "Calendar",
+    "insights": "My story",
+    "compatibility": "Reading for two"
   },
   "landing": {
     "readingCounter": "readings performed",

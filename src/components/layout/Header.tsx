@@ -61,8 +61,8 @@ export function Header() {
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            {status === "authenticated" && session?.user && (
+          <nav className="hidden md:flex items-center gap-5 lg:gap-6">
+            {status === "authenticated" && session?.user ? (
               <>
                 <Link
                   href="/dashboard"
@@ -78,6 +78,19 @@ export function Header() {
                 >
                   {t("newReading")}
                 </Link>
+                {/* Daily card and calendar only fit from lg; below that they live in the user menu */}
+                <Link
+                  href="/daily"
+                  className="hidden lg:inline text-sm text-slate-400 hover:text-slate-100 transition-colors"
+                >
+                  {t("dailyCard")}
+                </Link>
+                <Link
+                  href="/calendar"
+                  className="hidden lg:inline text-sm text-slate-400 hover:text-slate-100 transition-colors"
+                >
+                  {t("calendar")}
+                </Link>
                 <Link
                   href="/history"
                   className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
@@ -85,7 +98,14 @@ export function Header() {
                   {t("history")}
                 </Link>
               </>
-            )}
+            ) : status === "unauthenticated" ? (
+              <Link
+                href="/calendar"
+                className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+              >
+                {t("calendar")}
+              </Link>
+            ) : null}
           </nav>
 
           {/* Right side */}
@@ -234,6 +254,34 @@ export function Header() {
                             onClick={() => setIsMenuOpen(false)}
                           >
                             <span>&#128302;</span> {t("dailyCard")}
+                          </Link>
+                          <Link
+                            href="/calendar"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span aria-hidden="true">&#128197;</span> {t("calendar")}
+                          </Link>
+                          <Link
+                            href="/blueprint"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span aria-hidden="true">&#127756;</span> {t("blueprint")}
+                          </Link>
+                          <Link
+                            href="/history/insights"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span aria-hidden="true">&#128214;</span> {t("insights")}
+                          </Link>
+                          <Link
+                            href="/compatibility"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/50"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <span aria-hidden="true">&#128158;</span> {t("compatibility")}
                           </Link>
                           <Link
                             href="/collection"

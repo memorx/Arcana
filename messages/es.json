@@ -42,7 +42,11 @@
     "achievements": "Logros",
     "challenges": "Desafios",
     "closeMenu": "Cerrar menu",
-    "openMenu": "Abrir menu de usuario"
+    "openMenu": "Abrir menu de usuario",
+    "blueprint": "Mi Mapa Arcano",
+    "calendar": "Calendario",
+    "insights": "Mi historia",
+    "compatibility": "Lectura de dos"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
