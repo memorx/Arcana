@@ -1,7 +1,10 @@
+// Server components should import from the module files directly (as the
+// pages and the dashboard widget do): Next adds every client component this
+// barrel references to the bundle of any route that imports it.
 export { BlueprintBadges, BadgeSymbol } from "./BlueprintBadges";
 export { BlueprintConstellation } from "./BlueprintConstellation";
 export { BlueprintShare } from "./BlueprintShare";
-export { ReducedMotion } from "./ReducedMotion";
+export { Reveal } from "./Reveal";
 export { SynthesisPanel } from "./SynthesisPanel";
 export type { SynthesisPanelProps } from "./SynthesisPanel";
 export { SynthesisText } from "./SynthesisText";

@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SynthesisPanel } from "@/components/blueprint/SynthesisPanel";
 import { BlueprintShare } from "@/components/blueprint/BlueprintShare";
 import { BlueprintBadges } from "@/components/blueprint/BlueprintBadges";
+import { Reveal } from "@/components/blueprint/Reveal";
 import {
   getBirthCardRoles,
   getBlueprintBadges,
@@ -98,6 +99,21 @@ describe("BlueprintBadges", () => {
     expect(list.querySelectorAll("li")).toHaveLength(5);
     expect(screen.getByText("Caballo de Metal")).toBeInTheDocument();
     expect(screen.getByText("badges.western:", { exact: false })).toHaveClass("sr-only");
+  });
+});
+
+describe("Reveal", () => {
+  it("animates only under motion-safe (CSS, no JS library) and staggers with a delay", () => {
+    const { container } = render(
+      <Reveal delay={120}>
+        <p>hola</p>
+      </Reveal>
+    );
+    const wrapper = screen.getByText("hola").parentElement as HTMLElement;
+    expect(container.contains(wrapper)).toBe(true);
+    expect(wrapper.className).toMatch(/(^|\s)motion-safe:animate-\[blueprint-rise_/);
+    expect(wrapper.className).not.toMatch(/(^|\s)animate-/);
+    expect(wrapper.style.animationDelay).toBe("120ms");
   });
 });
 

@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui";
 import { getArcanaBlueprint } from "@/lib/systems";
 import { blueprintInputsHash, toBlueprintLocale } from "@/lib/ai/blueprint-synthesis";
-import { BlueprintBadges, getBlueprintBadges } from "@/components/blueprint";
+import { BlueprintBadges } from "@/components/blueprint/BlueprintBadges";
+import { getBlueprintBadges } from "@/components/blueprint/view-model";
 import { linkButtonClass } from "@/components/blueprint/link-styles";
 
 interface BlueprintWidgetProps {

@@ -7,13 +7,10 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui";
 import { getArcanaBlueprint } from "@/lib/systems";
 import { blueprintInputsHash, getFirstName, toBlueprintLocale } from "@/lib/ai/blueprint-synthesis";
-import {
-  BlueprintBadges,
-  BlueprintConstellation,
-  SynthesisText,
-  getBlueprintBadges,
-  type BlueprintBadge,
-} from "@/components/blueprint";
+import { BlueprintBadges } from "@/components/blueprint/BlueprintBadges";
+import { BlueprintConstellation } from "@/components/blueprint/BlueprintConstellation";
+import { SynthesisText } from "@/components/blueprint/SynthesisText";
+import { getBlueprintBadges, type BlueprintBadge } from "@/components/blueprint/view-model";
 import { linkButtonClass } from "@/components/blueprint/link-styles";
 
 interface PageProps {

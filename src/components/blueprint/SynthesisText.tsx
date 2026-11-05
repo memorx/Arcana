@@ -1,4 +1,4 @@
-import { splitSynthesis } from "./view-model";
+import { splitSynthesis } from "./synthesis-blocks";
 
 interface SynthesisTextProps {
   text: string;
