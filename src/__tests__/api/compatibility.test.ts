@@ -161,6 +161,21 @@ describe("POST /api/compatibility", () => {
     expect(tx.compatibilityReading.create).not.toHaveBeenCalled();
   });
 
+  it("doesn't use free readings: 3 free readings and 0 credits → 403 without calling the AI", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+    db.user.findUnique.mockResolvedValue({ id: "user-1", credits: 0, freeReadingsLeft: 3, profile: PROFILE });
+    db.card.findMany.mockResolvedValue(deck);
+    const tx = givenTransaction(1);
+
+    const response = await POST(post(validBody));
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: "insufficient_credits" });
+    expect(mockComplete).not.toHaveBeenCalled();
+    expect(db.$transaction).not.toHaveBeenCalled();
+    expect(tx.user.updateMany).not.toHaveBeenCalled();
+  });
+
   it("returns 503 and charges nothing when the AI fails", async () => {
     givenUser(10);
     const tx = givenTransaction(1);
@@ -224,12 +239,16 @@ describe("POST /api/compatibility", () => {
     expect(mockComplete).toHaveBeenCalledTimes(1);
     const aiCall = mockComplete.mock.calls[0][0];
     expect(aiCall).toEqual(
-      expect.objectContaining({ model: AI_MODELS.synthesis, effort: "medium", maxTokens: 2500 })
+      expect.objectContaining({ model: AI_MODELS.synthesis, effort: "medium", maxTokens: 4000 })
     );
     expect(aiCall.system).toContain("Responde siempre en español");
     expect(aiCall.user).toContain("John");
     expect(aiCall.user).toContain("Ana");
     expect(aiCall.user).not.toContain("Sofía Pérez");
+    // Neither exact birth date nor the user's surname reach the AI
+    expect(aiCall.user).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+    expect(aiCall.user).not.toContain("Smith");
+    expect(aiCall.user).toContain("Zodiaco occidental: Cáncer");
 
     // Charge: 2 credits, conditional, typed COMPATIBILITY
     expect(tx.user.updateMany).toHaveBeenCalledWith({

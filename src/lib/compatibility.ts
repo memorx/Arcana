@@ -7,6 +7,7 @@
  * shown in the interface language. All dates are read in UTC.
  */
 import {
+  CHINESE_ANIMALS,
   getChineseCompatibility,
   getChineseSign,
   getElementCompatibility,
@@ -97,7 +98,7 @@ export interface CompatibilityResult {
     score: CompatibilityScore;
     summary: Bilingual;
   };
-  /** Rounded average of the four system scores. */
+  /** The sum of the four system scores rescaled to 1–5 (see overallFromSum). */
   overall: CompatibilityScore;
   overallLabel: Bilingual;
 }
@@ -113,12 +114,13 @@ const NUMBER_FAMILIES: readonly (readonly number[])[] = [
   [3, 6, 9],
 ];
 
-const PAIRING_SCORES: Record<NumberPairing, CompatibilityScore> = { same: 4, family: 5, different: 3 };
+/** The same number counts at least as much as two numbers of the same family. */
+const PAIRING_SCORES: Record<NumberPairing, CompatibilityScore> = { same: 5, family: 5, different: 3 };
 
 export const NUMBER_PAIRINGS: Record<NumberPairing, Bilingual> = {
   same: {
-    en: "You share the same number: you recognize each other at once. The challenge is not to reinforce the same blind spots.",
-    es: "Comparten el mismo número: se reconocen al instante. El reto es no reforzar los mismos puntos ciegos.",
+    en: "You share the same number: you recognize each other at once and move at the same pace. It helps to look together for what neither of you sees easily.",
+    es: "Comparten el mismo número: se reconocen al instante y avanzan al mismo paso. Les ayuda buscar juntos lo que a ninguno de los dos le resulta fácil ver.",
   },
   family: {
     en: "Your numbers belong to the same family: you move at a similar rhythm, which makes it easy to understand each other.",
@@ -258,6 +260,37 @@ function toScore(n: number): CompatibilityScore {
   return Math.min(5, Math.max(1, Math.round(n))) as CompatibilityScore;
 }
 
+const WESTERN_ELEMENTS = Object.keys(WESTERN_ELEMENT_NAMES) as WesternElement[];
+
+const rangeOf = (scores: number[]) => ({ min: Math.min(...scores), max: Math.max(...scores) });
+
+/** Lowest and highest score each system can give, read from the scales themselves. */
+export const SYSTEM_SCORE_RANGES = {
+  western: rangeOf(WESTERN_ELEMENTS.flatMap((a) => WESTERN_ELEMENTS.map((b) => getElementCompatibility(a, b).score))),
+  chinese: rangeOf(CHINESE_ANIMALS.flatMap((a) => CHINESE_ANIMALS.map((b) => getChineseCompatibility(a, b).score))),
+  // With both names the score is the rounded average of two pairings, so it stays in this range.
+  numerology: rangeOf(Object.values(PAIRING_SCORES)),
+  tonalli: rangeOf(Object.values(TONALLI_SCORES)),
+} as const;
+
+const ranges = Object.values(SYSTEM_SCORE_RANGES);
+
+/** Lowest and highest possible sum of the four system scores. */
+export const OVERALL_SUM_RANGE = {
+  min: ranges.reduce((total, r) => total + r.min, 0),
+  max: ranges.reduce((total, r) => total + r.max, 0),
+} as const;
+
+/**
+ * Rescales the sum of the four scores so 1 and 5 are both reachable:
+ * the least affine possible pair gets 1 and the most affine gets 5.
+ */
+export function overallFromSum(sum: number): CompatibilityScore {
+  const { min, max } = OVERALL_SUM_RANGE;
+  if (max === min) return 3;
+  return toScore(1 + ((sum - min) * 4) / (max - min));
+}
+
 // ---------------------------------------------------------------------------
 // Engine
 // ---------------------------------------------------------------------------
@@ -349,7 +382,7 @@ export function computeCompatibility(me: CompatibilityPerson, partner: Compatibi
     summary: TONALLI_RESONANCES[resonance],
   };
 
-  const overall = toScore((western.score + chinese.score + numerology.score + tonalli.score) / 4);
+  const overall = overallFromSum(western.score + chinese.score + numerology.score + tonalli.score);
 
   return { western, chinese, numerology, tonalli, overall, overallLabel: OVERALL_LABELS[overall] };
 }
@@ -506,7 +539,11 @@ export function toTextBlocks(content: string): TextBlock[] {
       .replace(/\*\*/g, "")
       .trim();
     if (!text) continue;
-    const looksLikeTitle = text.length <= HEADING_MAX_LENGTH && !/[.!?…;,]$/.test(text);
+    // A question, an exclamation or a quote is never a title, even when it is short.
+    const looksLikeTitle =
+      text.length <= HEADING_MAX_LENGTH &&
+      !/[.!?…;,]["'”»’)]*$/.test(text) &&
+      !/^[¿¡«"“]/.test(text);
     if (marked || looksLikeTitle) {
       blocks.push({ type: "heading", text: text.replace(/^\d+[.)]\s+/, "").replace(/:$/, "") });
     } else {

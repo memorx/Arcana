@@ -2,8 +2,9 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { CompatibilityForm } from "@/components/compatibility/CompatibilityForm";
 
 const mockPush = jest.fn();
+const mockRefresh = jest.fn();
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush, replace: jest.fn(), refresh: jest.fn(), back: jest.fn(), prefetch: jest.fn() }),
+  useRouter: () => ({ push: mockPush, replace: jest.fn(), refresh: mockRefresh, back: jest.fn(), prefetch: jest.fn() }),
 }));
 
 // jest.setup.ts mocks next-intl so t(key) returns the key.
@@ -125,5 +126,33 @@ describe("CompatibilityForm", () => {
     submit();
 
     expect(await screen.findByRole("alert")).toHaveTextContent(message);
+    expect(mockRefresh).not.toHaveBeenCalled();
+  });
+
+  it.each([502, 504])(
+    "on %i can't tell whether the reading was saved: asks to check the list and refreshes it",
+    async (status) => {
+      respond(status, {});
+      render(<CompatibilityForm credits={5} cost={2} />);
+      fill({ date: "1992-03-03" });
+      submit();
+
+      expect(await screen.findByRole("alert")).toHaveTextContent("errors.unconfirmed");
+      expect(mockRefresh).toHaveBeenCalledTimes(1);
+      // No retry invitation: the normal submit button stays
+      expect(screen.getByRole("button", { name: "form.submitAria" })).toBeInTheDocument();
+    }
+  );
+
+  it("when the connection drops, says it couldn't confirm and refreshes the list", async () => {
+    mockFetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    render(<CompatibilityForm credits={5} cost={2} />);
+    fill({ date: "1992-03-03" });
+    submit();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("errors.unconfirmed");
+    expect(screen.queryByText("errors.generic")).not.toBeInTheDocument();
+    expect(mockRefresh).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText("form.partnerBirthDate")).toHaveValue("1992-03-03");
   });
 });

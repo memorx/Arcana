@@ -813,6 +813,7 @@
       "unavailable": "The reading couldn't be written right now. Nothing was charged; try again in a moment.",
       "refused": "We couldn't write this reading. Nothing was charged.",
       "rateLimited": "Too many readings in a row. Wait a minute and try again.",
+      "unconfirmed": "We couldn't confirm whether your reading was completed. Check your readings for two before trying again.",
       "generic": "Something went wrong. Nothing was charged; try again."
     },
     "how": {

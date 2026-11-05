@@ -19,6 +19,7 @@ type FormError =
   | "unavailable"
   | "refused"
   | "rateLimited"
+  | "unconfirmed"
   | "generic";
 
 const NAME_MAX = 60;
@@ -118,11 +119,18 @@ export function CompatibilityForm({ credits, cost }: CompatibilityFormProps) {
         setFormError("rateLimited");
       } else if (response.status === 503) {
         setFormError("unavailable");
-      } else {
+      } else if (response.status === 500) {
         setFormError("generic");
+      } else {
+        // 502/504 (e.g. the function timed out) or anything unexpected: the reading may
+        // have been saved and charged. Refresh the list instead of inviting a retry.
+        setFormError("unconfirmed");
+        router.refresh();
       }
     } catch {
-      setFormError("generic");
+      // The connection dropped: same uncertainty as a gateway error.
+      setFormError("unconfirmed");
+      router.refresh();
     }
     setIsSubmitting(false);
   };

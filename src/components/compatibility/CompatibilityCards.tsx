@@ -29,7 +29,7 @@ export function CompatibilityCards({ cards, partnerName, locale }: Compatibility
 
         return (
           <li key={card.position} className="flex min-w-0 flex-col items-center text-center">
-            <span className="mb-3 max-w-full truncate text-xs font-semibold uppercase tracking-wider text-amber-400">
+            <span className="mb-3 max-w-full line-clamp-2 break-words text-xs font-semibold uppercase tracking-wider text-amber-400">
               {role}
             </span>
             {/* Same image URL in both sizes, so it is only downloaded once */}

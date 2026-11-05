@@ -5,6 +5,9 @@ import {
   CARD_ROLES,
   NUMBER_PAIRINGS,
   OVERALL_LABELS,
+  OVERALL_SUM_RANGE,
+  SYSTEM_SCORE_RANGES,
+  overallFromSum,
   RELATIONSHIP_NUMBERS,
   TONALLI_RESONANCES,
   buildCompatibilitySummary,
@@ -93,7 +96,7 @@ describe("computeCompatibility — numerology", () => {
     expect(r.numerology.relationshipNumber).toBe(7);
   });
 
-  it("scores same family 5, same number 4 and different families 3", () => {
+  it("scores the same number and the same family 5, different families 3", () => {
     expect(getNumberPairing(1, 5)).toBe("family");
     expect(getNumberPairing(2, 8)).toBe("family");
     expect(getNumberPairing(11, 4)).toBe("family"); // 11 → 2
@@ -104,11 +107,23 @@ describe("computeCompatibility — numerology", () => {
     const same = computeCompatibility({ birthDate: utc(1988, 8, 8) }, { birthDate: utc(2000, 11, 11) });
     expect([same.numerology.a, same.numerology.b]).toEqual([6, 6]);
     expect(same.numerology.pairing).toBe("same");
-    expect(same.numerology.score).toBe(4);
+    expect(same.numerology.score).toBe(5);
 
     const different = computeCompatibility({ birthDate: utc(1990, 7, 15) }, { birthDate: utc(1988, 8, 8) });
     expect(different.numerology.pairing).toBe("different");
     expect(different.numerology.score).toBe(3);
+  });
+
+  it("never scores the same life path below two of the same family", () => {
+    // 1988-08-08 → 6 and 2000-11-11 → 6 (same number); then a real same-family partner for 6 (3 or 9)
+    const same = computeCompatibility({ birthDate: utc(1988, 8, 8) }, { birthDate: utc(2000, 11, 11) });
+    let family: ReturnType<typeof computeCompatibility> | null = null;
+    for (let i = 0; i < 400 && !family; i++) {
+      const r = computeCompatibility({ birthDate: utc(1988, 8, 8) }, { birthDate: addDays(utc(1980, 1, 1), i) });
+      if (r.numerology.pairing === "family") family = r;
+    }
+    expect(family).not.toBeNull();
+    expect(same.numerology.score).toBeGreaterThanOrEqual(family!.numerology.score);
   });
 
   it("without the partner's full name uses only the life paths", () => {
@@ -121,7 +136,7 @@ describe("computeCompatibility — numerology", () => {
   });
 
   it("with both full names also compares the expression numbers", () => {
-    // "John Smith" → 8 on both sides: same (4); life paths 5 and 6: different (3) → (4 + 3) / 2 → 4
+    // "John Smith" → 8 on both sides: same (5); life paths 5 and 6: different (3) → (5 + 3) / 2 → 4
     const r = computeCompatibility(ME, { birthDate: utc(1988, 8, 8), fullName: "John Smith" });
     expect(r.numerology.names).toEqual({ a: 8, b: 8, pairing: "same" });
     expect(r.numerology.score).toBe(4);
@@ -195,7 +210,69 @@ describe("computeCompatibility — tonalpohualli", () => {
 });
 
 describe("computeCompatibility — overall", () => {
-  it("is the rounded average of the four systems", () => {
+  type Result = ReturnType<typeof computeCompatibility>;
+  const sumOf = (r: Result) => r.western.score + r.chinese.score + r.numerology.score + r.tonalli.score;
+
+  /** First real pair of birth dates whose four system scores all meet `wanted`. */
+  function findPair(wanted: (r: Result) => boolean): Result | null {
+    for (let i = 0; i < 40; i++) {
+      const a = addDays(utc(1980, 1, 1), i * 97);
+      for (let j = 0; j < 9000; j++) {
+        const r = computeCompatibility({ birthDate: a }, { birthDate: addDays(utc(1960, 1, 1), j * 3) });
+        if (wanted(r)) return r;
+      }
+    }
+    return null;
+  }
+
+  it("derives the possible sums from the scales of each system", () => {
+    expect(SYSTEM_SCORE_RANGES).toEqual({
+      western: { min: 2, max: 5 },
+      chinese: { min: 2, max: 5 },
+      numerology: { min: 3, max: 5 },
+      tonalli: { min: 3, max: 5 },
+    });
+    expect(OVERALL_SUM_RANGE).toEqual({ min: 10, max: 20 });
+  });
+
+  it("rescales the sum so 1 and 5 are both reachable", () => {
+    const { min, max } = OVERALL_SUM_RANGE;
+    expect(overallFromSum(min)).toBe(1);
+    expect(overallFromSum(max)).toBe(5);
+    let previous = 1;
+    for (let sum = min; sum <= max; sum++) {
+      const score = overallFromSum(sum);
+      expect(score).toBeGreaterThanOrEqual(previous);
+      expect(score).toBe(Math.round(1 + ((sum - min) * 4) / (max - min)));
+      previous = score;
+    }
+  });
+
+  it("gives 5 to the most affine pair and 1 to the least affine", () => {
+    const R = SYSTEM_SCORE_RANGES;
+    const best = findPair(
+      (r) =>
+        r.western.score === R.western.max &&
+        r.chinese.score === R.chinese.max &&
+        r.numerology.score === R.numerology.max &&
+        r.tonalli.score === R.tonalli.max
+    );
+    const worst = findPair(
+      (r) =>
+        r.western.score === R.western.min &&
+        r.chinese.score === R.chinese.min &&
+        r.numerology.score === R.numerology.min &&
+        r.tonalli.score === R.tonalli.min
+    );
+    expect(best).not.toBeNull();
+    expect(worst).not.toBeNull();
+    expect(best!.overall).toBe(5);
+    expect(best!.overallLabel).toEqual(OVERALL_LABELS[5]);
+    expect(worst!.overall).toBe(1);
+    expect(worst!.overallLabel).toEqual(OVERALL_LABELS[1]);
+  });
+
+  it("is the rescaled sum of the four systems for any pair", () => {
     const pairs: [Date, Date][] = [
       [utc(1984, 6, 1), utc(1988, 6, 1)],
       [utc(1984, 6, 1), utc(1990, 6, 1)],
@@ -205,8 +282,7 @@ describe("computeCompatibility — overall", () => {
     ];
     for (const [a, b] of pairs) {
       const r = computeCompatibility({ birthDate: a }, { birthDate: b });
-      const mean = (r.western.score + r.chinese.score + r.numerology.score + r.tonalli.score) / 4;
-      expect(r.overall).toBe(Math.round(mean));
+      expect(r.overall).toBe(overallFromSum(sumOf(r)));
       expect(r.overallLabel).toEqual(OVERALL_LABELS[r.overall]);
     }
   });
@@ -315,6 +391,23 @@ describe("toTextBlocks", () => {
       { type: "heading", text: "Una pregunta para los dos" },
       { type: "paragraph", text: "¿Qué necesita escuchar cada quien esta semana?" },
     ]);
+  });
+
+  it("never takes a short question, exclamation or quote for a title", () => {
+    const lines = [
+      "«¿Qué quieren cuidar juntos?»",
+      "¿Qué quieren cuidar juntos?",
+      "¡Qué buen equipo hacen",
+      "“Lo que se nombra, se cuida”",
+      '"Despacio."',
+      "Dijo que sí (de verdad).",
+      "What do you both want to protect?”",
+    ];
+    for (const line of lines) {
+      expect(toTextBlocks(line)).toEqual([{ type: "paragraph", text: line }]);
+    }
+    // A plain short line or one ending in a colon is still a title
+    expect(toTextBlocks("Qué cuidar:")).toEqual([{ type: "heading", text: "Qué cuidar" }]);
   });
 
   it("keeps long lines without final punctuation as paragraphs", () => {

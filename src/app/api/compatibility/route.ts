@@ -3,11 +3,11 @@ import type { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AIRefusalError } from "@/lib/ai/config";
-import { generateCompatibilityReading } from "@/lib/ai/compatibility";
+import { describeMapForPrompt, generateCompatibilityReading } from "@/lib/ai/compatibility";
 import { InsufficientCreditsError, spendCredits } from "@/lib/credits";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import { drawCards } from "@/lib/reading-pipeline";
-import { describeBlueprintForAI, getArcanaBlueprint, type Locale } from "@/lib/systems";
+import { getArcanaBlueprint, type Locale } from "@/lib/systems";
 import {
   CARD_ROLES,
   COMPATIBILITY_COST,
@@ -171,12 +171,10 @@ export async function POST(req: NextRequest) {
         locale,
         myName: firstName(profile.fullName),
         partnerName: partnerName.value,
-        myBlueprint: describeBlueprintForAI(getArcanaBlueprint(profile.birthDate, profile.fullName), locale),
+        // Both maps without their first line: the prompt never carries an exact birth date.
+        myBlueprint: describeMapForPrompt(getArcanaBlueprint(profile.birthDate, profile.fullName), locale),
         // The partner's full name only feeds the numerology; it is never stored.
-        partnerBlueprint: describeBlueprintForAI(
-          getArcanaBlueprint(birth.date, partnerFullName.value ?? ""),
-          locale
-        ),
+        partnerBlueprint: describeMapForPrompt(getArcanaBlueprint(birth.date, partnerFullName.value ?? ""), locale),
         compatibility,
         cards: cards.map((c) => ({
           role: c.role,

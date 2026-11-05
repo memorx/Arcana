@@ -4,12 +4,14 @@
 import {
   COMPATIBILITY_MAX_TOKENS,
   buildCompatibilityPrompt,
+  describeMapForPrompt,
   generateCompatibilityReading,
   sanitizeName,
   type CompatibilityPromptInput,
 } from "@/lib/ai/compatibility";
 import { computeCompatibility } from "@/lib/compatibility";
 import { AI_MODELS } from "@/lib/ai/config";
+import { describeBlueprintForAI, getArcanaBlueprint } from "@/lib/systems";
 
 jest.mock("@/lib/ai/config", () => {
   const actual = jest.requireActual("@/lib/ai/config");
@@ -24,8 +26,8 @@ const input = (overrides: Partial<CompatibilityPromptInput> = {}): Compatibility
   locale: "es",
   myName: "John",
   partnerName: "Ana",
-  myBlueprint: "Mapa Arcano (nacimiento 1990-07-15).\n- Zodiaco occidental: Cáncer.",
-  partnerBlueprint: "Mapa Arcano (nacimiento 1992-03-03).\n- Zodiaco occidental: Piscis.",
+  myBlueprint: "- Zodiaco occidental: Cáncer.\n- Zodiaco chino: Caballo de Metal.",
+  partnerBlueprint: "- Zodiaco occidental: Piscis.\n- Zodiaco chino: Mono de Agua.",
   compatibility: computeCompatibility(
     { birthDate: utc(1990, 7, 15), fullName: "John Smith" },
     { birthDate: utc(1992, 3, 3) }
@@ -44,8 +46,8 @@ describe("buildCompatibilityPrompt", () => {
     const c = input().compatibility;
 
     expect(user).toContain("Lectura de dos: John y Ana.");
-    expect(user).toContain("Mapa de John:\nMapa Arcano (nacimiento 1990-07-15)");
-    expect(user).toContain("Mapa de Ana:\nMapa Arcano (nacimiento 1992-03-03)");
+    expect(user).toContain("Mapa de John:\n- Zodiaco occidental: Cáncer.");
+    expect(user).toContain("Mapa de Ana:\n- Zodiaco occidental: Piscis.");
     expect(user).toContain(`Zodiaco occidental: Cáncer (Agua) y Piscis (Agua): ${c.western.score}/5`);
     expect(user).toContain(`Zodiaco chino: ${c.chinese.a.label.es} y ${c.chinese.b.label.es}: ${c.chinese.score}/5`);
     expect(user).toContain(`número del vínculo ${c.numerology.relationshipNumber}`);
@@ -70,12 +72,26 @@ describe("buildCompatibilityPrompt", () => {
     expect(system).toContain("Responde siempre en español");
   });
 
+  it("asks to read the hard cards as transformation, not as the end of the bond", () => {
+    const es = buildCompatibilityPrompt(input()).system;
+    expect(es).toContain("muertes literales");
+    expect(es).toContain("La Torre, la Muerte, el Diablo o el 10 de Espadas");
+    expect(es).toContain("transformación");
+    expect(es).toContain("ni de que el vínculo vaya a terminar");
+
+    const en = buildCompatibilityPrompt(input({ locale: "en" })).system;
+    expect(en).toContain("literal deaths");
+    expect(en).toContain("The Tower, Death, The Devil or the 10 of Swords");
+    expect(en).toContain("transformation");
+    expect(en).toContain("the bond coming to an end");
+  });
+
   it("writes the English prompt for locale en", () => {
     const { system, user } = buildCompatibilityPrompt(
       input({
         locale: "en",
-        myBlueprint: "Arcana Blueprint (born 1990-07-15).\n- Western zodiac: Cancer.",
-        partnerBlueprint: "Arcana Blueprint (born 1992-03-03).\n- Western zodiac: Pisces.",
+        myBlueprint: "- Western zodiac: Cancer.",
+        partnerBlueprint: "- Western zodiac: Pisces.",
         cards: [
           { role: "me", name: "The Magician", isReversed: false },
           { role: "partner", name: "The Moon", isReversed: true },
@@ -120,6 +136,36 @@ describe("buildCompatibilityPrompt", () => {
   });
 });
 
+describe("describeMapForPrompt", () => {
+  const me = getArcanaBlueprint(utc(1990, 7, 15), "John Smith", utc(2026, 11, 5));
+  const partner = getArcanaBlueprint(utc(1992, 3, 3), "", utc(2026, 11, 5));
+
+  it("drops the first line, the one with the exact birth date", () => {
+    for (const locale of ["es", "en"] as const) {
+      const full = describeBlueprintForAI(me, locale);
+      const map = describeMapForPrompt(me, locale);
+      expect(full.split("\n")[0]).toContain("1990-07-15");
+      expect(map).toBe(full.split("\n").slice(1).join("\n"));
+      expect(map.startsWith("- ")).toBe(true);
+      expect(map).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+    }
+  });
+
+  it("gives a prompt without ISO dates or the surname", () => {
+    for (const locale of ["es", "en"] as const) {
+      const { user } = buildCompatibilityPrompt(
+        input({
+          locale,
+          myBlueprint: describeMapForPrompt(me, locale),
+          partnerBlueprint: describeMapForPrompt(partner, locale),
+        })
+      );
+      expect(user).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+      expect(user).not.toContain("Smith");
+    }
+  });
+});
+
 describe("sanitizeName", () => {
   it("collapses whitespace and control characters and caps the length", () => {
     expect(sanitizeName("  Ana \t María\u0007 ")).toBe("Ana María");
@@ -130,15 +176,15 @@ describe("sanitizeName", () => {
 });
 
 describe("generateCompatibilityReading", () => {
-  it("uses the synthesis model with medium effort and 2500 tokens", async () => {
+  it("uses the synthesis model with medium effort and 4000 tokens", async () => {
     const text = await generateCompatibilityReading(input());
     expect(text).toBe("texto");
-    expect(COMPATIBILITY_MAX_TOKENS).toBe(2500);
+    expect(COMPATIBILITY_MAX_TOKENS).toBe(4000);
     expect(complete).toHaveBeenCalledWith(
       expect.objectContaining({
         model: AI_MODELS.synthesis,
         effort: "medium",
-        maxTokens: 2500,
+        maxTokens: 4000,
         system: expect.stringContaining("lee el vínculo entre dos personas"),
         user: expect.stringContaining("Lectura de dos"),
       })

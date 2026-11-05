@@ -1,9 +1,9 @@
 import { AI_MODELS, complete } from "@/lib/ai/config";
 import type { CompatibilityCardRole, CompatibilityResult } from "@/lib/compatibility";
-import type { Locale } from "@/lib/systems";
+import { describeBlueprintForAI, type ArcanaBlueprint, type Locale } from "@/lib/systems";
 
 /** Thinking tokens count inside this budget. */
-export const COMPATIBILITY_MAX_TOKENS = 2500;
+export const COMPATIBILITY_MAX_TOKENS = 4000;
 
 export interface CompatibilityPromptInput {
   locale: Locale;
@@ -42,7 +42,8 @@ Una pregunta para los dos — una sola pregunta abierta para conversar juntos
 IMPORTANTE:
 - Nada de predicciones ("van a…", "terminarán…") ni de "almas gemelas", "destinados" o "karma"
 - No repitas los puntajes como números: tradúcelos en matices
-- Nunca hables de muertes, enfermedades, infidelidades ni tragedias
+- Nunca hables de muertes literales, enfermedades, infidelidades ni tragedias
+- Cartas como La Torre, la Muerte, el Diablo o el 10 de Espadas hablan de transformación, de finales necesarios o de patrones que piden atención; no de catástrofes literales ni de que el vínculo vaya a terminar. Nómbralas con calma.
 - Texto plano: sin markdown, sin asteriscos ni almohadillas; separa los párrafos con una línea en blanco
 - Entre 350 y 550 palabras
 - Responde siempre en español`;
@@ -71,7 +72,8 @@ A question for both of you — a single open question to talk about together
 IMPORTANT:
 - No predictions ("you will…", "you'll end up…") and no "soulmates", "destined" or "karma"
 - Don't repeat the scores as numbers: translate them into nuances
-- Never talk about deaths, illnesses, infidelity or tragedies
+- Never talk about literal deaths, illnesses, infidelity or tragedies
+- Cards like The Tower, Death, The Devil or the 10 of Swords speak of transformation, necessary endings or patterns that ask for attention; not of literal catastrophes or of the bond coming to an end. Name them calmly.
 - Plain text: no markdown, no asterisks or hash marks; separate paragraphs with a blank line
 - Between 350 and 550 words
 - Always respond in English`;
@@ -114,6 +116,14 @@ const LABELS = {
     and: "and",
   },
 } as const;
+
+/**
+ * describeBlueprintForAI without its first line ("Mapa Arcano (nacimiento YYYY-MM-DD)."):
+ * the prompt gets the systems, never the exact birth date.
+ */
+export function describeMapForPrompt(bp: ArcanaBlueprint, locale: Locale): string {
+  return describeBlueprintForAI(bp, locale).split("\n").slice(1).join("\n");
+}
 
 /** One line, no control characters, so a typed name can't reshape the prompt. */
 export function sanitizeName(name: string | null | undefined, maxLength = 60): string | null {
