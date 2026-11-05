@@ -189,6 +189,105 @@ describe("GET /api/cron/daily-readings", () => {
     expect(mockSendEmail).not.toHaveBeenCalled();
   });
 
+  describe("batches and time budget (code review)", () => {
+    const subscribers = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({
+        ...subscriber,
+        id: `sub-${i + 1}`,
+        user: { ...subscriber.user, id: `user-${i + 1}`, email: `persona${i + 1}@example.com` },
+      }));
+
+    /** Lets every resolved promise and pending tick run. */
+    const settle = async () => {
+      for (let i = 0; i < 20; i++) await new Promise((resolve) => setImmediate(resolve));
+    };
+
+    it("asks the AI for 4 people at a time, never 5", async () => {
+      mockPrisma.subscription.findMany.mockResolvedValue(subscribers(6));
+      const pending: Array<() => void> = [];
+      let inFlight = 0;
+      let maxInFlight = 0;
+      mockGenerate.mockImplementation(
+        () =>
+          new Promise<string>((resolve) => {
+            inFlight++;
+            maxInFlight = Math.max(maxInFlight, inFlight);
+            pending.push(() => {
+              inFlight--;
+              resolve("Buenos días.");
+            });
+          })
+      );
+
+      const responsePromise = GET(request());
+
+      await settle();
+      // The first four wait on the AI together; the fifth hasn't started
+      expect(mockGenerate).toHaveBeenCalledTimes(4);
+      expect(inFlight).toBe(4);
+
+      pending.splice(0).forEach((finish) => finish());
+      await settle();
+      expect(mockGenerate).toHaveBeenCalledTimes(6);
+      expect(inFlight).toBe(2);
+
+      pending.splice(0).forEach((finish) => finish());
+      const body = await (await responsePromise).json();
+
+      expect(maxInFlight).toBe(4);
+      expect(body).toMatchObject({ processed: 6, sent: 6, errors: 0, skippedForTime: 0 });
+      expect(mockSendEmail.mock.calls.map(([email]) => email.to).sort()).toEqual(
+        subscribers(6).map((s) => s.user.email).sort()
+      );
+    });
+
+    it("counts and logs one person's failure without stopping the rest of the batch", async () => {
+      mockPrisma.subscription.findMany.mockResolvedValue(subscribers(5));
+      const failure = new Error("db timeout");
+      mockPrisma.dailyReading.findUnique.mockImplementation(
+        async ({ where }: { where: { userId_date: { userId: string } } }) => {
+          if (where.userId_date.userId === "user-2") throw failure;
+          return null;
+        }
+      );
+
+      const body = await (await GET(request())).json();
+
+      expect(body).toMatchObject({ processed: 5, sent: 4, errors: 1, skippedForTime: 0 });
+      expect(console.error).toHaveBeenCalledWith("[CRON] Error processing user user-2:", failure);
+      expect(mockSendEmail).toHaveBeenCalledTimes(4);
+      expect(mockSendEmail).not.toHaveBeenCalledWith(expect.objectContaining({ to: "persona2@example.com" }));
+    });
+
+    it("doesn't start another batch after 48 s and reports who was left", async () => {
+      const NOW = new Date("2026-11-04T08:00:00.000Z");
+      jest.useFakeTimers({ now: NOW, doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] });
+      const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+      mockPrisma.subscription.findMany.mockResolvedValue(subscribers(14));
+      // Simulated clock: each batch of 4 ends at this point of the run
+      const batchEnds = [30_000, 48_000, 48_001];
+      let calls = 0;
+      mockGenerate.mockImplementation(async () => {
+        jest.setSystemTime(NOW.getTime() + batchEnds[Math.floor(calls++ / 4)]);
+        return "Buenos días.";
+      });
+
+      try {
+        const body = await (await GET(request())).json();
+
+        // Batches start at 0 s, 30 s and exactly 48 s; the fourth would start at 48.001 s
+        expect(mockGenerate).toHaveBeenCalledTimes(12);
+        expect(mockSendEmail).toHaveBeenCalledTimes(12);
+        expect(body).toMatchObject({ success: true, processed: 12, sent: 12, errors: 0, skippedForTime: 2 });
+        expect(warn).toHaveBeenCalledTimes(1);
+        expect(warn.mock.calls[0][0]).toMatch(/2 subscribers/);
+        expect(warn.mock.calls[0][0]).toContain("user-13, user-14");
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+  });
+
   describe("day energies and birthday (F-42, F-43)", () => {
     // 2026-11-04 08:00 UTC: 13 Miquiztli in the tonalpohualli
     const NOW = new Date("2026-11-04T08:00:00.000Z");
