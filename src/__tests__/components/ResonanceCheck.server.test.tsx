@@ -4,7 +4,6 @@
  * N-1: the server render must not depend on the clock, so hydration can't
  * disagree with the browser near the 24 h mark.
  */
-// @ts-expect-error -- @types/react-dom isn't a dependency (and lots don't install packages); runtime is fine.
 import { renderToString } from "react-dom/server";
 
 jest.mock("next/navigation", () => ({
