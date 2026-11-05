@@ -806,5 +806,37 @@
         "description": "How two people meet across the zodiacs, numerology and the tonalli, with three cards for the bond."
       }
     }
+  },
+  "calendar": {
+    "title": "Arcana Calendar",
+    "subtitle": "Every day with its sign in the Mexica tonalpohualli, its moon phase and, with your profile, your personal day.",
+    "metaTitle": "Arcana Calendar: tonalli, moon and personal day | Arcana",
+    "metaDescription": "Each day's sign in the Mexica tonalpohualli, the moon phase and your numerology personal day, month by month.",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "goToToday": "Go to today",
+    "personalDayAria": "personal day {number}",
+    "keyboardHint": "Use the arrow keys to move between days; Page Up and Page Down change the month.",
+    "legend": {
+      "sign": "Day sign (tonalpohualli)",
+      "moon": "Moon phase",
+      "personalDay": "Your personal day"
+    },
+    "detail": {
+      "tonalli": "Tonalli of the day",
+      "trecena": "Trecena {name}",
+      "lordOfNight": "Lord of the night",
+      "direction": "Direction and patron",
+      "moon": "Moon",
+      "illumination": "{percent}% illuminated",
+      "personalDay": "Personal day",
+      "personalDayNumber": "Day {number}",
+      "guestCta": "Create your free account and add your birth date to see your personal day.",
+      "guestButton": "Create account",
+      "noProfileCta": "Add your birth date to your profile to see your personal day.",
+      "noProfileButton": "Complete profile"
+    },
+    "about": "About the tonalpohualli"
   }
 }

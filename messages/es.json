@@ -806,5 +806,37 @@
         "description": "Cómo se encuentran dos personas en los zodiacos, la numerología y el tonalli, con tres cartas para el vínculo."
       }
     }
+  },
+  "calendar": {
+    "title": "Calendario Arcano",
+    "subtitle": "Cada día con su signo del tonalpohualli mexica, su fase lunar y, con tu perfil, tu día personal.",
+    "metaTitle": "Calendario Arcano: tonalli, luna y día personal | Arcana",
+    "metaDescription": "El signo de cada día en el tonalpohualli mexica, la fase lunar y tu día personal de numerología, mes a mes.",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "today": "Hoy",
+    "goToToday": "Ir a hoy",
+    "personalDayAria": "día personal {number}",
+    "keyboardHint": "Usa las flechas para moverte entre días; Re Pág y Av Pág cambian de mes.",
+    "legend": {
+      "sign": "Signo del día (tonalpohualli)",
+      "moon": "Fase lunar",
+      "personalDay": "Tu día personal"
+    },
+    "detail": {
+      "tonalli": "Tonalli del día",
+      "trecena": "Trecena {name}",
+      "lordOfNight": "Señor de la noche",
+      "direction": "Rumbo y patrono",
+      "moon": "Luna",
+      "illumination": "{percent}% de iluminación",
+      "personalDay": "Día personal",
+      "personalDayNumber": "Día {number}",
+      "guestCta": "Crea tu cuenta gratis y agrega tu fecha de nacimiento para ver tu día personal.",
+      "guestButton": "Crear cuenta",
+      "noProfileCta": "Agrega tu fecha de nacimiento a tu perfil para ver tu día personal.",
+      "noProfileButton": "Completar perfil"
+    },
+    "about": "Sobre el tonalpohualli"
   }
 }
