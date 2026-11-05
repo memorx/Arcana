@@ -30,10 +30,16 @@ jest.mock("@/lib/challenges", () => ({
   updateChallengeProgress: jest.fn(),
 }));
 
-import type { SpreadType } from "@prisma/client";
+import type { Reading, SpreadType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { InsufficientCreditsError } from "@/lib/credits";
-import { chargeAndCreateReading, drawCards, finalizeReading } from "@/lib/reading-pipeline";
+import {
+  buildReadingResponse,
+  chargeAndCreateReading,
+  drawCards,
+  finalizeReading,
+  type SpreadPosition,
+} from "@/lib/reading-pipeline";
 import { updateStreak } from "@/lib/streak";
 import { discoverCardsFromReading } from "@/lib/collection";
 import { checkAndUnlockAchievements } from "@/lib/achievements";
@@ -108,6 +114,59 @@ const mockTx = (updateManyCounts: number[]) => {
   (prisma.$transaction as jest.Mock).mockImplementation(async (callback) => callback(tx));
   return tx;
 };
+
+describe("buildReadingResponse", () => {
+  const spreadType = { id: "three", name: "Three Cards", nameEs: "Tres Cartas" } as unknown as SpreadType;
+  const reading = {
+    id: "reading-1",
+    intention: "¿Qué necesito ver?",
+    interpretation: "Una lectura.",
+    createdAt: new Date("2026-11-04T12:00:00Z"),
+    spreadType,
+  } as unknown as Reading & { spreadType: SpreadType };
+  const card = (id: string) => ({
+    id,
+    name: id,
+    nameEs: id,
+    arcana: "MAJOR",
+    suit: null,
+    keywords: [],
+    meaningUpright: "",
+    meaningReversed: "",
+    imageUrl: `/cards/${id}.jpg`,
+  });
+  const extras = {
+    streak: null,
+    goldenCards: [],
+    newlyDiscoveredCards: [],
+    unlockedAchievements: [],
+    levelUp: null,
+    completedChallenges: [],
+  };
+
+  it("matches each card to its position even when the spread JSON stores it as a string", () => {
+    // SpreadType.positions is untyped JSON: nothing guarantees "position" is a number
+    const positions = [
+      { position: "1", name: "Past", nameEs: "Pasado", description: "Lo que fue" },
+      { position: "2", name: "Present", nameEs: "Presente", description: "Lo que es" },
+    ] as unknown as SpreadPosition[];
+
+    const response = buildReadingResponse({
+      reading,
+      readingCards: [
+        { position: 1, cardId: "tower", isReversed: false, isGolden: false },
+        { position: 2, cardId: "star", isReversed: true, isGolden: false },
+      ],
+      cards: [card("tower"), card("star")] as Parameters<typeof buildReadingResponse>[0]["cards"],
+      positions,
+      usedFreeReading: false,
+      extras,
+    });
+
+    expect(response.cards.map((c) => c.positionInfo?.nameEs)).toEqual(["Pasado", "Presente"]);
+    expect(response.cards[1]).toMatchObject({ position: 2, cardId: "star", card: { id: "star" } });
+  });
+});
 
 describe("chargeAndCreateReading", () => {
   const base = {

@@ -293,7 +293,8 @@ export function buildReadingResponse(opts: {
 
   const cardsWithDetails = readingCards.map((rc) => {
     const card = cards.find((c) => c.id === rc.cardId)!;
-    const positionInfo = positions.find((p) => p.position === rc.position)!;
+    // positions comes from a JSON column: compare as numbers, like the other routes
+    const positionInfo = positions.find((p) => Number(p.position) === rc.position)!;
 
     return {
       ...rc,
