@@ -8,7 +8,7 @@ class MockUtterance {
   lang = "";
   voice: SpeechSynthesisVoice | null = null;
   onend: (() => void) | null = null;
-  onerror: (() => void) | null = null;
+  onerror: ((event: { error: string }) => void) | null = null;
   constructor(text: string) {
     this.text = text;
   }
@@ -172,6 +172,42 @@ describe("ReadAloud (F-65)", () => {
     const last = synth.speak.mock.calls[1][0] as MockUtterance;
     act(() => last.onend?.());
 
+    expect(screen.getByRole("button", { name: "play" })).toBeInTheDocument();
+  });
+
+  it("cancels the rest of the queue and goes back to idle when a chunk fails", () => {
+    const synth = installSpeech([voice("es-MX")]);
+    // A queue like the browser's: speak() appends, cancel() empties it
+    const queue: MockUtterance[] = [];
+    synth.speak.mockImplementation((utterance: MockUtterance) => queue.push(utterance));
+    synth.cancel.mockImplementation(() => queue.splice(0));
+    render(<ReadAloud text={"Uno.\n\nDos.\n\nTres."} locale="es" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "play" }));
+    expect(queue.map((u) => u.text)).toEqual(["Uno.", "Dos.", "Tres."]);
+    synth.cancel.mockClear();
+
+    // The first chunk is spoken, the second one fails
+    queue.shift();
+    const second = queue.shift()!;
+    act(() => second.onerror?.({ error: "synthesis-failed" }));
+
+    expect(synth.cancel).toHaveBeenCalledTimes(1);
+    expect(queue).toEqual([]); // "Tres." is never spoken
+    expect(screen.getByRole("button", { name: "play" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "stop" })).not.toBeInTheDocument();
+  });
+
+  it("doesn't cancel again when its speech was cancelled from somewhere else", () => {
+    const synth = installSpeech([voice("es-MX")]);
+    render(<ReadAloud text={"Uno.\n\nDos."} locale="es" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "play" }));
+    synth.cancel.mockClear();
+    // Another speechSynthesis.cancel() already emptied the queue (maybe to say something else)
+    act(() => (synth.speak.mock.calls[0][0] as MockUtterance).onerror?.({ error: "interrupted" }));
+
+    expect(synth.cancel).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "play" })).toBeInTheDocument();
   });
 

@@ -155,6 +155,20 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
     setStatus("idle");
   };
 
+  /**
+   * A chunk that fails stops the whole reading: otherwise the rest of the queue
+   * keeps talking with the controls already hidden. "canceled" / "interrupted"
+   * mean another cancel() already emptied the queue (maybe to say something
+   * else), so it isn't cancelled again.
+   */
+  const fail = (run: number, error: string) => {
+    if (runRef.current !== run) return;
+    runRef.current += 1;
+    speakingRef.current = false;
+    if (error !== "canceled" && error !== "interrupted") window.speechSynthesis.cancel();
+    setStatus("idle");
+  };
+
   const play = () => {
     const synth = window.speechSynthesis;
     const chunks = splitForSpeech(text);
@@ -171,7 +185,7 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
       const utterance = new SpeechSynthesisUtterance(chunk);
       utterance.lang = lang;
       if (voice) utterance.voice = voice;
-      utterance.onerror = () => finish(run);
+      utterance.onerror = (event) => fail(run, event.error);
       if (index === chunks.length - 1) utterance.onend = () => finish(run);
       synth.speak(utterance);
     });
