@@ -139,6 +139,8 @@ describe("SynthesisPanel", () => {
     render(<SynthesisPanel {...props} />);
 
     expect(screen.getByText("intro")).toBeInTheDocument();
+    // No share controls before there is a synthesis or a link.
+    expect(screen.queryByRole("button", { name: "start" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "generate" }));
 
     expect(await screen.findByText("Eres una persona que cuida y se mueve.")).toBeInTheDocument();
@@ -148,21 +150,26 @@ describe("SynthesisPanel", () => {
       expect.arrayContaining(["1¿Qué cuidas cuando te quedas?"])
     );
     // Share appears once there is a synthesis.
-    expect(screen.getByRole("button", { name: "create" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "start" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "generate" })).not.toBeInTheDocument();
   });
 
-  it("shows the loading state while waiting", async () => {
+  it("announces loading through a status region that is always present", async () => {
     let resolve: (value: unknown) => void = () => {};
     (global.fetch as jest.Mock).mockReturnValue(new Promise((r) => (resolve = r)));
     render(<SynthesisPanel {...props} />);
+
+    const status = screen.getByRole("status");
+    expect(status).toBeEmptyDOMElement();
     fireEvent.click(screen.getByRole("button", { name: "generate" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent("loadingSr");
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("loadingSr"));
+    expect(screen.getByRole("status")).toBe(status);
     expect(screen.getByText("loading.western")).toBeInTheDocument();
 
     resolve({ ok: false, status: 503, json: () => Promise.resolve({ error: "synthesis_unavailable", retry: true }) });
     expect(await screen.findByRole("alert")).toHaveTextContent("errors.unavailable");
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
   it("503 shows the unavailable message and a retry button", async () => {
@@ -191,6 +198,19 @@ describe("SynthesisPanel", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("errors.rateLimited"));
   });
 
+  it("429 synthesis_cooldown shows the friendly cooldown message", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: () => Promise.resolve({ error: "synthesis_cooldown", retryAfterSeconds: 470 }),
+    });
+    render(<SynthesisPanel {...props} isStale />);
+    fireEvent.click(screen.getByRole("button", { name: "regenerate" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("errors.cooldown");
+    expect(screen.getByRole("alert")).not.toHaveTextContent("errors.rateLimited");
+  });
+
   it("with a cached synthesis it renders it without calling the API", () => {
     render(<SynthesisPanel {...props} initialSynthesis={SYNTHESIS} initialShareId="abc123defg" />);
     expect(screen.getByText("Eres una persona que cuida y se mueve.")).toBeInTheDocument();
@@ -209,6 +229,21 @@ describe("SynthesisPanel", () => {
     expect(screen.getByText("stale")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "regenerate" })).toBeInTheDocument();
   });
+
+  it("with a stale synthesis an existing link can still be revoked, but not re-created", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ shareId: null }),
+    });
+    render(<SynthesisPanel {...props} isStale initialShareId="abc" />);
+    expect(screen.getByText("stale")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "stop" }));
+    await waitFor(() => expect(screen.queryByRole("button", { name: "stop" })).not.toBeInTheDocument());
+    expect(global.fetch).toHaveBeenCalledWith("/api/blueprint/share", { method: "DELETE" });
+    expect(screen.queryByRole("button", { name: "start" })).not.toBeInTheDocument();
+  });
 });
 
 describe("BlueprintShare", () => {
@@ -216,20 +251,40 @@ describe("BlueprintShare", () => {
     global.fetch = jest.fn();
   });
 
-  it("creates the link, shows it and copies it", async () => {
+  it("asks for confirmation with the privacy notice before creating the link", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       status: 200,
       json: () => Promise.resolve({ shareId: "shr4Ab9xYz", sharePath: "/share/blueprint/shr4Ab9xYz" }),
     });
     render(<BlueprintShare initialShareId={null} />);
+
+    // Before confirming there is no "create" button.
+    expect(screen.queryByRole("button", { name: "create" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "start" }));
+
+    // Confirmation step: the notice is visible, names the group and takes focus.
+    const group = screen.getByRole("group", { name: "note" });
+    expect(group).toHaveFocus();
+    expect(global.fetch).not.toHaveBeenCalled();
+
+    // Cancel goes back without creating anything.
+    fireEvent.click(screen.getByRole("button", { name: "cancel" }));
+    expect(screen.queryByRole("group")).not.toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
+
+    // Confirm creates, shows and copies the link.
+    fireEvent.click(screen.getByRole("button", { name: "start" }));
     fireEvent.click(screen.getByRole("button", { name: "create" }));
 
     const input = (await screen.findByLabelText("linkLabel")) as HTMLInputElement;
     expect(input.value).toBe("http://localhost/share/blueprint/shr4Ab9xYz");
     expect(global.fetch).toHaveBeenCalledWith("/api/blueprint/share", { method: "POST" });
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("http://localhost/share/blueprint/shr4Ab9xYz");
-    expect(await screen.findByRole("button", { name: "copyAria" })).toHaveTextContent("copied");
+    // The copy button name follows its state.
+    expect(await screen.findByRole("button", { name: "copied" })).toHaveTextContent("copied");
+    // The notice stays visible while the link exists.
+    expect(screen.getByText("note")).toBeInTheDocument();
   });
 
   it("stops sharing with DELETE", async () => {
@@ -239,9 +294,10 @@ describe("BlueprintShare", () => {
       json: () => Promise.resolve({ shareId: null }),
     });
     render(<BlueprintShare initialShareId="shr4Ab9xYz" />);
+    expect(screen.getByRole("button", { name: "copyAria" })).toHaveTextContent("copy");
     fireEvent.click(screen.getByRole("button", { name: "stop" }));
 
-    expect(await screen.findByRole("button", { name: "create" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "start" })).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/blueprint/share", { method: "DELETE" });
   });
 
@@ -252,7 +308,14 @@ describe("BlueprintShare", () => {
       json: () => Promise.resolve({ error: "synthesis_required" }),
     });
     render(<BlueprintShare initialShareId={null} />);
+    fireEvent.click(screen.getByRole("button", { name: "start" }));
     fireEvent.click(screen.getByRole("button", { name: "create" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("errors.synthesisRequired");
   });
+
+  it("without a current synthesis and without a link it renders nothing", () => {
+    const { container } = render(<BlueprintShare initialShareId={null} canCreate={false} />);
+    expect(container).toBeEmptyDOMElement();
+  });
 });
+

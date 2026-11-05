@@ -177,19 +177,52 @@ describe("Arcana Map API", () => {
           update: expect.objectContaining({ locale: "es", inputsHash: currentHash }),
         })
       );
+      // Regenerating must keep an existing public link.
+      expect(arcanaProfile.upsert.mock.calls[0][0].update).not.toHaveProperty("shareId");
     });
 
-    it("regenerates when the cached synthesis belongs to other inputs", async () => {
+    it("regenerates when the cached synthesis belongs to other inputs (saved over 10 minutes ago)", async () => {
       arcanaProfile.findUnique.mockResolvedValue({
         synthesis: "Old text",
         inputsHash: blueprintInputsHash(birthDate, "Ana Sofía López", "en"),
         shareId: "abc123defg",
+        updatedAt: new Date(Date.now() - 11 * 60 * 1000),
       });
       arcanaProfile.upsert.mockResolvedValue({ synthesis: "Nueva", shareId: "abc123defg" });
       const res = await POST_SYNTHESIS(request("POST", "/api/blueprint/synthesis"));
       expect(res.status).toBe(200);
       expect(mockComplete).toHaveBeenCalledTimes(1);
       expect(await res.json()).toEqual({ synthesis: "Nueva", shareId: "abc123defg", cached: false });
+    });
+
+    it("429 synthesis_cooldown when another synthesis was saved less than 10 minutes ago, without calling the AI", async () => {
+      arcanaProfile.findUnique.mockResolvedValue({
+        synthesis: "Old text",
+        inputsHash: blueprintInputsHash(birthDate, "Ana", "es"),
+        shareId: null,
+        updatedAt: new Date(Date.now() - 2 * 60 * 1000),
+      });
+      const res = await POST_SYNTHESIS(request("POST", "/api/blueprint/synthesis"));
+      expect(res.status).toBe(429);
+      const data = await res.json();
+      expect(data.error).toBe("synthesis_cooldown");
+      expect(data.retryAfterSeconds).toBeGreaterThan(470);
+      expect(data.retryAfterSeconds).toBeLessThanOrEqual(480);
+      expect(res.headers.get("Retry-After")).toBe(String(data.retryAfterSeconds));
+      expect(mockComplete).not.toHaveBeenCalled();
+      expect(arcanaProfile.upsert).not.toHaveBeenCalled();
+    });
+
+    it("the cooldown does not block reading the cached synthesis for the current inputs", async () => {
+      arcanaProfile.findUnique.mockResolvedValue({
+        synthesis: "Recién escrita",
+        inputsHash: currentHash,
+        shareId: null,
+        updatedAt: new Date(),
+      });
+      const res = await POST_SYNTHESIS(request("POST", "/api/blueprint/synthesis"));
+      expect(res.status).toBe(200);
+      expect((await res.json()).cached).toBe(true);
     });
 
     it("writes in the profile's language", async () => {

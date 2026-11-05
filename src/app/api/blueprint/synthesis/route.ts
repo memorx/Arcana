@@ -13,10 +13,15 @@ import {
 
 export const maxDuration = 60;
 
+/** Minimum time between two AI syntheses for the same person (cost guard). Not exported: route files only export handlers and config. */
+const SYNTHESIS_COOLDOWN_MS = 10 * 60 * 1000;
+
 /**
  * POST /api/blueprint/synthesis → { synthesis, shareId, cached }.
  * Free. If a synthesis for the current inputs exists it is returned without
  * calling the AI; otherwise it is generated and upserted with the new hash.
+ * A synthesis for other inputs saved less than 10 minutes ago → 429
+ * synthesis_cooldown with retryAfterSeconds (no AI call).
  * AI down → 503 (retry), refusal → 422; nothing is saved in either case.
  */
 export async function POST(req: NextRequest) {
@@ -45,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     const existing = await prisma.arcanaProfile.findUnique({
       where: { userId },
-      select: { synthesis: true, inputsHash: true, shareId: true },
+      select: { synthesis: true, inputsHash: true, shareId: true, updatedAt: true },
     });
     if (existing && existing.inputsHash === hash && existing.synthesis.trim()) {
       return NextResponse.json({
@@ -53,6 +58,17 @@ export async function POST(req: NextRequest) {
         shareId: existing.shareId,
         cached: true,
       });
+    }
+
+    if (existing && existing.inputsHash !== hash && existing.updatedAt) {
+      const elapsed = Date.now() - existing.updatedAt.getTime();
+      if (elapsed < SYNTHESIS_COOLDOWN_MS) {
+        const retryAfterSeconds = Math.max(1, Math.ceil((SYNTHESIS_COOLDOWN_MS - elapsed) / 1000));
+        return NextResponse.json(
+          { error: "synthesis_cooldown", retryAfterSeconds },
+          { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } }
+        );
+      }
     }
 
     const blueprint = getArcanaBlueprint(profile.birthDate, profile.fullName);

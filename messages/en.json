@@ -870,14 +870,18 @@
         "unavailable": "We couldn't write your synthesis right now. Please try again in a moment.",
         "refused": "We couldn't write this synthesis. Please try again later.",
         "rateLimited": "Too many tries in a row. Wait a minute and try again.",
+        "cooldown": "Your synthesis was updated a moment ago. You can create a new one in {minutes, plural, one {# minute} other {# minutes}}.",
         "profile": "We need your date of birth first. Complete your profile and come back.",
         "generic": "Something went wrong. Please try again."
       }
     },
     "share": {
       "title": "Share your map",
-      "note": "Anyone with the link will see your first name, your five signs and your synthesis.",
-      "create": "Create a link to share",
+      "intro": "Create a public link to your map and send it to whoever you like.",
+      "start": "Share my map",
+      "note": "Anyone with the link will see your first name, your five signs and your synthesis. Your birth date can be worked out from your signs.",
+      "create": "Create link",
+      "cancel": "Cancel",
       "linkLabel": "Public link to your Arcana Map",
       "copy": "Copy",
       "copied": "Copied!",

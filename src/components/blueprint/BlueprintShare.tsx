@@ -1,25 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui";
 
 interface BlueprintShareProps {
   initialShareId: string | null;
+  /**
+   * Whether a new link may be created (there is a current synthesis). When
+   * false, an existing link can still be copied or revoked.
+   */
+  canCreate?: boolean;
 }
 
 /**
- * Public link of the Arcana Map: create it (POST /api/blueprint/share, copies
- * it right away), copy it again, share it natively, or stop sharing (DELETE).
+ * Public link of the Arcana Map. Creating it takes one confirmation step: the
+ * privacy notice is shown with a "Create link" button (POST
+ * /api/blueprint/share, then the link is copied). The link can be copied
+ * again, shared natively, or revoked (DELETE).
  */
-export function BlueprintShare({ initialShareId }: BlueprintShareProps) {
+export function BlueprintShare({ initialShareId, canCreate = true }: BlueprintShareProps) {
   const t = useTranslations("blueprint.share");
   const [shareId, setShareId] = useState<string | null>(initialShareId);
+  const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState<"create" | "stop" | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [canNativeShare, setCanNativeShare] = useState(false);
+  const confirmRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -31,6 +40,10 @@ export function BlueprintShare({ initialShareId }: BlueprintShareProps) {
     const id = window.setTimeout(() => setCopied(false), 2500);
     return () => window.clearTimeout(id);
   }, [copied]);
+
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+  }, [confirming]);
 
   const url = shareId ? `${origin}/share/blueprint/${shareId}` : "";
 
@@ -56,6 +69,7 @@ export function BlueprintShare({ initialShareId }: BlueprintShareProps) {
         return;
       }
       setShareId(data.shareId);
+      setConfirming(false);
       await copy(`${window.location.origin}/share/blueprint/${data.shareId}`);
     } catch {
       setError(t("errors.generic"));
@@ -90,24 +104,17 @@ export function BlueprintShare({ initialShareId }: BlueprintShareProps) {
     }
   };
 
+  if (!shareId && !canCreate) return null;
+
   return (
     <section aria-labelledby="blueprint-share-title" className="mt-8 border-t border-slate-800/80 pt-6">
       <h3 id="blueprint-share-title" className="text-base font-semibold text-slate-100">
         {t("title")}
       </h3>
-      <p className="mt-1 text-sm text-slate-400">{t("note")}</p>
 
-      {!shareId ? (
-        <Button
-          variant="secondary"
-          className="mt-4 w-full sm:w-auto"
-          onClick={create}
-          isLoading={busy === "create"}
-        >
-          {t("create")}
-        </Button>
-      ) : (
-        <div className="mt-4 space-y-3">
+      {shareId ? (
+        <div className="mt-3 space-y-3">
+          <p className="text-sm text-slate-400">{t("note")}</p>
           <label htmlFor="blueprint-share-url" className="block text-xs text-slate-500">
             {t("linkLabel")}
           </label>
@@ -120,7 +127,12 @@ export function BlueprintShare({ initialShareId }: BlueprintShareProps) {
               onFocus={(e) => e.currentTarget.select()}
               className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-300 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
             />
-            <Button size="sm" onClick={() => copy(url)} aria-label={t("copyAria")} disabled={!url}>
+            <Button
+              size="sm"
+              onClick={() => copy(url)}
+              aria-label={copied ? t("copied") : t("copyAria")}
+              disabled={!url}
+            >
               {copied ? t("copied") : t("copy")}
             </Button>
           </div>
@@ -138,6 +150,38 @@ export function BlueprintShare({ initialShareId }: BlueprintShareProps) {
             </Button>
           </div>
         </div>
+      ) : confirming ? (
+        <div
+          ref={confirmRef}
+          tabIndex={-1}
+          role="group"
+          aria-labelledby="blueprint-share-notice"
+          className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+        >
+          <p id="blueprint-share-notice" className="text-sm leading-relaxed text-amber-100">
+            {t("note")}
+          </p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <Button onClick={create} isLoading={busy === "create"} className="w-full sm:w-auto">
+              {t("create")}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setConfirming(false)}
+              disabled={busy === "create"}
+              className="w-full sm:w-auto"
+            >
+              {t("cancel")}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <p className="mt-1 text-sm text-slate-400">{t("intro")}</p>
+          <Button variant="secondary" className="mt-4 w-full sm:w-auto" onClick={() => setConfirming(true)}>
+            {t("start")}
+          </Button>
+        </>
       )}
 
       {error && (

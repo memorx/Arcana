@@ -21,16 +21,24 @@ export async function BlueprintWidget({ userId }: BlueprintWidgetProps) {
   const t = await getTranslations("blueprint");
   const locale = toBlueprintLocale(await getLocale());
 
-  const [profile, arcana] = await Promise.all([
-    prisma.userProfile.findUnique({
-      where: { userId },
-      select: { birthDate: true, fullName: true, locale: true },
-    }),
-    prisma.arcanaProfile.findUnique({
-      where: { userId },
-      select: { inputsHash: true },
-    }),
-  ]);
+  let profile: { birthDate: Date; fullName: string; locale: string } | null;
+  let arcana: { inputsHash: string } | null;
+  try {
+    [profile, arcana] = await Promise.all([
+      prisma.userProfile.findUnique({
+        where: { userId },
+        select: { birthDate: true, fullName: true, locale: true },
+      }),
+      prisma.arcanaProfile.findUnique({
+        where: { userId },
+        select: { inputsHash: true },
+      }),
+    ]);
+  } catch (error) {
+    // A widget must never take the dashboard down.
+    console.error("BlueprintWidget error:", error);
+    return null;
+  }
 
   if (!profile) {
     return (
@@ -53,7 +61,13 @@ export async function BlueprintWidget({ userId }: BlueprintWidgetProps) {
     );
   }
 
-  const bp = getArcanaBlueprint(profile.birthDate, profile.fullName);
+  let bp: ReturnType<typeof getArcanaBlueprint>;
+  try {
+    bp = getArcanaBlueprint(profile.birthDate, profile.fullName);
+  } catch (error) {
+    console.error("BlueprintWidget blueprint error:", error);
+    return null;
+  }
   const badges = getBlueprintBadges(bp, locale, (key, values) => t(key, values));
   const hasSynthesis =
     arcana?.inputsHash ===

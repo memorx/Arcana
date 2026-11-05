@@ -23,10 +23,20 @@ export function getFirstName(fullName: string | null | undefined): string {
   return (fullName ?? "").trim().split(/\s+/)[0] ?? "";
 }
 
-/** Cache key of a synthesis: sha256 of "YYYY-MM-DD|full name|locale". */
+/**
+ * Cache key of a synthesis: sha256 of "YYYY-MM-DD|full name|locale". The name
+ * is trimmed with inner whitespace collapsed, as `getArcanaBlueprint` does,
+ * so "Ana  López" and "Ana López" share one synthesis.
+ */
 export function blueprintInputsHash(birthDate: Date, fullName: string, locale: Locale): string {
   const day = birthDate.toISOString().slice(0, 10);
-  return createHash("sha256").update(`${day}|${fullName.trim()}|${locale}`).digest("hex");
+  const name = fullName.trim().replace(/\s+/g, " ");
+  return createHash("sha256").update(`${day}|${name}|${locale}`).digest("hex");
+}
+
+/** Removes the "(born YYYY-MM-DD)" / "(nacimiento YYYY-MM-DD)" header: the AI does not need the exact date. */
+function withoutBirthDate(description: string): string {
+  return description.replace(/\s*\((?:born|nacimiento)\s+\d{4}-\d{2}-\d{2}\)/i, "");
 }
 
 const SYSTEM_PROMPT: Record<Locale, string> = {
@@ -52,6 +62,7 @@ Estructura: cuatro partes, en este orden, separadas por una línea en blanco y s
 
 IMPORTANTE:
 - Nada de predicciones: no anuncies eventos, enfermedades, muertes, dinero ni relaciones que "llegarán".
+- La Muerte, la Torre, el Diablo o el signo Miquiztli hablan de transformación y finales necesarios, no de catástrofes literales.
 - No inventes datos que no estén en el mapa (ascendente, casas, hora de nacimiento) ni menciones años o fechas concretas.
 - Texto plano: sin Markdown, sin títulos, sin viñetas, sin negritas.
 - Entre 350 y 450 palabras.
@@ -78,6 +89,7 @@ Structure: four parts, in this order, separated by a blank line and without head
 
 IMPORTANT:
 - No predictions: don't announce events, illnesses, deaths, money or relationships that "will come".
+- Death, the Tower, the Devil or the Miquiztli day sign speak of transformation and necessary endings, not literal catastrophes.
 - Don't invent data that isn't in the map (rising sign, houses, birth time) and don't mention specific years or dates.
 - Plain text: no Markdown, no headings, no bullet points, no bold.
 - Between 350 and 450 words.
@@ -98,7 +110,7 @@ export function buildBlueprintSynthesisPrompt(
 
   return {
     system: SYSTEM_PROMPT[locale],
-    user: `${nameLine}${describeBlueprintForAI(bp, locale)}\n\n${ask}`,
+    user: `${nameLine}${withoutBirthDate(describeBlueprintForAI(bp, locale))}\n\n${ask}`,
   };
 }
 

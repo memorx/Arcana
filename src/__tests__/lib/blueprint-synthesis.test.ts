@@ -69,6 +69,26 @@ describe("buildBlueprintSynthesisPrompt", () => {
     }
   });
 
+  it("treats difficult cards and signs as transformation, not catastrophe", () => {
+    expect(buildBlueprintSynthesisPrompt(bp, "es").system).toContain(
+      "La Muerte, la Torre, el Diablo o el signo Miquiztli hablan de transformación y finales necesarios, no de catástrofes literales."
+    );
+    expect(buildBlueprintSynthesisPrompt(bp, "en").system).toContain(
+      "Death, the Tower, the Devil or the Miquiztli day sign speak of transformation and necessary endings, not literal catastrophes."
+    );
+  });
+
+  it("does not send the exact birth date", () => {
+    for (const locale of ["es", "en"] as const) {
+      const { system, user } = buildBlueprintSynthesisPrompt(bp, locale);
+      expect(user).not.toContain("1990-07-15");
+      expect(`${system}\n${user}`).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+      expect(user).not.toMatch(/\((?:born|nacimiento)/);
+    }
+    expect(buildBlueprintSynthesisPrompt(bp, "es").user).toContain("Mapa Arcano.");
+    expect(buildBlueprintSynthesisPrompt(bp, "en").user).toContain("Arcana Blueprint.");
+  });
+
   it("leaves the name line out when there is no name", () => {
     const anonymous = getArcanaBlueprint(birthDate, "   ", onDate);
     const { user } = buildBlueprintSynthesisPrompt(anonymous, "es");
@@ -94,6 +114,13 @@ describe("blueprintInputsHash", () => {
   it("is sha256 of YYYY-MM-DD|trimmed full name|locale", () => {
     const expected = createHash("sha256").update("1990-07-15|Ana López|es").digest("hex");
     expect(blueprintInputsHash(birthDate, "  Ana López ", "es")).toBe(expected);
+  });
+
+  it("collapses inner whitespace in the name, like getArcanaBlueprint", () => {
+    expect(blueprintInputsHash(birthDate, "  Ana \t  López ", "es")).toBe(
+      blueprintInputsHash(birthDate, "Ana López", "es")
+    );
+    expect(getArcanaBlueprint(birthDate, "  Ana \t  López ").fullName).toBe("Ana López");
   });
 
   it("changes with the date, the name or the locale", () => {

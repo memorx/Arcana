@@ -574,7 +574,7 @@
     "save": "Guardar Perfil",
     "saving": "Guardando...",
     "saved": "Perfil guardado!",
-    "continue": "Continuar a Suscripcion",
+    "continue": "Continuar a suscripción",
     "focusAreas": {
       "general": "Guia General",
       "love": "Amor y Relaciones",
@@ -870,14 +870,18 @@
         "unavailable": "No pudimos escribir tu síntesis en este momento. Inténtalo de nuevo en un rato.",
         "refused": "No pudimos escribir esta síntesis. Inténtalo más tarde.",
         "rateLimited": "Fueron muchos intentos seguidos. Espera un minuto y vuelve a intentarlo.",
+        "cooldown": "Tu síntesis se actualizó hace muy poco. Podrás generar una nueva en {minutes, plural, one {# minuto} other {# minutos}}.",
         "profile": "Primero necesitamos tu fecha de nacimiento. Completa tu perfil y regresa.",
         "generic": "Algo salió mal. Inténtalo de nuevo."
       }
     },
     "share": {
       "title": "Comparte tu mapa",
-      "note": "Quien tenga el enlace verá tu nombre de pila, tus cinco signos y tu síntesis.",
-      "create": "Crear enlace para compartir",
+      "intro": "Crea un enlace público de tu mapa para mandárselo a quien tú quieras.",
+      "start": "Compartir mi mapa",
+      "note": "Quien abra el enlace verá tu nombre de pila, tus cinco signos y tu síntesis. Con tus signos se puede calcular tu fecha de nacimiento.",
+      "create": "Crear enlace",
+      "cancel": "Cancelar",
       "linkLabel": "Enlace público de tu Mapa Arcano",
       "copy": "Copiar",
       "copied": "¡Copiado!",

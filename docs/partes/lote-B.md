@@ -56,14 +56,31 @@ Rama `capataz/lote-B` (worktree `C:/Users/guill/dev/arcana-lotes/lote-B`), base 
 
 ### PENDIENTES (decisión del dueño del producto)
 
-- **Privacidad de la tarjeta pública:** la página no muestra la fecha de nacimiento, pero las cinco insignias juntas casi la delatan (el zodiaco chino con elemento da el año dentro de un ciclo de 60, el signo occidental da un rango de ~30 días y el tonalli fija un día dentro de un ciclo de 260: en ese rango sólo cabe uno). El aviso al compartir dice "verá tu nombre de pila, tus cinco signos y tu síntesis". Decidir si basta o si la versión pública debe omitir el tonalli o el año chino.
+- **Privacidad de la tarjeta pública:** la página no muestra la fecha de nacimiento, pero las cinco insignias juntas la delatan (el zodiaco chino con elemento da el año dentro de un ciclo de 60, el signo occidental da un rango de ~30 días y el tonalli fija un día dentro de un ciclo de 260: en ese rango sólo cabe uno). Para esta ronda Fable decidió conservar las cinco insignias, con un aviso explícito y un paso de confirmación (C1). Queda para Memo la versión más estricta: omitir en la página pública el tonalli o el año chino.
 - **¿Renovar la síntesis cada año o en cada cumpleaños?** Hoy se genera una vez por combinación de fecha/nombre/idioma y vive para siempre. Si se quiere una por año, habría que meter el año en el hash (cambio de contrato de §4.6) o invalidar por `updatedAt`.
 - **Costo:** la síntesis es gratis (decisión provisional de §7) y usa el modelo `synthesis` con effort `medium`; el caché por hash y el rate limit limitan el gasto a una llamada por cambio de perfil.
 - **Textos de la página y del prompt** (es/en) a revisión de Memo, sobre todo "Generar mi síntesis", el aviso de compartir y la regla de 350–450 palabras.
 
+### Correcciones de revisión (commit `fix(blueprint): apply review corrections (F-30..F-35)`)
+
+Todas dentro del alcance del lote (más la llave `profile.continue`, autorizada en N4).
+
+- **C1 Privacidad (decisión de Fable para esta ronda).** Se conservan las cinco insignias públicas y el aviso ahora es honesto: «Quien abra el enlace verá tu nombre de pila, tus cinco signos y tu síntesis. Con tus signos se puede calcular tu fecha de nacimiento.» / «Anyone with the link will see your first name, your five signs and your synthesis. Your birth date can be worked out from your signs.» (`blueprint.share.note`). Compartir pide confirmación: "Compartir mi mapa" (`share.start`) abre un paso con el aviso visible, que nombra el grupo y recibe el foco, y los botones "Crear enlace" (`share.create`) y "Cancelar" (`share.cancel`). Mientras el enlace existe, el aviso sigue visible junto al enlace. Llaves nuevas: `share.intro`, `share.start`, `share.cancel`; `share.create` pasa a "Crear enlace" / "Create link". La versión más estricta (omitir tonalli o año chino en público) sigue en PENDIENTES para Memo.
+- **C2** `SynthesisPanel` monta `<BlueprintShare initialShareId={shareId} canCreate={Boolean(synthesis)} />` cuando `synthesis || shareId`, fuera de la rama de la síntesis: con la síntesis vieja se puede copiar o revocar un enlace existente, pero no crear uno nuevo (`canCreate`; sin enlace ni síntesis vigente no se pinta nada). Test: con `isStale` e `initialShareId="abc"` se ve "Dejar de compartir", el DELETE funciona y no aparece "Compartir mi mapa".
+- **C3** `src/__tests__/app/share-blueprint.test.tsx` (7): id inexistente → `notFound()`; cinco ids con formato inválido → `notFound()` sin consultar la base; dueño sin perfil → `notFound()`; el HTML no contiene apellido ni segundo nombre, año, fecha ISO, día ni mes (los números se revisan nodo de texto por nodo de texto); una síntesis con hash que no coincide no se muestra (sí las insignias); `generateMetadata` con `robots.index === false` (también para un id inexistente), nombre de pila en el título y sin fecha ni apellido en la descripción.
+- **N1 Costo.** `POST /api/blueprint/synthesis`: si hay `ArcanaProfile` con hash distinto y `updatedAt` de hace menos de 10 minutos → `429 { error: "synthesis_cooldown", retryAfterSeconds }` con cabecera `Retry-After`, sin llamar a la IA. La caché del hash vigente no se ve afectada. La UI muestra `synthesis.errors.cooldown` («Tu síntesis se actualizó hace muy poco. Podrás generar una nueva en N minutos», con plural ICU). Tests: 429 con `retryAfterSeconds` entre 471 y 480 a los 2 minutos y sin IA ni upsert; a los 11 minutos regenera; la síntesis vigente se sigue leyendo aunque sea reciente; la UI muestra el mensaje propio y no el de "muchos intentos". Nota: `@updatedAt` también cambia al crear o quitar el enlace (`updateMany` sobre `shareId`), así que esas acciones también reinician los 10 minutos. Es raro (requiere cambiar el perfil y compartir en esa ventana) y no lo separé porque haría falta otra columna (esquema fuera del lote).
+- **N2** Regla agregada al system prompt: «La Muerte, la Torre, el Diablo o el signo Miquiztli hablan de transformación y finales necesarios, no de catástrofes literales.» / «Death, the Tower, the Devil or the Miquiztli day sign speak of transformation and necessary endings, not literal catastrophes.» Test en es y en.
+- **N3** `buildBlueprintSynthesisPrompt` quita la cabecera `(born YYYY-MM-DD)` / `(nacimiento YYYY-MM-DD)` de `describeBlueprintForAI` antes de mandarla (queda "Mapa Arcano." / "Arcana Blueprint."). Test: ni el system ni el user contienen una fecha ISO, en los dos idiomas.
+- **N4** `messages/es.json` `profile.continue` → «Continuar a suscripción».
+- **N5** `SynthesisPanel`: un `<p role="status" className="sr-only">` fijo, siempre en el DOM, que recibe `loadingSr` al empezar la carga y se vacía al terminar. Se quitó el `role="status"` del contenedor de carga. Test: la región existe vacía antes del clic, es el mismo nodo durante la carga y se vacía con el error.
+- **N6** `BlueprintShare`: `aria-label={copied ? t("copied") : t("copyAria")}`. Test: el nombre accesible pasa de "Copiar enlace" a "¡Copiado!".
+- **N7** `blueprint.test.ts`: `expect(upsert.mock.calls[0][0].update).not.toHaveProperty("shareId")` (regenerar conserva el enlace).
+- **N8** `BlueprintWidget`: las consultas van en try/catch y, si fallan (o si el cálculo del mapa lanza), el widget devuelve `null` y registra el error. Test nuevo `src/__tests__/components/blueprint-widget.test.tsx` (3): base caída → `null`; sin perfil → enlace al setup; con perfil → insignias, "síntesis lista" y enlace a `/blueprint`.
+- **N9** `blueprintInputsHash` normaliza el nombre con `.trim().replace(/\s+/g, " ")`, igual que `getArcanaBlueprint`. Test: "  Ana \t  López " y "Ana López" dan el mismo hash. En producción no hay filas `ArcanaProfile` todavía (la función es nueva), así que el cambio no invalida nada.
+
 ### Comandos corridos al final y su resultado (jest / tsc / lint / build)
 
-Corridos en el worktree sobre `dfdfa5f` (el código final; después sólo se commiteó este parte).
+Primera entrega, corridos sobre `dfdfa5f` (las cifras de después de la revisión están en la tabla «Después de la revisión», más abajo).
 
 | Comando | Resultado |
 |---|---|
@@ -86,6 +103,19 @@ Primera carga de JS medida en el build (Decisiones 10 y 13):
 
 No verificado en navegador: no corrí `npm run dev` (el `.env` apunta a producción). La revisión visual a 360 px y con movimiento reducido queda para el preview de Vercel (Fase 4).
 
+**Después de la revisión** (corridos en el worktree con las correcciones C1–C3 y N1–N9, antes del commit `fix(blueprint): apply review corrections`):
+
+| Comando | Resultado |
+|---|---|
+| Suites del lote (6): `api/blueprint` (23), `lib/blueprint-synthesis` (13), `components/blueprint` (21), `components/profile-setup` (4), `components/blueprint-widget` (3), `app/share-blueprint` (7) | **71/71 verdes** |
+| `npx jest` (toda la suite) | **44 suites, 643/643 verdes** |
+| `npx tsc --noEmit` | **exit 0, 0 errores** |
+| `npm run lint` | **exit 0: 0 errores, 23 avisos** (los mismos de la línea base) |
+| `npm run build` | **exit 0**, 55/55 páginas. Se corrió porque cambiaron una ruta de API y la página pública. `/blueprint` 3.5 kB · 144 kB; `/share/blueprint/[shareId]` 249 B · 141 kB; `/profile/setup` 7.16 kB · 147 kB |
+| Paridad `messages` | **697 llaves en cada uno, 0 de un solo lado**; `blueprint` con 113 llaves, último namespace en ambos; `profile.continue` = «Continuar a suscripción» |
+
+Nota de la corrección: las dos suites nuevas que importan la página pública y el widget mockean `@/lib/ai/config`, porque el SDK de Anthropic necesita `TextEncoder`, que jsdom no trae (lo arrastra `blueprint-synthesis.ts` por el hash; en el servidor no es problema).
+
 ### Rutas y componentes exportados
 
 | Tipo | Nombre | Firma / props |
@@ -93,12 +123,12 @@ No verificado en navegador: no corrí `npm run dev` (el `.env` apunta a producci
 | Página privada | `/blueprint` | server; `redirect("/login?callbackUrl=/blueprint")` sin sesión |
 | Página pública | `/share/blueprint/[shareId]` | server; `robots: { index: false }`; `notFound()` |
 | API | `GET /api/blueprint` | → `{ blueprint, synthesis: string \| null, shareId: string \| null }`; 401, 404 `profile_required`, 429 |
-| API | `POST /api/blueprint/synthesis` | → `{ synthesis, shareId, cached }`; 401, 404, 422 `synthesis_refused`, 429, 503 `synthesis_unavailable` + `retry: true`; `maxDuration = 60` |
+| API | `POST /api/blueprint/synthesis` | → `{ synthesis, shareId, cached }`; 401, 404, 422 `synthesis_refused`, 429 (rate limit) y 429 `synthesis_cooldown` + `retryAfterSeconds`, 503 `synthesis_unavailable` + `retry: true`; `maxDuration = 60` |
 | API | `POST /api/blueprint/share` | → `{ shareId, sharePath }`; 401, 409 `synthesis_required`, 429 |
 | API | `DELETE /api/blueprint/share` | → `{ shareId: null }`; 401, 429 |
 | Widget | `BlueprintWidget` (`@/components/dashboard/BlueprintWidget`) | `({ userId: string })`, server, async |
 | Componente | `SynthesisPanel` (client) | `{ initialSynthesis: string \| null; isStale: boolean; initialShareId: string \| null; synthesisLocale: "en" \| "es"; uiLocale: "en" \| "es" }` |
-| Componente | `BlueprintShare` (client) | `{ initialShareId: string \| null }` |
+| Componente | `BlueprintShare` (client) | `{ initialShareId: string \| null; canCreate?: boolean /* default true */ }` |
 | Componente | `SystemCard` | `{ symbol: string; symbolIsText?; eyebrow: string; title: string; subtitle?; traits?: string[]; description?; details?: { label; value }[]; footnote?; accent?: "amber" \| "purple" \| "emerald"; className?; children? }` |
 | Componente | `BlueprintBadges` | `{ badges: BlueprintBadge[]; label: string; size?: "sm" \| "md"; className? }` |
 | Componente | `BlueprintConstellation` | `{ badges: BlueprintBadge[]; center: string; className? }` (decorativo) |
@@ -118,6 +148,7 @@ Llaves nuevas: namespace `blueprint` al final de `messages/en.json` y `messages/
 | F-32, F-33 (+ `messages`, tests) | `d103479` | feat(blueprint): arcana map page, synthesis panel and public share page (F-32, F-33) |
 | F-34 (+ test del perfil) | `c0ad613` | feat(blueprint): dashboard widget, profile next steps and UTC sign preview (F-34) |
 | F-32, F-33, F-34 | `dfdfa5f` | perf(blueprint): CSS reveal instead of framer-motion and lean client bundles (F-32, F-33, F-34) |
-| F-35 | (este) | docs(partes): Lote B report (F-30..F-35) |
+| F-35 | `84342aa` | docs(partes): Lote B report (F-30..F-35) |
+| Revisión (C1–C3, N1–N9) | (el que contiene este texto) | fix(blueprint): apply review corrections (F-30..F-35) |
 
 `npm-ci.log` (de la preparación del worktree) quedó sin commitear a propósito.

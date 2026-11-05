@@ -6,7 +6,7 @@ import { Button, Card, CardContent } from "@/components/ui";
 import { BlueprintShare } from "./BlueprintShare";
 import { SynthesisText } from "./SynthesisText";
 
-type ErrorKind = "unavailable" | "refused" | "rateLimited" | "profile" | "generic";
+type ErrorKind = "unavailable" | "refused" | "rateLimited" | "cooldown" | "profile" | "generic";
 
 const LOADING_STEPS = ["western", "chinese", "tonalli", "numerology", "cards", "writing"] as const;
 const LOADING_GLYPHS = ["☉", "☯", "◈", "✧", "✦"];
@@ -48,6 +48,7 @@ export function SynthesisPanel({
   const [stale, setStale] = useState(isStale && !initialSynthesis);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ErrorKind | null>(null);
+  const [cooldownMinutes, setCooldownMinutes] = useState(1);
   const [step, setStep] = useState(0);
   const [shareId, setShareId] = useState<string | null>(initialShareId);
   const [justGenerated, setJustGenerated] = useState(false);
@@ -78,6 +79,11 @@ export function SynthesisPanel({
         setShareId(typeof data.shareId === "string" ? data.shareId : null);
         setStale(false);
         setJustGenerated(true);
+        return;
+      }
+      if (res.status === 429 && data.error === "synthesis_cooldown") {
+        setCooldownMinutes(Math.max(1, Math.ceil(Number(data.retryAfterSeconds) / 60) || 1));
+        setError("cooldown");
         return;
       }
       setError(errorKind(res.status));
@@ -111,6 +117,10 @@ export function SynthesisPanel({
           </h2>
         </div>
         <p className="mt-1 text-sm text-slate-400">{t("subtitle")}</p>
+        {/* Always in the DOM so screen readers announce the text when loading starts */}
+        <p role="status" className="sr-only">
+          {loading ? t("loadingSr") : ""}
+        </p>
 
         {synthesis ? (
           <>
@@ -123,10 +133,9 @@ export function SynthesisPanel({
               </p>
             )}
             <p className="mt-4 text-xs text-slate-500">{t("disclaimer")}</p>
-            <BlueprintShare initialShareId={shareId} />
           </>
         ) : loading ? (
-          <div role="status" className="mt-6 flex flex-col items-center py-8 text-center">
+          <div className="mt-6 flex flex-col items-center py-8 text-center">
             <div aria-hidden="true" className="relative h-28 w-28">
               <div className="absolute inset-0 rounded-full border border-slate-700/80" />
               <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-400/80 motion-safe:animate-spin" />
@@ -148,7 +157,6 @@ export function SynthesisPanel({
               })}
               <span className="absolute inset-0 flex items-center justify-center text-2xl text-amber-300">✦</span>
             </div>
-            <p className="sr-only">{t("loadingSr")}</p>
             <p aria-hidden="true" className="mt-8 font-medium text-slate-200">
               {t(`loading.${LOADING_STEPS[step]}`)}
             </p>
@@ -165,7 +173,9 @@ export function SynthesisPanel({
             )}
             {error && (
               <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
-                {t(`errors.${error}`)}
+                {error === "cooldown"
+                  ? t("errors.cooldown", { minutes: cooldownMinutes })
+                  : t(`errors.${error}`)}
               </p>
             )}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -176,6 +186,9 @@ export function SynthesisPanel({
             </div>
           </div>
         )}
+
+        {/* Outside the synthesis branch: an existing link can be revoked even if the synthesis is out of date */}
+        {(synthesis || shareId) && <BlueprintShare initialShareId={shareId} canCreate={Boolean(synthesis)} />}
       </CardContent>
     </Card>
   );
