@@ -23,10 +23,18 @@ jest.mock("@/lib/email", () => ({
   sendDailyReadingEmail: jest.fn(),
 }));
 
+// Real isBirthdayToday; the gift itself is tested in src/__tests__/lib/birthday.test.ts
+jest.mock("@/lib/birthday", () => ({
+  ...jest.requireActual("@/lib/birthday"),
+  claimBirthdayGift: jest.fn(),
+}));
+
 import { GET } from "@/app/api/cron/daily-readings/route";
 import { prisma } from "@/lib/prisma";
 import { generateDailyInterpretation } from "@/lib/anthropic";
 import { sendDailyReadingEmail } from "@/lib/email";
+import { claimBirthdayGift } from "@/lib/birthday";
+import { describeDayEnergies, getDayEnergies } from "@/lib/systems";
 
 const mockPrisma = prisma as unknown as {
   subscription: { findMany: jest.Mock };
@@ -35,6 +43,7 @@ const mockPrisma = prisma as unknown as {
 };
 const mockGenerate = generateDailyInterpretation as jest.Mock;
 const mockSendEmail = sendDailyReadingEmail as jest.Mock;
+const mockClaimGift = claimBirthdayGift as jest.Mock;
 
 const SECRET = "cron-test-secret";
 
@@ -177,5 +186,111 @@ describe("GET /api/cron/daily-readings", () => {
     expect(response.status).toBe(200);
     expect(body).toMatchObject({ sent: 0, errors: 1 });
     expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  describe("day energies and birthday (F-42, F-43)", () => {
+    // 2026-11-04 08:00 UTC: 13 Miquiztli in the tonalpohualli
+    const NOW = new Date("2026-11-04T08:00:00.000Z");
+    const TODAY = new Date(Date.UTC(2026, 10, 4));
+
+    const withProfile = (profile: Record<string, unknown>) => ({
+      ...subscriber,
+      user: { ...subscriber.user, profile: { ...subscriber.user.profile, ...profile } },
+    });
+
+    beforeEach(() => {
+      jest.useFakeTimers({ now: NOW, doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] });
+      mockClaimGift.mockResolvedValue({ granted: true, credits: 3, isBirthday: true });
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("passes today's energies, with the personal day, to the AI and the email", async () => {
+      const birthDate = new Date(Date.UTC(1990, 6, 15));
+      mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ birthDate })]);
+      const expected = describeDayEnergies(getDayEnergies(TODAY, birthDate), "es");
+
+      const response = await GET(request());
+
+      expect(await response.json()).toMatchObject({ sent: 1, errors: 0 });
+      expect(expected).toContain("13 Miquiztli");
+      expect(expected).toContain("Día personal");
+      expect(mockGenerate).toHaveBeenCalledWith(expect.objectContaining({ dayContext: expected }));
+      expect(mockSendEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ dayContext: expected, isBirthday: false, birthdayGiftCredits: undefined })
+      );
+      expect(mockClaimGift).not.toHaveBeenCalled();
+    });
+
+    it("writes the energies in the profile's language", async () => {
+      const birthDate = new Date(Date.UTC(1990, 6, 15));
+      mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ birthDate, locale: "en" })]);
+
+      await GET(request());
+
+      const { dayContext } = mockGenerate.mock.calls[0][0];
+      expect(dayContext).toBe(describeDayEnergies(getDayEnergies(TODAY, birthDate), "en"));
+      expect(dayContext).toContain("Personal day");
+    });
+
+    it("leaves the personal day out without a birth date", async () => {
+      await GET(request());
+
+      const { dayContext } = mockGenerate.mock.calls[0][0];
+      expect(dayContext).toBe(describeDayEnergies(getDayEnergies(TODAY, null), "es"));
+      expect(dayContext).not.toContain("Día personal");
+    });
+
+    it("claims the birthday gift and greets in the email on the birthday", async () => {
+      const birthDate = new Date(Date.UTC(1990, 10, 4));
+      mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ birthDate })]);
+
+      const response = await GET(request());
+
+      expect(await response.json()).toMatchObject({ sent: 1, errors: 0 });
+      expect(mockClaimGift).toHaveBeenCalledTimes(1);
+      expect(mockClaimGift).toHaveBeenCalledWith("user-1", { birthDate, today: TODAY });
+      expect(mockSendEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ isBirthday: true, birthdayGiftCredits: 3 })
+      );
+    });
+
+    it("still says happy birthday when the gift was already claimed today", async () => {
+      const birthDate = new Date(Date.UTC(1990, 10, 4));
+      mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ birthDate })]);
+      mockClaimGift.mockResolvedValue({ granted: false, credits: 3, isBirthday: true });
+
+      await GET(request());
+
+      expect(mockSendEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ isBirthday: true, birthdayGiftCredits: 3 })
+      );
+    });
+
+    it("sends the card even if the gift fails, without promising credits", async () => {
+      const birthDate = new Date(Date.UTC(1990, 10, 4));
+      mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ birthDate })]);
+      mockClaimGift.mockRejectedValue(new Error("db down"));
+
+      const response = await GET(request());
+
+      expect(await response.json()).toMatchObject({ sent: 1, errors: 0 });
+      expect(mockSendEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ isBirthday: true, birthdayGiftCredits: undefined })
+      );
+    });
+
+    it("doesn't claim the gift again when today's card was already sent", async () => {
+      const birthDate = new Date(Date.UTC(1990, 10, 4));
+      mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ birthDate })]);
+      mockPrisma.dailyReading.findUnique.mockResolvedValue({ id: "daily-1", sentAt: new Date() });
+
+      await GET(request());
+
+      expect(mockClaimGift).not.toHaveBeenCalled();
+      expect(mockSendEmail).not.toHaveBeenCalled();
+    });
   });
 });

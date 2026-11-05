@@ -3,6 +3,18 @@ import { prisma } from "@/lib/prisma";
 import { generateDailyInterpretation } from "@/lib/anthropic";
 import { sendDailyReadingEmail } from "@/lib/email";
 import { verifyCronRequest } from "@/lib/cron-auth";
+import { claimBirthdayGift, isBirthdayToday } from "@/lib/birthday";
+import { describeDayEnergies, getDayEnergies } from "@/lib/systems";
+
+/** Day energies as plain text for the prompt and the email; never blocks the card. */
+function buildDayContext(today: Date, birthDate: Date | null | undefined, locale: string) {
+  try {
+    return describeDayEnergies(getDayEnergies(today, birthDate), locale === "en" ? "en" : "es");
+  } catch (error) {
+    console.error("[CRON] Could not compute the day energies:", error);
+    return undefined;
+  }
+}
 
 // Vercel Cron runs this every hour at minute 0
 // We'll process users whose emailTime matches the current hour
@@ -117,6 +129,21 @@ export async function GET(req: NextRequest) {
         // Determine user's preferred locale (default to Spanish)
         const locale = profile.locale || "es";
 
+        // Tonalli, moon and personal day, woven into the card and the email
+        const dayContext = buildDayContext(today, profile.birthDate, locale);
+
+        // Birthday gift (idempotent; the dashboard banner may have claimed it already)
+        const isBirthday = isBirthdayToday(profile.birthDate, today);
+        let birthdayGiftCredits: number | undefined;
+        if (isBirthday) {
+          try {
+            const gift = await claimBirthdayGift(user.id, { birthDate: profile.birthDate, today });
+            birthdayGiftCredits = gift.credits;
+          } catch (error) {
+            console.error(`[CRON] Could not claim the birthday gift for ${user.id}:`, error);
+          }
+        }
+
         // Generate interpretation
         const interpretation = await generateDailyInterpretation({
           cardName: selectedCard.name,
@@ -126,10 +153,11 @@ export async function GET(req: NextRequest) {
           focusArea: profile.focusArea,
           userName: profile.fullName.split(" ")[0], // First name only
           locale,
+          dayContext,
         });
 
         // Create or update daily reading
-        const dailyReading = await prisma.dailyReading.upsert({
+        await prisma.dailyReading.upsert({
           where: {
             userId_date: {
               userId: user.id,
@@ -175,6 +203,9 @@ export async function GET(req: NextRequest) {
           locale,
           zodiacSign: profile.zodiacSign,
           keywords: selectedCard.keywords,
+          dayContext,
+          isBirthday,
+          birthdayGiftCredits,
         });
 
         console.log(`[CRON] Sent daily reading to ${user.email}`);
