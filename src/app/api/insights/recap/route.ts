@@ -27,7 +27,8 @@ function serialize(recap: MonthlyRecap) {
  * POST /api/insights/recap  { year, month, locale? }  →  { recap, cached }
  * "Tu mes en cartas". Free. Needs at least 3 readings that month. A saved
  * recap is returned as is unless the month has readings it didn't cover
- * (a recap written on the 5th gets rewritten once the month has more).
+ * (a recap written on the 5th gets rewritten once the month has more) or it
+ * is asked for in another language.
  */
 export async function POST(req: NextRequest) {
   const { success, resetIn } = rateLimit(req, 3, 60000);
@@ -89,8 +90,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // No new readings since the last recap (any month): nothing new to say, no AI call.
-    if (existing && existing.readingCount >= readings.length) {
+    // Same language and no new readings since the last recap (any month): nothing
+    // new to say, no AI call. Asked for in another language, it's written again.
+    if (existing && existing.locale === locale && existing.readingCount >= readings.length) {
       return NextResponse.json({ recap: serialize(existing), cached: true });
     }
 

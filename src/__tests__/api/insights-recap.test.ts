@@ -167,6 +167,26 @@ describe("POST /api/insights/recap (F-53)", () => {
     expect(data.recap.readingCount).toBe(12);
   });
 
+  it("rewrites a saved recap when it's asked for in another language", async () => {
+    // Saved in Spanish, same readings, now asked for in English
+    findRecap.mockResolvedValue(storedRecap({ locale: "es", readingCount: 3 }));
+    mockComplete.mockResolvedValue("This month your cards spoke of letting go.");
+
+    const response = await call({ ...previous, locale: "en" });
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.cached).toBe(false);
+    expect(mockComplete).toHaveBeenCalledTimes(1);
+    expect(mockComplete.mock.calls[0][0].user).toContain("Past: The Tower (reversed)");
+    expect(upsertRecap.mock.calls[0][0].update).toEqual({
+      locale: "en",
+      content: "This month your cards spoke of letting go.",
+      readingCount: 3,
+    });
+    expect(data.recap).toMatchObject({ locale: "en", content: "This month your cards spoke of letting go." });
+  });
+
   it("returns 400 with fewer than 3 readings in the month, without calling the AI", async () => {
     findReadings.mockResolvedValue(threeReadings.slice(0, 2));
 
