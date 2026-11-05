@@ -2,16 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateDailyInterpretation } from "@/lib/anthropic";
 import { sendDailyReadingEmail } from "@/lib/email";
+import { verifyCronRequest } from "@/lib/cron-auth";
 
 // Vercel Cron runs this every hour at minute 0
 // We'll process users whose emailTime matches the current hour
 
+// One AI call per subscriber in this slot.
+export const maxDuration = 60;
+
 export async function GET(req: NextRequest) {
   // Verify cron secret to prevent unauthorized access
-  const authHeader = req.headers.get("authorization");
-  console.log(`[CRON] Auth header present: ${!!authHeader}`);
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  console.log(`[CRON] Auth header present: ${!!req.headers.get("authorization")}`);
+  const unauthorized = verifyCronRequest(req);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   const now = new Date();
