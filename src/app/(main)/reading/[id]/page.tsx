@@ -16,6 +16,7 @@ import {
 import { PersonalNotes } from "@/components/reading/PersonalNotes";
 import { FollowUpChat } from "@/components/reading/FollowUpChat";
 import { ReadAloud } from "@/components/reading/ReadAloud";
+import { ResonanceCheck } from "@/components/reading/ResonanceCheck";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -216,7 +217,14 @@ export default async function ReadingPage({ params }: PageProps) {
         </CardContent>
       </Card>
 
-      {/* F-83 (integrator): mount ResonanceCheck (Lote D) here, between the interpretation and the notes */}
+      {/* How the reading resonated (asks after 24 h; shows the rating once given) */}
+      <ResonanceCheck
+        readingId={id}
+        createdAt={reading.createdAt.toISOString()}
+        resonance={reading.resonance}
+        resonanceNote={reading.resonanceNote}
+        locale={locale}
+      />
 
       {/* Personal Notes */}
       <PersonalNotes

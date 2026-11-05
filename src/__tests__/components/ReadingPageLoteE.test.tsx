@@ -34,7 +34,11 @@ const baseReading = {
   intention: "¿Qué necesito ver?",
   interpretation: "Primer párrafo.\nSegundo párrafo.",
   personalNotes: null,
-  createdAt: new Date("2026-11-05T12:00:00Z"),
+  // A fresh, unrated reading (what Prisma returns): ResonanceCheck (F-83) stays hidden for 24 h,
+  // so it never competes with these assertions whatever day the suite runs.
+  createdAt: new Date(),
+  resonance: null,
+  resonanceNote: null,
   cards: [{ position: 1, cardId: "major_16", isReversed: false }],
   spreadType: {
     name: "One Card",
@@ -127,5 +131,66 @@ describe("reading page additions from Lote E (F-66)", () => {
     const notes = screen.getByText("notes.title");
     const chat = screen.getByText("title");
     expect(notes.compareDocumentPosition(chat) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+describe("ResonanceCheck on the reading page (F-83)", () => {
+  beforeEach(() => {
+    Object.defineProperty(window, "speechSynthesis", {
+      value: {
+        speak: jest.fn(),
+        cancel: jest.fn(),
+        pause: jest.fn(),
+        resume: jest.fn(),
+        getVoices: jest.fn(() => []),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      },
+      configurable: true,
+      writable: true,
+    });
+    Object.defineProperty(window, "SpeechSynthesisUtterance", { value: function () {}, configurable: true, writable: true });
+  });
+
+  afterEach(() => {
+    delete (window as unknown as Record<string, unknown>).speechSynthesis;
+    delete (window as unknown as Record<string, unknown>).SpeechSynthesisUtterance;
+  });
+
+  it("shows a saved rating and its note between the interpretation and the personal notes", async () => {
+    mockPrisma.reading.findUnique.mockResolvedValue({
+      ...baseReading,
+      source: "app",
+      resonance: 4,
+      resonanceNote: "Se cumplió en el trabajo.",
+    });
+    mockPrisma.card.findMany.mockResolvedValue([]);
+    mockPrisma.readingFollowUp.findMany.mockResolvedValue([]);
+    mockPrisma.user.findUnique.mockResolvedValue({ credits: 0 });
+
+    render(await ReadingPage({ params: Promise.resolve({ id: "reading-1" }) }));
+
+    const note = screen.getByText(/Se cumplió en el trabajo\./);
+    expect(screen.getAllByText("result").length).toBeGreaterThan(0);
+    const interpretation = screen.getByText("reading.interpretation");
+    const notes = screen.getByText("notes.title");
+    expect(interpretation.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(note.compareDocumentPosition(notes) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("asks how it resonated when an unrated reading is older than 24 h", async () => {
+    mockPrisma.reading.findUnique.mockResolvedValue({
+      ...baseReading,
+      source: "app",
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    });
+    mockPrisma.card.findMany.mockResolvedValue([]);
+    mockPrisma.readingFollowUp.findMany.mockResolvedValue([]);
+    mockPrisma.user.findUnique.mockResolvedValue({ credits: 0 });
+
+    render(await ReadingPage({ params: Promise.resolve({ id: "reading-1" }) }));
+
+    expect(await screen.findByRole("group", { name: "starsGroup" })).toBeInTheDocument();
+    expect(screen.getByText("question")).toBeInTheDocument();
   });
 });
