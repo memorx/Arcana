@@ -17,14 +17,14 @@ export async function CollectivePulse() {
     return null;
   }
 
-  if (!pulse.enough || pulse.top.length === 0) return null;
+  if (!pulse.enough || pulse.cards.length === 0) return null;
 
   const t = await getTranslations("pulse");
   const locale = await getLocale();
   const cardName = (card: { name: string; nameEs: string }) =>
     locale === "en" ? card.name : card.nameEs;
 
-  const [first, ...rest] = pulse.top;
+  const [first, ...rest] = pulse.cards;
 
   return (
     <section aria-labelledby="collective-pulse-title" className="py-12 border-t border-slate-800/50">
@@ -61,16 +61,16 @@ export async function CollectivePulse() {
                 })}
               </h2>
 
-              <p className="text-slate-400 mt-2">{t("share", { percentage: first.percentage })}</p>
+              <p className="text-slate-400 mt-2">{t("share", { percentage: first.percent })}</p>
 
               {rest.length > 0 && (
                 <div className="mt-4">
                   <p className="text-sm text-slate-500 mb-2">{t("also")}</p>
                   <ul className="flex flex-wrap gap-2 justify-center sm:justify-start">
                     {rest.map((card) => (
-                      <li key={card.cardId}>
+                      <li key={card.name}>
                         <Badge variant="primary">
-                          {cardName(card)} · {card.percentage}%
+                          {cardName(card)} · {card.percent}%
                         </Badge>
                       </li>
                     ))}

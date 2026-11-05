@@ -2,6 +2,9 @@ import { getTranslations } from "next-intl/server";
 import { ArcanaCalendar } from "@/components/calendar/ArcanaCalendar";
 import { todayUtc } from "@/lib/systems";
 
+// "Today" is computed per request; never serve a cached day.
+export const dynamic = "force-dynamic";
+
 /**
  * Arcana Calendar: public. Guests see the tonalli and the moon of every day;
  * with a profile, the personal day too (loaded by the client from /api/calendar).

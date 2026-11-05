@@ -55,8 +55,8 @@ Rama `capataz/lote-C` (worktree `C:/Users/guill/dev/arcana-lotes/lote-C`), base 
 ### PENDIENTES (decisión del dueño del producto)
 
 - **Textos** para revisión de Memo: banner ("Te dejamos 3 créditos de regalo en tu cuenta. Que este año te traiga buenas preguntas."), asunto del correo de cumpleaños, pulso ("Hoy en Arcana salió más…", "Anónimo: sólo contamos cartas, nunca quién las sacó."), "Más que tarot".
-- **Quién recibe el regalo:** cualquiera con perfil que abra el dashboard en su cumpleaños (además de los suscriptores, por el cron). 3 créditos al año, según F-43. Confirmar.
-- **Umbral del pulso (5 lecturas):** con poco tráfico puede no mostrarse casi nunca; es una perilla (`PULSE_MIN_READINGS`).
+- **Quién recibe el regalo:** cualquiera con perfil y cuenta de al menos 30 días (regla de Fable en la revisión) que abra el dashboard en su cumpleaños, además de los suscriptores por el cron. 3 créditos al año. Confirmar.
+- **Umbral del pulso (5 personas distintas):** con poco tráfico puede no mostrarse casi nunca; es una perilla (`PULSE_MIN_PEOPLE`).
 - **"Hoy" en UTC:** para alguien en México el calendario, el saludo de cumpleaños y el pulso cambian de día a las 18:00. Usar el huso de la persona (ya hay `date-fns-tz`) sería una ronda aparte que toca también `daily-reading` y el cron.
 - Lo que heredo del Lote A: que alguien de la tradición revise los textos del tonalpohualli, ahora visibles en el calendario.
 
@@ -74,6 +74,32 @@ Corridos en el worktree sobre `48d8243` (la máquina estaba cargada con los otro
 | Mutaciones (los tests nuevos fallan sin el arreglo) | — | regalo sin la condición del año (`lt: year + 1`), cron sin `dayContext` y pulso sin umbral → **3 suites rojas, 6 tests rojos**; archivos restaurados desde copia y `git status` limpio |
 
 Suites nuevas: `src/__tests__/lib/{birthday,email,pulse}.test.ts`, `src/__tests__/api/{calendar,pulse}.test.ts`, `src/__tests__/components/{calendar-utils.test.ts,ArcanaCalendar.test.tsx,CollectivePulse.test.tsx,TodayEnergies.test.tsx,TodayEnergiesWidget.test.tsx,BirthdayBanner.test.tsx}`. Actualizada: `src/__tests__/api/cron-daily-readings.test.ts` (sólo casos y mocks añadidos).
+
+### Correcciones de revisión (commit `fix(calendar): apply review corrections (F-40..F-47)`)
+
+Todo dentro de los archivos del lote. Lo de arriba describe la entrega original; donde choca, manda esta sección.
+
+- **C1** `calendar.metaTitle` sin " | Arcana" en es/en (la plantilla `%s | Arcana` del layout raíz lo agrega). Test `src/__tests__/app/calendar-layout.test.ts` con los mensajes reales: título exacto en es y en, la marca aparece una sola vez con la plantilla, canonical `/calendar`.
+- **C2** `text-slate-500` → `text-slate-400` en las cabeceras de los días, la leyenda y la ayuda de teclado de `ArcanaCalendar.tsx`, y en los tres `dt` de `DayDetail.tsx`.
+- **N1** `claimBirthdayGift`: el `updateMany` exige además `createdAt: { lt: hoy − 30 días }` (`BIRTHDAY_GIFT_MIN_ACCOUNT_DAYS = 30`). Una cuenta nueva en su cumpleaños recibe `isBirthday: true`, `granted: false`, sin transacción. Para que el banner no le diga "tus créditos ya están en tu cuenta", el resultado agrega `alreadyGranted` (si `count === 0`, se lee `lastBirthdayGiftYear` dentro de la misma transacción): el banner muestra `granted`, `alreadyGranted` o, si no aplica, sólo el saludo (`birthday.greetingOnly`, llave nueva en en/es). Tests: cuenta de 5 días → `granted: false`, saldo intacto, sin `creditTransaction`; cuenta de 60 días → `granted: true` con su transacción; el `where` lleva la fecha límite; banner con saludo sin créditos.
+- **N2** Cron: `birthdayGiftCredits` sólo si `gift.granted`. Si el regalo ya se dio hoy desde el dashboard, o la cuenta es nueva, el correo felicita sin mencionar créditos (test actualizado con los dos casos).
+- **N4** Cron: `const locale = profile.locale === "en" ? "en" : "es"` una sola vez, para la IA, `describeDayEnergies` y el correo; en `sendDailyReadingEmail`, `isSpanish = locale !== "en"`. Tests: `"fr"`, `""` y `null` llegan como `"es"` a la IA y al correo con el contexto en español; el correo con `locale: "fr"` sale en español. Las otras dos plantillas de `email.ts` (restablecer contraseña, suscripción expirada) conservan su `locale === "es"`: no las llama el cron y cambiarlas mueve comportamiento fuera de la ficha.
+- **N5** Pulso: el umbral cuenta **personas distintas** (≥ 5) entre las cartas diarias de hoy y las tiradas de las últimas 24 h; se lee `userId` sólo para contarlas. Consultas: `dailyReading.findMany({ where: { date: today }, select: { userId, cardId } })` (sustituye al `groupBy`, que no da usuarios) y `reading.findMany({ …, select: { userId, cards } })`. Una persona cuyas tiradas tienen JSON roto no cuenta. La respuesta pública (lib, `/api/pulse` y lo que usa `CollectivePulse`) es sólo `{ enough, date, cards: [{ name, nameEs, imageUrl, percent }] }`: sin `totalReadings`, `count` ni `cardId`. Tests reescritos (4 personas con 8 lecturas → `enough: false`; 5 personas entre ambas fuentes → sí; llaves exactas de la salida).
+- **N6** Las etiquetas `aria-label` se arman en el mismo `useMemo` que las energías, con un solo `Intl.DateTimeFormat` por mes (`dayMonthFormatter` nuevo en `calendar-utils.ts`; `formatDayMonth` lo usa).
+- **N7** `export const dynamic = "force-dynamic"` en `src/app/(main)/calendar/page.tsx`.
+- **N8** `email.ts`: `escapeHtml` en el nombre del saludo, el nombre de la carta (preheader, `alt` y título), las palabras clave y la interpretación. La interpretación ya se mostraba con `white-space: pre-line` (no había `<br>`), así que sólo se escapa y los saltos de línea quedan igual. Test: nombre, carta, palabras clave e interpretación con `<…>` salen escapados y el salto de línea se conserva.
+- **N9** `pulse.moreThanTarot.blueprint.description`: "Cinco sistemas a partir de tu fecha de nacimiento y tu nombre…" / "Five systems from your birth date and your name…".
+- **N10** Tests nuevos: `src/__tests__/app/landing.test.tsx` (la sección "Más que tarot" enlaza exactamente `/blueprint`, `/calendar`, `/reading/manual`, `/compatibility`, en ese orden) y `src/__tests__/app/daily-page.test.tsx` (`/daily` monta `TodayEnergies` con `todayUtc()` y la fecha de nacimiento del perfil; `null` sin perfil).
+
+Resultado después de la revisión:
+
+| Comando | Resultado |
+|---|---|
+| Suites del lote + `cron-daily-readings.test.ts` (15 suites) | **15 verdes, 96 de 96 tests** |
+| `npx tsc --noEmit` | **0 errores** |
+| `npm run lint` | **exit 0: 0 errores, 21 avisos** (los mismos, todos fuera del lote) |
+| `npm run build` | **exit 0**: 52/52 páginas; `/`, `/calendar`, `/api/calendar`, `/api/pulse` dinámicas |
+| Paridad en/es | **639 llaves en cada uno**, 0 de un solo lado (nueva: `birthday.greetingOnly`) |
 
 ### Exports para el integrador (firmas exactas)
 
@@ -93,15 +119,15 @@ export type ProfileStatus = "loading" | "guest" | "no-profile" | "ready" | "erro
 export function DayDetail(props: { dayKey: string; birthDate: Date | null; profileStatus: ProfileStatus; locale: Locale; isToday: boolean }): JSX.Element;
 
 // src/lib/birthday.ts
-export const BIRTHDAY_GIFT_CREDITS: 3;
-export interface BirthdayGiftResult { granted: boolean; credits: 3; isBirthday: boolean }
+export const BIRTHDAY_GIFT_CREDITS: 3; export const BIRTHDAY_GIFT_MIN_ACCOUNT_DAYS: 30;
+export interface BirthdayGiftResult { granted: boolean; alreadyGranted: boolean; credits: 3; isBirthday: boolean }
 export function isBirthdayToday(birthDate: Date | null | undefined, today?: Date /* todayUtc() */): boolean;
 export async function claimBirthdayGift(userId: string, opts?: { birthDate?: Date | null; today?: Date }): Promise<BirthdayGiftResult>;
 
 // src/lib/pulse.ts
-export const PULSE_MIN_READINGS: 5; export const PULSE_TOP_CARDS: 3; export const PULSE_REVALIDATE_SECONDS: 600;
-export interface PulseCard { cardId: string; name: string; nameEs: string; imageUrl: string; count: number; percentage: number }
-export type CollectivePulse = { enough: false } | { enough: true; date: string; totalReadings: number; top: PulseCard[] };
+export const PULSE_MIN_PEOPLE: 5; export const PULSE_TOP_CARDS: 3; export const PULSE_REVALIDATE_SECONDS: 600;
+export interface PulseCard { name: string; nameEs: string; imageUrl: string; percent: number }   // sin ids ni conteos
+export type CollectivePulse = { enough: false } | { enough: true; date: string; cards: PulseCard[] };
 export async function computeCollectivePulse(today?: Date, now?: Date): Promise<CollectivePulse>;   // sin caché
 export function getCollectivePulse(today?: Date): Promise<CollectivePulse>;                         // unstable_cache 600 s
 

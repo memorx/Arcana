@@ -200,7 +200,7 @@ describe("GET /api/cron/daily-readings", () => {
 
     beforeEach(() => {
       jest.useFakeTimers({ now: NOW, doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] });
-      mockClaimGift.mockResolvedValue({ granted: true, credits: 3, isBirthday: true });
+      mockClaimGift.mockResolvedValue({ granted: true, alreadyGranted: false, credits: 3, isBirthday: true });
     });
 
     afterEach(() => {
@@ -257,17 +257,41 @@ describe("GET /api/cron/daily-readings", () => {
       );
     });
 
-    it("still says happy birthday when the gift was already claimed today", async () => {
+    it("says happy birthday without announcing credits this run didn't add", async () => {
       const birthDate = new Date(Date.UTC(1990, 10, 4));
       mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ birthDate })]);
-      mockClaimGift.mockResolvedValue({ granted: false, credits: 3, isBirthday: true });
 
+      // Already claimed today from the dashboard
+      mockClaimGift.mockResolvedValue({ granted: false, alreadyGranted: true, credits: 3, isBirthday: true });
       await GET(request());
+      expect(mockSendEmail).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isBirthday: true, birthdayGiftCredits: undefined })
+      );
 
-      expect(mockSendEmail).toHaveBeenCalledWith(
-        expect.objectContaining({ isBirthday: true, birthdayGiftCredits: 3 })
+      // Account too new for the gift
+      mockClaimGift.mockResolvedValue({ granted: false, alreadyGranted: false, credits: 3, isBirthday: true });
+      await GET(request());
+      expect(mockSendEmail).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isBirthday: true, birthdayGiftCredits: undefined })
       );
     });
+
+    it.each([["fr"], [""], [null]])(
+      "treats any language other than English (%p) as Spanish everywhere",
+      async (profileLocale) => {
+        mockPrisma.subscription.findMany.mockResolvedValue([withProfile({ locale: profileLocale })]);
+
+        await GET(request());
+
+        const expected = describeDayEnergies(getDayEnergies(TODAY, null), "es");
+        expect(mockGenerate).toHaveBeenCalledWith(
+          expect.objectContaining({ locale: "es", dayContext: expected })
+        );
+        expect(mockSendEmail).toHaveBeenCalledWith(
+          expect.objectContaining({ locale: "es", dayContext: expected })
+        );
+      }
+    );
 
     it("sends the card even if the gift fails, without promising credits", async () => {
       const birthDate = new Date(Date.UTC(1990, 10, 4));

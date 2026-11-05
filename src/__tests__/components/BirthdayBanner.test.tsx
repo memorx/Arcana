@@ -25,14 +25,14 @@ describe("BirthdayBanner", () => {
   });
 
   it("renders nothing the rest of the year", async () => {
-    mockClaim.mockResolvedValue({ granted: false, credits: 3, isBirthday: false });
+    mockClaim.mockResolvedValue({ granted: false, alreadyGranted: false, credits: 3, isBirthday: false });
 
     expect(await BirthdayBanner({ userId: "user-1" })).toBeNull();
     expect(mockClaim).toHaveBeenCalledWith("user-1");
   });
 
   it("greets and announces the gift when it was just granted", async () => {
-    mockClaim.mockResolvedValue({ granted: true, credits: 3, isBirthday: true });
+    mockClaim.mockResolvedValue({ granted: true, alreadyGranted: false, credits: 3, isBirthday: true });
 
     render((await BirthdayBanner({ userId: "user-1" }))!);
 
@@ -42,12 +42,22 @@ describe("BirthdayBanner", () => {
   });
 
   it("still greets on the birthday when the gift was already claimed", async () => {
-    mockClaim.mockResolvedValue({ granted: false, credits: 3, isBirthday: true });
+    mockClaim.mockResolvedValue({ granted: false, alreadyGranted: true, credits: 3, isBirthday: true });
 
     render((await BirthdayBanner({ userId: "user-1" }))!);
 
     expect(screen.getByText("alreadyGranted(3)")).toBeInTheDocument();
     expect(screen.queryByText("granted(3)")).not.toBeInTheDocument();
+  });
+
+  it("greets without mentioning credits when the account is too new for the gift", async () => {
+    mockClaim.mockResolvedValue({ granted: false, alreadyGranted: false, credits: 3, isBirthday: true });
+
+    render((await BirthdayBanner({ userId: "user-1" }))!);
+
+    expect(screen.getByRole("heading", { name: "title" })).toBeInTheDocument();
+    expect(screen.getByText("greetingOnly")).toBeInTheDocument();
+    expect(screen.queryByText(/granted/i)).not.toBeInTheDocument();
   });
 
   it("renders nothing if the gift can't be claimed", async () => {

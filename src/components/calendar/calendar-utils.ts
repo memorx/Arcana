@@ -109,7 +109,11 @@ export function weekBounds(key: string, weekStart: WeekStart): { start: string; 
   return { start: addDays(key, -offset), end: addDays(key, 6 - offset) };
 }
 
-const intlLocale = (locale: Locale) => (locale === "en" ? "en-US" : "es-MX");
+/** BCP 47 tag used for every date in the calendar. */
+export function intlLocaleFor(locale: Locale): string {
+  return locale === "en" ? "en-US" : "es-MX";
+}
+const intlLocale = intlLocaleFor;
 
 /** Weekday names in column order: `narrow` for small screens, `long` for screen readers. */
 export function weekdayNames(
@@ -134,13 +138,18 @@ export function formatMonthYear(year: number, month: number, locale: Locale): st
   }).format(new Date(Date.UTC(year, month, 1)));
 }
 
-/** "4 de noviembre" / "November 4". */
-export function formatDayMonth(key: string, locale: Locale): string {
+/** Formatter for "4 de noviembre" / "November 4"; create it once and reuse it. */
+export function dayMonthFormatter(locale: Locale): Intl.DateTimeFormat {
   return new Intl.DateTimeFormat(intlLocale(locale), {
     day: "numeric",
     month: "long",
     timeZone: "UTC",
-  }).format(fromDayKey(key));
+  });
+}
+
+/** "4 de noviembre" / "November 4". */
+export function formatDayMonth(key: string, locale: Locale): string {
+  return dayMonthFormatter(locale).format(fromDayKey(key));
 }
 
 /** "miércoles, 4 de noviembre de 2026" / "Wednesday, November 4, 2026". */

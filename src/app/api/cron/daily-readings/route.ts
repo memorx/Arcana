@@ -7,9 +7,9 @@ import { claimBirthdayGift, isBirthdayToday } from "@/lib/birthday";
 import { describeDayEnergies, getDayEnergies } from "@/lib/systems";
 
 /** Day energies as plain text for the prompt and the email; never blocks the card. */
-function buildDayContext(today: Date, birthDate: Date | null | undefined, locale: string) {
+function buildDayContext(today: Date, birthDate: Date | null | undefined, locale: "en" | "es") {
   try {
-    return describeDayEnergies(getDayEnergies(today, birthDate), locale === "en" ? "en" : "es");
+    return describeDayEnergies(getDayEnergies(today, birthDate), locale);
   } catch (error) {
     console.error("[CRON] Could not compute the day energies:", error);
     return undefined;
@@ -126,8 +126,9 @@ export async function GET(req: NextRequest) {
         // Determine if reversed (30% chance)
         const isReversed = Math.random() < 0.3;
 
-        // Determine user's preferred locale (default to Spanish)
-        const locale = profile.locale || "es";
+        // User's language, normalised once: anything that isn't "en" is Spanish
+        // (same value for the AI, the day energies and the email)
+        const locale = profile.locale === "en" ? "en" : "es";
 
         // Tonalli, moon and personal day, woven into the card and the email
         const dayContext = buildDayContext(today, profile.birthDate, locale);
@@ -138,7 +139,8 @@ export async function GET(req: NextRequest) {
         if (isBirthday) {
           try {
             const gift = await claimBirthdayGift(user.id, { birthDate: profile.birthDate, today });
-            birthdayGiftCredits = gift.credits;
+            // Only announce credits that this run actually added
+            if (gift.granted) birthdayGiftCredits = gift.credits;
           } catch (error) {
             console.error(`[CRON] Could not claim the birthday gift for ${user.id}:`, error);
           }

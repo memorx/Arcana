@@ -3,7 +3,7 @@
  */
 jest.mock("@/lib/prisma", () => ({
   prisma: {
-    dailyReading: { groupBy: jest.fn() },
+    dailyReading: { findMany: jest.fn() },
     reading: { findMany: jest.fn() },
     card: { findMany: jest.fn() },
   },
@@ -20,12 +20,12 @@ import { prisma } from "@/lib/prisma";
 import {
   computeCollectivePulse,
   getCollectivePulse,
-  PULSE_MIN_READINGS,
+  PULSE_MIN_PEOPLE,
   PULSE_REVALIDATE_SECONDS,
 } from "@/lib/pulse";
 
 const mockPrisma = prisma as unknown as {
-  dailyReading: { groupBy: jest.Mock };
+  dailyReading: { findMany: jest.Mock };
   reading: { findMany: jest.Mock };
   card: { findMany: jest.Mock };
 };
@@ -41,37 +41,55 @@ const CARDS = {
   fool: { id: "card-fool", name: "The Fool", nameEs: "El Loco", imageUrl: "/fool.jpg" },
 };
 
-const spread = (...ids: string[]) => ({
+const daily = (userId: string, cardId: string) => ({ userId, cardId });
+const spread = (userId: string, ...ids: string[]) => ({
+  userId,
   cards: ids.map((cardId, i) => ({ position: i + 1, cardId, isReversed: false, isGolden: false })),
+});
+const publicCard = (card: (typeof CARDS)[keyof typeof CARDS], percent: number) => ({
+  name: card.name,
+  nameEs: card.nameEs,
+  imageUrl: card.imageUrl,
+  percent,
 });
 
 describe("computeCollectivePulse", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([]);
+    mockPrisma.dailyReading.findMany.mockResolvedValue([]);
     mockPrisma.reading.findMany.mockResolvedValue([]);
     mockPrisma.card.findMany.mockImplementation(async ({ where }: { where: { id: { in: string[] } } }) =>
       Object.values(CARDS).filter((c) => where.id.in.includes(c.id))
     );
   });
 
-  it("queries today's daily cards and the spreads of the last 24 hours, counts only", async () => {
+  it("reads today's daily cards and the spreads of the last 24 hours", async () => {
     await computeCollectivePulse(TODAY, NOW);
 
-    expect(mockPrisma.dailyReading.groupBy).toHaveBeenCalledWith({
-      by: ["cardId"],
+    expect(mockPrisma.dailyReading.findMany).toHaveBeenCalledWith({
       where: { date: TODAY },
-      _count: true,
+      select: { userId: true, cardId: true },
     });
     expect(mockPrisma.reading.findMany).toHaveBeenCalledWith({
       where: { createdAt: { gte: new Date("2026-11-03T15:30:00.000Z") } },
-      select: { cards: true },
+      select: { userId: true, cards: true },
     });
   });
 
-  it(`says "not enough" below ${PULSE_MIN_READINGS} readings and doesn't look up cards`, async () => {
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([{ cardId: "card-sun", _count: 2 }]);
-    mockPrisma.reading.findMany.mockResolvedValue([spread("card-sun", "card-moon"), spread("card-star")]);
+  it(`needs ${PULSE_MIN_PEOPLE} different people, not ${PULSE_MIN_PEOPLE} readings`, async () => {
+    // 8 readings, but only 4 people
+    mockPrisma.dailyReading.findMany.mockResolvedValue([
+      daily("u1", "card-sun"),
+      daily("u2", "card-sun"),
+      daily("u3", "card-moon"),
+    ]);
+    mockPrisma.reading.findMany.mockResolvedValue([
+      spread("u1", "card-sun"),
+      spread("u1", "card-star"),
+      spread("u2", "card-moon"),
+      spread("u4", "card-fool"),
+      spread("u4", "card-sun"),
+    ]);
 
     const pulse = await computeCollectivePulse(TODAY, NOW);
 
@@ -79,42 +97,39 @@ describe("computeCollectivePulse", () => {
     expect(mockPrisma.card.findMany).not.toHaveBeenCalled();
   });
 
-  it("shows the pulse from exactly 5 readings", async () => {
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([{ cardId: "card-sun", _count: 3 }]);
-    mockPrisma.reading.findMany.mockResolvedValue([spread("card-sun", "card-moon"), spread("card-star")]);
+  it("counts people across both sources and shows the pulse from 5", async () => {
+    mockPrisma.dailyReading.findMany.mockResolvedValue([daily("u1", "card-sun"), daily("u2", "card-sun")]);
+    mockPrisma.reading.findMany.mockResolvedValue([
+      spread("u3", "card-moon"),
+      spread("u4", "card-star"),
+      spread("u5", "card-sun"),
+    ]);
 
     const pulse = await computeCollectivePulse(TODAY, NOW);
 
-    expect(pulse.enough).toBe(true);
-    if (!pulse.enough) return;
-    expect(pulse.totalReadings).toBe(5);
-    expect(pulse.date).toBe("2026-11-04");
+    expect(pulse).toMatchObject({ enough: true, date: "2026-11-04" });
   });
 
-  it("adds daily cards and spread cards, ranks the top 3 and computes the share of readings", async () => {
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([
-      { cardId: "card-moon", _count: 2 },
-      { cardId: "card-sun", _count: 1 },
+  it("ranks the top 3 and gives each one's share of the readings, without counts", async () => {
+    mockPrisma.dailyReading.findMany.mockResolvedValue([
+      daily("u1", "card-moon"),
+      daily("u2", "card-moon"),
+      daily("u3", "card-sun"),
     ]);
     mockPrisma.reading.findMany.mockResolvedValue([
-      spread("card-sun", "card-moon", "card-star"),
-      spread("card-sun", "card-fool"),
-      spread("card-sun"),
-      spread("card-star"),
+      spread("u4", "card-sun", "card-moon", "card-star"),
+      spread("u5", "card-sun", "card-fool"),
+      spread("u5", "card-sun"),
+      spread("u1", "card-star"),
     ]);
-    // sun: 1 daily + 3 spreads = 4 · moon: 2 + 1 = 3 · star: 2 · fool: 1 · total readings: 3 + 4 = 7
+    // sun: 1 daily + 3 spreads = 4 · moon: 2 + 1 = 3 · star: 2 · fool: 1 · 7 readings
 
     const pulse = await computeCollectivePulse(TODAY, NOW);
 
     expect(pulse).toEqual({
       enough: true,
       date: "2026-11-04",
-      totalReadings: 7,
-      top: [
-        { ...pick(CARDS.sun), count: 4, percentage: 57 },
-        { ...pick(CARDS.moon), count: 3, percentage: 43 },
-        { ...pick(CARDS.star), count: 2, percentage: 29 },
-      ],
+      cards: [publicCard(CARDS.sun, 57), publicCard(CARDS.moon, 43), publicCard(CARDS.star, 29)],
     });
     expect(mockPrisma.card.findMany).toHaveBeenCalledWith({
       where: { id: { in: ["card-sun", "card-moon", "card-star"] } },
@@ -122,68 +137,93 @@ describe("computeCollectivePulse", () => {
     });
   });
 
-  it("breaks ties by card id so the order is stable", async () => {
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([
-      { cardId: "card-star", _count: 2 },
-      { cardId: "card-fool", _count: 2 },
-      { cardId: "card-moon", _count: 2 },
-    ]);
-
-    const pulse = await computeCollectivePulse(TODAY, NOW);
-
-    expect(pulse.enough && pulse.top.map((c) => c.cardId)).toEqual(["card-fool", "card-moon", "card-star"]);
-  });
-
-  it("counts a card once per reading and skips malformed card JSON", async () => {
-    mockPrisma.reading.findMany.mockResolvedValue([
-      spread("card-sun", "card-sun"),
-      { cards: null },
-      { cards: "not an array" },
-      { cards: [{ position: 1 }, null, { cardId: 42 }] },
-      spread("card-moon"),
-      spread("card-moon"),
-      spread("card-moon"),
-      spread("card-star"),
-    ]);
+  it("returns no ids, counts, totals or anything about who read", async () => {
+    mockPrisma.dailyReading.findMany.mockResolvedValue(
+      ["u1", "u2", "u3", "u4", "u5"].map((u) => daily(u, "card-sun"))
+    );
 
     const pulse = await computeCollectivePulse(TODAY, NOW);
 
     expect(pulse.enough).toBe(true);
     if (!pulse.enough) return;
-    // Only the 5 readings with valid cards count
-    expect(pulse.totalReadings).toBe(5);
-    // The repeated Sun counts once: it ties with the Star and goes after it
-    expect(pulse.top.map((c) => [c.cardId, c.count, c.percentage])).toEqual([
-      ["card-moon", 3, 60],
-      ["card-star", 1, 20],
-      ["card-sun", 1, 20],
+    expect(Object.keys(pulse).sort()).toEqual(["cards", "date", "enough"]);
+    expect(Object.keys(pulse.cards[0]).sort()).toEqual(["imageUrl", "name", "nameEs", "percent"]);
+    expect(JSON.stringify(pulse)).not.toMatch(/user|u1|count|total|card-sun/i);
+  });
+
+  it("breaks ties by card id so the order is stable", async () => {
+    mockPrisma.dailyReading.findMany.mockResolvedValue([
+      daily("u1", "card-star"),
+      daily("u2", "card-fool"),
+      daily("u3", "card-moon"),
+      daily("u4", "card-star"),
+      daily("u5", "card-fool"),
+      daily("u6", "card-moon"),
     ]);
+
+    const pulse = await computeCollectivePulse(TODAY, NOW);
+
+    expect(pulse.enough && pulse.cards.map((c) => c.name)).toEqual(["The Fool", "The Moon", "The Star"]);
+  });
+
+  it("counts a card once per reading and skips readings with malformed card JSON", async () => {
+    mockPrisma.reading.findMany.mockResolvedValue([
+      spread("u1", "card-sun", "card-sun"),
+      { userId: "u9", cards: null },
+      { userId: "u9", cards: "not an array" },
+      { userId: "u9", cards: [{ position: 1 }, null, { cardId: 42 }] },
+      spread("u2", "card-moon"),
+      spread("u3", "card-moon"),
+      spread("u4", "card-moon"),
+      spread("u5", "card-star"),
+    ]);
+
+    const pulse = await computeCollectivePulse(TODAY, NOW);
+
+    // u9 only had broken readings: 5 people, 5 readings
+    expect(pulse.enough).toBe(true);
+    if (!pulse.enough) return;
+    // The repeated Sun counts once: it ties with the Star and goes after it
+    expect(pulse.cards.map((c) => [c.name, c.percent])).toEqual([
+      ["The Moon", 60],
+      ["The Star", 20],
+      ["The Sun", 20],
+    ]);
+  });
+
+  it("doesn't count people whose only readings are broken", async () => {
+    mockPrisma.reading.findMany.mockResolvedValue([
+      spread("u1", "card-sun"),
+      spread("u2", "card-sun"),
+      spread("u3", "card-sun"),
+      spread("u4", "card-sun"),
+      { userId: "u5", cards: [] },
+    ]);
+
+    expect(await computeCollectivePulse(TODAY, NOW)).toEqual({ enough: false });
   });
 
   it("drops card ids that no longer exist", async () => {
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([
-      { cardId: "card-gone", _count: 4 },
-      { cardId: "card-sun", _count: 1 },
+    mockPrisma.dailyReading.findMany.mockResolvedValue([
+      daily("u1", "card-gone"),
+      daily("u2", "card-gone"),
+      daily("u3", "card-gone"),
+      daily("u4", "card-gone"),
+      daily("u5", "card-sun"),
     ]);
 
     const pulse = await computeCollectivePulse(TODAY, NOW);
 
-    expect(pulse.enough && pulse.top.map((c) => c.cardId)).toEqual(["card-sun"]);
-  });
-
-  it("returns only counts and card data, nothing about who read", async () => {
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([{ cardId: "card-sun", _count: 5 }]);
-
-    const pulse = await computeCollectivePulse(TODAY, NOW);
-
-    expect(JSON.stringify(pulse)).not.toMatch(/user|intention|email/i);
+    expect(pulse.enough && pulse.cards.map((c) => c.name)).toEqual(["The Sun"]);
   });
 });
 
 describe("getCollectivePulse", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPrisma.dailyReading.groupBy.mockResolvedValue([{ cardId: "card-sun", _count: 6 }]);
+    mockPrisma.dailyReading.findMany.mockResolvedValue(
+      ["u1", "u2", "u3", "u4", "u5", "u6"].map((u) => daily(u, "card-sun"))
+    );
     mockPrisma.reading.findMany.mockResolvedValue([]);
     mockPrisma.card.findMany.mockResolvedValue([CARDS.sun]);
   });
@@ -197,8 +237,8 @@ describe("getCollectivePulse", () => {
       ["collective-pulse", "2026-11-04"],
       expect.objectContaining({ revalidate: 600 })
     );
-    expect(pulse).toMatchObject({ enough: true, date: "2026-11-04", totalReadings: 6 });
-    expect(mockPrisma.dailyReading.groupBy).toHaveBeenCalledWith(
+    expect(pulse).toEqual({ enough: true, date: "2026-11-04", cards: [publicCard(CARDS.sun, 100)] });
+    expect(mockPrisma.dailyReading.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { date: TODAY } })
     );
   });
@@ -209,7 +249,3 @@ describe("getCollectivePulse", () => {
     expect(mockCache.mock.calls[0][1]).toEqual(["collective-pulse", "2026-11-05"]);
   });
 });
-
-function pick(card: { id: string; name: string; nameEs: string; imageUrl: string }) {
-  return { cardId: card.id, name: card.name, nameEs: card.nameEs, imageUrl: card.imageUrl };
-}

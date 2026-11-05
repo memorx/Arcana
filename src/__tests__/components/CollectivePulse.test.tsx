@@ -26,11 +26,10 @@ const mockPulse = getCollectivePulse as jest.Mock;
 const pulse = {
   enough: true,
   date: "2026-11-04",
-  totalReadings: 10,
-  top: [
-    { cardId: "card-sun", name: "The Sun", nameEs: "El Sol", imageUrl: "/sun.jpg", count: 4, percentage: 40 },
-    { cardId: "card-moon", name: "The Moon", nameEs: "La Luna", imageUrl: "/moon.jpg", count: 3, percentage: 30 },
-    { cardId: "card-star", name: "The Star", nameEs: "La Estrella", imageUrl: "/star.jpg", count: 2, percentage: 20 },
+  cards: [
+    { name: "The Sun", nameEs: "El Sol", imageUrl: "/sun.jpg", percent: 40 },
+    { name: "The Moon", nameEs: "La Luna", imageUrl: "/moon.jpg", percent: 30 },
+    { name: "The Star", nameEs: "La Estrella", imageUrl: "/star.jpg", percent: 20 },
   ],
 };
 
@@ -67,7 +66,7 @@ describe("CollectivePulse", () => {
   });
 
   it("leaves the runners-up list out when only one card is known", async () => {
-    mockPulse.mockResolvedValue({ ...pulse, top: [pulse.top[0]] });
+    mockPulse.mockResolvedValue({ ...pulse, cards: [pulse.cards[0]] });
 
     render((await CollectivePulse())!);
 

@@ -50,7 +50,9 @@ export async function BirthdayBanner({ userId }: BirthdayBannerProps) {
             <p className="text-sm text-slate-300 mt-1">
               {result.granted
                 ? t("granted", { credits: result.credits })
-                : t("alreadyGranted", { credits: result.credits })}
+                : result.alreadyGranted
+                  ? t("alreadyGranted", { credits: result.credits })
+                  : t("greetingOnly")}
             </p>
           </div>
           <Link href="/reading/new" className="sm:shrink-0">

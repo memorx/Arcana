@@ -2,8 +2,12 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { todayUtc } from "@/lib/systems";
 
-/** Below this many readings the pulse is not shown (too few to be anonymous or meaningful). */
-export const PULSE_MIN_READINGS = 5;
+/**
+ * The pulse is shown only when at least this many different people read in
+ * the window (today's daily cards + spreads of the last 24 h). Below that a
+ * single person's cards would be recognisable.
+ */
+export const PULSE_MIN_PEOPLE = 5;
 /** How many cards the pulse lists. */
 export const PULSE_TOP_CARDS = 3;
 /** Cache lifetime, in seconds. */
@@ -11,15 +15,13 @@ export const PULSE_REVALIDATE_SECONDS = 600;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** Public shape: no counts, no totals, no ids. */
 export interface PulseCard {
-  cardId: string;
   name: string;
   nameEs: string;
   imageUrl: string;
-  /** Readings in which the card came up. */
-  count: number;
-  /** Share of all readings counted, 0–100, rounded. */
-  percentage: number;
+  /** Share of the window's readings in which the card came up, 0–100, rounded. */
+  percent: number;
 }
 
 export type CollectivePulse =
@@ -28,9 +30,7 @@ export type CollectivePulse =
       enough: true;
       /** UTC day, "YYYY-MM-DD". */
       date: string;
-      /** Daily cards of the day + spreads of the last 24 h. */
-      totalReadings: number;
-      top: PulseCard[];
+      cards: PulseCard[];
     };
 
 function isoDay(date: Date): string {
@@ -52,71 +52,73 @@ function cardIdsOf(cards: unknown): string[] {
 
 /**
  * The cards that came up most in Arcana: today's daily cards plus every card
- * of the spreads read in the last 24 hours. Anonymous: only counts are read,
- * never who drew what. Uncached; use `getCollectivePulse` in pages and routes.
+ * of the spreads read in the last 24 hours. User ids are read only to count
+ * how many different people there are; the result has no ids and no counts.
+ * Uncached; use `getCollectivePulse` in pages and routes.
  */
 export async function computeCollectivePulse(
   today: Date = todayUtc(),
   now: Date = new Date(),
 ): Promise<CollectivePulse> {
-  const [dailyGroups, readings] = await Promise.all([
-    prisma.dailyReading.groupBy({
-      by: ["cardId"],
+  const [dailyReadings, readings] = await Promise.all([
+    prisma.dailyReading.findMany({
       where: { date: today },
-      _count: true,
+      select: { userId: true, cardId: true },
     }),
     prisma.reading.findMany({
       where: { createdAt: { gte: new Date(now.getTime() - DAY_MS) } },
-      select: { cards: true },
+      select: { userId: true, cards: true },
     }),
   ]);
 
   const counts = new Map<string, number>();
+  const people = new Set<string>();
   let totalReadings = 0;
 
-  for (const group of dailyGroups) {
-    const n = typeof group._count === "number" ? group._count : 0;
-    if (n <= 0) continue;
-    counts.set(group.cardId, (counts.get(group.cardId) ?? 0) + n);
-    totalReadings += n;
+  const count = (cardId: string) => counts.set(cardId, (counts.get(cardId) ?? 0) + 1);
+
+  for (const daily of dailyReadings) {
+    if (!daily.cardId) continue;
+    people.add(daily.userId);
+    totalReadings += 1;
+    count(daily.cardId);
   }
 
   for (const reading of readings) {
     const ids = cardIdsOf(reading.cards);
     if (ids.length === 0) continue;
+    people.add(reading.userId);
     totalReadings += 1;
-    for (const id of ids) counts.set(id, (counts.get(id) ?? 0) + 1);
+    ids.forEach(count);
   }
 
-  if (totalReadings < PULSE_MIN_READINGS) return { enough: false };
+  if (people.size < PULSE_MIN_PEOPLE) return { enough: false };
 
   const ranked = [...counts.entries()]
     .sort(([idA, a], [idB, b]) => b - a || idA.localeCompare(idB))
     .slice(0, PULSE_TOP_CARDS);
 
-  const cards = await prisma.card.findMany({
+  const found = await prisma.card.findMany({
     where: { id: { in: ranked.map(([id]) => id) } },
     select: { id: true, name: true, nameEs: true, imageUrl: true },
   });
-  const byId = new Map(cards.map((card) => [card.id, card]));
+  const byId = new Map(found.map((card) => [card.id, card]));
 
-  const top: PulseCard[] = [];
-  for (const [cardId, count] of ranked) {
+  const cards: PulseCard[] = [];
+  for (const [cardId, n] of ranked) {
     const card = byId.get(cardId);
     if (!card) continue; // a deleted card id in old JSON
-    top.push({
-      cardId,
+    cards.push({
       name: card.name,
       nameEs: card.nameEs,
       imageUrl: card.imageUrl,
-      count,
-      percentage: Math.round((count / totalReadings) * 100),
+      percent: Math.round((n / totalReadings) * 100),
     });
   }
 
-  if (top.length === 0) return { enough: false };
+  if (cards.length === 0) return { enough: false };
 
-  return { enough: true, date: isoDay(today), totalReadings, top };
+  return { enough: true, date: isoDay(today), cards };
 }
 
 /**

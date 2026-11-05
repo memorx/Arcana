@@ -777,6 +777,7 @@
     "title": "Happy birthday!",
     "granted": "We've left {credits} gift credits in your account. May this year bring you good questions.",
     "alreadyGranted": "Your {credits} gift credits are already in your account.",
+    "greetingOnly": "May this year bring you good questions.",
     "cta": "Do your birthday reading"
   },
   "pulse": {
@@ -791,7 +792,7 @@
       "cta": "Explore",
       "blueprint": {
         "title": "Arcana Map",
-        "description": "Five systems from your birth date: tarot birth cards, Western and Chinese zodiac, Mexica tonalli and numerology."
+        "description": "Five systems from your birth date and your name: tarot birth cards, Western and Chinese zodiac, Mexica tonalli and numerology."
       },
       "calendar": {
         "title": "Arcana Calendar",
@@ -810,7 +811,7 @@
   "calendar": {
     "title": "Arcana Calendar",
     "subtitle": "Every day with its sign in the Mexica tonalpohualli, its moon phase and, with your profile, your personal day.",
-    "metaTitle": "Arcana Calendar: tonalli, moon and personal day | Arcana",
+    "metaTitle": "Arcana Calendar: tonalli, moon and personal day",
     "metaDescription": "Each day's sign in the Mexica tonalpohualli, the moon phase and your numerology personal day, month by month.",
     "previousMonth": "Previous month",
     "nextMonth": "Next month",

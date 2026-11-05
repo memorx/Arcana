@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 import {
   addDays,
   buildMonthGrid,
-  formatDayMonth,
+  dayMonthFormatter,
   formatMonthYear,
   fromDayKey,
+  intlLocaleFor,
   isDayKey,
   monthOf,
   shiftMonthKeepingDay,
@@ -106,29 +107,31 @@ export function ArcanaCalendar({ today }: ArcanaCalendarProps) {
     () => buildMonthGrid(view.year, view.month, weekStart),
     [view.year, view.month, weekStart]
   );
-  const energies = useMemo(() => {
-    const map = new Map<string, DayEnergies>();
+  // Energies and the full aria-label of every day of the month, with one
+  // date formatter per month (not one per cell)
+  const days = useMemo(() => {
+    const intl = intlLocaleFor(locale);
+    const dayMonth = dayMonthFormatter(locale);
+    const map = new Map<string, { energies: DayEnergies; label: string }>();
     for (const week of weeks) {
       for (const key of week) {
-        if (key) map.set(key, getDayEnergies(fromDayKey(key), profile.birthDate));
+        if (!key) continue;
+        const date = fromDayKey(key);
+        const energies = getDayEnergies(date, profile.birthDate);
+        const label = [
+          dayMonth.format(date),
+          `${energies.tonalli.number} ${energies.tonalli.sign.name[locale]}`,
+          energies.moon.name[locale].toLocaleLowerCase(intl),
+          energies.personalDay !== null ? t("personalDayAria", { number: energies.personalDay }) : null,
+          key === today ? t("today").toLocaleLowerCase(intl) : null,
+        ]
+          .filter(Boolean)
+          .join(", ");
+        map.set(key, { energies, label });
       }
     }
     return map;
-  }, [weeks, profile.birthDate]);
-
-  const intl = locale === "en" ? "en-US" : "es-MX";
-
-  function dayLabel(key: string, day: DayEnergies): string {
-    return [
-      formatDayMonth(key, locale),
-      `${day.tonalli.number} ${day.tonalli.sign.name[locale]}`,
-      day.moon.name[locale].toLocaleLowerCase(intl),
-      day.personalDay !== null ? t("personalDayAria", { number: day.personalDay }) : null,
-      key === today ? t("today").toLocaleLowerCase(intl) : null,
-    ]
-      .filter(Boolean)
-      .join(", ");
-  }
+  }, [weeks, profile.birthDate, locale, today, t]);
 
   function select(key: string, { focus = false } = {}) {
     focusPending.current = focus;
@@ -223,7 +226,7 @@ export function ArcanaCalendar({ today }: ArcanaCalendarProps) {
             <thead>
               <tr>
                 {weekdays.map((day) => (
-                  <th key={day.long} scope="col" className="pb-1 sm:pb-2 text-xs font-medium text-slate-500">
+                  <th key={day.long} scope="col" className="pb-1 sm:pb-2 text-xs font-medium text-slate-400">
                     <span aria-hidden="true" className="sm:hidden">
                       {day.narrow}
                     </span>
@@ -240,7 +243,7 @@ export function ArcanaCalendar({ today }: ArcanaCalendarProps) {
                 <tr key={week.find(Boolean) ?? w}>
                   {week.map((key, i) => {
                     if (!key) return <td key={`pad-${w}-${i}`} aria-hidden="true" />;
-                    const day = energies.get(key)!;
+                    const { energies: day, label } = days.get(key)!;
                     const isSelected = key === selected;
                     const isToday = key === today;
                     return (
@@ -252,7 +255,7 @@ export function ArcanaCalendar({ today }: ArcanaCalendarProps) {
                           }}
                           type="button"
                           tabIndex={isSelected ? 0 : -1}
-                          aria-label={dayLabel(key, day)}
+                          aria-label={label}
                           aria-current={isToday ? "date" : undefined}
                           onClick={() => {
                             select(key);
@@ -301,7 +304,7 @@ export function ArcanaCalendar({ today }: ArcanaCalendarProps) {
           </table>
 
           {/* Legend */}
-          <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+          <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
             <li>
               <span aria-hidden="true">🐊</span> {t("legend.sign")}
             </li>
@@ -317,7 +320,7 @@ export function ArcanaCalendar({ today }: ArcanaCalendarProps) {
               </li>
             )}
           </ul>
-          <p className="mt-2 text-xs text-slate-500 sr-only sm:not-sr-only">{t("keyboardHint")}</p>
+          <p className="mt-2 text-xs text-slate-400 sr-only sm:not-sr-only">{t("keyboardHint")}</p>
         </CardContent>
       </Card>
 

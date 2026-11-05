@@ -24,10 +24,7 @@ describe("GET /api/pulse", () => {
     const pulse = {
       enough: true,
       date: "2026-11-04",
-      totalReadings: 12,
-      top: [
-        { cardId: "card-sun", name: "The Sun", nameEs: "El Sol", imageUrl: "/sun.jpg", count: 5, percentage: 42 },
-      ],
+      cards: [{ name: "The Sun", nameEs: "El Sol", imageUrl: "/sun.jpg", percent: 42 }],
     };
     mockPulse.mockResolvedValue(pulse);
 

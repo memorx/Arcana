@@ -126,7 +126,8 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
     birthdayGiftCredits,
   } = params;
 
-  const isSpanish = locale === "es";
+  // Anything that isn't "en" is Spanish (same rule as the daily-readings cron).
+  const isSpanish = locale !== "en";
 
   const cardSubject = isSpanish
     ? `Tu carta del día: ${cardNameEs}`
@@ -137,7 +138,8 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
       : `Happy birthday, ${userName}! ${cardSubject}`
     : cardSubject;
 
-  const displayCardName = isSpanish ? cardNameEs : cardName;
+  const displayCardName = escapeHtml(isSpanish ? cardNameEs : cardName);
+  const safeUserName = escapeHtml(userName);
 
   const html = `
 <!DOCTYPE html>
@@ -172,7 +174,7 @@ ${isBirthday ? renderBirthdayHeader(userName, birthdayGiftCredits, isSpanish) : 
           <tr>
             <td style="padding: 25px 30px 10px; text-align: center;">
               <p style="color: #e2e8f0; font-size: 16px; margin: 0;">
-                ${isSpanish ? `Hola ${userName}` : `Hello ${userName}`} ${getZodiacEmoji(zodiacSign)}
+                ${isSpanish ? `Hola ${safeUserName}` : `Hello ${safeUserName}`} ${getZodiacEmoji(zodiacSign)}
               </p>
               <p style="color: #94a3b8; font-size: 14px; margin: 8px 0 0;">
                 ${date}
@@ -194,7 +196,7 @@ ${isBirthday ? renderBirthdayHeader(userName, birthdayGiftCredits, isSpanish) : 
                 ${displayCardName}
               </h2>
               <p style="color: #94a3b8; font-size: 12px; margin: 0 0 12px; letter-spacing: 1px;">
-                ${keywords.slice(0, 3).join(" • ")}
+                ${keywords.slice(0, 3).map(escapeHtml).join(" • ")}
               </p>
               ${
                 isReversed
@@ -211,7 +213,7 @@ ${renderDayEnergies(dayContext, isSpanish)}
             <td style="padding: 20px 30px;">
               <div style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 25px; border-left: 3px solid #f59e0b;">
                 <p style="color: #d1d5db; font-size: 15px; line-height: 1.8; margin: 0; white-space: pre-line;">
-                  ${interpretation}
+                  ${escapeHtml(interpretation)}
                 </p>
               </div>
             </td>

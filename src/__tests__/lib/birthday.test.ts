@@ -5,7 +5,7 @@
 // In-memory stand-in for the two tables the gift touches. `updateMany`
 // honours the conditional `where` the same way Postgres does, so the
 // idempotency test exercises the real condition written in birthday.ts.
-type UserRow = { id: string; credits: number; lastBirthdayGiftYear: number | null };
+type UserRow = { id: string; credits: number; lastBirthdayGiftYear: number | null; createdAt: Date };
 type TxRow = { userId: string; amount: number; type: string };
 
 const db: { users: UserRow[]; profiles: Map<string, Date>; transactions: TxRow[] } = {
@@ -15,7 +15,7 @@ const db: { users: UserRow[]; profiles: Map<string, Date>; transactions: TxRow[]
 };
 
 type YearFilter = null | { lt: number };
-type UserWhere = { id: string; OR: { lastBirthdayGiftYear: YearFilter }[] };
+type UserWhere = { id: string; createdAt: { lt: Date }; OR: { lastBirthdayGiftYear: YearFilter }[] };
 
 function matchesYear(row: UserRow, filter: YearFilter): boolean {
   if (filter === null) return row.lastBirthdayGiftYear === null;
@@ -33,7 +33,10 @@ const fakeTx = {
         data: { credits: { increment: number }; lastBirthdayGiftYear: number };
       }) => {
         const rows = db.users.filter(
-          (u) => u.id === where.id && where.OR.some((c) => matchesYear(u, c.lastBirthdayGiftYear))
+          (u) =>
+            u.id === where.id &&
+            u.createdAt < where.createdAt.lt &&
+            where.OR.some((c) => matchesYear(u, c.lastBirthdayGiftYear))
         );
         for (const row of rows) {
           row.credits += data.credits.increment;
@@ -42,6 +45,10 @@ const fakeTx = {
         return { count: rows.length };
       }
     ),
+    findUnique: jest.fn(async ({ where }: { where: { id: string } }) => {
+      const row = db.users.find((u) => u.id === where.id);
+      return row ? { lastBirthdayGiftYear: row.lastBirthdayGiftYear } : null;
+    }),
   },
   creditTransaction: {
     create: jest.fn(async ({ data }: { data: TxRow }) => {
@@ -64,7 +71,12 @@ jest.mock("@/lib/prisma", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
-import { BIRTHDAY_GIFT_CREDITS, claimBirthdayGift, isBirthdayToday } from "@/lib/birthday";
+import {
+  BIRTHDAY_GIFT_CREDITS,
+  BIRTHDAY_GIFT_MIN_ACCOUNT_DAYS,
+  claimBirthdayGift,
+  isBirthdayToday,
+} from "@/lib/birthday";
 
 const utc = (y: number, m: number, d: number, h = 0, min = 0) =>
   new Date(Date.UTC(y, m - 1, d, h, min));
@@ -109,7 +121,7 @@ describe("claimBirthdayGift", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    db.users = [{ id: "user-1", credits: 2, lastBirthdayGiftYear: null }];
+    db.users = [{ id: "user-1", credits: 2, lastBirthdayGiftYear: null, createdAt: utc(2020, 1, 1) }];
     db.profiles = new Map([["user-1", utc(1990, 7, 15)]]);
     db.transactions = [];
   });
@@ -117,7 +129,7 @@ describe("claimBirthdayGift", () => {
   it("gives 3 credits and a BIRTHDAY transaction on the birthday", async () => {
     const result = await claimBirthdayGift("user-1", { today: birthday });
 
-    expect(result).toEqual({ granted: true, credits: 3, isBirthday: true });
+    expect(result).toEqual({ granted: true, alreadyGranted: false, credits: 3, isBirthday: true });
     expect(BIRTHDAY_GIFT_CREDITS).toBe(3);
     expect(db.users[0]).toMatchObject({ credits: 5, lastBirthdayGiftYear: 2026 });
     expect(db.transactions).toEqual([{ userId: "user-1", amount: 3, type: "BIRTHDAY" }]);
@@ -128,7 +140,7 @@ describe("claimBirthdayGift", () => {
     const second = await claimBirthdayGift("user-1", { today: utc(2026, 7, 15, 18) });
 
     expect(first.granted).toBe(true);
-    expect(second).toEqual({ granted: false, credits: 3, isBirthday: true });
+    expect(second).toEqual({ granted: false, alreadyGranted: true, credits: 3, isBirthday: true });
     expect(db.users[0].credits).toBe(5);
     expect(db.transactions).toHaveLength(1);
   });
@@ -144,6 +156,38 @@ describe("claimBirthdayGift", () => {
     expect(db.transactions).toHaveLength(1);
   });
 
+  it("only gives it to accounts at least 30 days old", async () => {
+    expect(BIRTHDAY_GIFT_MIN_ACCOUNT_DAYS).toBe(30);
+    await claimBirthdayGift("user-1", { today: birthday });
+
+    expect(fakeTx.user.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ id: "user-1", createdAt: { lt: utc(2026, 6, 15) } }),
+      })
+    );
+  });
+
+  it("a 5-day-old account gets the greeting but not the credits", async () => {
+    db.users[0].createdAt = utc(2026, 7, 10);
+
+    const result = await claimBirthdayGift("user-1", { today: birthday });
+
+    expect(result).toEqual({ granted: false, alreadyGranted: false, credits: 3, isBirthday: true });
+    expect(db.users[0]).toMatchObject({ credits: 2, lastBirthdayGiftYear: null });
+    expect(db.transactions).toHaveLength(0);
+    expect(fakeTx.creditTransaction.create).not.toHaveBeenCalled();
+  });
+
+  it("a 60-day-old account gets the credits", async () => {
+    db.users[0].createdAt = utc(2026, 5, 16);
+
+    const result = await claimBirthdayGift("user-1", { today: birthday });
+
+    expect(result).toMatchObject({ granted: true, isBirthday: true });
+    expect(db.users[0]).toMatchObject({ credits: 5, lastBirthdayGiftYear: 2026 });
+    expect(db.transactions).toEqual([{ userId: "user-1", amount: 3, type: "BIRTHDAY" }]);
+  });
+
   it("gives it again the next year", async () => {
     db.users[0].lastBirthdayGiftYear = 2025;
 
@@ -156,7 +200,7 @@ describe("claimBirthdayGift", () => {
   it("does not write anything when it is not the birthday", async () => {
     const result = await claimBirthdayGift("user-1", { today: utc(2026, 7, 16) });
 
-    expect(result).toEqual({ granted: false, credits: 3, isBirthday: false });
+    expect(result).toEqual({ granted: false, alreadyGranted: false, credits: 3, isBirthday: false });
     expect(prisma.$transaction).not.toHaveBeenCalled();
     expect(db.users[0].credits).toBe(2);
   });
@@ -166,7 +210,7 @@ describe("claimBirthdayGift", () => {
 
     const result = await claimBirthdayGift("user-1", { today: birthday });
 
-    expect(result).toEqual({ granted: false, credits: 3, isBirthday: false });
+    expect(result).toEqual({ granted: false, alreadyGranted: false, credits: 3, isBirthday: false });
     expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 

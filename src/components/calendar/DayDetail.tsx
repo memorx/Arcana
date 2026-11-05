@@ -60,7 +60,7 @@ export function DayDetail({ dayKey, birthDate, profileStatus, locale, isToday }:
           </div>
           <dl className="grid grid-cols-1 gap-3 pt-2 text-sm sm:grid-cols-2 lg:grid-cols-1">
             <div className="rounded-lg bg-slate-900/50 border border-slate-800 p-3">
-              <dt className="text-xs text-slate-500">
+              <dt className="text-xs text-slate-400">
                 {t("detail.trecena", { name: tonalli.trecena.nahuatl })}
               </dt>
               <dd className="text-slate-300 mt-1">
@@ -69,14 +69,14 @@ export function DayDetail({ dayKey, birthDate, profileStatus, locale, isToday }:
               </dd>
             </div>
             <div className="rounded-lg bg-slate-900/50 border border-slate-800 p-3">
-              <dt className="text-xs text-slate-500">{t("detail.lordOfNight")}</dt>
+              <dt className="text-xs text-slate-400">{t("detail.lordOfNight")}</dt>
               <dd className="text-slate-300 mt-1">
                 <span className="text-slate-200">{tonalli.lordOfNight.nahuatl}.</span>{" "}
                 {tonalli.lordOfNight.meaning[locale]}
               </dd>
             </div>
             <div className="rounded-lg bg-slate-900/50 border border-slate-800 p-3 sm:col-span-2 lg:col-span-1">
-              <dt className="text-xs text-slate-500">{t("detail.direction")}</dt>
+              <dt className="text-xs text-slate-400">{t("detail.direction")}</dt>
               <dd className="text-slate-300 mt-1">
                 {tonalli.sign.direction[locale]} · {tonalli.sign.patron}
               </dd>

@@ -110,6 +110,30 @@ describe("sendDailyReadingEmail", () => {
     expect(email.html).toContain("We've left 3 gift credits in your account.");
   });
 
+  it("escapes the name, the card, the keywords and the interpretation", async () => {
+    const email = await send({
+      userName: "Ana <img src=x>",
+      cardNameEs: "El <b>Sol</b>",
+      keywords: ["<i>alegría</i>", "éxito"],
+      interpretation: "Línea uno <script>x</script>\nLínea dos & más",
+    });
+
+    expect(email.html).not.toMatch(/<img src=x>|<b>Sol<\/b>|<i>alegría<\/i>|<script>x<\/script>/);
+    expect(email.html).toContain("Hola Ana &lt;img src=x&gt;");
+    expect(email.html).toContain("El &lt;b&gt;Sol&lt;/b&gt;");
+    expect(email.html).toContain(`alt="El &lt;b&gt;Sol&lt;/b&gt;"`);
+    expect(email.html).toContain("&lt;i&gt;alegría&lt;/i&gt; • éxito");
+    // Line breaks stay as they were (the paragraph uses white-space: pre-line)
+    expect(email.html).toContain("Línea uno &lt;script&gt;x&lt;/script&gt;\nLínea dos &amp; más");
+  });
+
+  it("treats any language other than English as Spanish", async () => {
+    const email = await send({ locale: "fr", dayContext: "Fase lunar: Luna llena." });
+
+    expect(email.subject).toBe("Tu carta del día: El Sol");
+    expect(email.html).toContain("Energías del día");
+  });
+
   it("escapes the name in the birthday greeting and the title", async () => {
     const email = await send({ userName: "<b>Ana</b>", isBirthday: true });
 
