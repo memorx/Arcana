@@ -22,6 +22,74 @@ interface DailyReadingEmailParams {
   locale: string;
   zodiacSign: string;
   keywords: string[];
+  /** Day energies (tonalli, moon, personal day) as plain text, one item per line. */
+  dayContext?: string;
+  /** Today is the person's birthday: greeting header and subject. */
+  isBirthday?: boolean;
+  /** Gift credits already in the account (shown only on the birthday). */
+  birthdayGiftCredits?: number;
+}
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function renderDayEnergies(dayContext: string | undefined, isSpanish: boolean): string {
+  const lines = (dayContext ?? "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (lines.length === 0) return "";
+
+  return `
+          <!-- Day energies -->
+          <tr>
+            <td style="padding: 0 30px 10px;">
+              <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px; padding: 14px 18px;">
+                <p style="color: #f59e0b; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 8px;">
+                  ${isSpanish ? "Energías del día" : "Today's energies"}
+                </p>
+                ${lines
+                  .map(
+                    (line) =>
+                      `<p style="color: #cbd5e1; font-size: 13px; line-height: 1.6; margin: 0 0 6px;">${escapeHtml(line)}</p>`
+                  )
+                  .join("\n                ")}
+              </div>
+            </td>
+          </tr>`;
+}
+
+function renderBirthdayHeader(
+  userName: string,
+  giftCredits: number | undefined,
+  isSpanish: boolean
+): string {
+  const name = escapeHtml(userName);
+  const title = isSpanish ? `¡Feliz cumpleaños, ${name}!` : `Happy birthday, ${name}!`;
+  const gift =
+    giftCredits && giftCredits > 0
+      ? isSpanish
+        ? `Te dejamos ${giftCredits} créditos de regalo en tu cuenta.`
+        : `We've left ${giftCredits} gift credits in your account.`
+      : "";
+
+  return `
+          <!-- Birthday -->
+          <tr>
+            <td style="padding: 25px 30px 0; text-align: center;">
+              <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(139, 92, 246, 0.18) 100%); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 18px 20px;">
+                <div style="font-size: 32px; line-height: 1; margin-bottom: 8px;">&#127874;</div>
+                <p style="color: #fbbf24; font-size: 20px; font-weight: bold; margin: 0;">${title}</p>
+                ${gift ? `<p style="color: #e2e8f0; font-size: 14px; margin: 8px 0 0;">${gift}</p>` : ""}
+              </div>
+            </td>
+          </tr>`;
 }
 
 // Use Next.js image optimization as a proxy to avoid email clients blocking external images
@@ -53,15 +121,25 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
     locale,
     zodiacSign,
     keywords,
+    dayContext,
+    isBirthday = false,
+    birthdayGiftCredits,
   } = params;
 
-  const isSpanish = locale === "es";
+  // Anything that isn't "en" is Spanish (same rule as the daily-readings cron).
+  const isSpanish = locale !== "en";
 
-  const subject = isSpanish
+  const cardSubject = isSpanish
     ? `Tu carta del día: ${cardNameEs}`
     : `Your daily card: ${cardName}`;
+  const subject = isBirthday
+    ? isSpanish
+      ? `¡Feliz cumpleaños, ${userName}! ${cardSubject}`
+      : `Happy birthday, ${userName}! ${cardSubject}`
+    : cardSubject;
 
-  const displayCardName = isSpanish ? cardNameEs : cardName;
+  const displayCardName = escapeHtml(isSpanish ? cardNameEs : cardName);
+  const safeUserName = escapeHtml(userName);
 
   const html = `
 <!DOCTYPE html>
@@ -69,7 +147,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${subject}</title>
+  <title>${escapeHtml(subject)}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Georgia', 'Times New Roman', serif; background-color: #0f172a;">
   <!-- Preheader text -->
@@ -91,12 +169,12 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
               </p>
             </td>
           </tr>
-
+${isBirthday ? renderBirthdayHeader(userName, birthdayGiftCredits, isSpanish) : ""}
           <!-- Greeting -->
           <tr>
             <td style="padding: 25px 30px 10px; text-align: center;">
               <p style="color: #e2e8f0; font-size: 16px; margin: 0;">
-                ${isSpanish ? `Hola ${userName}` : `Hello ${userName}`} ${getZodiacEmoji(zodiacSign)}
+                ${isSpanish ? `Hola ${safeUserName}` : `Hello ${safeUserName}`} ${getZodiacEmoji(zodiacSign)}
               </p>
               <p style="color: #94a3b8; font-size: 14px; margin: 8px 0 0;">
                 ${date}
@@ -118,7 +196,7 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
                 ${displayCardName}
               </h2>
               <p style="color: #94a3b8; font-size: 12px; margin: 0 0 12px; letter-spacing: 1px;">
-                ${keywords.slice(0, 3).join(" • ")}
+                ${keywords.slice(0, 3).map(escapeHtml).join(" • ")}
               </p>
               ${
                 isReversed
@@ -129,13 +207,13 @@ export async function sendDailyReadingEmail(params: DailyReadingEmailParams) {
               }
             </td>
           </tr>
-
+${renderDayEnergies(dayContext, isSpanish)}
           <!-- Interpretation -->
           <tr>
             <td style="padding: 20px 30px;">
               <div style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 25px; border-left: 3px solid #f59e0b;">
                 <p style="color: #d1d5db; font-size: 15px; line-height: 1.8; margin: 0; white-space: pre-line;">
-                  ${interpretation}
+                  ${escapeHtml(interpretation)}
                 </p>
               </div>
             </td>

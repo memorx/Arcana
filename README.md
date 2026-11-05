@@ -30,7 +30,7 @@ collection) to keep people coming back.
 | Data | PostgreSQL (Supabase) through Prisma 6 |
 | Auth | Auth.js (NextAuth v5) with email/password and optional Google sign-in |
 | Payments | Stripe Checkout, subscriptions and webhooks |
-| AI | Anthropic Claude API |
+| AI | Anthropic Claude API: Claude Opus 5.5 for readings and syntheses, Claude Haiku 4.5 for the daily card. Models and effort are set with `ARCANA_MODEL_READING`, `ARCANA_MODEL_DAILY`, `ARCANA_MODEL_SYNTHESIS` and `ARCANA_AI_EFFORT` (see `.env.example`); every call goes through `src/lib/ai/config.ts` |
 | Email | Resend |
 | Ops | Vercel (hosting and cron), Upstash Redis (rate limiting), Sentry |
 | i18n | next-intl (English and Spanish) |
@@ -52,6 +52,7 @@ Payments, AI interpretations and emails need their own keys (Stripe, Anthropic a
 
 ```bash
 npm test                  # unit tests (Jest)
+npm run lint              # ESLint
 npm run test:e2e          # end-to-end tests (Playwright)
 ```
 

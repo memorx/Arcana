@@ -21,26 +21,27 @@ describe("CREDIT_PACKAGES", () => {
     expect(popularPackages).toHaveLength(1);
   });
 
-  it("has 5 credit package at $1.99", () => {
+  // Prices are in MXN cents (see src/lib/pricing.ts)
+  it("has 5 credit package at $39 MXN", () => {
     const pkg = CREDIT_PACKAGES.find((p) => p.credits === 5);
     expect(pkg).toBeDefined();
-    expect(pkg?.price).toBe(199);
-    expect(pkg?.priceDisplay).toBe("$1.99");
+    expect(pkg?.price).toBe(3900);
+    expect(pkg?.priceDisplay).toBe("$39 MXN");
   });
 
-  it("has 15 credit package at $4.99 (popular)", () => {
+  it("has 15 credit package at $99 MXN (popular)", () => {
     const pkg = CREDIT_PACKAGES.find((p) => p.credits === 15);
     expect(pkg).toBeDefined();
-    expect(pkg?.price).toBe(499);
-    expect(pkg?.priceDisplay).toBe("$4.99");
+    expect(pkg?.price).toBe(9900);
+    expect(pkg?.priceDisplay).toBe("$99 MXN");
     expect(pkg?.popular).toBe(true);
   });
 
-  it("has 30 credit package at $8.99", () => {
-    const pkg = CREDIT_PACKAGES.find((p) => p.credits === 30);
+  it("has 50 credit package at $299 MXN", () => {
+    const pkg = CREDIT_PACKAGES.find((p) => p.credits === 50);
     expect(pkg).toBeDefined();
-    expect(pkg?.price).toBe(899);
-    expect(pkg?.priceDisplay).toBe("$8.99");
+    expect(pkg?.price).toBe(29900);
+    expect(pkg?.priceDisplay).toBe("$299 MXN");
   });
 
   it("prices increase with credits", () => {
@@ -86,10 +87,10 @@ describe("getPackageById", () => {
     expect(pkg?.popular).toBe(true);
   });
 
-  it("returns pack_30 correctly", () => {
-    const pkg = getPackageById("pack_30");
+  it("returns pack_50 correctly", () => {
+    const pkg = getPackageById("pack_50");
     expect(pkg).toBeDefined();
-    expect(pkg?.credits).toBe(30);
+    expect(pkg?.credits).toBe(50);
   });
 
   it("returns undefined for invalid id", () => {

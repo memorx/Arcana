@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCard, TarotCardStatic, CardBack } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCardStatic, CardBack } from "@/components/ui";
 import { StreakRewardModal } from "@/components/dashboard/StreakRewardModal";
 import { NewCardDiscoveredModal } from "@/components/reading/NewCardDiscoveredModal";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -150,7 +149,6 @@ export default function ReadingFlowPage({
   params: Promise<{ spreadTypeId: string }>;
 }) {
   const { spreadTypeId } = use(params);
-  const router = useRouter();
   const t = useTranslations("reading");
   const tCommon = useTranslations("common");
   const locale = useLocale();
@@ -161,6 +159,8 @@ export default function ReadingFlowPage({
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  // The AI couldn't interpret (503) or declined (422): nothing was charged, the intention is kept
+  const [aiError, setAiError] = useState<"unavailable" | "refused" | null>(null);
   const [readingResult, setReadingResult] = useState<ReadingResult | null>(null);
   const [revealedCards, setRevealedCards] = useState<number[]>([]);
   const [allRevealed, setAllRevealed] = useState(false);
@@ -298,6 +298,7 @@ export default function ReadingFlowPage({
     }
 
     setError("");
+    setAiError(null);
     setIsSubmitting(true);
     setStep("shuffling");
 
@@ -311,10 +312,24 @@ export default function ReadingFlowPage({
         body: JSON.stringify({ spreadTypeId, intention, locale }),
       });
 
-      const data = await res.json();
+      // A 502/504 from Vercel comes as plain text, not JSON: never let parsing throw.
+      const data = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        throw new Error(data.error || t("createError"));
+      if (res.status === 503 || res.status === 422) {
+        setAiError(res.status === 503 ? "unavailable" : "refused");
+        setStep("intention");
+        return;
+      }
+
+      if (res.status === 403) {
+        // Lost the race for the last credits: offer to buy instead of showing a raw server string
+        setShowCreditsModal(true);
+        setStep("intention");
+        return;
+      }
+
+      if (!res.ok || !data) {
+        throw new Error(data?.error || t("createError"));
       }
 
       setReadingResult(data);
@@ -455,6 +470,19 @@ export default function ReadingFlowPage({
                 {error && <span className="text-xs text-red-400">{error}</span>}
               </div>
 
+              {aiError && (
+                <div
+                  role="alert"
+                  className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+                >
+                  <p className="text-sm text-amber-200">
+                    {aiError === "unavailable"
+                      ? t("interpretationUnavailable")
+                      : t("interpretationRefused")}
+                  </p>
+                </div>
+              )}
+
               <Button
                 onClick={handleStartReading}
                 disabled={intention.length < 10 || isSubmitting}
@@ -462,7 +490,7 @@ export default function ReadingFlowPage({
                 className="w-full mt-4"
                 size="lg"
               >
-                {t("startReading")}
+                {aiError ? t("retry") : t("startReading")}
               </Button>
             </CardContent>
           </Card>

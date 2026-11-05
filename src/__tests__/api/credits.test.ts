@@ -100,8 +100,24 @@ describe("GET /api/user/credits", () => {
 
     expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
       where: { id: "specific-user-id" },
-      select: { credits: true, freeReadingsLeft: true },
+      select: { credits: true, freeReadingsLeft: true, level: true, xp: true },
     });
+  });
+
+  it("returns level and xp alongside credits", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-123" } });
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+      credits: 5,
+      freeReadingsLeft: 1,
+      level: 3,
+      xp: 420,
+    });
+
+    const response = await GET();
+    const body = await response.json();
+
+    expect(body.level).toBe(3);
+    expect(body.xp).toBe(420);
   });
 
   it("returns 500 on database error", async () => {

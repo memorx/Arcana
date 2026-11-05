@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
-const protectedRoutes = ['/dashboard', '/reading', '/history', '/credits', '/daily', '/subscribe', '/profile', '/referral']
+const protectedRoutes = ['/dashboard', '/reading', '/history', '/credits', '/daily', '/subscribe', '/profile', '/referral', '/blueprint', '/compatibility', '/history/insights', '/reading/manual']
 const authRoutes = ['/login', '/register']
 
 export async function middleware(request: NextRequest) {
@@ -43,6 +43,9 @@ export const config = {
     '/subscribe/:path*',
     '/profile/:path*',
     '/referral/:path*',
+    '/blueprint/:path*',
+    '/compatibility/:path*',
+    // '/history/insights' and '/reading/manual' are already matched by '/history/:path*' and '/reading/:path*'
     '/login',
     '/register'
   ]

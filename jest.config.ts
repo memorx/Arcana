@@ -1,3 +1,4 @@
+process.env.TZ = "America/Mexico_City"; // los tests de fechas leen campos UTC; el huso fijo evita falsos verdes en CI
 import type { Config } from "jest";
 import nextJest from "next/jest.js";
 

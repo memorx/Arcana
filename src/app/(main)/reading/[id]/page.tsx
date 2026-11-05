@@ -14,6 +14,9 @@ import {
   ShareButton,
 } from "@/components/ui";
 import { PersonalNotes } from "@/components/reading/PersonalNotes";
+import { FollowUpChat } from "@/components/reading/FollowUpChat";
+import { ReadAloud } from "@/components/reading/ReadAloud";
+import { ResonanceCheck } from "@/components/reading/ResonanceCheck";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -28,6 +31,7 @@ export default async function ReadingPage({ params }: PageProps) {
   }
 
   const t = await getTranslations("reading");
+  const tManual = await getTranslations("manual");
   const locale = await getLocale();
 
   const reading = await prisma.reading.findUnique({
@@ -52,9 +56,20 @@ export default async function ReadingPage({ params }: PageProps) {
   }>;
 
   const cardIds = readingCards.map((c) => c.cardId);
-  const cards = await prisma.card.findMany({
-    where: { id: { in: cardIds } },
-  });
+  const [cards, followUps, user] = await Promise.all([
+    prisma.card.findMany({
+      where: { id: { in: cardIds } },
+    }),
+    prisma.readingFollowUp.findMany({
+      where: { readingId: id },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, question: true, answer: true, creditsCharged: true, createdAt: true },
+    }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { credits: true },
+    }),
+  ]);
 
   const cardsMap = new Map(cards.map((c) => [c.id, c]));
   const positions = reading.spreadType.positions as Array<{
@@ -92,8 +107,14 @@ export default async function ReadingPage({ params }: PageProps) {
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-2">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
               <Badge variant="primary">{spreadName}</Badge>
+              {reading.source === "manual" && (
+                <Badge variant="secondary">
+                  <span aria-hidden="true" className="mr-1">&#127924;</span>
+                  {tManual("badge")}
+                </Badge>
+              )}
               <span className="text-sm text-slate-500">
                 {new Date(reading.createdAt).toLocaleDateString(
                   locale === "en" ? "en-US" : "es-ES",
@@ -178,11 +199,12 @@ export default async function ReadingPage({ params }: PageProps) {
 
       {/* Interpretation */}
       <Card variant="highlighted">
-        <CardHeader>
+        <CardHeader className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2">
             <span className="text-amber-400">&#9788;</span>
             {t("interpretation")}
           </CardTitle>
+          <ReadAloud text={reading.interpretation} locale={locale} />
         </CardHeader>
         <CardContent>
           <div className="prose prose-invert prose-slate max-w-none">
@@ -195,10 +217,27 @@ export default async function ReadingPage({ params }: PageProps) {
         </CardContent>
       </Card>
 
+      {/* How the reading resonated (asks after 24 h; shows the rating once given) */}
+      <ResonanceCheck
+        readingId={id}
+        createdAt={reading.createdAt.toISOString()}
+        resonance={reading.resonance}
+        resonanceNote={reading.resonanceNote}
+        locale={locale}
+      />
+
       {/* Personal Notes */}
       <PersonalNotes
         readingId={id}
         initialNotes={reading.personalNotes}
+      />
+
+      {/* Follow-up questions */}
+      <FollowUpChat
+        readingId={id}
+        initialFollowUps={followUps.map((f) => ({ ...f, createdAt: f.createdAt.toISOString() }))}
+        credits={user?.credits ?? 0}
+        locale={locale}
       />
 
       {/* Actions */}

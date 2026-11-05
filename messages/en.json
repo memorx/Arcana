@@ -42,7 +42,11 @@
     "achievements": "Achievements",
     "challenges": "Challenges",
     "closeMenu": "Close menu",
-    "openMenu": "Open user menu"
+    "openMenu": "Open user menu",
+    "blueprint": "My Arcana Map",
+    "calendar": "Calendar",
+    "insights": "My story",
+    "compatibility": "Reading for two"
   },
   "landing": {
     "readingCounter": "readings performed",
@@ -232,7 +236,10 @@
     "subscribeCta": "Subscribe $79 MXN/mo",
     "referralTitle": "Invite friends, earn credits",
     "referralDesc": "Get 2 credits for each friend who signs up",
-    "inviteFriends": "Invite Friends"
+    "inviteFriends": "Invite Friends",
+    "explore": {
+      "title": "Explore"
+    }
   },
   "reading": {
     "selectSpread": "Choose Your Spread",
@@ -300,6 +307,9 @@
     "buyCredits": "Buy Credits",
     "loadError": "Could not load spread type",
     "createError": "Error creating reading",
+    "interpretationUnavailable": "We couldn't write your interpretation right now. You weren't charged. Try again in a moment.",
+    "interpretationRefused": "We couldn't interpret this reading this time. You weren't charged. If you like, try putting your intention in other words.",
+    "retry": "Try again",
     "viewHistory": "View history",
     "share": "Share",
     "shareReading": "Share Reading",
@@ -769,5 +779,530 @@
     "cancel": "Cancel",
     "deleteError": "Error deleting account. Please try again.",
     "notAuthenticated": "You must be logged in to access settings."
+  },
+  "blueprint": {
+    "meta": {
+      "title": "My Arcana Map",
+      "description": "Your tarot birth cards, Western and Chinese zodiac, Mexica tonalpohualli and numerology, read together."
+    },
+    "eyebrow": "Arcana Map",
+    "title": "{name}'s Arcana Map",
+    "titleNoName": "Your Arcana Map",
+    "subtitle": "Five systems read together from your date of birth and your name: tarot, the Western and Chinese zodiacs, the Mexica tonalpohualli and numerology.",
+    "bornOn": "Born {date}",
+    "moonAtBirth": "Moon at birth: {phase}",
+    "badgesLabel": "Your five signs",
+    "toSynthesis": "Go to your synthesis",
+    "systemsTitle": "Your five systems",
+    "noProfile": {
+      "title": "Your Arcana Map starts with your date of birth",
+      "description": "Add your name and date of birth to your profile and we'll put together your tarot birth cards, your signs and your numbers.",
+      "cta": "Complete my profile"
+    },
+    "badges": {
+      "western": "Western zodiac",
+      "chinese": "Chinese zodiac",
+      "tonalli": "Tonalpohualli",
+      "lifePath": "Numerology",
+      "lifePathValue": "Life path {number}",
+      "birthCard": "Tarot birth card"
+    },
+    "systems": {
+      "western": {
+        "title": "Western zodiac",
+        "ruler": "Ruler: {ruler}",
+        "card": "Card of the sign"
+      },
+      "chinese": {
+        "title": "Chinese zodiac",
+        "year": "Lunar year {year}",
+        "allies": "Allies",
+        "secretFriend": "Secret friend"
+      },
+      "tonalli": {
+        "title": "Tonalpohualli",
+        "subtitle": "Mexica sign of the day you were born",
+        "trecena": "Trecena",
+        "direction": "Direction",
+        "patron": "Patron",
+        "lordOfNight": "Lord of the night"
+      },
+      "numerology": {
+        "title": "Numerology",
+        "lifePathTitle": "Life path {number}: {name}",
+        "expression": "Expression",
+        "soulUrge": "Soul urge",
+        "personality": "Personality",
+        "birthday": "Birthday",
+        "personalYear": "Personal year {year}"
+      },
+      "tarot": {
+        "title": "Tarot birth cards",
+        "description": "They come from adding the day, month and year you were born (Mary K. Greer's method). The personality card speaks of how you show yourself; the soul card, of what moves you inside.",
+        "roles": {
+          "personalitySoul": "Personality and soul",
+          "personality": "Personality",
+          "soul": "Soul",
+          "hidden": "Hidden factor"
+        }
+      }
+    },
+    "synthesis": {
+      "title": "Your synthesis",
+      "subtitle": "Where your five systems meet, and where they pull in different directions.",
+      "intro": "Arcana reads your five systems together and writes you a portrait: what they agree on, one tension worth living with, and three questions for your year. It's free.",
+      "generate": "Create my synthesis",
+      "regenerate": "Update my synthesis",
+      "retry": "Try again",
+      "free": "Free · takes up to a minute",
+      "stale": "Your profile changed since your last synthesis, so it no longer matches your map. Create a new one whenever you like.",
+      "questionsTitle": "Questions for your year",
+      "disclaimer": "A mirror for reflection, not a prediction.",
+      "languageNote": "Written in {language}, your profile's language.",
+      "languages": {
+        "en": "English",
+        "es": "Spanish"
+      },
+      "loadingSr": "Writing your synthesis. This can take up to a minute.",
+      "loadingHint": "This can take up to a minute.",
+      "loading": {
+        "western": "Reading your Western sign…",
+        "chinese": "Looking at your Chinese year…",
+        "tonalli": "Counting your tonalli…",
+        "numerology": "Adding up your numbers…",
+        "cards": "Listening to your birth cards…",
+        "writing": "Writing your synthesis…"
+      },
+      "errors": {
+        "unavailable": "We couldn't write your synthesis right now. Please try again in a moment.",
+        "refused": "We couldn't write this synthesis. Please try again later.",
+        "rateLimited": "Too many tries in a row. Wait a minute and try again.",
+        "cooldown": "Your synthesis was updated a moment ago. You can create a new one in {minutes, plural, one {# minute} other {# minutes}}.",
+        "profile": "We need your date of birth first. Complete your profile and come back.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "share": {
+      "title": "Share your map",
+      "intro": "Create a public link to your map and send it to whoever you like.",
+      "start": "Share my map",
+      "note": "Anyone with the link will see your first name, your five signs and your synthesis. Your birth date can be worked out from your signs.",
+      "create": "Create link",
+      "cancel": "Cancel",
+      "linkLabel": "Public link to your Arcana Map",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "copyAria": "Copy link",
+      "native": "Share…",
+      "nativeTitle": "My Arcana Map",
+      "stop": "Stop sharing",
+      "errors": {
+        "synthesisRequired": "Create your synthesis first, then you can share your map.",
+        "rateLimited": "Too many tries in a row. Wait a minute and try again.",
+        "generic": "We couldn't update the link. Please try again."
+      }
+    },
+    "public": {
+      "metaTitle": "{name}'s Arcana Map",
+      "metaTitleNoName": "An Arcana Map",
+      "metaDescription": "Tarot birth cards, Western and Chinese zodiac, Mexica tonalpohualli and numerology, read together.",
+      "eyebrow": "Arcana Map",
+      "title": "{name}'s Arcana Map",
+      "titleNoName": "An Arcana Map",
+      "intro": "Five systems read together: tarot, the Western and Chinese zodiacs, the Mexica tonalpohualli and numerology.",
+      "synthesisTitle": "The synthesis",
+      "noSynthesis": "This map doesn't have a synthesis right now.",
+      "ctaTitle": "Discover your Arcana Map",
+      "ctaText": "Your date of birth and your name are enough to put your five systems together.",
+      "cta": "Discover your Arcana Map",
+      "login": "I already have an account"
+    },
+    "widget": {
+      "title": "My Arcana Map",
+      "cta": "View my map",
+      "synthesisReady": "Your synthesis is ready.",
+      "synthesisPending": "Create your synthesis, it's free.",
+      "setupTitle": "Your Arcana Map",
+      "setupText": "Add your date of birth and see your five systems together.",
+      "setupCta": "Complete my profile"
+    },
+    "setup": {
+      "readyTitle": "Your Arcana Map is ready",
+      "readyText": "Your tarot birth cards, your signs and your numbers, read together.",
+      "viewMap": "View my Arcana Map",
+      "dashboard": "Go to my space"
+    }
+  },
+  "birthday": {
+    "title": "Happy birthday!",
+    "granted": "We've left {credits} gift credits in your account. May this year bring you good questions.",
+    "alreadyGranted": "Your {credits} gift credits are already in your account.",
+    "greetingOnly": "May this year bring you good questions.",
+    "cta": "Do your birthday reading"
+  },
+  "pulse": {
+    "kicker": "Collective pulse",
+    "title": "Today in Arcana, <hl>{card}</hl> came up the most",
+    "share": "It appeared in {percentage}% of today's readings.",
+    "also": "Also today:",
+    "anonymous": "Anonymous: we only count cards, never who drew them.",
+    "moreThanTarot": {
+      "title": "More than tarot",
+      "subtitle": "Other ways of reading yourself, in the same place as your cards.",
+      "cta": "Explore",
+      "blueprint": {
+        "title": "Arcana Map",
+        "description": "Five systems from your birth date and your name: tarot birth cards, Western and Chinese zodiac, Mexica tonalli and numerology."
+      },
+      "calendar": {
+        "title": "Arcana Calendar",
+        "description": "Every day with its tonalpohualli sign, its moon phase and your personal day."
+      },
+      "manual": {
+        "title": "Your own deck",
+        "description": "Draw with your physical cards, tell us which ones came up and Arcana reads them."
+      },
+      "compatibility": {
+        "title": "Reading for two",
+        "description": "How two people meet across the zodiacs, numerology and the tonalli, with three cards for the bond."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Arcana Calendar",
+    "subtitle": "Every day with its sign in the Mexica tonalpohualli, its moon phase and, with your profile, your personal day.",
+    "metaTitle": "Arcana Calendar: tonalli, moon and personal day",
+    "metaDescription": "Each day's sign in the Mexica tonalpohualli, the moon phase and your numerology personal day, month by month.",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "goToToday": "Go to today",
+    "personalDayAria": "personal day {number}",
+    "keyboardHint": "Use the arrow keys to move between days; Page Up and Page Down change the month.",
+    "legend": {
+      "sign": "Day sign (tonalpohualli)",
+      "moon": "Moon phase",
+      "personalDay": "Your personal day"
+    },
+    "detail": {
+      "tonalli": "Tonalli of the day",
+      "trecena": "Trecena {name}",
+      "lordOfNight": "Lord of the night",
+      "direction": "Direction and patron",
+      "moon": "Moon",
+      "illumination": "{percent}% illuminated",
+      "personalDay": "Personal day",
+      "personalDayNumber": "Day {number}",
+      "guestCta": "Create your free account and add your birth date to see your personal day.",
+      "guestButton": "Create account",
+      "noProfileCta": "Add your birth date to your profile to see your personal day.",
+      "noProfileButton": "Complete profile"
+    },
+    "about": "About the tonalpohualli"
+  },
+  "energies": {
+    "title": "Today's energies",
+    "calendarLink": "Calendar",
+    "tonalli": "Tonalli",
+    "moon": "Moon",
+    "illumination": "{percent}%",
+    "personalDay": "Personal day",
+    "personalDayValue": "{number} · {name}",
+    "addBirthDate": "Add your birth date"
+  },
+  "insights": {
+    "metaTitle": "My story",
+    "metaDescription": "Your recurring cards, your suits, your months and how your readings resonated.",
+    "title": "My story",
+    "myStory": "My story",
+    "subtitle": "What your cards have been telling you over time.",
+    "backToHistory": "Back to history",
+    "empty": {
+      "title": "Your story is just beginning",
+      "body": "With {required} readings we start showing your recurring cards, your suits and your months. You have {count} so far.",
+      "cta": "Start a reading"
+    },
+    "stats": {
+      "totalReadings": "Readings",
+      "monthStreak": "Months in a row",
+      "reversedRate": "Reversed ({days} days)"
+    },
+    "recurring": {
+      "title": "Your recurring cards",
+      "subtitle": "The ones that came up most in the last {days} days.",
+      "count": "{count, plural, one {# time} other {# times}}",
+      "reversed": "{percent}% reversed",
+      "empty": "No readings in the last {days} days."
+    },
+    "suits": {
+      "title": "Your suits",
+      "subtitle": "How your cards were spread across suits in the last {days} days.",
+      "empty": "No readings in the last {days} days.",
+      "chartLabel": "Share by suit: {values}",
+      "names": {
+        "MAJOR": "Major Arcana",
+        "WANDS": "Wands",
+        "CUPS": "Cups",
+        "SWORDS": "Swords",
+        "PENTACLES": "Pentacles"
+      },
+      "hints": {
+        "MAJOR": "The big themes and turning points of your life",
+        "WANDS": "Fire: drive, desire, action",
+        "CUPS": "Water: emotions and bonds",
+        "SWORDS": "Air: mind, decisions, conflict",
+        "PENTACLES": "Earth: body, work, money"
+      }
+    },
+    "months": {
+      "title": "Your months",
+      "streak": "{count, plural, =0 {Your month streak starts with your next reading.} one {# month in a row with readings.} other {# months in a row with readings.}}",
+      "chartLabel": "Readings per month: {values}"
+    },
+    "resonance": {
+      "title": "How your readings resonated",
+      "empty": "You haven't rated any reading yet. A day after each reading you can tell us, on the reading itself, how it resonated.",
+      "chartLabel": "Average resonance: {average} out of 5",
+      "basedOn": "{count, plural, one {From # rated reading} other {From # rated readings}}"
+    },
+    "recap": {
+      "title": "Your month in cards",
+      "subtitle": "A written look back at your month: the thread of your questions and the cards that came back.",
+      "selectMonth": "Month",
+      "monthOption": "{label} · {count, plural, one {# reading} other {# readings}}",
+      "free": "Free",
+      "ready": "{count, plural, one {This month has # reading.} other {This month has # readings.}}",
+      "generate": "Write my month",
+      "generating": "Reading your month…",
+      "newReadings": "You have new readings since this recap.",
+      "update": "Update",
+      "needMore": "A month needs {min} readings to be written (this one has {count}).",
+      "unavailable": "We couldn't write your month right now. Try again in a moment.",
+      "refused": "We couldn't write this month's recap.",
+      "error": "Something went wrong. Try again."
+    },
+    "widget": {
+      "title": "Your card of the month",
+      "count": "{count, plural, one {Came up # time this month} other {Came up # times this month}}",
+      "viewStory": "See my story",
+      "noReadingsMonth": "No readings this month yet.",
+      "emptyTitle": "Your card of the month will show up here",
+      "emptyBody": "The one that comes up most in your readings.",
+      "emptyCta": "Start a reading"
+    }
+  },
+  "resonance": {
+    "title": "Resonance",
+    "question": "How did this reading resonate with what happened?",
+    "readingFrom": "Reading from {date}",
+    "starsGroup": "Rate from 1 to 5",
+    "starLabel": "{count, plural, one {# star out of 5} other {# stars out of 5}}",
+    "scaleLow": "Not at all",
+    "scaleHigh": "Completely",
+    "noteLabel": "Anything you want to remember? (optional)",
+    "notePlaceholder": "What happened, what changed, what stayed with you…",
+    "noteCount": "{count}/{max}",
+    "submit": "Save",
+    "saving": "Saving…",
+    "thanks": "Thank you. This helps your story make sense.",
+    "xp": "+{xp} XP",
+    "xpHint": "+5 XP",
+    "result": "Resonated {score}/5",
+    "badge": "Resonated {score}/5",
+    "error": "We couldn't save it. Try again.",
+    "alreadySaved": "This reading already has a rating.",
+    "tooSoon": "You can rate it a day after the reading."
+  },
+  "manual": {
+    "metaTitle": "Read your own deck | Arcana",
+    "metaDescription": "Draw with your physical cards, tell Arcana which ones came out and get your interpretation.",
+    "entryTitle": "Have your own deck?",
+    "entryDescription": "Shuffle and draw with your physical cards, tell us which ones came out and Arcana gives you the interpretation.",
+    "entryCta": "Read my own cards",
+    "badge": "With your deck",
+    "backToSpreads": "Back to spreads",
+    "title": "Read your own deck",
+    "subtitle": "Shuffle and draw with your own cards. Tell us which ones came out and Arcana interprets them.",
+    "balanceFree": "{count, plural, one {# free reading} other {# free readings}}",
+    "balanceCredits": "{count, plural, one {# credit available} other {# credits available}}",
+    "stepsLabel": "Reading steps",
+    "steps": {
+      "spread": "Spread",
+      "cards": "Cards",
+      "intention": "Intention"
+    },
+    "chooseSpread": "Which spread did you lay out?",
+    "chooseSpreadHint": "Choose the same layout you set on your table.",
+    "cost": "{count, plural, one {# credit} other {# credits}}",
+    "cantAfford": "{count, plural, one {You need # more credit} other {You need # more credits}}",
+    "buyCredits": "Get credits",
+    "pickCardsTitle": "Which cards came out?",
+    "pickCardsHint": "Choose a position and tap the card that came out there. If it came out upside down, mark it as reversed.",
+    "progress": "{done} of {total} cards",
+    "choosingFor": "Choosing the card for position {number}: {position}",
+    "loadingCards": "Bringing out the deck…",
+    "cardsLoadError": "We couldn't load the deck.",
+    "retryLoad": "Try again",
+    "back": "Back",
+    "next": "Continue",
+    "positionLabel": "Position {number}",
+    "choosePosition": "Position {number}: {position}. Choose its card",
+    "emptySlot": "No card yet",
+    "reversed": "Reversed",
+    "reversedToggle": "The card in {position} came out reversed",
+    "clearSlot": "Remove {card} from {position}",
+    "searchLabel": "Search for a card",
+    "searchPlaceholder": "Search by name: Tower, Torre, 3 cups…",
+    "filterLabel": "Filter by arcana or suit",
+    "filters": {
+      "all": "All",
+      "major": "Major",
+      "wands": "Wands",
+      "cups": "Cups",
+      "swords": "Swords",
+      "pentacles": "Pentacles"
+    },
+    "resultsCount": "{count, plural, one {# card} other {# cards}}",
+    "noResults": "No card matches “{query}”.",
+    "deckLabel": "78-card deck",
+    "pickCard": "Choose {card}",
+    "alreadyChosen": "{card}, already in position {position}",
+    "summaryTitle": "Your spread",
+    "intentionTitle": "What did you ask the cards?",
+    "intentionHint": "Write the question or intention you drew with.",
+    "costFree": "{count, plural, one {This reading uses your last free reading.} other {This reading uses one of your # free readings.}}",
+    "costCredits": "This reading costs {count, plural, one {# credit} other {# credits}}. You have {balance, plural, one {# credit} other {# credits}}.",
+    "needCredits": "You don't have enough credits for this spread. You weren't charged.",
+    "createError": "We couldn't save your reading. Try again.",
+    "interpreting": "Arcana is reading your cards…",
+    "submit": "Interpret my cards"
+  },
+  "followUp": {
+    "title": "Ask your reading more",
+    "subtitle": "Ask up to {limit} questions about this reading. The first one is free; after that, {cost, plural, one {# credit} other {# credits}} each.",
+    "counter": "{used} of {limit}",
+    "counterLabel": "{used} of {limit} questions used",
+    "yourQuestion": "Your question",
+    "answerLabel": "Answer",
+    "placeholder": "What else would you like to understand about this reading?",
+    "charCount": "{count}/{max}",
+    "costFree": "This question is free.",
+    "costPaid": "This question costs {cost, plural, one {# credit} other {# credits}}. You have {credits, plural, one {# credit} other {# credits}}.",
+    "noCredits": "You don't have enough credits for another question.",
+    "buyCredits": "Get credits",
+    "submit": "Ask",
+    "submitPaid": "Ask · {cost, plural, one {# credit} other {# credits}}",
+    "sending": "The cards are answering…",
+    "retry": "Try again",
+    "limitReached": "You've asked the {limit} questions for this reading.",
+    "free": "Free",
+    "paid": "{count, plural, one {# credit} other {# credits}}",
+    "errors": {
+      "unavailable": "We couldn't answer right now. You weren't charged. Try again in a moment.",
+      "refused": "We couldn't answer that question as it's written. You weren't charged. Try rephrasing it.",
+      "credits": "You don't have enough credits for this question. You weren't charged.",
+      "limit": "This reading already has its {limit} questions.",
+      "rate": "Too many questions in a row. Wait a minute and try again.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "readAloud": {
+    "label": "Read aloud",
+    "play": "Listen aloud",
+    "playShort": "Listen",
+    "pause": "Pause reading aloud",
+    "pauseShort": "Pause",
+    "resume": "Resume reading aloud",
+    "resumeShort": "Resume",
+    "stop": "Stop reading aloud",
+    "playing": "Reading aloud",
+    "paused": "Paused"
+  },
+  "compatibility": {
+    "metaDescription": "Compare two birth dates across the western and Chinese zodiac, numerology and the Mexica tonalpohualli, with three tarot cards for the bond.",
+    "title": "Reading for two",
+    "subtitle": "Two birth dates, four systems and three cards for the bond: how you meet, what you ask of each other and what to take care of.",
+    "profileRequired": {
+      "title": "First, your own map",
+      "description": "To compare two maps we need yours: add your birth date and full name to your profile.",
+      "cta": "Complete my profile"
+    },
+    "form": {
+      "title": "The other person",
+      "partnerName": "Name",
+      "partnerNameHint": "Optional. It's the name the reading will use.",
+      "partnerBirthDate": "Birth date",
+      "partnerFullName": "Full name",
+      "partnerFullNameHint": "Optional, for name numerology. It's only used for the calculation and isn't saved.",
+      "costLabel": "Cost",
+      "cost": "{cost} credits",
+      "balance": "You have {credits, plural, one {# credit} other {# credits}}",
+      "notEnoughCredits": "You need {cost} credits for a reading for two.",
+      "buyCredits": "Get credits",
+      "submit": "Read the bond",
+      "submitAria": "Read the bond for {cost} credits",
+      "loading": "Reading both maps…",
+      "loadingHint": "It takes about half a minute. Keep this page open.",
+      "retry": "Try again",
+      "noCharge": "Credits are only charged once the reading is ready."
+    },
+    "errors": {
+      "birthDateRequired": "Enter their birth date.",
+      "birthDateInvalid": "That date doesn't look right.",
+      "birthDateFuture": "The birth date can't be in the future.",
+      "birthDateTooOld": "Use a date from 1924 onwards.",
+      "nameTooLong": "Use up to 60 characters.",
+      "fullNameTooLong": "Use up to 80 characters.",
+      "insufficientCredits": "You don't have enough credits for this reading.",
+      "profileRequired": "Complete your profile first.",
+      "unavailable": "The reading couldn't be written right now. Nothing was charged; try again in a moment.",
+      "refused": "We couldn't write this reading. Nothing was charged.",
+      "rateLimited": "Too many readings in a row. Wait a minute and try again.",
+      "unconfirmed": "We couldn't confirm whether your reading was completed. Check your readings for two before trying again.",
+      "generic": "Something went wrong. Nothing was charged; try again."
+    },
+    "how": {
+      "title": "What we compare",
+      "western": "Western zodiac: how your elements get along.",
+      "chinese": "Chinese zodiac: trines, secret friends and opposite signs.",
+      "numerology": "Numerology: your life paths and the number of the bond.",
+      "tonalli": "Tonalpohualli: your day signs in the Mexica calendar.",
+      "cards": "Three cards: you, the other person and the bond."
+    },
+    "previous": {
+      "title": "Your readings for two",
+      "empty": "Your readings for two will appear here.",
+      "noName": "No name",
+      "bornOn": "Born {date}"
+    },
+    "detail": {
+      "back": "Readings for two",
+      "title": "{me} & {partner}",
+      "createdOn": "Reading from {date}",
+      "metersTitle": "System by system",
+      "cardsTitle": "Three cards for the bond",
+      "readingTitle": "The reading",
+      "newReading": "New reading for two",
+      "summaryUnavailable": "The system details for this reading aren't available."
+    },
+    "systems": {
+      "western": "Western zodiac",
+      "chinese": "Chinese zodiac",
+      "numerology": "Numerology",
+      "tonalli": "Tonalpohualli",
+      "overall": "Overall"
+    },
+    "meterAria": "{system}: {score} of 5",
+    "scoreOutOf": "{score}/5",
+    "numerology": {
+      "lifePaths": "Life paths {a} and {b}",
+      "bondNumber": "Bond number {number} · {name}",
+      "names": "Name expression {a} and {b}"
+    },
+    "roles": {
+      "me": "You",
+      "partner": "The other person",
+      "bond": "The bond"
+    }
   }
 }

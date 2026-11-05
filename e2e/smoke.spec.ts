@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+// The app picks the language from the locale cookie, then Accept-Language (default es).
+// These checks were written for the Spanish default, so the browser asks for Spanish.
+test.use({ locale: "es-MX" });
+
 /**
  * Smoke Tests - Critical paths that should always work
  * These tests verify the app is functional without complex authentication
@@ -24,13 +28,15 @@ test.describe("Smoke Tests - Public Pages", () => {
 
     expect(response?.status()).toBe(200);
 
-    // Form elements
+    // Form elements (the Spanish label is written "Contrasena")
     await expect(page.getByLabel(/email|correo/i)).toBeVisible();
-    await expect(page.getByLabel(/password|contraseña/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /iniciar|sign in|login/i })).toBeVisible();
+    await expect(page.getByLabel(/password|contrase[ñn]a/i)).toBeVisible();
+    await expect(page.locator("form").getByRole("button", { name: /iniciar|sign in|login/i })).toBeVisible();
 
-    // OAuth option
-    await expect(page.getByRole("button", { name: /google/i })).toBeVisible();
+    // OAuth option: the page shows it only when NEXT_PUBLIC_GOOGLE_ENABLED is "true" at build time
+    if (process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "true") {
+      await expect(page.getByRole("button", { name: /google/i })).toBeVisible();
+    }
   });
 
   test("register page loads and has form", async ({ page }) => {
@@ -71,7 +77,7 @@ test.describe("Smoke Tests - Navigation", () => {
     await page.goto("/");
 
     // Navigate to login
-    await page.getByRole("link", { name: /iniciar sesión|login|sign in/i }).first().click();
+    await page.getByRole("link", { name: /iniciar sesi[oó]n|log ?in|sign in/i }).first().click();
     await expect(page).toHaveURL(/\/login/);
 
     // Navigate to register from login
@@ -92,9 +98,9 @@ test.describe("Smoke Tests - Navigation", () => {
     if (await langSelector.isVisible()) {
       await langSelector.click();
 
-      // Should show language options
-      const options = page.locator('[role="menuitem"], [role="option"]');
-      await expect(options.first()).toBeVisible({ timeout: 3000 });
+      // Should show both language options ("🇪🇸 ES" / "🇺🇸 EN")
+      await expect(page.getByRole("button", { name: /\bES$/ })).toBeVisible({ timeout: 3000 });
+      await expect(page.getByRole("button", { name: /\bEN$/ })).toBeVisible();
     }
   });
 });
@@ -203,13 +209,14 @@ test.describe("Smoke Tests - Error States", () => {
     await page.goto("/login");
 
     await page.getByLabel(/email|correo/i).fill("nonexistent@example.com");
-    await page.getByLabel(/password|contraseña/i).fill("wrongpassword123");
+    await page.getByLabel(/password|contrase[ñn]a/i).fill("wrongpassword123");
 
-    await page.getByRole("button", { name: /iniciar|sign in|login/i }).click();
+    // The form's own button (the header also has an "Iniciar sesion" button-link)
+    await page.locator("form").getByRole("button", { name: /iniciar|sign in|login/i }).click();
 
-    // Should show error
+    // Should show error (the credentials check goes to the database: allow for its latency)
     await expect(page.locator("body")).toContainText(/invalid|inválido|error|incorrect/i, {
-      timeout: 5000,
+      timeout: 15000,
     });
   });
 });
@@ -251,6 +258,7 @@ test.describe("Smoke Tests - Responsive Design", () => {
 
     // Desktop nav should be hidden on mobile
     const desktopNav = page.locator("nav.hidden.md\\:flex, nav.md\\:flex.hidden");
+    await expect(desktopNav).toBeHidden();
 
     // Either hamburger menu visible or responsive nav
     const mobileMenuButton = page.locator('[aria-label*="menu"], button:has(svg)').first();

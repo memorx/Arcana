@@ -1,8 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { AI_MODELS, complete } from "@/lib/ai/config";
 
 interface CardForInterpretation {
   position: number;
@@ -17,12 +13,21 @@ interface InterpretationRequest {
   intention: string;
   cards: CardForInterpretation[];
   locale: string;
+  /** Plain-text summary of the person's previous readings (reading memory). */
+  history?: string;
+  /** "manual" = the person drew the cards with their own physical deck. */
+  source?: "app" | "manual";
 }
+
+/** Readings: thinking tokens count inside this budget. */
+const READING_MAX_TOKENS = 4000;
+/** Daily card: short message from a model without thinking. */
+const DAILY_MAX_TOKENS = 700;
 
 export async function generateTarotInterpretation(
   request: InterpretationRequest
 ): Promise<string> {
-  const { spreadName, intention, cards, locale } = request;
+  const { spreadName, intention, cards, locale, history, source } = request;
   const isSpanish = locale === "es";
 
   const cardsDescription = cards
@@ -90,34 +95,35 @@ IMPORTANT:
 - If the reading is mostly "difficult", focus on what is asking for attention and what can be learned
 - Always respond in English`;
 
-  const systemPrompt = isSpanish ? systemPromptEs : systemPromptEn;
+  const manualDeckNote = isSpanish
+    ? "\n\nLa persona tiró estas cartas con su propio mazo físico. Respeta esa elección y no menciones el azar."
+    : "\n\nThe person drew these cards with their own physical deck. Respect that choice and don't mention chance or randomness.";
+
+  const systemPrompt =
+    (isSpanish ? systemPromptEs : systemPromptEn) + (source === "manual" ? manualDeckNote : "");
   const spreadLabel = isSpanish ? "Tirada" : "Spread";
+
+  const historyBlock = history?.trim()
+    ? `\n\n---\n\n${
+        isSpanish
+          ? "Contexto de lecturas anteriores (úsalo sólo si aporta; no lo recites)"
+          : "Context from previous readings (use it only if it adds something; don't recite it)"
+      }:\n${history.trim()}`
+    : "";
 
   const userPrompt = `${intention}
 
 ---
 
 ${spreadLabel}: ${spreadName}
-${cardsDescription}`;
+${cardsDescription}${historyBlock}`;
 
-  const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2000,
-    messages: [
-      {
-        role: "user",
-        content: userPrompt,
-      },
-    ],
+  return complete({
+    model: AI_MODELS.reading,
+    maxTokens: READING_MAX_TOKENS,
     system: systemPrompt,
+    user: userPrompt,
   });
-
-  const textContent = message.content.find((block) => block.type === "text");
-  if (!textContent || textContent.type !== "text") {
-    throw new Error("No text content in response");
-  }
-
-  return textContent.text;
 }
 
 // ============================================================================
@@ -132,12 +138,17 @@ interface DailyInterpretationRequest {
   focusArea: string;
   userName: string;
   locale: string;
+  /** Plain-text "energies of the day" (tonalli, moon, personal day). */
+  dayContext?: string;
+  /** Time budget for the AI call in ms (the daily cron uses 15 s per person). */
+  timeoutMs?: number;
 }
 
 export async function generateDailyInterpretation(
   request: DailyInterpretationRequest
 ): Promise<string> {
-  const { cardName, cardNameEs, isReversed, zodiacSign, focusArea, userName, locale } = request;
+  const { cardName, cardNameEs, isReversed, zodiacSign, focusArea, userName, locale, dayContext, timeoutMs } =
+    request;
 
   const isSpanish = locale === "es";
   const displayCard = isSpanish ? cardNameEs : cardName;
@@ -151,8 +162,9 @@ export async function generateDailyInterpretation(
   };
 
   const focus = focusAreaMap[focusArea] || focusAreaMap.general;
+  const hasDayContext = Boolean(dayContext?.trim());
 
-  const systemPrompt = isSpanish
+  const baseSystemPrompt = isSpanish
     ? `Eres una guía de tarot sabia que ofrece mensajes diarios breves pero significativos.
 
 Tu estilo:
@@ -184,36 +196,35 @@ Structure:
 
 Do NOT make specific predictions. Offer reflective guidance.`;
 
+  const dayContextInstruction = isSpanish
+    ? "\n\nSi recibes las energías del día, téjelas en una sola frase dentro del mensaje, sin convertirlas en el tema: la carta sigue siendo el centro."
+    : "\n\nIf you receive the energies of the day, weave them into a single sentence of the message without making them the topic: the card stays at the center.";
+
+  const systemPrompt = baseSystemPrompt + (hasDayContext ? dayContextInstruction : "");
+
+  const dayContextBlock = hasDayContext
+    ? `\n\n${isSpanish ? "Energías del día" : "Energies of the day"}: ${dayContext!.trim()}`
+    : "";
+
   const userPrompt = isSpanish
     ? `Carta del día para ${userName} (${zodiacSign}):
 ${displayCard}${isReversed ? " (invertida)" : ""}
 
-Área de enfoque: ${focus.es}
+Área de enfoque: ${focus.es}${dayContextBlock}
 
 Escribe un mensaje personal y breve para comenzar el día.`
     : `Daily card for ${userName} (${zodiacSign}):
 ${displayCard}${isReversed ? " (reversed)" : ""}
 
-Focus area: ${focus.en}
+Focus area: ${focus.en}${dayContextBlock}
 
 Write a personal, brief message to start the day.`;
 
-  const message = await anthropic.messages.create({
-    model: "claude-3-5-haiku-20241022", // Using Haiku for cost efficiency
-    max_tokens: 500,
-    messages: [
-      {
-        role: "user",
-        content: userPrompt,
-      },
-    ],
+  return complete({
+    model: AI_MODELS.daily,
+    maxTokens: DAILY_MAX_TOKENS,
     system: systemPrompt,
+    user: userPrompt,
+    ...(timeoutMs !== undefined ? { timeoutMs } : {}),
   });
-
-  const textContent = message.content.find((block) => block.type === "text");
-  if (!textContent || textContent.type !== "text") {
-    throw new Error("No text content in response");
-  }
-
-  return textContent.text;
 }

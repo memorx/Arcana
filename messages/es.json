@@ -42,7 +42,11 @@
     "achievements": "Logros",
     "challenges": "Desafios",
     "closeMenu": "Cerrar menu",
-    "openMenu": "Abrir menu de usuario"
+    "openMenu": "Abrir menu de usuario",
+    "blueprint": "Mi Mapa Arcano",
+    "calendar": "Calendario",
+    "insights": "Mi historia",
+    "compatibility": "Lectura de dos"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
@@ -232,7 +236,10 @@
     "subscribeCta": "Suscribirse $79 MXN/mes",
     "referralTitle": "Invita amigos, gana creditos",
     "referralDesc": "Obten 2 creditos por cada amigo que se registre",
-    "inviteFriends": "Invitar Amigos"
+    "inviteFriends": "Invitar Amigos",
+    "explore": {
+      "title": "Explora"
+    }
   },
   "reading": {
     "selectSpread": "Elige tu Tirada",
@@ -300,6 +307,9 @@
     "buyCredits": "Comprar Creditos",
     "loadError": "No se pudo cargar el tipo de tirada",
     "createError": "Error al crear la lectura",
+    "interpretationUnavailable": "No pudimos escribir tu interpretación ahora. No se te cobró nada; inténtalo de nuevo en un momento.",
+    "interpretationRefused": "Esta vez no pudimos interpretar tu lectura. No se te cobró nada. Si quieres, escribe tu intención con otras palabras.",
+    "retry": "Intentar de nuevo",
     "viewHistory": "Ver historial",
     "share": "Compartir",
     "shareReading": "Compartir Lectura",
@@ -571,7 +581,7 @@
     "save": "Guardar Perfil",
     "saving": "Guardando...",
     "saved": "Perfil guardado!",
-    "continue": "Continuar a Suscripcion",
+    "continue": "Continuar a suscripción",
     "focusAreas": {
       "general": "Guia General",
       "love": "Amor y Relaciones",
@@ -769,5 +779,530 @@
     "cancel": "Cancelar",
     "deleteError": "Error al eliminar la cuenta. Por favor intenta de nuevo.",
     "notAuthenticated": "Debes iniciar sesion para acceder a la configuracion."
+  },
+  "blueprint": {
+    "meta": {
+      "title": "Mi Mapa Arcano",
+      "description": "Tus cartas natales del tarot, tu zodiaco occidental y chino, tu tonalpohualli mexica y tu numerología, leídos juntos."
+    },
+    "eyebrow": "Mapa Arcano",
+    "title": "El Mapa Arcano de {name}",
+    "titleNoName": "Tu Mapa Arcano",
+    "subtitle": "Cinco sistemas leídos juntos a partir de tu fecha de nacimiento y tu nombre: el tarot, los zodiacos occidental y chino, el tonalpohualli mexica y la numerología.",
+    "bornOn": "Nacimiento: {date}",
+    "moonAtBirth": "Luna al nacer: {phase}",
+    "badgesLabel": "Tus cinco signos",
+    "toSynthesis": "Ir a tu síntesis",
+    "systemsTitle": "Tus cinco sistemas",
+    "noProfile": {
+      "title": "Tu Mapa Arcano empieza con tu fecha de nacimiento",
+      "description": "Agrega tu nombre y tu fecha de nacimiento en tu perfil y armamos tus cartas natales del tarot, tus signos y tus números.",
+      "cta": "Completar mi perfil"
+    },
+    "badges": {
+      "western": "Zodiaco occidental",
+      "chinese": "Zodiaco chino",
+      "tonalli": "Tonalpohualli",
+      "lifePath": "Numerología",
+      "lifePathValue": "Camino de vida {number}",
+      "birthCard": "Carta natal del tarot"
+    },
+    "systems": {
+      "western": {
+        "title": "Zodiaco occidental",
+        "ruler": "Regente: {ruler}",
+        "card": "Carta del signo"
+      },
+      "chinese": {
+        "title": "Zodiaco chino",
+        "year": "Año lunar {year}",
+        "allies": "Afines",
+        "secretFriend": "Amigo secreto"
+      },
+      "tonalli": {
+        "title": "Tonalpohualli",
+        "subtitle": "Signo mexica del día en que naciste",
+        "trecena": "Trecena",
+        "direction": "Rumbo",
+        "patron": "Patrono",
+        "lordOfNight": "Señor de la noche"
+      },
+      "numerology": {
+        "title": "Numerología",
+        "lifePathTitle": "Camino de vida {number}: {name}",
+        "expression": "Expresión",
+        "soulUrge": "Alma",
+        "personality": "Personalidad",
+        "birthday": "Cumpleaños",
+        "personalYear": "Año personal {year}"
+      },
+      "tarot": {
+        "title": "Cartas natales del tarot",
+        "description": "Salen de sumar el día, el mes y el año en que naciste (método de Mary K. Greer). La carta de personalidad habla de cómo te muestras; la del alma, de lo que te mueve por dentro.",
+        "roles": {
+          "personalitySoul": "Personalidad y alma",
+          "personality": "Personalidad",
+          "soul": "Alma",
+          "hidden": "Factor oculto"
+        }
+      }
+    },
+    "synthesis": {
+      "title": "Tu síntesis",
+      "subtitle": "Dónde se encuentran tus cinco sistemas y dónde tiran hacia lados distintos.",
+      "intro": "Arcana lee tus cinco sistemas juntos y te escribe un retrato: en qué coinciden, una tensión que vale la pena vivir y tres preguntas para tu año. Es gratis.",
+      "generate": "Generar mi síntesis",
+      "regenerate": "Actualizar mi síntesis",
+      "retry": "Intentar de nuevo",
+      "free": "Gratis · tarda hasta un minuto",
+      "stale": "Tu perfil cambió desde tu última síntesis, así que ya no corresponde a tu mapa. Genera una nueva cuando quieras.",
+      "questionsTitle": "Preguntas para tu año",
+      "disclaimer": "Un espejo para reflexionar, no una predicción.",
+      "languageNote": "Escrita en {language}, el idioma de tu perfil.",
+      "languages": {
+        "en": "inglés",
+        "es": "español"
+      },
+      "loadingSr": "Escribiendo tu síntesis. Puede tardar hasta un minuto.",
+      "loadingHint": "Puede tardar hasta un minuto.",
+      "loading": {
+        "western": "Leyendo tu signo occidental…",
+        "chinese": "Mirando tu año chino…",
+        "tonalli": "Contando tu tonalli…",
+        "numerology": "Sumando tus números…",
+        "cards": "Escuchando tus cartas natales…",
+        "writing": "Escribiendo tu síntesis…"
+      },
+      "errors": {
+        "unavailable": "No pudimos escribir tu síntesis en este momento. Inténtalo de nuevo en un rato.",
+        "refused": "No pudimos escribir esta síntesis. Inténtalo más tarde.",
+        "rateLimited": "Fueron muchos intentos seguidos. Espera un minuto y vuelve a intentarlo.",
+        "cooldown": "Tu síntesis se actualizó hace muy poco. Podrás generar una nueva en {minutes, plural, one {# minuto} other {# minutos}}.",
+        "profile": "Primero necesitamos tu fecha de nacimiento. Completa tu perfil y regresa.",
+        "generic": "Algo salió mal. Inténtalo de nuevo."
+      }
+    },
+    "share": {
+      "title": "Comparte tu mapa",
+      "intro": "Crea un enlace público de tu mapa para mandárselo a quien tú quieras.",
+      "start": "Compartir mi mapa",
+      "note": "Quien abra el enlace verá tu nombre de pila, tus cinco signos y tu síntesis. Con tus signos se puede calcular tu fecha de nacimiento.",
+      "create": "Crear enlace",
+      "cancel": "Cancelar",
+      "linkLabel": "Enlace público de tu Mapa Arcano",
+      "copy": "Copiar",
+      "copied": "¡Copiado!",
+      "copyAria": "Copiar enlace",
+      "native": "Compartir…",
+      "nativeTitle": "Mi Mapa Arcano",
+      "stop": "Dejar de compartir",
+      "errors": {
+        "synthesisRequired": "Primero genera tu síntesis y luego podrás compartir tu mapa.",
+        "rateLimited": "Fueron muchos intentos seguidos. Espera un minuto y vuelve a intentarlo.",
+        "generic": "No pudimos actualizar el enlace. Inténtalo de nuevo."
+      }
+    },
+    "public": {
+      "metaTitle": "El Mapa Arcano de {name}",
+      "metaTitleNoName": "Un Mapa Arcano",
+      "metaDescription": "Cartas natales del tarot, zodiaco occidental y chino, tonalpohualli mexica y numerología, leídos juntos.",
+      "eyebrow": "Mapa Arcano",
+      "title": "El Mapa Arcano de {name}",
+      "titleNoName": "Un Mapa Arcano",
+      "intro": "Cinco sistemas leídos juntos: el tarot, los zodiacos occidental y chino, el tonalpohualli mexica y la numerología.",
+      "synthesisTitle": "La síntesis",
+      "noSynthesis": "Este mapa no tiene síntesis por ahora.",
+      "ctaTitle": "Descubre tu Mapa Arcano",
+      "ctaText": "Con tu fecha de nacimiento y tu nombre basta para reunir tus cinco sistemas.",
+      "cta": "Descubre tu Mapa Arcano",
+      "login": "Ya tengo cuenta"
+    },
+    "widget": {
+      "title": "Mi Mapa Arcano",
+      "cta": "Ver mi mapa",
+      "synthesisReady": "Tu síntesis está lista.",
+      "synthesisPending": "Genera tu síntesis, es gratis.",
+      "setupTitle": "Tu Mapa Arcano",
+      "setupText": "Agrega tu fecha de nacimiento y mira tus cinco sistemas juntos.",
+      "setupCta": "Completar mi perfil"
+    },
+    "setup": {
+      "readyTitle": "Tu Mapa Arcano está listo",
+      "readyText": "Tus cartas natales del tarot, tus signos y tus números, leídos juntos.",
+      "viewMap": "Ver mi Mapa Arcano",
+      "dashboard": "Ir a mi espacio"
+    }
+  },
+  "birthday": {
+    "title": "¡Feliz cumpleaños!",
+    "granted": "Te dejamos {credits} créditos de regalo en tu cuenta. Que este año te traiga buenas preguntas.",
+    "alreadyGranted": "Tus {credits} créditos de regalo ya están en tu cuenta.",
+    "greetingOnly": "Que este año te traiga buenas preguntas.",
+    "cta": "Haz tu lectura de cumpleaños"
+  },
+  "pulse": {
+    "kicker": "Pulso colectivo",
+    "title": "Hoy en Arcana salió más <hl>{card}</hl>",
+    "share": "Apareció en el {percentage}% de las lecturas del día.",
+    "also": "También salieron hoy:",
+    "anonymous": "Anónimo: sólo contamos cartas, nunca quién las sacó.",
+    "moreThanTarot": {
+      "title": "Más que tarot",
+      "subtitle": "Otras formas de leerte, en el mismo lugar que tus cartas.",
+      "cta": "Explorar",
+      "blueprint": {
+        "title": "Mapa Arcano",
+        "description": "Cinco sistemas a partir de tu fecha de nacimiento y tu nombre: cartas natales del tarot, zodiaco occidental y chino, tonalli mexica y numerología."
+      },
+      "calendar": {
+        "title": "Calendario Arcano",
+        "description": "Cada día con su signo del tonalpohualli, su fase lunar y tu día personal."
+      },
+      "manual": {
+        "title": "Tu mazo",
+        "description": "Tira con tus cartas físicas, dinos cuáles salieron y Arcana las interpreta."
+      },
+      "compatibility": {
+        "title": "Lectura de dos",
+        "description": "Cómo se encuentran dos personas en los zodiacos, la numerología y el tonalli, con tres cartas para el vínculo."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Calendario Arcano",
+    "subtitle": "Cada día con su signo del tonalpohualli mexica, su fase lunar y, con tu perfil, tu día personal.",
+    "metaTitle": "Calendario Arcano: tonalli, luna y día personal",
+    "metaDescription": "El signo de cada día en el tonalpohualli mexica, la fase lunar y tu día personal de numerología, mes a mes.",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "today": "Hoy",
+    "goToToday": "Ir a hoy",
+    "personalDayAria": "día personal {number}",
+    "keyboardHint": "Usa las flechas para moverte entre días; Re Pág y Av Pág cambian de mes.",
+    "legend": {
+      "sign": "Signo del día (tonalpohualli)",
+      "moon": "Fase lunar",
+      "personalDay": "Tu día personal"
+    },
+    "detail": {
+      "tonalli": "Tonalli del día",
+      "trecena": "Trecena {name}",
+      "lordOfNight": "Señor de la noche",
+      "direction": "Rumbo y patrono",
+      "moon": "Luna",
+      "illumination": "{percent}% de iluminación",
+      "personalDay": "Día personal",
+      "personalDayNumber": "Día {number}",
+      "guestCta": "Crea tu cuenta gratis y agrega tu fecha de nacimiento para ver tu día personal.",
+      "guestButton": "Crear cuenta",
+      "noProfileCta": "Agrega tu fecha de nacimiento a tu perfil para ver tu día personal.",
+      "noProfileButton": "Completar perfil"
+    },
+    "about": "Sobre el tonalpohualli"
+  },
+  "energies": {
+    "title": "Energías de hoy",
+    "calendarLink": "Calendario",
+    "tonalli": "Tonalli",
+    "moon": "Luna",
+    "illumination": "{percent}%",
+    "personalDay": "Día personal",
+    "personalDayValue": "{number} · {name}",
+    "addBirthDate": "Agrega tu fecha de nacimiento"
+  },
+  "insights": {
+    "metaTitle": "Mi historia",
+    "metaDescription": "Tus cartas recurrentes, tus palos, tus meses y cómo resonaron tus lecturas.",
+    "title": "Mi historia",
+    "myStory": "Mi historia",
+    "subtitle": "Lo que tus cartas te han ido diciendo con el tiempo.",
+    "backToHistory": "Volver al historial",
+    "empty": {
+      "title": "Tu historia apenas empieza",
+      "body": "Con {required} lecturas empezamos a mostrarte tus cartas recurrentes, tus palos y tus meses. Llevas {count}.",
+      "cta": "Hacer una lectura"
+    },
+    "stats": {
+      "totalReadings": "Lecturas",
+      "monthStreak": "Meses seguidos",
+      "reversedRate": "Invertidas ({days} días)"
+    },
+    "recurring": {
+      "title": "Tus cartas recurrentes",
+      "subtitle": "Las que más te han salido en los últimos {days} días.",
+      "count": "{count, plural, one {# vez} other {# veces}}",
+      "reversed": "{percent}% invertida",
+      "empty": "No hay lecturas en los últimos {days} días."
+    },
+    "suits": {
+      "title": "Tus palos",
+      "subtitle": "Cómo se repartieron tus cartas en los últimos {days} días.",
+      "empty": "No hay lecturas en los últimos {days} días.",
+      "chartLabel": "Reparto por palo: {values}",
+      "names": {
+        "MAJOR": "Arcanos mayores",
+        "WANDS": "Bastos",
+        "CUPS": "Copas",
+        "SWORDS": "Espadas",
+        "PENTACLES": "Oros"
+      },
+      "hints": {
+        "MAJOR": "Los grandes temas y giros de tu vida",
+        "WANDS": "Fuego: impulso, deseo, acción",
+        "CUPS": "Agua: emociones y vínculos",
+        "SWORDS": "Aire: mente, decisiones, conflictos",
+        "PENTACLES": "Tierra: cuerpo, trabajo, dinero"
+      }
+    },
+    "months": {
+      "title": "Tus meses",
+      "streak": "{count, plural, =0 {Tu racha de meses empieza con tu próxima lectura.} one {# mes seguido con lecturas.} other {# meses seguidos con lecturas.}}",
+      "chartLabel": "Lecturas por mes: {values}"
+    },
+    "resonance": {
+      "title": "Cómo resonaron tus lecturas",
+      "empty": "Todavía no has calificado ninguna lectura. Un día después de cada lectura puedes contarnos, en la misma lectura, cómo resonó.",
+      "chartLabel": "Resonancia promedio: {average} de 5",
+      "basedOn": "{count, plural, one {De # lectura calificada} other {De # lecturas calificadas}}"
+    },
+    "recap": {
+      "title": "Tu mes en cartas",
+      "subtitle": "Un repaso escrito de tu mes: el hilo de tus preguntas y las cartas que volvieron.",
+      "selectMonth": "Mes",
+      "monthOption": "{label} · {count, plural, one {# lectura} other {# lecturas}}",
+      "free": "Gratis",
+      "ready": "{count, plural, one {Este mes tiene # lectura.} other {Este mes tiene # lecturas.}}",
+      "generate": "Escribir mi mes",
+      "generating": "Leyendo tu mes…",
+      "newReadings": "Tienes lecturas nuevas desde este repaso.",
+      "update": "Actualizar",
+      "needMore": "Hacen falta {min} lecturas en el mes para escribirlo (este tiene {count}).",
+      "unavailable": "No pudimos escribir tu mes ahora. Inténtalo de nuevo en un momento.",
+      "refused": "No pudimos escribir el repaso de este mes.",
+      "error": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "widget": {
+      "title": "Tu carta del mes",
+      "count": "{count, plural, one {Salió # vez este mes} other {Salió # veces este mes}}",
+      "viewStory": "Ver mi historia",
+      "noReadingsMonth": "Aún no tienes lecturas este mes.",
+      "emptyTitle": "Aquí aparecerá tu carta del mes",
+      "emptyBody": "La que más te salga en tus lecturas.",
+      "emptyCta": "Hacer una lectura"
+    }
+  },
+  "resonance": {
+    "title": "Resonancia",
+    "question": "¿Cómo resonó esta lectura con lo que pasó?",
+    "readingFrom": "Lectura del {date}",
+    "starsGroup": "Califica de 1 a 5",
+    "starLabel": "{count, plural, one {# estrella de 5} other {# estrellas de 5}}",
+    "scaleLow": "Nada",
+    "scaleHigh": "Totalmente",
+    "noteLabel": "¿Algo que quieras recordar? (opcional)",
+    "notePlaceholder": "Qué pasó, qué cambió, qué te quedó…",
+    "noteCount": "{count}/{max}",
+    "submit": "Guardar",
+    "saving": "Guardando…",
+    "thanks": "Gracias. Esto le da sentido a tu historia.",
+    "xp": "+{xp} XP",
+    "xpHint": "+5 XP",
+    "result": "Resonó {score}/5",
+    "badge": "Resonó {score}/5",
+    "error": "No se pudo guardar. Inténtalo de nuevo.",
+    "alreadySaved": "Esta lectura ya tiene una calificación.",
+    "tooSoon": "Podrás calificarla un día después de la lectura."
+  },
+  "manual": {
+    "metaTitle": "Tirada con tu propio mazo | Arcana",
+    "metaDescription": "Tira con tus cartas físicas, dile a Arcana cuáles salieron y recibe tu interpretación.",
+    "entryTitle": "¿Tienes tu propio mazo?",
+    "entryDescription": "Baraja y tira con tus cartas físicas, dinos cuáles salieron y Arcana te da la interpretación.",
+    "entryCta": "Tirar con mi mazo",
+    "badge": "Con tu mazo",
+    "backToSpreads": "Volver a las tiradas",
+    "title": "Tirada con tu propio mazo",
+    "subtitle": "Baraja y tira con tus cartas de siempre. Dinos cuáles salieron y Arcana las interpreta.",
+    "balanceFree": "{count, plural, one {# lectura gratis} other {# lecturas gratis}}",
+    "balanceCredits": "{count, plural, one {# crédito disponible} other {# créditos disponibles}}",
+    "stepsLabel": "Pasos de la tirada",
+    "steps": {
+      "spread": "Tirada",
+      "cards": "Cartas",
+      "intention": "Intención"
+    },
+    "chooseSpread": "¿Qué tirada hiciste?",
+    "chooseSpreadHint": "Elige la misma disposición que pusiste en tu mesa.",
+    "cost": "{count, plural, one {# crédito} other {# créditos}}",
+    "cantAfford": "{count, plural, one {Te falta # crédito} other {Te faltan # créditos}}",
+    "buyCredits": "Conseguir créditos",
+    "pickCardsTitle": "¿Qué cartas salieron?",
+    "pickCardsHint": "Elige una posición y toca la carta que salió ahí. Si salió de cabeza, márcala como invertida.",
+    "progress": "{done} de {total} cartas",
+    "choosingFor": "Eligiendo la carta de la posición {number}: {position}",
+    "loadingCards": "Sacando el mazo…",
+    "cardsLoadError": "No pudimos cargar el mazo.",
+    "retryLoad": "Intentar de nuevo",
+    "back": "Atrás",
+    "next": "Continuar",
+    "positionLabel": "Posición {number}",
+    "choosePosition": "Posición {number}: {position}. Elegir su carta",
+    "emptySlot": "Sin carta",
+    "reversed": "Invertida",
+    "reversedToggle": "La carta de {position} salió invertida",
+    "clearSlot": "Quitar {card} de {position}",
+    "searchLabel": "Buscar una carta",
+    "searchPlaceholder": "Busca por nombre: Torre, Tower, 3 copas…",
+    "filterLabel": "Filtrar por arcano o palo",
+    "filters": {
+      "all": "Todas",
+      "major": "Mayores",
+      "wands": "Bastos",
+      "cups": "Copas",
+      "swords": "Espadas",
+      "pentacles": "Oros"
+    },
+    "resultsCount": "{count, plural, one {# carta} other {# cartas}}",
+    "noResults": "Ninguna carta coincide con «{query}».",
+    "deckLabel": "Mazo de 78 cartas",
+    "pickCard": "Elegir {card}",
+    "alreadyChosen": "{card}, ya está en la posición {position}",
+    "summaryTitle": "Tu tirada",
+    "intentionTitle": "¿Qué le preguntaste a las cartas?",
+    "intentionHint": "Escribe la pregunta o intención con la que tiraste.",
+    "costFree": "{count, plural, one {Esta lectura usa tu última lectura gratis.} other {Esta lectura usa una de tus # lecturas gratis.}}",
+    "costCredits": "Esta lectura cuesta {count, plural, one {# crédito} other {# créditos}}. Tienes {balance, plural, one {# crédito} other {# créditos}}.",
+    "needCredits": "No te alcanzan los créditos para esta tirada. No se te cobró nada.",
+    "createError": "No pudimos guardar tu lectura. Inténtalo de nuevo.",
+    "interpreting": "Arcana está leyendo tus cartas…",
+    "submit": "Interpretar mis cartas"
+  },
+  "followUp": {
+    "title": "Pregúntale más a tu lectura",
+    "subtitle": "Haz hasta {limit} preguntas sobre esta lectura. La primera es gratis; después, {cost, plural, one {# crédito} other {# créditos}} cada una.",
+    "counter": "{used} de {limit}",
+    "counterLabel": "{used} de {limit} preguntas usadas",
+    "yourQuestion": "Tu pregunta",
+    "answerLabel": "Respuesta",
+    "placeholder": "¿Qué más quieres entender de esta lectura?",
+    "charCount": "{count}/{max}",
+    "costFree": "Esta pregunta es gratis.",
+    "costPaid": "Esta pregunta cuesta {cost, plural, one {# crédito} other {# créditos}}. Tienes {credits, plural, one {# crédito} other {# créditos}}.",
+    "noCredits": "No te alcanzan los créditos para otra pregunta.",
+    "buyCredits": "Conseguir créditos",
+    "submit": "Preguntar",
+    "submitPaid": "Preguntar · {cost, plural, one {# crédito} other {# créditos}}",
+    "sending": "Las cartas están respondiendo…",
+    "retry": "Intentar de nuevo",
+    "limitReached": "Ya hiciste las {limit} preguntas de esta lectura.",
+    "free": "Gratis",
+    "paid": "{count, plural, one {# crédito} other {# créditos}}",
+    "errors": {
+      "unavailable": "No pudimos responder en este momento. No se te cobró nada. Inténtalo de nuevo en un momento.",
+      "refused": "No pudimos responder esa pregunta tal como está escrita. No se te cobró nada. Prueba a reformularla.",
+      "credits": "No te alcanzan los créditos para esta pregunta. No se te cobró nada.",
+      "limit": "Esta lectura ya tiene sus {limit} preguntas.",
+      "rate": "Demasiadas preguntas seguidas. Espera un minuto e inténtalo de nuevo.",
+      "generic": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
+  "readAloud": {
+    "label": "Leer en voz alta",
+    "play": "Escuchar en voz alta",
+    "playShort": "Escuchar",
+    "pause": "Pausar la lectura en voz alta",
+    "pauseShort": "Pausar",
+    "resume": "Continuar la lectura en voz alta",
+    "resumeShort": "Continuar",
+    "stop": "Detener la lectura en voz alta",
+    "playing": "Leyendo en voz alta",
+    "paused": "En pausa"
+  },
+  "compatibility": {
+    "metaDescription": "Compara dos fechas de nacimiento con el zodiaco occidental y chino, la numerología y el tonalpohualli mexica, más tres cartas de tarot para el vínculo.",
+    "title": "Lectura de dos",
+    "subtitle": "Dos fechas de nacimiento, cuatro sistemas y tres cartas para el vínculo: cómo se encuentran, qué se piden y qué cuidar.",
+    "profileRequired": {
+      "title": "Primero, tu propio mapa",
+      "description": "Para comparar dos mapas necesitamos el tuyo: agrega tu fecha de nacimiento y tu nombre completo en tu perfil.",
+      "cta": "Completar mi perfil"
+    },
+    "form": {
+      "title": "La otra persona",
+      "partnerName": "Nombre",
+      "partnerNameHint": "Opcional. Es el nombre que usará la lectura.",
+      "partnerBirthDate": "Fecha de nacimiento",
+      "partnerFullName": "Nombre completo",
+      "partnerFullNameHint": "Opcional, para la numerología del nombre. Sólo se usa para el cálculo y no se guarda.",
+      "costLabel": "Costo",
+      "cost": "{cost} créditos",
+      "balance": "Tienes {credits, plural, one {# crédito} other {# créditos}}",
+      "notEnoughCredits": "Necesitas {cost} créditos para una lectura de dos.",
+      "buyCredits": "Conseguir créditos",
+      "submit": "Leer el vínculo",
+      "submitAria": "Leer el vínculo por {cost} créditos",
+      "loading": "Leyendo los dos mapas…",
+      "loadingHint": "Tarda alrededor de medio minuto. Deja esta página abierta.",
+      "retry": "Reintentar",
+      "noCharge": "Los créditos se cobran sólo cuando la lectura está lista."
+    },
+    "errors": {
+      "birthDateRequired": "Escribe su fecha de nacimiento.",
+      "birthDateInvalid": "Esa fecha no parece correcta.",
+      "birthDateFuture": "La fecha de nacimiento no puede estar en el futuro.",
+      "birthDateTooOld": "Usa una fecha a partir de 1924.",
+      "nameTooLong": "Usa hasta 60 caracteres.",
+      "fullNameTooLong": "Usa hasta 80 caracteres.",
+      "insufficientCredits": "No tienes créditos suficientes para esta lectura.",
+      "profileRequired": "Primero completa tu perfil.",
+      "unavailable": "No se pudo escribir la lectura en este momento. No se cobró nada; inténtalo de nuevo en un momento.",
+      "refused": "No pudimos escribir esta lectura. No se cobró nada.",
+      "rateLimited": "Demasiadas lecturas seguidas. Espera un minuto y vuelve a intentarlo.",
+      "unconfirmed": "No pudimos confirmar si la lectura quedó lista. Revisa tus lecturas de dos antes de intentarlo otra vez.",
+      "generic": "Algo salió mal. No se cobró nada; inténtalo de nuevo."
+    },
+    "how": {
+      "title": "Qué comparamos",
+      "western": "Zodiaco occidental: cómo se llevan sus elementos.",
+      "chinese": "Zodiaco chino: trinos, amigos secretos y signos opuestos.",
+      "numerology": "Numerología: sus caminos de vida y el número del vínculo.",
+      "tonalli": "Tonalpohualli: sus signos del día en el calendario mexica.",
+      "cards": "Tres cartas: tú, la otra persona y el vínculo."
+    },
+    "previous": {
+      "title": "Tus lecturas de dos",
+      "empty": "Aquí aparecerán tus lecturas de dos.",
+      "noName": "Sin nombre",
+      "bornOn": "Nació el {date}"
+    },
+    "detail": {
+      "back": "Lecturas de dos",
+      "title": "{me} y {partner}",
+      "createdOn": "Lectura del {date}",
+      "metersTitle": "Sistema por sistema",
+      "cardsTitle": "Tres cartas para el vínculo",
+      "readingTitle": "La lectura",
+      "newReading": "Nueva lectura de dos",
+      "summaryUnavailable": "Los detalles por sistema de esta lectura no están disponibles."
+    },
+    "systems": {
+      "western": "Zodiaco occidental",
+      "chinese": "Zodiaco chino",
+      "numerology": "Numerología",
+      "tonalli": "Tonalpohualli",
+      "overall": "Conjunto"
+    },
+    "meterAria": "{system}: {score} de 5",
+    "scoreOutOf": "{score}/5",
+    "numerology": {
+      "lifePaths": "Caminos de vida {a} y {b}",
+      "bondNumber": "Número del vínculo {number} · {name}",
+      "names": "Expresión del nombre {a} y {b}"
+    },
+    "roles": {
+      "me": "Tú",
+      "partner": "La otra persona",
+      "bond": "El vínculo"
+    }
   }
 }
