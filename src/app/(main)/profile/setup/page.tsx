@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import {
   Button,
@@ -12,7 +12,9 @@ import {
   Input,
   Badge,
 } from "@/components/ui";
-import { getZodiacSign, getZodiacEmoji, getZodiacSignEs } from "@/lib/zodiac";
+// Straight from the module (not the @/lib/systems barrel) to keep the other systems out of this client bundle.
+import { getWesternSign, getWesternSignByKey } from "@/lib/systems/western";
+import { linkButtonClass } from "@/components/blueprint/link-styles";
 import { FOCUS_AREAS, EMAIL_TIMES } from "@/lib/pricing";
 
 interface ProfileData {
@@ -25,14 +27,17 @@ interface ProfileData {
 }
 
 export default function ProfileSetupPage() {
-  const router = useRouter();
   const t = useTranslations("profile");
+  const tBlueprint = useTranslations("blueprint.setup");
   const locale = useLocale();
+  const signLocale = locale === "en" ? "en" : "es";
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const nextStepsRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<ProfileData>({
     fullName: "",
@@ -73,14 +78,36 @@ export default function ProfileSetupPage() {
     fetchProfile();
   }, []);
 
-  // Calculate zodiac sign when birth date changes
+  // Hide "continue to subscribe" after saving if the subscription is already active
+  useEffect(() => {
+    fetch("/api/subscription")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setIsSubscribed(data?.subscription?.status === "active"))
+      .catch(() => {});
+  }, []);
+
+  // Calculate zodiac sign when birth date changes.
+  // "YYYY-MM-DD" parses as midnight UTC and getWesternSign reads the UTC day,
+  // so the sign does not shift a day back in time zones west of UTC.
   useEffect(() => {
     if (formData.birthDate) {
       const date = new Date(formData.birthDate);
-      const sign = getZodiacSign(date);
-      setFormData((prev) => ({ ...prev, zodiacSign: sign }));
+      if (Number.isNaN(date.getTime())) return;
+      try {
+        const sign = getWesternSign(date).key;
+        setFormData((prev) => ({ ...prev, zodiacSign: sign }));
+      } catch {
+        // Out-of-range date while typing: keep the previous sign
+      }
     }
   }, [formData.birthDate]);
+
+  // Move focus to the next steps once the profile is saved
+  useEffect(() => {
+    if (success) nextStepsRef.current?.focus();
+  }, [success]);
+
+  const westernSign = formData.zodiacSign ? getWesternSignByKey(formData.zodiacSign) : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,10 +134,7 @@ export default function ProfileSetupPage() {
       }
 
       setSuccess(true);
-      // Keep loading state while showing success and navigating
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
+      setIsSaving(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error saving profile");
       setIsSaving(false);
@@ -221,17 +245,15 @@ export default function ProfileSetupPage() {
             </div>
 
             {/* Zodiac Sign Display */}
-            {formData.zodiacSign && (
+            {westernSign && (
               <div className="p-4 bg-gradient-to-r from-purple-900/30 to-amber-900/20 rounded-lg border border-purple-500/20">
                 <p className="text-sm text-slate-400 mb-1">{t("zodiacSign")}</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">
-                    {getZodiacEmoji(formData.zodiacSign)}
+                  <span className="text-2xl" aria-hidden="true">
+                    {westernSign.emoji}
                   </span>
                   <span className="text-xl font-semibold text-slate-100">
-                    {locale === "en"
-                      ? formData.zodiacSign
-                      : getZodiacSignEs(formData.zodiacSign)}
+                    {westernSign.name[signLocale]}
                   </span>
                 </div>
               </div>
@@ -308,6 +330,38 @@ export default function ProfileSetupPage() {
               {isSaving ? t("saving") : t("save")}
             </Button>
           </form>
+
+          {/* Next steps after saving */}
+          {success && (
+            <div
+              ref={nextStepsRef}
+              tabIndex={-1}
+              role="region"
+              aria-labelledby="profile-next-steps-title"
+              className="mt-6 rounded-xl border border-purple-500/30 bg-gradient-to-br from-purple-900/30 to-amber-900/10 p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+            >
+              <p id="profile-next-steps-title" className="flex items-center gap-2 font-semibold text-slate-100">
+                <span aria-hidden="true" className="text-amber-400">
+                  &#10022;
+                </span>
+                {tBlueprint("readyTitle")}
+              </p>
+              <p className="mt-1 text-sm text-slate-400">{tBlueprint("readyText")}</p>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <Link href="/blueprint" className={linkButtonClass("primary", "md")}>
+                  {tBlueprint("viewMap")}
+                </Link>
+                {!isSubscribed && (
+                  <Link href="/subscribe" className={linkButtonClass("secondary", "md")}>
+                    {t("continue")}
+                  </Link>
+                )}
+                <Link href="/dashboard" className={linkButtonClass("ghost", "md")}>
+                  {tBlueprint("dashboard")}
+                </Link>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
