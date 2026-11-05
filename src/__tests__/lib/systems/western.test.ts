@@ -33,6 +33,7 @@ describe("getWesternSign", () => {
 
   it("reads the UTC calendar day, whatever the local time zone", () => {
     // Midnight UTC is still March 20 in Mexico City; 23:59 UTC is March 22 in Tokyo.
+    // Only discriminates off UTC; see also the cusp check in index.test.ts.
     expect(getWesternSign(utc(1990, 3, 21, 0, 0)).key).toBe("Aries");
     expect(getWesternSign(utc(1990, 3, 21, 23, 59)).key).toBe("Aries");
     expect(getWesternSign(utc(1990, 4, 19, 23, 59)).key).toBe("Aries");

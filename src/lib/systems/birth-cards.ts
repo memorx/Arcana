@@ -29,7 +29,7 @@ export const MAJOR_ARCANA: readonly MajorArcanaInfo[] = [
   {
     name: "The Magician",
     nameEs: "El Mago",
-    keywords: { en: "will, skill, manifestation", es: "voluntad, habilidad, manifestación" },
+    keywords: { en: "will, skill, making things real", es: "voluntad, habilidad, concreción" },
   },
   {
     name: "The High Priestess",

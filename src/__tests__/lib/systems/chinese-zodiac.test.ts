@@ -34,7 +34,8 @@ describe("getChineseSign (vectors from the plan)", () => {
   });
 
   it("reads the UTC day, not the local one", () => {
-    // 2024-02-10 00:00Z is still Feb 9 in Mexico City.
+    // 2024-02-10 00:00Z is still Feb 9 in Mexico City. This only discriminates when the
+    // machine is not on UTC; the time-zone-proof check is in index.test.ts (spied getters).
     expect(getChineseSign(utc(2024, 2, 10, 0)).animal).toBe("Dragon");
     expect(getChineseSign(utc(2024, 2, 9, 23)).animal).toBe("Rabbit");
   });
@@ -45,7 +46,8 @@ describe("getChineseSign (vectors from the plan)", () => {
     expect(getChineseSign(utc(2026, 11, 4)).label.es).toBe("Caballo de Fuego");
   });
 
-  it("falls back to February 4th outside the 1924–2043 table", () => {
+  it("outside the table it uses the Lichun approximation (February 4th)", () => {
+    // Approximate on purpose: there is no verified table outside 1924–2043.
     expect(getChineseSign(utc(1923, 2, 3)).year).toBe(1922);
     expect(getChineseSign(utc(1923, 2, 4)).year).toBe(1923);
     expect(getChineseSign(utc(2050, 2, 4)).year).toBe(2050);
@@ -78,6 +80,25 @@ describe("LUNAR_NEW_YEAR table", () => {
       };
       expect([353, 354, 355, 383, 384, 385]).toContain(day(y) - day(y - 1));
     }
+  });
+
+  it.each([
+    [1924, 2, 5],
+    [1933, 1, 26],
+    [1950, 2, 17],
+    [1961, 2, 15],
+    [1966, 1, 21],
+    [1976, 1, 31],
+    [1988, 2, 17],
+    [1995, 1, 31],
+    [2008, 2, 7],
+    [2015, 2, 19],
+    [2030, 2, 3],
+    [2038, 2, 4],
+    [2043, 2, 10],
+  ])("New Year %i-%i-%i starts the year; the day before belongs to the previous one", (y, m, d) => {
+    expect(getChineseSign(utc(y, m, d)).year).toBe(y);
+    expect(getChineseSign(new Date(Date.UTC(y, m - 1, d) - 86_400_000)).year).toBe(y - 1);
   });
 });
 

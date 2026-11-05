@@ -70,6 +70,7 @@ describe("getLifePathNumber", () => {
 
   it("reads the UTC day", () => {
     // 1990-07-15 00:00Z is July 14 in Mexico City; 23:00Z is July 16 in Tokyo.
+    // Only discriminates off UTC; the time-zone-proof check is in index.test.ts (spied getters).
     expect(getLifePathNumber(utc(1990, 7, 15, 0))).toBe(5);
     expect(getLifePathNumber(utc(1990, 7, 15, 23))).toBe(5);
   });

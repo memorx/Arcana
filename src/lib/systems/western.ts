@@ -76,8 +76,8 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     ruler: { en: "Mars", es: "Marte" },
     traits: { en: "Initiative, courage, candor.", es: "Iniciativa, valentía, franqueza." },
     description: {
-      en: "Aries moves first and asks questions on the way. There is a spark in you that wants to start things and test yourself against what is real. The work is discovering when a pause is also a form of courage.",
-      es: "Aries se mueve primero y pregunta en el camino. Hay en ti una chispa que quiere empezar cosas y medirse con lo real. El trabajo está en descubrir cuándo una pausa también es una forma de valentía.",
+      en: "Aries moves first and asks questions on the way. There is a spark in you that wants to start things and test itself against what is real. The challenge is discovering when a pause is also a form of courage.",
+      es: "Aries se mueve primero y pregunta sobre la marcha. Hay en ti una chispa que quiere empezar cosas y medirse con lo real. El reto está en descubrir cuándo una pausa también es una forma de valentía.",
     },
     tarotArcana: 4,
   },
@@ -88,7 +88,7 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     traits: { en: "Patience, steadiness, sensuality.", es: "Paciencia, constancia, sensualidad." },
     description: {
       en: "Taurus builds slowly and means it. You trust what you can touch, taste and keep, and you give others a place to rest. The invitation is to notice when steadiness turns into holding on.",
-      es: "Tauro construye despacio y en serio. Confías en lo que se puede tocar, saborear y conservar, y les das a otros un lugar donde descansar. La invitación es notar cuándo la constancia se vuelve aferrarse.",
+      es: "Tauro construye despacio y en serio. Confías en lo que se puede tocar, saborear y conservar, y les das a otros un lugar donde descansar. La invitación es notar cuándo la constancia se vuelve apego.",
     },
     tarotArcana: 5,
   },
@@ -109,7 +109,7 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     ruler: { en: "Moon", es: "Luna" },
     traits: { en: "Care, memory, intuition.", es: "Cuidado, memoria, intuición." },
     description: {
-      en: "Cancer feels the room before walking in. You protect what you love and remember what others forget. The growth is letting yourself be cared for as generously as you care for others.",
+      en: "Cancer reads the room before walking in. You protect what you love and remember what others forget. The growth is letting yourself be cared for as generously as you care for others.",
       es: "Cáncer siente el ambiente antes de entrar. Proteges lo que amas y recuerdas lo que otros olvidan. El crecimiento está en dejarte cuidar con la misma generosidad con que cuidas.",
     },
     tarotArcana: 7,
@@ -121,7 +121,7 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     traits: { en: "Warmth, creativity, loyalty.", es: "Calidez, creatividad, lealtad." },
     description: {
       en: "Leo shines best when it lights up others too. You bring warmth, play and a generous heart to whatever you touch. The quiet lesson is that you are worth the same whether or not anyone is watching.",
-      es: "Leo brilla mejor cuando también ilumina a otros. Llevas calidez, juego y un corazón generoso a todo lo que tocas. La lección callada es que vales lo mismo aunque nadie esté mirando.",
+      es: "Leo brilla mejor cuando también ilumina a otros. Llevas calidez, juego y un corazón generoso a todo lo que tocas. La lección de fondo es que vales lo mismo aunque nadie esté mirando.",
     },
     tarotArcana: 8,
   },
@@ -143,7 +143,7 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     traits: { en: "Harmony, fairness, grace.", es: "Armonía, sentido de justicia, gracia." },
     description: {
       en: "Libra looks for balance and finds beauty in it. You weigh every side and make room for other voices. The challenge is remembering that your own preference also belongs on the scale.",
-      es: "Libra busca el equilibrio y encuentra belleza en él. Sopesas cada lado y le haces espacio a otras voces. El reto es recordar que tu propia preferencia también cuenta en la balanza.",
+      es: "Libra busca el equilibrio y encuentra belleza en él. Sopesas cada lado y les haces espacio a otras voces. El reto es recordar que tu propia preferencia también cuenta en la balanza.",
     },
     tarotArcana: 11,
   },
@@ -176,7 +176,7 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     traits: { en: "Discipline, ambition, responsibility.", es: "Disciplina, ambición, responsabilidad." },
     description: {
       en: "Capricorn climbs with patience and keeps its word. You take on responsibility early and build things that last. The reminder is that rest and play are also part of the path.",
-      es: "Capricornio sube con paciencia y cumple su palabra. Asumes responsabilidades desde temprano y construyes cosas que duran. El recordatorio es que el descanso y el juego también son parte del camino.",
+      es: "Capricornio sube con paciencia y cumple su palabra. Asumes responsabilidades desde joven y construyes cosas que duran. El recordatorio es que el descanso y el juego también son parte del camino.",
     },
     tarotArcana: 15,
   },
@@ -186,8 +186,8 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     ruler: { en: "Uranus", es: "Urano" },
     traits: { en: "Originality, independence, ideals.", es: "Originalidad, independencia, ideales." },
     description: {
-      en: "Aquarius sees how things could be different. You value freedom, friendship and ideas that help many people at once. The closeness you sometimes keep at a distance is also worth exploring.",
-      es: "Acuario ve cómo las cosas podrían ser distintas. Valoras la libertad, la amistad y las ideas que ayudan a muchos a la vez. La cercanía que a veces mantienes a distancia también vale la pena explorarla.",
+      en: "Aquarius sees how things could be different. You value freedom, friendship and ideas that help many people at once. The closeness you sometimes keep at arm's length is also worth exploring.",
+      es: "Acuario ve cómo las cosas podrían ser distintas. Valoras la libertad, la amistad y las ideas que ayudan a muchos a la vez. También vale la pena explorar la cercanía que a veces mantienes a raya.",
     },
     tarotArcana: 17,
   },
@@ -197,7 +197,7 @@ const SIGN_DATA: Record<WesternSignKey, SignData> = {
     ruler: { en: "Neptune", es: "Neptuno" },
     traits: { en: "Empathy, imagination, sensitivity.", es: "Empatía, imaginación, sensibilidad." },
     description: {
-      en: "Pisces feels with others as if their story were its own. Your imagination and compassion reach places words do not. The practice is drawing a gentle line between what is yours and what you absorb.",
+      en: "Pisces feels for others as if their story were its own. Your imagination and compassion reach places words do not. The practice is drawing a gentle line between what is yours and what you absorb.",
       es: "Piscis siente con los demás como si su historia fuera propia. Tu imaginación y tu compasión llegan a donde no llegan las palabras. La práctica es trazar una línea amable entre lo que es tuyo y lo que absorbes.",
     },
     tarotArcana: 18,
@@ -247,29 +247,29 @@ const ELEMENT_COMPATIBILITY: Record<
   same: {
     score: 4,
     summary: {
-      en: "Same element: you understand each other's rhythm without explaining it. The work is not to amplify the same blind spots.",
-      es: "Mismo elemento: entienden el ritmo del otro sin tener que explicarlo. El trabajo es no amplificar los mismos puntos ciegos.",
+      en: "Same element: you understand each other's rhythm without explaining it. The challenge is not to amplify the same blind spots.",
+      es: "Mismo elemento: entienden el ritmo del otro sin tener que explicarlo. El reto es no amplificar los mismos puntos ciegos.",
     },
   },
   "fire-air": {
     score: 5,
     summary: {
       en: "Fire and air feed each other: ideas turn into action and action finds its words.",
-      es: "El fuego y el aire se alimentan: las ideas se vuelven acción y la acción encuentra sus palabras.",
+      es: "El fuego y el aire se avivan mutuamente: las ideas se vuelven acción y la acción encuentra sus palabras.",
     },
   },
   "earth-water": {
     score: 5,
     summary: {
       en: "Earth and water nourish each other: one gives shape, the other gives depth.",
-      es: "La tierra y el agua se nutren: una da forma y la otra da profundidad.",
+      es: "La tierra y el agua se nutren mutuamente: una da forma y la otra da profundidad.",
     },
   },
   "fire-water": {
     score: 2,
     summary: {
       en: "Fire and water meet in steam: passion and sensitivity need patience to understand each other.",
-      es: "El fuego y el agua se encuentran en vapor: la pasión y la sensibilidad necesitan paciencia para entenderse.",
+      es: "Cuando el fuego y el agua se encuentran, hay vapor: la pasión y la sensibilidad necesitan paciencia para entenderse.",
     },
   },
   "earth-air": {

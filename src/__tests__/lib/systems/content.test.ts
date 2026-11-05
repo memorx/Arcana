@@ -91,7 +91,9 @@ describe("bilingual content", () => {
 
   it("writes Spanish with accents (no unaccented -cion endings, México with accent)", () => {
     for (const [path, { es }] of ALL) {
-      expect({ path, es, missingAccent: /cion\b|\bMexico\b|\bdia\b|\bdias\b/.test(es) }).toEqual({
+      const missingAccent =
+        /cion\b|\bMexico\b|\bdia\b|\bdias\b|\b(tambien|despues|segun|corazon|razon|asi|aqui|traves)\b/i.test(es);
+      expect({ path, es, missingAccent }).toEqual({
         path,
         es,
         missingAccent: false,

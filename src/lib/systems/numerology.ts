@@ -162,7 +162,7 @@ const MEANINGS: Record<CoreNumber, Omit<NumberMeaning, "number">> = {
     name: { en: "Expression", es: "La expresión" },
     keywords: { en: "creativity, communication, joy", es: "creatividad, comunicación, alegría" },
     description: {
-      en: "Three wants to express what it lives: in words, art, humor or play. It brings lightness and optimism wherever it goes. Its challenge is focusing its many talents on what truly matters to it.",
+      en: "Three wants to express what it experiences: through words, art, humor or play. It brings lightness and optimism wherever it goes. Its challenge is focusing its many talents on what truly matters to it.",
       es: "El tres quiere expresar lo que vive: con palabras, arte, humor o juego. Lleva ligereza y optimismo a donde va. Su reto es enfocar sus muchos talentos en lo que de verdad le importa.",
     },
     tarotArcana: 3,
@@ -181,7 +181,7 @@ const MEANINGS: Record<CoreNumber, Omit<NumberMeaning, "number">> = {
     keywords: { en: "change, curiosity, adventure", es: "cambio, curiosidad, aventura" },
     description: {
       en: "Five learns through experience and needs movement to feel alive. It adapts quickly and brings fresh air to any routine. Its challenge is finding a freedom that does not require running away.",
-      es: "El cinco aprende de la experiencia y necesita movimiento para sentir la vida. Se adapta rápido y le da aire fresco a cualquier rutina. Su reto es encontrar una libertad que no implique huir.",
+      es: "El cinco aprende de la experiencia y necesita movimiento para sentirse vivo. Se adapta rápido y le da aire fresco a cualquier rutina. Su reto es encontrar una libertad que no implique huir.",
     },
     tarotArcana: 5,
   },
@@ -216,7 +216,7 @@ const MEANINGS: Record<CoreNumber, Omit<NumberMeaning, "number">> = {
     name: { en: "Completion", es: "La plenitud" },
     keywords: { en: "compassion, closure, generosity", es: "compasión, cierre de ciclos, generosidad" },
     description: {
-      en: "Nine sees the whole picture and feels with others. It knows how to close cycles and let go with gratitude. Its challenge is giving itself what it so easily gives to the world.",
+      en: "Nine sees the whole picture and feels for others. It knows how to close cycles and let go with gratitude. Its challenge is giving itself what it so easily gives to the world.",
       es: "El nueve mira el panorama completo y siente con los demás. Sabe cerrar ciclos y soltar con gratitud. Su reto es darse lo que con tanta facilidad le da al mundo.",
     },
     tarotArcana: 9,
@@ -231,7 +231,7 @@ const MEANINGS: Record<CoreNumber, Omit<NumberMeaning, "number">> = {
     tarotArcana: 11,
   },
   22: {
-    name: { en: "The master builder", es: "La gran construcción" },
+    name: { en: "The master builder", es: "El gran constructor" },
     keywords: { en: "vision made real, purpose, service", es: "visión hecha realidad, propósito, servicio" },
     description: {
       en: "Twenty-two is the master builder: wide visions with the practical sense to make them real. It thinks about what can serve many people. Its challenge is moving one step at a time without losing sight of the dream.",

@@ -10,6 +10,7 @@ import {
   getBirthCards,
   getChineseSign,
   getDayEnergies,
+  getLifePathNumber,
   getMoonPhase,
   getNumerologyProfile,
   getTonalli,
@@ -18,7 +19,8 @@ import {
   type Locale,
 } from "@/lib/systems";
 
-const utc = (y: number, m: number, d: number, h = 0) => new Date(Date.UTC(y, m - 1, d, h));
+const utc = (y: number, m: number, d: number, h = 0, min = 0) =>
+  new Date(Date.UTC(y, m - 1, d, h, min));
 const LOCALES: Locale[] = ["en", "es"];
 const BAD = /undefined|null|NaN|\[object Object\]/;
 
@@ -67,7 +69,7 @@ describe("describeBlueprintForAI", () => {
   it("writes a complete Spanish summary", () => {
     const text = describeBlueprintForAI(bp, "es");
     expect(text).toContain("Mapa Arcano (nacimiento 1990-07-15)");
-    expect(text).toContain("Zodiaco occidental: Cáncer (agua, cardinal; regente Luna). Cuidado, memoria, intuición.");
+    expect(text).toContain("Zodiaco occidental: Cáncer (agua, cardinal; regente: Luna). Cuidado, memoria, intuición.");
     expect(text).toContain("Zodiaco chino: Caballo de Metal (Yang)");
     expect(text).toContain("Tonalpohualli (tradición mexica): 12 Cóatl · 12 Serpiente");
     expect(text).toContain("camino de vida 5 (la libertad), expresión 8, alma 6, personalidad 11");
@@ -78,7 +80,7 @@ describe("describeBlueprintForAI", () => {
   it("writes a complete English summary", () => {
     const text = describeBlueprintForAI(bp, "en");
     expect(text).toContain("Arcana Blueprint (born 1990-07-15)");
-    expect(text).toContain("Western zodiac: Cancer (water, cardinal; ruled by Moon). Care, memory, intuition.");
+    expect(text).toContain("Western zodiac: Cancer (water, cardinal; ruler: Moon). Care, memory, intuition.");
     expect(text).toContain("Chinese zodiac: Metal Horse (Yang)");
     expect(text).toContain("Tonalpohualli (Mexica tradition): 12 Cóatl · 12 Serpent");
     expect(text).toContain("life path 5 (freedom)");
@@ -109,9 +111,75 @@ describe("describeBlueprintForAI", () => {
     expect(es).not.toMatch(BAD);
   });
 
+  it("drops the optional sentences when the text would pass 900 characters", () => {
+    const long = { en: "x".repeat(800), es: "x".repeat(800) };
+    const bigTraits = { ...bp, western: { ...bp.western, traits: long } };
+    for (const locale of LOCALES) {
+      const text = describeBlueprintForAI(bigTraits, locale);
+      expect(text.length).toBeLessThanOrEqual(BLUEPRINT_DESCRIPTION_MAX);
+      expect(text).toMatch(/[.…]$/);
+      expect(text).not.toContain("xxx");
+    }
+  });
+
+  it("cuts with an ellipsis when even the compact text is too long", () => {
+    const hugeName = { en: "y".repeat(1000), es: "y".repeat(1000) };
+    const text = describeBlueprintForAI({ ...bp, western: { ...bp.western, name: hugeName } }, "es");
+    expect(text.length).toBe(BLUEPRINT_DESCRIPTION_MAX);
+    expect(text.endsWith("…")).toBe(true);
+  });
+
   it("names The Fool for a personality of 22", () => {
     const bp22 = getArcanaBlueprint(utc(1970, 11, 12), "Ana", utc(2026, 11, 4));
     expect(describeBlueprintForAI(bp22, "en")).toContain(`personality ${MAJOR_ARCANA[0].name}`);
+  });
+});
+
+describe("time-zone independence", () => {
+  it("never reads local date fields (local getters spied to throw)", () => {
+    const boom = (): never => {
+      throw new Error("local date getter used");
+    };
+    const spies = [
+      jest.spyOn(Date.prototype, "getDate").mockImplementation(boom),
+      jest.spyOn(Date.prototype, "getMonth").mockImplementation(boom),
+      jest.spyOn(Date.prototype, "getFullYear").mockImplementation(boom),
+      jest.spyOn(Date.prototype, "getDay").mockImplementation(boom),
+    ];
+    const birth = utc(1990, 7, 15);
+    let spyWorks = false;
+    let results: unknown[] = [];
+    try {
+      try {
+        new Date().getDate();
+      } catch {
+        spyWorks = true;
+      }
+      results = [
+        getChineseSign(birth).label.es,
+        getTonalli(birth).label.es,
+        getLifePathNumber(birth),
+        getBirthCards(birth).sum,
+        getMoonPhase(birth).phase,
+      ];
+    } finally {
+      spies.forEach((spy) => spy.mockRestore());
+    }
+    expect(spyWorks).toBe(true);
+    expect(results).toEqual([
+      "Caballo de Metal",
+      "12 Cóatl · 12 Serpiente",
+      5,
+      2012,
+      getMoonPhase(birth).phase,
+    ]);
+  });
+
+  // getWesternSign is excluded above: it hands src/lib/zodiac.ts a local Date built
+  // from the UTC fields, and zodiac.ts reads local getters by design.
+  it("getWesternSign uses the UTC day at the Aries cusp", () => {
+    expect(getWesternSign(utc(1990, 3, 21, 0, 0)).key).toBe("Aries");
+    expect(getWesternSign(utc(1990, 3, 20, 23, 59)).key).toBe("Pisces");
   });
 });
 

@@ -1,8 +1,9 @@
 /**
  * Moon phases from the mean synodic month.
  *
- * Age = days since the reference new moon of 2000-01-06 18:14 UTC
- * (JD 2451550.1), modulo the synodic month (29.530588853 days). This is the
+ * Age = days since the reference new moon JD 2451550.1 ≈ 2000-01-06 14:24 UTC
+ * (Meeus's mean new moon; the true new moon was at 18:14 UTC), modulo the
+ * synodic month (29.530588853 days). This is the
  * *mean* moon: real phases can differ by up to ~14 hours, which is fine for
  * naming the phase of a day. `getMoonPhase` evaluates the UTC calendar day
  * at 12:00 UTC so that the whole day gets one phase.
@@ -32,7 +33,7 @@ export interface MoonPhaseInfo {
 }
 
 export const SYNODIC_MONTH = 29.530588853;
-/** JD of the new moon of 2000-01-06 18:14 UTC. */
+/** JD 2451550.1 ≈ 2000-01-06 14:24 UTC: Meeus's mean new moon (the true one was at 18:14 UTC). */
 export const REFERENCE_NEW_MOON_JD = 2451550.1;
 
 const UNIX_EPOCH_JD = 2440587.5;
@@ -45,7 +46,7 @@ export const MOON_PHASES: readonly (Omit<MoonPhaseInfo, "illumination" | "age">)
     emoji: "🌑",
     guidance: {
       en: "A quiet moment to name what you want to begin.",
-      es: "Un momento callado para nombrar lo que quieres empezar.",
+      es: "Un momento de calma para nombrar lo que quieres empezar.",
     },
   },
   {

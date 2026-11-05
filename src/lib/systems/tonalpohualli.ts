@@ -179,7 +179,7 @@ const DAY_SIGN_DATA: DaySignData[] = [
     glyph: "🐕",
     patron: "Mictlantecuhtli",
     meaning: {
-      en: "Loyalty and guidance: the companion who helps cross the thresholds.",
+      en: "Loyalty and guidance: the companion who helps us cross thresholds.",
       es: "La lealtad y la guía: el compañero que ayuda a cruzar los umbrales.",
     },
     traits: { en: "Loyalty, guidance, generosity.", es: "Lealtad, guía, generosidad." },
@@ -202,7 +202,7 @@ const DAY_SIGN_DATA: DaySignData[] = [
     patron: "Patécatl",
     meaning: {
       en: "Persistence and regeneration: the grass that grows back after being cut.",
-      es: "La persistencia y la regeneración: la hierba que vuelve a crecer después de cortarla.",
+      es: "La persistencia y la regeneración: la hierba que vuelve a crecer después de que la cortan.",
     },
     traits: { en: "Tenacity, healing, regeneration.", es: "Tenacidad, sanación, regeneración." },
   },
@@ -303,7 +303,7 @@ export const DAY_SIGNS: readonly DaySign[] = DAY_SIGN_DATA.map((data, index) => 
   direction: DIRECTIONS[index % 4],
 }));
 
-/** Patron and theme of each trecena, in calendar order (Codex Borbonicus). */
+/** Patron and theme of each trecena, in calendar order (Codex Borbonicus; trecenas 1–2 from Borgia/Aubin). */
 const TRECENA_DATA: { patron: string; meaning: Bilingual }[] = [
   {
     patron: "Tonacatecuhtli",

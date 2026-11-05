@@ -81,8 +81,10 @@ export const LUNAR_NEW_YEAR: Readonly<Record<number, string>> = {
 };
 
 /**
- * Outside the table we fall back to February 4th (Lichun, the start of
- * spring), the boundary many Chinese almanacs use for the zodiac year.
+ * APPROXIMATION. Outside 1924–2043 there is no table: we use February 4th
+ * (Lichun, the start of spring), the boundary many Chinese almanacs use for
+ * the zodiac year. Births close to the real New Year of those years can land
+ * on the wrong animal. Do not extend the table without a verified source.
  */
 const FALLBACK_NEW_YEAR = "02-04";
 
@@ -112,7 +114,7 @@ export const CHINESE_ANIMAL_INFO: Record<ChineseAnimal, AnimalInfo> = {
   Rat: {
     name: { en: "Rat", es: "Rata" },
     emoji: "🐀",
-    traits: { en: "Sharpness, resourcefulness, charm.", es: "Agudeza, recursos, encanto." },
+    traits: { en: "Sharpness, resourcefulness, charm.", es: "Agudeza, inventiva, encanto." },
     description: {
       en: "The Rat sees opportunities others miss and knows how to make a lot out of a little. Quick and sociable, it looks after the people it loves with real attention. Its growth lies in trusting that there will be enough.",
       es: "La Rata ve oportunidades que otros no ven y sabe hacer mucho con poco. Rápida y sociable, cuida con atención a quienes quiere. Su crecimiento está en confiar en que habrá suficiente.",
@@ -123,8 +125,8 @@ export const CHINESE_ANIMAL_INFO: Record<ChineseAnimal, AnimalInfo> = {
     emoji: "🐂",
     traits: { en: "Perseverance, reliability, calm.", es: "Perseverancia, confiabilidad, calma." },
     description: {
-      en: "The Ox moves at its own pace and gets there. Others lean on its honesty and on its way of carrying a task to the end. Its invitation is to make room for change without feeling it is losing ground.",
-      es: "El Buey avanza a su ritmo y llega. Otros se apoyan en su honestidad y en su manera de llevar una tarea hasta el final. Su invitación es abrirle espacio al cambio sin sentir que pierde terreno.",
+      en: "The Ox moves at its own pace and gets there. Others lean on its honesty and on its way of carrying a task to the end. The invitation for it is to make room for change without feeling it is losing ground.",
+      es: "El Buey avanza a su ritmo y llega. Otros se apoyan en su honestidad y en su manera de llevar una tarea hasta el final. Lo que le toca es abrirle espacio al cambio sin sentir que pierde terreno.",
     },
   },
   Tiger: {
@@ -142,7 +144,7 @@ export const CHINESE_ANIMAL_INFO: Record<ChineseAnimal, AnimalInfo> = {
     traits: { en: "Gentleness, diplomacy, good taste.", es: "Gentileza, diplomacia, buen gusto." },
     description: {
       en: "The Rabbit creates calm around it and has a fine sense of beauty and timing. It reads people well and avoids needless conflict. It grows when it says what it needs, even if that stirs the calm.",
-      es: "El Conejo crea calma a su alrededor y tiene un fino sentido de la belleza y del momento. Lee bien a las personas y evita los conflictos innecesarios. Crece cuando dice lo que necesita, aunque eso altere la calma.",
+      es: "El Conejo crea calma a su alrededor y tiene un fino sentido de la belleza y de la oportunidad. Lee bien a las personas y evita los conflictos innecesarios. Crece cuando dice lo que necesita, aunque eso altere la calma.",
     },
   },
   Dragon: {
@@ -159,8 +161,8 @@ export const CHINESE_ANIMAL_INFO: Record<ChineseAnimal, AnimalInfo> = {
     emoji: "🐍",
     traits: { en: "Insight, elegance, discretion.", es: "Intuición, elegancia, discreción." },
     description: {
-      en: "The Snake observes before it moves and understands more than it says. It values depth, beauty and well-chosen words. Its invitation is to share what it knows before it feels completely sure.",
-      es: "La Serpiente observa antes de moverse y entiende más de lo que dice. Valora la profundidad, la belleza y las palabras bien elegidas. Su invitación es compartir lo que sabe antes de sentirse del todo segura.",
+      en: "The Snake observes before it moves and understands more than it says. It values depth, beauty and well-chosen words. The invitation for it is to share what it knows before it feels completely sure.",
+      es: "La Serpiente observa antes de moverse y entiende más de lo que dice. Valora la profundidad, la belleza y las palabras bien elegidas. Lo que le toca es compartir lo que sabe antes de sentirse del todo segura.",
     },
   },
   Horse: {
@@ -168,8 +170,8 @@ export const CHINESE_ANIMAL_INFO: Record<ChineseAnimal, AnimalInfo> = {
     emoji: "🐎",
     traits: { en: "Freedom, energy, frankness.", es: "Libertad, energía, franqueza." },
     description: {
-      en: "The Horse needs open space and moves with contagious enthusiasm. It is sincere, warm and quick to help. It grows when it stays long enough to see what it started come to bloom.",
-      es: "El Caballo necesita espacio abierto y avanza con un entusiasmo contagioso. Es sincero, cálido y rápido para ayudar. Crece cuando se queda el tiempo suficiente para ver florecer lo que empezó.",
+      en: "The Horse needs open space and moves with contagious enthusiasm. It is sincere, warm and quick to help. It grows when it stays long enough to see what it started bloom.",
+      es: "El Caballo necesita espacio abierto y avanza con un entusiasmo contagioso. Es sincero, cálido y siempre dispuesto a ayudar. Crece cuando se queda el tiempo suficiente para ver florecer lo que empezó.",
     },
   },
   Goat: {
@@ -195,8 +197,8 @@ export const CHINESE_ANIMAL_INFO: Record<ChineseAnimal, AnimalInfo> = {
     emoji: "🐓",
     traits: { en: "Honesty, diligence, observation.", es: "Honestidad, diligencia, observación." },
     description: {
-      en: "The Rooster sees clearly and says what it sees. It is organized, hardworking and proud of a job well done. Its invitation is to be as gentle with mistakes, its own and others', as it is demanding of quality.",
-      es: "El Gallo ve con claridad y dice lo que ve. Es organizado, trabajador y se enorgullece del trabajo bien hecho. Su invitación es ser tan amable con los errores, propios y ajenos, como exigente con la calidad.",
+      en: "The Rooster sees clearly and says what it sees. It is organized, hardworking and proud of a job well done. The invitation for it is to be as gentle with mistakes, its own and others', as it is demanding of quality.",
+      es: "El Gallo ve con claridad y dice lo que ve. Es organizado, trabajador y se enorgullece del trabajo bien hecho. Lo que le toca es ser tan amable con los errores, propios y ajenos, como exigente con la calidad.",
     },
   },
   Dog: {
@@ -205,7 +207,7 @@ export const CHINESE_ANIMAL_INFO: Record<ChineseAnimal, AnimalInfo> = {
     traits: { en: "Loyalty, fairness, protection.", es: "Lealtad, sentido de justicia, protección." },
     description: {
       en: "The Dog stands by its people and by what is right. It is honest, attentive and quick to defend whoever needs it. It grows when it lets go of worries that are not its to carry.",
-      es: "El Perro acompaña a los suyos y a lo que es justo. Es honesto, atento y rápido para defender a quien lo necesite. Crece cuando suelta las preocupaciones que no le toca cargar.",
+      es: "El Perro está con los suyos y del lado de lo justo. Es honesto, atento y siempre dispuesto a defender a quien lo necesite. Crece cuando suelta las preocupaciones que no le toca cargar.",
     },
   },
   Pig: {
@@ -323,8 +325,8 @@ const RELATIONS: Record<ChineseRelation, { score: 1 | 2 | 3 | 4 | 5; summary: Bi
   same: {
     score: 4,
     summary: {
-      en: "Same animal: you recognize each other's ways at once. The work is not to mirror the same blind spots.",
-      es: "Mismo animal: reconocen al instante la forma de ser del otro. El trabajo es no reflejar los mismos puntos ciegos.",
+      en: "Same animal: you recognize each other's ways at once. The challenge is not to reinforce the same blind spots.",
+      es: "Mismo animal: reconocen al instante la forma de ser del otro. El reto es no reforzar los mismos puntos ciegos.",
     },
   },
   trine: {
@@ -338,7 +340,7 @@ const RELATIONS: Record<ChineseRelation, { score: 1 | 2 | 3 | 4 | 5; summary: Bi
     score: 5,
     summary: {
       en: "Secret friends: a quiet, deep affinity in which each one brings what the other lacks.",
-      es: "Amigos secretos: una afinidad callada y profunda en la que cada uno aporta lo que al otro le falta.",
+      es: "Amigos secretos: una afinidad silenciosa y profunda en la que cada uno aporta lo que al otro le falta.",
     },
   },
   clash: {

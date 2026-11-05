@@ -77,6 +77,7 @@ describe("getBirthCards (special cases)", () => {
   });
 
   it("reads the UTC day", () => {
+    // Only discriminates off UTC; the time-zone-proof check is in index.test.ts (spied getters).
     expect(getBirthCards(utc(1990, 7, 15, 0)).sum).toBe(2012);
     expect(getBirthCards(utc(1990, 7, 15, 23)).sum).toBe(2012);
   });

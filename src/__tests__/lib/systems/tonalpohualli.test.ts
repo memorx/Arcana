@@ -37,6 +37,7 @@ describe("julianDayNumber", () => {
   });
 
   it("reads the UTC day whatever the hour", () => {
+    // Only discriminates off UTC; the time-zone-proof check is in index.test.ts (spied getters).
     expect(julianDayNumber(utc(2026, 11, 4, 0, 0))).toBe(2461349);
     expect(julianDayNumber(utc(2026, 11, 4, 23, 59))).toBe(2461349);
   });
@@ -85,14 +86,12 @@ describe("tonalliFromJDN / getTonalli (mandatory vectors)", () => {
     expect(t.label.es).toBe("4 Xóchitl · 4 Flor");
   });
 
-  it("2000-01-01 (JDN 2451545) is consistent with the formulas", () => {
-    const d = 2451545 - TONALPOHUALLI_CORRELATION;
-    const t = getTonalli(utc(2000, 1, 1));
-    expect(t.number).toBe((((d + 3) % 13) + 13) % 13 + 1);
-    expect(t.sign.index).toBe((((d + 19) % 20) + 20) % 20);
+  it("2000-01-01 (JDN 2451545) → 11 Ehécatl, the Maya 11 Ik' under GMT 584283", () => {
+    expect(getTonalli(utc(2000, 1, 1)).label.es).toBe("11 Ehécatl · 11 Viento");
   });
 
   it("uses the UTC day: 4 Nov 2026 23:59 UTC is still 13 Miquiztli", () => {
+    // Only discriminates off UTC; the time-zone-proof check is in index.test.ts (spied getters).
     expect(getTonalli(utc(2026, 11, 4, 23, 59)).label.es).toBe("13 Miquiztli · 13 Muerte");
     expect(getTonalli(utc(2026, 11, 5, 0, 0)).label.es).toBe("1 Mázatl · 1 Venado");
   });
