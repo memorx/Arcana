@@ -20,6 +20,7 @@ export default async function NewReadingPage() {
   }
 
   const t = await getTranslations("reading");
+  const tManual = await getTranslations("manual");
   const locale = await getLocale();
 
   const [user, spreadTypes] = await Promise.all([
@@ -60,6 +61,31 @@ export default async function NewReadingPage() {
           </Badge>
         </div>
       </div>
+
+      {/* Your own deck */}
+      <Link href="/reading/manual" className="group mb-10 block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+        <Card variant="interactive" className="relative overflow-hidden">
+          <div aria-hidden="true" className="absolute -top-10 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/15 via-purple-500/10 to-transparent rounded-full blur-2xl" />
+          <CardContent className="relative flex flex-col sm:flex-row sm:items-center gap-4 p-6">
+            <div aria-hidden="true" className="flex shrink-0 gap-1">
+              {[-8, 0, 8].map((angle) => (
+                <div
+                  key={angle}
+                  className="w-7 h-11 bg-gradient-to-b from-amber-700/40 to-purple-900/50 rounded-sm border border-amber-500/30 motion-safe:transition-transform motion-safe:duration-300 group-hover:motion-safe:-translate-y-1"
+                  style={{ transform: `rotate(${angle}deg)` }}
+                />
+              ))}
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-xl">{tManual("entryTitle")}</CardTitle>
+              <CardDescription className="mt-1">{tManual("entryDescription")}</CardDescription>
+            </div>
+            <span className="shrink-0 text-amber-400 group-hover:text-amber-300 font-medium text-sm">
+              {tManual("entryCta")} &rarr;
+            </span>
+          </CardContent>
+        </Card>
+      </Link>
 
       {/* Classic Spreads */}
       <section className="mb-10">
