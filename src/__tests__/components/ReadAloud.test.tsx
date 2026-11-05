@@ -81,6 +81,14 @@ describe("splitForSpeech (F-65)", () => {
     expect(chunks.join(" ")).toBe(paragraph);
   });
 
+  it("uses chunks of at most 180 characters by default", () => {
+    const sentence = "Una oración de prueba que mide un poco más de cuarenta caracteres.";
+    const chunks = splitForSpeech(Array.from({ length: 10 }, () => sentence).join(" "));
+
+    expect(chunks.length).toBeGreaterThan(1);
+    for (const chunk of chunks) expect(chunk.length).toBeLessThanOrEqual(180);
+  });
+
   it("cuts a single very long sentence at commas or spaces", () => {
     const long = Array.from({ length: 40 }, (_, i) => `palabra${i}`).join(", ");
 
@@ -142,6 +150,18 @@ describe("ReadAloud (F-65)", () => {
     expect(synth.cancel).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "play" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "stop" })).not.toBeInTheDocument();
+  });
+
+  it("returns focus to the play button after Stop", () => {
+    installSpeech([voice("es-MX")]);
+    render(<ReadAloud text="Uno. Dos." locale="es" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "play" }));
+    const stop = screen.getByRole("button", { name: "stop" });
+    stop.focus();
+    fireEvent.click(stop);
+
+    expect(screen.getByRole("button", { name: "play" })).toHaveFocus();
   });
 
   it("goes back to idle when the last utterance ends", () => {

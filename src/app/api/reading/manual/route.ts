@@ -68,6 +68,9 @@ export async function POST(req: NextRequest) {
     } catch {
       return badRequest("invalid_body");
     }
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return badRequest("invalid_body");
+    }
 
     const { spreadTypeId, intention } = body;
     const locale = body.locale === "en" ? "en" : "es";
@@ -206,11 +209,14 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    // Streak, collection, achievements, XP and challenges (no golden cards)
+    // Streak, achievements, base XP and reading challenges, like any reading. The cards go in
+    // empty on purpose: cards picked by hand don't discover cards for the collection or count
+    // for the "cards_discovered" challenge (otherwise anyone could pick all 78 and collect the
+    // collection achievements). No golden cards either. The response still lists the real cards.
     const extras = await finalizeReading({
       userId: user.id,
       readingId: charged.reading.id,
-      readingCards,
+      readingCards: [],
       spreadType,
     });
 

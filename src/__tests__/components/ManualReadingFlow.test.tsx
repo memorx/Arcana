@@ -101,6 +101,55 @@ describe("CardPicker (F-61)", () => {
     expect(screen.getByText("noResults torre")).toBeInTheDocument();
   });
 
+  const cardButtons = () => screen.getAllByRole("button", { name: /^(pickCard|alreadyChosen)/ });
+  const tabbable = () => cardButtons().filter((b) => b.tabIndex === 0);
+
+  it("keeps a single card in the Tab order: the first visible one by default", () => {
+    renderPicker();
+
+    expect(tabbable()).toHaveLength(1);
+    expect(tabbable()[0]).toHaveAccessibleName("pickCard El Loco");
+    expect(cardButtons().filter((b) => b.tabIndex === -1)).toHaveLength(deck.length - 1);
+  });
+
+  it("puts the active position's card in the Tab order", () => {
+    renderPicker({ takenAt: { cups_3: 1 }, activeCardId: "cups_3" });
+
+    expect(tabbable()).toHaveLength(1);
+    expect(tabbable()[0]).toHaveAccessibleName("pickCard Tres de Copas");
+  });
+
+  it("moves the single tab stop along with the arrow keys", () => {
+    renderPicker();
+    screen.getByRole("button", { name: "pickCard El Loco" }).focus();
+
+    fireEvent.keyDown(document.activeElement!, { key: "ArrowRight" });
+
+    expect(tabbable()).toHaveLength(1);
+    expect(tabbable()[0]).toHaveAccessibleName("pickCard La Torre");
+    expect(tabbable()[0]).toHaveFocus();
+
+    fireEvent.keyDown(document.activeElement!, { key: "End" });
+    expect(tabbable()[0]).toHaveAccessibleName("pickCard As de Espadas");
+  });
+
+  it("uses Wikimedia's 120 px thumbnails and falls back to the original image", () => {
+    const { container } = render(
+      <CardPicker cards={[deck[0]]} takenAt={{}} activeCardId={null} onPick={jest.fn()} locale="es" />
+    );
+
+    const img = container.querySelector("img")!;
+    expect(img.getAttribute("src")).toBe(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/RWS_Tarot_00_Fool.jpg/120px-RWS_Tarot_00_Fool.jpg"
+    );
+
+    fireEvent.error(img);
+    expect(container.querySelector("img")!.getAttribute("src")).toBe(deck[0].imageUrl);
+
+    fireEvent.error(container.querySelector("img")!);
+    expect(container.querySelector("img")).toBeNull();
+  });
+
   it("moves focus between cards with the arrow keys", () => {
     renderPicker();
     const first = screen.getByRole("button", { name: "pickCard El Loco" });

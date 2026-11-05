@@ -108,6 +108,19 @@ describe("FollowUpChat (F-64)", () => {
     expect(within(alert).getByRole("link", { name: /buyCredits/ })).toHaveAttribute("href", "/credits");
   });
 
+  it("treats any other 403 as a generic error, not as missing credits", async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 403, json: async () => ({ error: "Forbidden" }) });
+    renderChat([item(1)], 3);
+
+    ask("¿Y en el amor?");
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("errors.generic 5")).toBeInTheDocument();
+    expect(within(alert).queryByRole("link")).not.toBeInTheDocument();
+    // The balance shown with the page is kept
+    expect(screen.getByText("costPaid 1 3")).toBeInTheDocument();
+  });
+
   it("doesn't let you send a paid question without credits and links to /credits", () => {
     renderChat([item(1)], 0);
 

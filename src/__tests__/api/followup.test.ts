@@ -187,6 +187,19 @@ describe("POST /api/readings/[id]/followup (F-63)", () => {
   });
 
   it.each([
+    ["a JSON null body", "null"],
+    ["a JSON array body", "[]"],
+  ])("returns 400 invalid_body for %s", async (_label, body) => {
+    givenReading(0, 0);
+
+    const response = await POST(postRequest(body), params);
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "invalid_body" });
+    expect(mockComplete).not.toHaveBeenCalled();
+  });
+
+  it.each([
     ["an empty question", { question: "   " }],
     ["a missing question", {}],
     ["a question over 500 characters", { question: "a".repeat(501) }],
@@ -243,7 +256,7 @@ describe("POST /api/readings/[id]/followup (F-63)", () => {
     expect(mockComplete).toHaveBeenCalledTimes(1);
     const call = mockComplete.mock.calls[0][0];
     expect(call).toEqual(
-      expect.objectContaining({ model: AI_MODELS.reading, effort: "low", maxTokens: 1200 })
+      expect.objectContaining({ model: AI_MODELS.reading, effort: "low", maxTokens: 4000 })
     );
     expect(call.user).toContain("¿Debo cambiar de trabajo este año?");
     expect(call.user).toContain("Posición 1 · Pasado: La Torre (invertida)");
@@ -276,6 +289,51 @@ describe("POST /api/readings/[id]/followup (F-63)", () => {
     expect(tx.reading.update.mock.invocationCallOrder[0]).toBeLessThan(
       tx.readingFollowUp.count.mock.invocationCallOrder[0]
     );
+  });
+
+  it("charges from the count inside the transaction, not the one read before the AI", async () => {
+    // Looked like the first (free) question, but another one was saved while the AI answered
+    const { tx, state } = givenReading(0, 3);
+    state.followUps = 1;
+
+    const response = await POST(postRequest({ question: "¿Y en el trabajo?" }), params);
+    const data = await response.json();
+
+    expect(response.status).toBe(201);
+    expect(data.followUp.creditsCharged).toBe(1);
+    expect(tx.user.updateMany).toHaveBeenCalledTimes(1);
+    expect(state.credits).toBe(2);
+  });
+
+  it("gives the AI each position's meaning and, for own-deck readings, says the person drew the cards", async () => {
+    givenReading(0, 3);
+    mockPrisma.reading.findUnique.mockResolvedValue({
+      ...reading(0),
+      source: "manual",
+      spreadType: {
+        name: "Two Cards",
+        nameEs: "Dos Cartas",
+        positions: [
+          { position: 1, name: "Past", nameEs: "Pasado", description: "Lo que quedó atrás" },
+          { position: 2, name: "Present", nameEs: "Presente", description: "Lo que vives hoy" },
+        ],
+      },
+    });
+
+    await POST(postRequest({ question: "¿Y ahora?" }), params);
+
+    const call = mockComplete.mock.calls[0][0];
+    expect(call.user).toContain("Posición 1 · Pasado: La Torre (invertida)\n  Representa: Lo que quedó atrás");
+    expect(call.user).toContain("Representa: Lo que vives hoy");
+    expect(call.system).toContain("tiró estas cartas con su propio mazo físico");
+  });
+
+  it("doesn't mention the physical deck for app readings", async () => {
+    givenReading(0, 3);
+
+    await POST(postRequest({ question: "¿Y ahora?" }), params);
+
+    expect(mockComplete.mock.calls[0][0].system).not.toContain("propio mazo");
   });
 
   it("returns 409 on the sixth question without calling the AI or charging", async () => {

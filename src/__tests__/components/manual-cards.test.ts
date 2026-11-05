@@ -6,6 +6,7 @@ import {
   isComplete,
   nextEmptySlot,
   normalizeText,
+  thumbUrl,
   type DeckCard,
 } from "@/components/manual/manual-cards";
 
@@ -21,6 +22,28 @@ const deck: DeckCard[] = [
 const ids = (cards: DeckCard[]) => cards.map((c) => c.id);
 
 describe("manual deck helpers (F-61)", () => {
+  describe("thumbUrl", () => {
+    it("turns a Commons image into Wikimedia's resized copy", () => {
+      expect(
+        thumbUrl("https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg", 120)
+      ).toBe("https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/RWS_Tarot_00_Fool.jpg/120px-RWS_Tarot_00_Fool.jpg");
+      expect(thumbUrl("https://upload.wikimedia.org/wikipedia/commons/a/ab/Cups03.jpg", 250)).toBe(
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Cups03.jpg/250px-Cups03.jpg"
+      );
+    });
+
+    it("returns any other URL unchanged", () => {
+      const urls = [
+        "/cards/fool.jpg",
+        "https://example.com/wikipedia/commons/9/90/Fool.jpg",
+        "https://upload.wikimedia.org/wikipedia/en/9/90/Fool.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Fool.jpg/120px-Fool.jpg",
+        "",
+      ];
+      for (const url of urls) expect(thumbUrl(url, 120)).toBe(url);
+    });
+  });
+
   describe("normalizeText", () => {
     it("drops accents and case", () => {
       expect(normalizeText("  Ásí ÑANDÚ ")).toBe("asi nandu");

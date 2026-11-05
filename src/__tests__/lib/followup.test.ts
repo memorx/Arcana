@@ -1,6 +1,7 @@
 import {
   FOLLOWUP_COST,
   FOLLOWUP_LIMIT,
+  FOLLOWUP_MAX_TOKENS,
   FOLLOWUP_QUESTION_MAX_LENGTH,
   buildFollowUpPrompt,
   followUpCost,
@@ -26,6 +27,8 @@ describe("follow-up prompt and pricing (F-63)", () => {
     expect(FOLLOWUP_LIMIT).toBe(5);
     expect(FOLLOWUP_COST).toBe(1);
     expect(FOLLOWUP_QUESTION_MAX_LENGTH).toBe(500);
+    // A ceiling (thinking counts inside it), not what gets billed
+    expect(FOLLOWUP_MAX_TOKENS).toBe(4000);
     expect(followUpCost(0)).toBe(0);
     expect(followUpCost(1)).toBe(1);
     expect(followUpCost(4)).toBe(1);
@@ -60,6 +63,31 @@ describe("follow-up prompt and pricing (F-63)", () => {
     expect(system).toContain("mismo idioma en el que está escrita la pregunta");
     expect(system).toContain("No sacas cartas nuevas");
     expect(system).toContain("No predices el futuro");
+  });
+
+  it("adds what each position represents when the spread has it", () => {
+    const { user } = buildFollowUpPrompt({
+      ...context,
+      cards: [
+        { position: 1, positionName: "Pasado", positionDescription: "Lo que quedó atrás", cardName: "La Torre", isReversed: true },
+        { position: 2, positionName: "Presente", positionDescription: "  ", cardName: "El Ermitaño", isReversed: false },
+      ],
+    });
+
+    expect(user).toContain("- Posición 1 · Pasado: La Torre (invertida)\n  Representa: Lo que quedó atrás\n");
+    // A blank description adds nothing
+    expect(user).toContain("- Posición 2 · Presente: El Ermitaño\n\n");
+  });
+
+  it("tells the model the person drew the cards with their own deck only for manual readings", () => {
+    expect(buildFollowUpPrompt({ ...context, source: "manual" }).system).toContain(
+      "La persona tiró estas cartas con su propio mazo físico. Respeta esa elección y no menciones el azar."
+    );
+    expect(buildFollowUpPrompt({ ...context, locale: "en", source: "manual" }).system).toContain(
+      "drew these cards with their own physical deck"
+    );
+    expect(buildFollowUpPrompt({ ...context, source: "app" }).system).not.toContain("propio mazo");
+    expect(buildFollowUpPrompt(context).system).not.toContain("propio mazo");
   });
 
   it("uses English labels and instructions for the en locale", () => {

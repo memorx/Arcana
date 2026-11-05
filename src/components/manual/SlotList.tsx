@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import type { DeckCard, SlotChoice } from "./manual-cards";
+import { THUMB_WIDTH, thumbUrl, type DeckCard, type SlotChoice } from "./manual-cards";
 
 export interface ManualSpreadPosition {
   position: number;
@@ -83,7 +83,7 @@ export function SlotList({
               >
                 {card?.imageUrl ? (
                   <Image
-                    src={card.imageUrl}
+                    src={thumbUrl(card.imageUrl, THUMB_WIDTH)}
                     alt=""
                     fill
                     sizes="32px"

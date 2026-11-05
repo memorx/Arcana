@@ -99,6 +99,9 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     } catch {
       return NextResponse.json({ error: "invalid_body" }, { status: 400 });
     }
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+    }
 
     const question = typeof body.question === "string" ? body.question.trim() : "";
     if (!question) {
@@ -155,6 +158,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       position: number;
       name: string;
       nameEs: string;
+      description?: string;
     }>;
     const cards = await prisma.card.findMany({
       where: { id: { in: readingCards.map((c) => c.cardId) } },
@@ -169,12 +173,14 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       interpretation: reading.interpretation,
       previous: reading.followUps,
       question,
+      source: reading.source === "manual" ? "manual" : "app",
       cards: readingCards.map((rc) => {
         const card = cardsById.get(rc.cardId);
         const position = positions.find((p) => Number(p.position) === Number(rc.position));
         return {
           position: Number(rc.position),
           positionName: position ? (locale === "en" ? position.name : position.nameEs) : String(rc.position),
+          positionDescription: position?.description,
           cardName: card ? (locale === "en" ? card.name : card.nameEs) : rc.cardId,
           isReversed: !!rc.isReversed,
         };

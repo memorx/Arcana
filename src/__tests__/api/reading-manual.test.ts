@@ -66,6 +66,10 @@ import { prisma } from "@/lib/prisma";
 import { generateTarotInterpretation } from "@/lib/anthropic";
 import { rateLimit } from "@/lib/rate-limit";
 import { processGoldenCards } from "@/lib/golden-cards";
+import { discoverCardsFromReading } from "@/lib/collection";
+import { updateStreak } from "@/lib/streak";
+import { addXP } from "@/lib/xp";
+import { updateChallengeProgress } from "@/lib/challenges";
 
 const mockAuth = auth as jest.Mock;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
@@ -157,6 +161,7 @@ describe("POST /api/reading/manual (F-62)", () => {
     jest.clearAllMocks();
     (rateLimit as jest.Mock).mockReturnValue({ success: true, remaining: 4, resetIn: 60000 });
     mockGenerate.mockResolvedValue("Manual interpretation");
+    (discoverCardsFromReading as jest.Mock).mockResolvedValue([]);
   });
 
   it("returns 429 when rate limited", async () => {
@@ -206,6 +211,18 @@ describe("POST /api/reading/manual (F-62)", () => {
       const response = await POST(createRequest("not json"));
 
       expect(response.status).toBe(400);
+    });
+
+    it.each([
+      ["null", "null"],
+      ["an array", "[]"],
+      ["a string", '"hola"'],
+    ])("rejects a JSON body that is %s with invalid_body", async (_label, body) => {
+      const response = await POST(createRequest(body));
+
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ error: "invalid_body" });
+      expect(mockGenerate).not.toHaveBeenCalled();
     });
   });
 
@@ -299,6 +316,51 @@ describe("POST /api/reading/manual (F-62)", () => {
     expect(data.cards.every((c: { isGolden: boolean }) => c.isGolden === false)).toBe(true);
     expect(processGoldenCards).not.toHaveBeenCalled();
     expect(data.goldenCards).toEqual([]);
+  });
+
+  it("saves isGolden false even if the body claims a golden card", async () => {
+    givenUser(3, 0);
+    const tx = mockTransaction([1]);
+
+    const response = await POST(
+      createRequest({
+        ...validBody,
+        cards: chosenCards.map((c) => ({ ...c, isGolden: true })),
+      })
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    const saved = tx.reading.create.mock.calls[0][0].data.cards;
+    expect(saved.every((c: { isGolden: boolean }) => c.isGolden === false)).toBe(true);
+    expect(data.cards.every((c: { isGolden: boolean }) => c.isGolden === false)).toBe(true);
+    expect(processGoldenCards).not.toHaveBeenCalled();
+  });
+
+  it("doesn't discover collection cards or count cards_discovered, but keeps streak, XP and reading challenges", async () => {
+    givenUser(3, 0);
+    mockTransaction([1]);
+    // Would discover every card it's given
+    (discoverCardsFromReading as jest.Mock).mockImplementation(async (_userId: string, ids: string[]) =>
+      ids.map((id) => ({ id, name: id, nameEs: id, imageUrl: "", arcana: "MAJOR", suit: null }))
+    );
+
+    const response = await POST(createRequest(validBody));
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    const discoverCalls = (discoverCardsFromReading as jest.Mock).mock.calls;
+    expect(discoverCalls.every(([, ids]) => Array.isArray(ids) && ids.length === 0)).toBe(true);
+    expect(data.newlyDiscoveredCards).toEqual([]);
+    expect(updateChallengeProgress).not.toHaveBeenCalledWith("user-123", "cards_discovered", expect.anything());
+
+    expect(updateStreak).toHaveBeenCalledWith("user-123");
+    expect(updateChallengeProgress).toHaveBeenCalledWith("user-123", "reading_completed");
+    expect(updateChallengeProgress).toHaveBeenCalledWith("user-123", "spread_used", expect.objectContaining({ spreadTypeId: "test-spread" }));
+    // Base XP for a 3-card reading, nothing for new cards
+    expect(addXP).toHaveBeenCalledWith("user-123", expect.any(Number), "reading_completion");
+    // The response still has the three chosen cards
+    expect(data.cards.map((c: { cardId: string }) => c.cardId)).toEqual(["card-4", "card-2", "card-1"]);
   });
 
   it("returns the same response shape as POST /api/reading", async () => {

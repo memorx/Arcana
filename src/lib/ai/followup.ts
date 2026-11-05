@@ -14,8 +14,11 @@ export const FOLLOWUP_FREE_COUNT = 1;
 export const FOLLOWUP_COST = 1;
 /** Max length of a question, in characters. */
 export const FOLLOWUP_QUESTION_MAX_LENGTH = 500;
-/** Output budget for an answer (2–3 short paragraphs; thinking counts inside it). */
-export const FOLLOWUP_MAX_TOKENS = 1200;
+/**
+ * Output ceiling for an answer. It's a cap, not what gets billed: the answer itself is
+ * 2–3 short paragraphs, but on thinking models the thinking counts inside this budget.
+ */
+export const FOLLOWUP_MAX_TOKENS = 4000;
 
 /** Credits the next follow-up costs, given how many the reading already has. */
 export function followUpCost(previousCount: number): number {
@@ -25,6 +28,8 @@ export function followUpCost(previousCount: number): number {
 export interface FollowUpCard {
   position: number;
   positionName: string;
+  /** What the position stands for in the spread. */
+  positionDescription?: string;
   cardName: string;
   isReversed: boolean;
 }
@@ -39,6 +44,8 @@ export interface FollowUpContext {
   /** Earlier follow-ups on this reading, oldest first. */
   previous: Array<{ question: string; answer: string }>;
   question: string;
+  /** "manual" = the person drew the cards with their own physical deck. */
+  source?: "app" | "manual";
 }
 
 const SYSTEM_ES = `Eres la misma guía de tarot que hizo esta lectura: sabia, cálida y honesta. La persona ya recibió su interpretación y ahora te hace una pregunta de seguimiento.
@@ -53,6 +60,9 @@ Cómo respondes:
 - Escribe 2 o 3 párrafos breves, sin títulos ni listas.
 - Responde en el mismo idioma en el que está escrita la pregunta.`;
 
+const MANUAL_DECK_ES =
+  "\n\nLa persona tiró estas cartas con su propio mazo físico. Respeta esa elección y no menciones el azar.";
+
 const SYSTEM_EN = `You are the same tarot guide who gave this reading: wise, warm and honest. The person already received their interpretation and now asks you a follow-up question.
 
 How you answer:
@@ -65,6 +75,9 @@ How you answer:
 - Write 2 or 3 short paragraphs, without headings or lists.
 - Answer in the same language the question is written in.`;
 
+const MANUAL_DECK_EN =
+  "\n\nThe person drew these cards with their own physical deck. Respect that choice and don't mention chance or randomness.";
+
 /** System and user prompts for one follow-up answer. */
 export function buildFollowUpPrompt(ctx: FollowUpContext): { system: string; user: string } {
   const es = ctx.locale !== "en";
@@ -75,6 +88,7 @@ export function buildFollowUpPrompt(ctx: FollowUpContext): { system: string; use
         cards: "Cartas",
         position: "Posición",
         reversed: "invertida",
+        represents: "Representa",
         interpretation: "Interpretación original",
         previous: "Preguntas de seguimiento anteriores",
         q: "Pregunta",
@@ -87,6 +101,7 @@ export function buildFollowUpPrompt(ctx: FollowUpContext): { system: string; use
         cards: "Cards",
         position: "Position",
         reversed: "reversed",
+        represents: "Represents",
         interpretation: "Original interpretation",
         previous: "Earlier follow-up questions",
         q: "Question",
@@ -100,7 +115,7 @@ export function buildFollowUpPrompt(ctx: FollowUpContext): { system: string; use
       (card) =>
         `- ${labels.position} ${card.position} · ${card.positionName}: ${card.cardName}${
           card.isReversed ? ` (${labels.reversed})` : ""
-        }`
+        }${card.positionDescription?.trim() ? `\n  ${labels.represents}: ${card.positionDescription.trim()}` : ""}`
     )
     .join("\n");
 
@@ -123,5 +138,7 @@ ${ctx.interpretation.trim()}${previous}
 ${labels.question}:
 ${ctx.question.trim()}`;
 
-  return { system: es ? SYSTEM_ES : SYSTEM_EN, user };
+  const manualNote = ctx.source === "manual" ? (es ? MANUAL_DECK_ES : MANUAL_DECK_EN) : "";
+
+  return { system: (es ? SYSTEM_ES : SYSTEM_EN) + manualNote, user };
 }

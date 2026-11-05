@@ -48,7 +48,7 @@ function cleanForSpeech(text: string): string {
  * after ~15 seconds, so each paragraph is split into sentences and grouped into
  * chunks of at most `maxLength` characters (long sentences are cut at commas or spaces).
  */
-export function splitForSpeech(text: string, maxLength = 220): string[] {
+export function splitForSpeech(text: string, maxLength = 180): string[] {
   const chunks: string[] = [];
 
   const pushLong = (sentence: string) => {
@@ -110,6 +110,15 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
   // Each play gets an id; events from a cancelled run are ignored.
   const runRef = useRef(0);
   const speakingRef = useRef(false);
+  // After Stop the stop button disappears; focus goes back to the play button.
+  const primaryRef = useRef<HTMLButtonElement>(null);
+  const focusPrimaryRef = useRef(false);
+
+  useEffect(() => {
+    if (status !== "idle" || !focusPrimaryRef.current) return;
+    focusPrimaryRef.current = false;
+    primaryRef.current?.focus();
+  }, [status]);
 
   useEffect(() => {
     if (!("speechSynthesis" in window) || typeof window.SpeechSynthesisUtterance === "undefined") return;
@@ -185,6 +194,7 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
     runRef.current += 1;
     speakingRef.current = false;
     window.speechSynthesis.cancel();
+    focusPrimaryRef.current = true;
     setStatus("idle");
   };
 
@@ -194,7 +204,7 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
   return (
     <div role="group" aria-label={t("label")} className={cn("flex items-center gap-2", className)}>
       {status === "playing" ? (
-        <button type="button" onClick={pause} aria-label={t("pause")} className={cn(buttonClass, "px-3")}>
+        <button ref={primaryRef} type="button" onClick={pause} aria-label={t("pause")} className={cn(buttonClass, "px-3")}>
           <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M7 5h3v14H7zM14 5h3v14h-3z" />
           </svg>
@@ -202,6 +212,7 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
         </button>
       ) : (
         <button
+          ref={primaryRef}
           type="button"
           onClick={status === "paused" ? resume : play}
           aria-label={status === "paused" ? t("resume") : t("play")}

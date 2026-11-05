@@ -4,7 +4,7 @@ import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { DECK_FILTERS, filterDeck, type DeckCard, type DeckFilter } from "./manual-cards";
+import { DECK_FILTERS, THUMB_WIDTH, filterDeck, thumbUrl, type DeckCard, type DeckFilter } from "./manual-cards";
 
 export interface CardPickerProps {
   cards: DeckCard[];
@@ -30,7 +30,8 @@ const NAV_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Ho
 /**
  * Grid of the 78 cards with search (English and Spanish names) and a suit filter.
  * Cards already placed in another position are marked and can't be picked again.
- * Arrow keys move between cards; Enter or Space picks one.
+ * Only one card is in the Tab order (roving tabindex); arrow keys, Home and End move
+ * between cards and Enter or Space picks one. Thumbnails are Wikimedia's 120 px copies.
  */
 export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: CardPickerProps) {
   const t = useTranslations("manual");
@@ -38,12 +39,35 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
   const gridRef = useRef<HTMLUListElement>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<DeckFilter>("all");
-  const [brokenImages, setBrokenImages] = useState<Set<string>>(() => new Set());
+  // Images that failed: 1 = the thumbnail failed (use the original), 2 = both failed (show the name).
+  const [failedImages, setFailedImages] = useState<Record<string, number>>({});
+  // Roving tabindex: only one card is in the Tab order; arrows move between cards.
+  const [focusId, setFocusId] = useState<string | null>(null);
 
   const visible = useMemo(() => filterDeck(cards, query, filter), [cards, query, filter]);
   const nameOf = (card: DeckCard) => (locale === "en" ? card.name : card.nameEs);
 
-  // Roving focus over the grid: left/right step by one, up/down by a row.
+  // The tabbable card: the last one focused if it's still visible, else the active position's card, else the first.
+  const isVisible = (id: string | null) => !!id && visible.some((c) => c.id === id);
+  const tabbableId = isVisible(focusId)
+    ? focusId
+    : isVisible(activeCardId)
+      ? activeCardId
+      : (visible[0]?.id ?? null);
+
+  const imageFor = (card: DeckCard): string | null => {
+    const failed = failedImages[card.id] ?? 0;
+    if (!card.imageUrl || failed >= 2) return null;
+    const thumb = thumbUrl(card.imageUrl, THUMB_WIDTH);
+    if (failed === 0) return thumb;
+    // The thumbnail failed: try the original once (if it's a different URL).
+    return thumb === card.imageUrl ? null : card.imageUrl;
+  };
+
+  const markImageFailed = (card: DeckCard) =>
+    setFailedImages((prev) => ({ ...prev, [card.id]: (prev[card.id] ?? 0) + 1 }));
+
+  // Left/right step by one, up/down by a row, Home/End to the ends.
   const handleGridKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
     if (!NAV_KEYS.has(event.key) || !gridRef.current) return;
     const buttons = Array.from(gridRef.current.querySelectorAll<HTMLButtonElement>("button[data-card-id]"));
@@ -63,7 +87,10 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
     };
     const next = Math.min(buttons.length - 1, Math.max(0, targets[event.key]));
     event.preventDefault();
-    buttons[next]?.focus();
+    const target = buttons[next];
+    if (!target) return;
+    setFocusId(target.dataset.cardId ?? null);
+    target.focus();
   };
 
   return (
@@ -134,13 +161,15 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
             const placedAt = takenAt[card.id];
             const isActive = activeCardId === card.id;
             const isTaken = placedAt !== undefined && !isActive;
-            const showImage = !!card.imageUrl && !brokenImages.has(card.id);
+            const image = imageFor(card);
 
             return (
               <li key={card.id}>
                 <button
                   type="button"
                   data-card-id={card.id}
+                  tabIndex={card.id === tabbableId ? 0 : -1}
+                  onFocus={() => setFocusId(card.id)}
                   aria-pressed={isActive}
                   aria-disabled={isTaken || undefined}
                   aria-label={isTaken ? t("alreadyChosen", { card: name, position: placedAt }) : t("pickCard", { card: name })}
@@ -154,14 +183,15 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
                   )}
                 >
                   <span className="relative block aspect-[2/3] w-full overflow-hidden rounded-md border border-amber-500/20 bg-slate-800">
-                    {showImage ? (
+                    {image ? (
                       <Image
-                        src={card.imageUrl}
+                        key={image}
+                        src={image}
                         alt=""
                         fill
                         sizes="(max-width: 640px) 22vw, 96px"
                         className="object-cover motion-safe:transition-transform motion-safe:duration-200 group-hover:motion-safe:scale-105"
-                        onError={() => setBrokenImages((prev) => new Set(prev).add(card.id))}
+                        onError={() => markImageFailed(card)}
                         unoptimized
                       />
                     ) : (

@@ -89,7 +89,7 @@ export function FollowUpChat({ readingId, initialFollowUps, credits: initialCred
         setError("unavailable");
       } else if (res.status === 422) {
         setError("refused");
-      } else if (res.status === 403) {
+      } else if (res.status === 403 && data?.error === "insufficient_credits") {
         // The server's balance wins over the one rendered with the page.
         setCredits(0);
         setError("credits");
