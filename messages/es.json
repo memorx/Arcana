@@ -772,5 +772,11 @@
     "cancel": "Cancelar",
     "deleteError": "Error al eliminar la cuenta. Por favor intenta de nuevo.",
     "notAuthenticated": "Debes iniciar sesion para acceder a la configuracion."
+  },
+  "birthday": {
+    "title": "¡Feliz cumpleaños!",
+    "granted": "Te dejamos {credits} créditos de regalo en tu cuenta. Que este año te traiga buenas preguntas.",
+    "alreadyGranted": "Tus {credits} créditos de regalo ya están en tu cuenta.",
+    "cta": "Haz tu lectura de cumpleaños"
   }
 }

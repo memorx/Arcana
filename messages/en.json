@@ -772,5 +772,11 @@
     "cancel": "Cancel",
     "deleteError": "Error deleting account. Please try again.",
     "notAuthenticated": "You must be logged in to access settings."
+  },
+  "birthday": {
+    "title": "Happy birthday!",
+    "granted": "We've left {credits} gift credits in your account. May this year bring you good questions.",
+    "alreadyGranted": "Your {credits} gift credits are already in your account.",
+    "cta": "Do your birthday reading"
   }
 }
