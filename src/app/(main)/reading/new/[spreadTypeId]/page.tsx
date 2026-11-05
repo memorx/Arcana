@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCard, TarotCardStatic, CardBack } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCardStatic, CardBack } from "@/components/ui";
 import { StreakRewardModal } from "@/components/dashboard/StreakRewardModal";
 import { NewCardDiscoveredModal } from "@/components/reading/NewCardDiscoveredModal";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -150,7 +149,6 @@ export default function ReadingFlowPage({
   params: Promise<{ spreadTypeId: string }>;
 }) {
   const { spreadTypeId } = use(params);
-  const router = useRouter();
   const t = useTranslations("reading");
   const tCommon = useTranslations("common");
   const locale = useLocale();
