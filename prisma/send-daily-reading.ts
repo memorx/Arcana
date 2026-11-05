@@ -1,13 +1,11 @@
+// Load .env before anything else: @/lib/ai/config reads ARCANA_MODEL_* when it's imported.
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
-import Anthropic from "@anthropic-ai/sdk";
-import * as dotenv from "dotenv";
-
-dotenv.config();
+import { generateDailyInterpretation } from "@/lib/anthropic";
 
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 function getZodiacEmoji(sign: string): string {
   const emojis: Record<string, string> = {
@@ -16,37 +14,6 @@ function getZodiacEmoji(sign: string): string {
     Sagittarius: "♐", Capricorn: "♑", Aquarius: "♒", Pisces: "♓"
   };
   return emojis[sign] || "✨";
-}
-
-async function generateInterpretation(params: {
-  cardName: string;
-  cardNameEs: string;
-  isReversed: boolean;
-  zodiacSign: string;
-  focusArea: string;
-  userName: string;
-  locale: string;
-}): Promise<string> {
-  const { cardName, isReversed, zodiacSign, focusArea, userName, locale } = params;
-  const isSpanish = locale === "es";
-
-  const prompt = isSpanish
-    ? `Eres un lector de tarot sabio y compasivo. Genera una interpretación diaria breve para ${userName}, un ${zodiacSign}.
-       La carta de hoy es: ${cardName}${isReversed ? " (Invertida)" : ""}.
-       Área de enfoque: ${focusArea}.
-       Escribe 2-3 párrafos cortos, cálidos y perspicaces. Sé específico pero esperanzador.`
-    : `You are a wise and compassionate tarot reader. Generate a brief daily interpretation for ${userName}, a ${zodiacSign}.
-       Today's card is: ${cardName}${isReversed ? " (Reversed)" : ""}.
-       Focus area: ${focusArea}.
-       Write 2-3 short, warm, and insightful paragraphs. Be specific but hopeful.`;
-
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 500,
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  return (response.content[0] as { text: string }).text;
 }
 
 async function main() {
@@ -77,7 +44,8 @@ async function main() {
   console.log(`Locale: ${locale}`);
   console.log(`Generating interpretation...`);
 
-  const interpretation = await generateInterpretation({
+  // Same prompt and model (AI_MODELS.daily) as the daily cron
+  const interpretation = await generateDailyInterpretation({
     cardName: selectedCard.name,
     cardNameEs: selectedCard.nameEs,
     isReversed,
