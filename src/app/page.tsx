@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Header, Footer } from "@/components/layout";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
 import { ReadingCounter, DailyCardPreview, Testimonials } from "@/components/landing";
+import { CollectivePulse } from "@/components/landing/CollectivePulse";
 import { auth } from "@/lib/auth";
 
 export default async function Home() {
@@ -10,7 +12,35 @@ export default async function Home() {
   const isAuthenticated = !!session?.user;
   const t = await getTranslations("landing");
   const tSpreads = await getTranslations("spreads");
+  const tPulse = await getTranslations("pulse");
   const locale = await getLocale();
+
+  const moreThanTarot = [
+    {
+      href: "/blueprint",
+      icon: "✶",
+      title: tPulse("moreThanTarot.blueprint.title"),
+      description: tPulse("moreThanTarot.blueprint.description"),
+    },
+    {
+      href: "/calendar",
+      icon: "☾",
+      title: tPulse("moreThanTarot.calendar.title"),
+      description: tPulse("moreThanTarot.calendar.description"),
+    },
+    {
+      href: "/reading/manual",
+      icon: "❖",
+      title: tPulse("moreThanTarot.manual.title"),
+      description: tPulse("moreThanTarot.manual.description"),
+    },
+    {
+      href: "/compatibility",
+      icon: "♡",
+      title: tPulse("moreThanTarot.compatibility.title"),
+      description: tPulse("moreThanTarot.compatibility.description"),
+    },
+  ];
 
   const features = [
     {
@@ -199,6 +229,11 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Collective Pulse: hidden when there are too few readings today */}
+        <Suspense fallback={null}>
+          <CollectivePulse />
+        </Suspense>
+
         {/* Reading Counter */}
         <section className="py-8 border-t border-slate-800/50">
           <div className="container mx-auto px-4">
@@ -282,6 +317,44 @@ export default async function Home() {
                   </h3>
                   <p className="text-slate-400 text-sm">{feature.description}</p>
                 </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* More than tarot */}
+        <section
+          aria-labelledby="more-than-tarot-title"
+          className="py-20 border-t border-slate-800/50 bg-gradient-to-b from-purple-950/10 to-transparent"
+        >
+          <div className="container mx-auto px-4">
+            <h2 id="more-than-tarot-title" className="text-3xl font-bold text-center mb-4">
+              <span className="bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">
+                {tPulse("moreThanTarot.title")}
+              </span>
+            </h2>
+            <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
+              {tPulse("moreThanTarot.subtitle")}
+            </p>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              {moreThanTarot.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                >
+                  <Card variant="interactive" className="text-center p-8 h-full flex flex-col">
+                    <div aria-hidden="true" className="text-4xl mb-4 text-amber-400">
+                      {item.icon}
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-100 mb-2">{item.title}</h3>
+                    <p className="text-slate-400 text-sm flex-1">{item.description}</p>
+                    <span className="mt-4 text-sm text-purple-300 transition-colors group-hover:text-amber-300">
+                      {tPulse("moreThanTarot.cta")} <span aria-hidden="true">&rarr;</span>
+                    </span>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>

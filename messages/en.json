@@ -925,5 +925,82 @@
       "viewMap": "View my Arcana Map",
       "dashboard": "Go to my space"
     }
+  },
+  "birthday": {
+    "title": "Happy birthday!",
+    "granted": "We've left {credits} gift credits in your account. May this year bring you good questions.",
+    "alreadyGranted": "Your {credits} gift credits are already in your account.",
+    "greetingOnly": "May this year bring you good questions.",
+    "cta": "Do your birthday reading"
+  },
+  "pulse": {
+    "kicker": "Collective pulse",
+    "title": "Today in Arcana, <hl>{card}</hl> came up the most",
+    "share": "It appeared in {percentage}% of today's readings.",
+    "also": "Also today:",
+    "anonymous": "Anonymous: we only count cards, never who drew them.",
+    "moreThanTarot": {
+      "title": "More than tarot",
+      "subtitle": "Other ways of reading yourself, in the same place as your cards.",
+      "cta": "Explore",
+      "blueprint": {
+        "title": "Arcana Map",
+        "description": "Five systems from your birth date and your name: tarot birth cards, Western and Chinese zodiac, Mexica tonalli and numerology."
+      },
+      "calendar": {
+        "title": "Arcana Calendar",
+        "description": "Every day with its tonalpohualli sign, its moon phase and your personal day."
+      },
+      "manual": {
+        "title": "Your own deck",
+        "description": "Draw with your physical cards, tell us which ones came up and Arcana reads them."
+      },
+      "compatibility": {
+        "title": "Reading for two",
+        "description": "How two people meet across the zodiacs, numerology and the tonalli, with three cards for the bond."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Arcana Calendar",
+    "subtitle": "Every day with its sign in the Mexica tonalpohualli, its moon phase and, with your profile, your personal day.",
+    "metaTitle": "Arcana Calendar: tonalli, moon and personal day",
+    "metaDescription": "Each day's sign in the Mexica tonalpohualli, the moon phase and your numerology personal day, month by month.",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "goToToday": "Go to today",
+    "personalDayAria": "personal day {number}",
+    "keyboardHint": "Use the arrow keys to move between days; Page Up and Page Down change the month.",
+    "legend": {
+      "sign": "Day sign (tonalpohualli)",
+      "moon": "Moon phase",
+      "personalDay": "Your personal day"
+    },
+    "detail": {
+      "tonalli": "Tonalli of the day",
+      "trecena": "Trecena {name}",
+      "lordOfNight": "Lord of the night",
+      "direction": "Direction and patron",
+      "moon": "Moon",
+      "illumination": "{percent}% illuminated",
+      "personalDay": "Personal day",
+      "personalDayNumber": "Day {number}",
+      "guestCta": "Create your free account and add your birth date to see your personal day.",
+      "guestButton": "Create account",
+      "noProfileCta": "Add your birth date to your profile to see your personal day.",
+      "noProfileButton": "Complete profile"
+    },
+    "about": "About the tonalpohualli"
+  },
+  "energies": {
+    "title": "Today's energies",
+    "calendarLink": "Calendar",
+    "tonalli": "Tonalli",
+    "moon": "Moon",
+    "illumination": "{percent}%",
+    "personalDay": "Personal day",
+    "personalDayValue": "{number} · {name}",
+    "addBirthDate": "Add your birth date"
   }
 }

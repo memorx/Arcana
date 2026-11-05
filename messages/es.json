@@ -925,5 +925,82 @@
       "viewMap": "Ver mi Mapa Arcano",
       "dashboard": "Ir a mi espacio"
     }
+  },
+  "birthday": {
+    "title": "¡Feliz cumpleaños!",
+    "granted": "Te dejamos {credits} créditos de regalo en tu cuenta. Que este año te traiga buenas preguntas.",
+    "alreadyGranted": "Tus {credits} créditos de regalo ya están en tu cuenta.",
+    "greetingOnly": "Que este año te traiga buenas preguntas.",
+    "cta": "Haz tu lectura de cumpleaños"
+  },
+  "pulse": {
+    "kicker": "Pulso colectivo",
+    "title": "Hoy en Arcana salió más <hl>{card}</hl>",
+    "share": "Apareció en el {percentage}% de las lecturas del día.",
+    "also": "También salieron hoy:",
+    "anonymous": "Anónimo: sólo contamos cartas, nunca quién las sacó.",
+    "moreThanTarot": {
+      "title": "Más que tarot",
+      "subtitle": "Otras formas de leerte, en el mismo lugar que tus cartas.",
+      "cta": "Explorar",
+      "blueprint": {
+        "title": "Mapa Arcano",
+        "description": "Cinco sistemas a partir de tu fecha de nacimiento y tu nombre: cartas natales del tarot, zodiaco occidental y chino, tonalli mexica y numerología."
+      },
+      "calendar": {
+        "title": "Calendario Arcano",
+        "description": "Cada día con su signo del tonalpohualli, su fase lunar y tu día personal."
+      },
+      "manual": {
+        "title": "Tu mazo",
+        "description": "Tira con tus cartas físicas, dinos cuáles salieron y Arcana las interpreta."
+      },
+      "compatibility": {
+        "title": "Lectura de dos",
+        "description": "Cómo se encuentran dos personas en los zodiacos, la numerología y el tonalli, con tres cartas para el vínculo."
+      }
+    }
+  },
+  "calendar": {
+    "title": "Calendario Arcano",
+    "subtitle": "Cada día con su signo del tonalpohualli mexica, su fase lunar y, con tu perfil, tu día personal.",
+    "metaTitle": "Calendario Arcano: tonalli, luna y día personal",
+    "metaDescription": "El signo de cada día en el tonalpohualli mexica, la fase lunar y tu día personal de numerología, mes a mes.",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "today": "Hoy",
+    "goToToday": "Ir a hoy",
+    "personalDayAria": "día personal {number}",
+    "keyboardHint": "Usa las flechas para moverte entre días; Re Pág y Av Pág cambian de mes.",
+    "legend": {
+      "sign": "Signo del día (tonalpohualli)",
+      "moon": "Fase lunar",
+      "personalDay": "Tu día personal"
+    },
+    "detail": {
+      "tonalli": "Tonalli del día",
+      "trecena": "Trecena {name}",
+      "lordOfNight": "Señor de la noche",
+      "direction": "Rumbo y patrono",
+      "moon": "Luna",
+      "illumination": "{percent}% de iluminación",
+      "personalDay": "Día personal",
+      "personalDayNumber": "Día {number}",
+      "guestCta": "Crea tu cuenta gratis y agrega tu fecha de nacimiento para ver tu día personal.",
+      "guestButton": "Crear cuenta",
+      "noProfileCta": "Agrega tu fecha de nacimiento a tu perfil para ver tu día personal.",
+      "noProfileButton": "Completar perfil"
+    },
+    "about": "Sobre el tonalpohualli"
+  },
+  "energies": {
+    "title": "Energías de hoy",
+    "calendarLink": "Calendario",
+    "tonalli": "Tonalli",
+    "moon": "Luna",
+    "illumination": "{percent}%",
+    "personalDay": "Día personal",
+    "personalDayValue": "{number} · {name}",
+    "addBirthDate": "Agrega tu fecha de nacimiento"
   }
 }
