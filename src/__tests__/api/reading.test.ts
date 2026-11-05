@@ -45,6 +45,11 @@ jest.mock("@/lib/anthropic", () => ({
   generateTarotInterpretation: jest.fn().mockResolvedValue("Test interpretation"),
 }));
 
+// Mock reading memory (F-50; covered in reading-memory.test.ts and reading-history.test.ts)
+jest.mock("@/lib/reading-memory", () => ({
+  buildHistoryContext: jest.fn().mockResolvedValue(undefined),
+}));
+
 // Mock streak
 jest.mock("@/lib/streak", () => ({
   updateStreak: jest.fn().mockResolvedValue({ currentStreak: 1, longestStreak: 1, reward: null }),
