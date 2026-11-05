@@ -774,7 +774,6 @@
     "notAuthenticated": "Debes iniciar sesion para acceder a la configuracion."
   },
   "compatibility": {
-    "metaTitle": "Lectura de dos | Arcana",
     "metaDescription": "Compara dos fechas de nacimiento con el zodiaco occidental y chino, la numerología y el tonalpohualli mexica, más tres cartas de tarot para el vínculo.",
     "title": "Lectura de dos",
     "subtitle": "Dos fechas de nacimiento, cuatro sistemas y tres cartas para el vínculo: cómo se encuentran, qué se piden y qué cuidar.",
@@ -828,8 +827,7 @@
       "title": "Tus lecturas de dos",
       "empty": "Aquí aparecerán tus lecturas de dos.",
       "noName": "Sin nombre",
-      "bornOn": "Nació el {date}",
-      "open": "Abrir la lectura con {name}"
+      "bornOn": "Nació el {date}"
     },
     "detail": {
       "back": "Lecturas de dos",

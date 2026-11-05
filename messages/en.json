@@ -774,7 +774,6 @@
     "notAuthenticated": "You must be logged in to access settings."
   },
   "compatibility": {
-    "metaTitle": "Reading for two | Arcana",
     "metaDescription": "Compare two birth dates across the western and Chinese zodiac, numerology and the Mexica tonalpohualli, with three tarot cards for the bond.",
     "title": "Reading for two",
     "subtitle": "Two birth dates, four systems and three cards for the bond: how you meet, what you ask of each other and what to take care of.",
@@ -828,8 +827,7 @@
       "title": "Your readings for two",
       "empty": "Your readings for two will appear here.",
       "noName": "No name",
-      "bornOn": "Born {date}",
-      "open": "Open the reading with {name}"
+      "bornOn": "Born {date}"
     },
     "detail": {
       "back": "Readings for two",

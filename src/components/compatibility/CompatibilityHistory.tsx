@@ -44,7 +44,6 @@ export function CompatibilityHistory({ readings, locale }: CompatibilityHistoryP
           <li key={reading.id}>
             <Link
               href={`/compatibility/${reading.id}`}
-              aria-label={t("previous.open", { name })}
               className="flex items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition-colors hover:border-purple-500/50 hover:bg-slate-900/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
             >
               <div className="min-w-0">

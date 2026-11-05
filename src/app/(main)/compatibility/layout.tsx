@@ -4,7 +4,8 @@ import { getTranslations } from "next-intl/server";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("compatibility");
   return {
-    title: t("metaTitle"),
+    // The root layout adds " | Arcana"
+    title: t("title"),
     description: t("metaDescription"),
   };
 }
