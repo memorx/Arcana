@@ -22,6 +22,7 @@ const eslintConfig = [
       "public/workbox-*.js",
       "next-env.d.ts",
       "_referencias/**",
+      "design/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tu lectura · Arcana</title>
+<meta name="description" content="Maqueta de la pantalla de lectura de Arcana: tres cartas que se revelan quemando el papel.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Martian+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Water+Brush&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<header class="cabecera">
+  <a class="marca" href="index.html">Arcana</a>
+  <p class="hora" data-hora>jue 5 nov 2026 · 1 Mázatl (Venado) · Señor de la noche: Tláloc · Luna creciente</p>
+  <a class="entrar" href="index.html">Mi espacio</a>
+</header>
+
+<main class="app">
+  <div class="encabezado">
+    <p class="meta">Tu lectura · Pasado, presente y futuro · <span data-fecha>5 de noviembre de 2026</span></p>
+    <h1>Tu lectura</h1>
+    <p class="intencion">«Estoy por dejar un trabajo de diez años y no sé si es valentía o huida. ¿Qué me pide este momento?»</p>
+  </div>
+
+  <ol class="tirada" aria-label="Tres cartas">
+    <li class="pos">
+      <p class="pos-nombre">I · <b>Pasado</b></p>
+      <button class="carta" type="button" aria-label="Voltear la carta del pasado" data-revelada="Pasado: El Ermitaño">
+        <img src="img/cartas/rws-tarot-09-hermit-color.webp" alt="El Ermitaño: un anciano en la cima sostiene una lámpara con una estrella" width="480" height="822">
+        <img class="reverso" src="img/reverso.svg" alt="" width="300" height="520">
+        <span class="pista" aria-hidden="true">Toca</span>
+      </button>
+      <p class="nombre-carta">El Ermitaño</p>
+    </li>
+    <li class="pos">
+      <p class="pos-nombre">II · <b>Presente</b></p>
+      <button class="carta" type="button" aria-label="Voltear la carta del presente" data-revelada="Presente: Dos de Copas">
+        <img src="img/cartas/cups02-color.webp" alt="Dos de Copas: dos personas intercambian copas bajo un caduceo con cabeza de león" width="480" height="822">
+        <img class="reverso" src="img/reverso.svg" alt="" width="300" height="520">
+        <span class="pista" aria-hidden="true">Toca</span>
+      </button>
+      <p class="nombre-carta">Dos de Copas</p>
+    </li>
+    <li class="pos">
+      <p class="pos-nombre">III · <b>Futuro</b></p>
+      <button class="carta" type="button" aria-label="Voltear la carta del futuro" data-revelada="Futuro: La Rueda de la Fortuna">
+        <img src="img/cartas/rws-tarot-10-wheel-of-fortune-color.webp" alt="La Rueda de la Fortuna: una rueda con letras entre nubes y cuatro criaturas que leen" width="480" height="822">
+        <img class="reverso" src="img/reverso.svg" alt="" width="300" height="520">
+        <span class="pista" aria-hidden="true">Toca</span>
+      </button>
+      <p class="nombre-carta">La Rueda de la Fortuna</p>
+    </li>
+  </ol>
+
+  <div class="controles">
+    <button class="boton boton--linea" type="button" data-todas>Voltear las tres</button>
+    <p class="ayuda">Toca cada carta para voltearla, en el orden que quieras.</p>
+  </div>
+
+  <article class="interpretacion" aria-labelledby="interp-t" aria-live="polite">
+    <h2 id="interp-t">Lo que dicen juntas</h2>
+    <p>Tu pregunta trae una tensión clara: diez años de algo conocido contra la inquietud de no saber si te vas por valentía o por cansancio. Las cartas no deciden por ti, pero sí ponen luz sobre cómo llegaste aquí.</p>
+    <p>El Ermitaño en el pasado habla de un tiempo largo de oficio y de soledad elegida: aprendiste a sostener tu propia lámpara. No es casual que la pregunta llegue ahora; ese trabajo interior ya hizo su parte.</p>
+    <p>En el presente, el Dos de Copas pone el acento en un vínculo, alguien o algo con quien hay un intercambio parejo. Quizá la respuesta no está sólo en irte, sino en hacia qué relación caminas: un equipo, un proyecto, una forma de trabajar que te corresponda.</p>
+    <p>La Rueda de la Fortuna en el futuro no promete un giro bueno ni malo: recuerda que todo ciclo da vuelta. Lo que sí está en tus manos es desde dónde te subes a la rueda.</p>
+    <p class="preguntas">Si nadie fuera a juzgar tu decisión, ¿qué harías? ¿Qué de estos diez años quieres llevar contigo?</p>
+    <div class="acciones-lectura">
+      <a class="boton boton--linea" href="#">Preguntar algo más · 1 gratis</a>
+      <a class="boton boton--linea" href="#">Escuchar</a>
+      <a class="boton boton--linea" href="#">Guardar en mi historia</a>
+    </div>
+  </article>
+</main>
+
+<script src="tinta.js"></script>
+</body>
+</html>

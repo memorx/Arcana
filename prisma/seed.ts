@@ -92,7 +92,7 @@ const majorArcana = [
       "Amor, armonía y relaciones significativas. Representa una conexión profunda, ya sea romántica o de valores. También indica una decisión importante que debe tomarse desde el corazón.",
     meaningReversed:
       "Desequilibrio, desalineación de valores, malas decisiones. Puede indicar conflictos en relaciones o falta de armonía interior.",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_06_Lovers.jpg",
   },
   {
     name: "The Chariot",

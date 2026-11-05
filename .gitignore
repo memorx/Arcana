@@ -48,3 +48,10 @@ public/workbox-*.js.map
 # Referencias de diseño (capturas de sitios ajenos y tablero de direcciones): sólo en local, el repo es público.
 # El tablero publicado vive en https://claude.ai/artifact/JaE4Pu1PAc6qfJ4zhT8oRK
 _referencias/
+
+# Originales de los grabados (se regeneran con design/maqueta/scripts/cartas.py)
+design/cartas/original/
+design/maqueta/_qa/
+design/maqueta/_artifact/
+design/cartas/descarga.log
+design/maqueta/img/cartas/
