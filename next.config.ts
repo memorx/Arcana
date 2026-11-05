@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import withPWAInit from "next-pwa";
@@ -36,6 +37,10 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  // Pin the tracing root to this project so Next doesn't pick up a lockfile
+  // from a parent folder (silences the "multiple lockfiles" warning).
+  outputFileTracingRoot: path.join(process.cwd()),
+
   images: {
     remotePatterns: [
       {
