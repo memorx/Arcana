@@ -43,7 +43,6 @@ export function RecapPanel({ months, initialRecaps }: RecapPanelProps) {
     Object.fromEntries(initialRecaps.map((recap) => [keyOf(recap.year, recap.month), recap]))
   );
   const newestFirst = [...months].reverse();
-  const currentKey = months.length ? keyOf(months[months.length - 1].year, months[months.length - 1].month) : "";
 
   const [selected, setSelected] = useState(() => {
     const preferred =
@@ -58,7 +57,8 @@ export function RecapPanel({ months, initialRecaps }: RecapPanelProps) {
 
   const recap = recaps[selected];
   const canWrite = month.count >= MIN_READINGS;
-  const hasNewReadings = Boolean(recap) && selected === currentKey && month.count > (recap?.readingCount ?? 0);
+  // Any month (not only the current one) can have readings the saved recap didn't cover.
+  const hasNewReadings = Boolean(recap) && month.count > (recap?.readingCount ?? 0);
 
   async function generate() {
     if (!month || loading) return;
@@ -154,12 +154,12 @@ export function RecapPanel({ months, initialRecaps }: RecapPanelProps) {
             <Button onClick={generate}>{t("generate")}</Button>
           </div>
         ) : (
-          <p className="text-slate-400">{t("needMore", { count: month.count })}</p>
+          <p className="text-slate-400">{t("needMore", { count: month.count, min: MIN_READINGS })}</p>
         )}
 
         {error && !loading && (
           <p role="alert" className="mt-4 text-sm text-red-300">
-            {error === "needMore" ? t("needMore", { count: month.count }) : t(error)}
+            {error === "needMore" ? t("needMore", { count: month.count, min: MIN_READINGS }) : t(error)}
           </p>
         )}
       </div>

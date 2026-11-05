@@ -86,12 +86,12 @@ describe("buildMonthlyRecapPrompt", () => {
 });
 
 describe("generateMonthlyRecap", () => {
-  it("uses the synthesis model with medium effort and 2000 tokens", async () => {
+  it("uses the synthesis model with medium effort and 4000 tokens (thinking included)", async () => {
     const text = await generateMonthlyRecap({ year: 2026, month: 10, locale: "es", readings: [reading(2)] });
 
     expect(text).toBe("Tu mes en cartas…");
     expect(complete).toHaveBeenCalledWith(
-      expect.objectContaining({ model: AI_MODELS.synthesis, effort: "medium", maxTokens: 2000 })
+      expect.objectContaining({ model: AI_MODELS.synthesis, effort: "medium", maxTokens: 4000 })
     );
   });
 });

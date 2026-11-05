@@ -134,7 +134,7 @@ describe("POST /api/insights/recap (F-53)", () => {
     expect(findRecap).not.toHaveBeenCalled();
   });
 
-  it("returns the saved recap of a closed month without calling the AI", async () => {
+  it("returns the saved recap of a closed month without new readings, without calling the AI", async () => {
     findRecap.mockResolvedValue(storedRecap());
 
     const response = await call(previous);
@@ -148,6 +148,23 @@ describe("POST /api/insights/recap (F-53)", () => {
     });
     expect(mockComplete).not.toHaveBeenCalled();
     expect(upsertRecap).not.toHaveBeenCalled();
+  });
+
+  it("rewrites a closed month's recap that was written before the month ended (C-1)", async () => {
+    // Written on the 5th with 3 readings; the month ended with 12
+    findRecap.mockResolvedValue(storedRecap({ readingCount: 3 }));
+    findReadings.mockResolvedValue(
+      Array.from({ length: 12 }, (_, i) => monthReading(i + 1, `Pregunta número ${i + 1} del mes`))
+    );
+
+    const response = await call(previous);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.cached).toBe(false);
+    expect(mockComplete).toHaveBeenCalledTimes(1);
+    expect(upsertRecap.mock.calls[0][0].update.readingCount).toBe(12);
+    expect(data.recap.readingCount).toBe(12);
   });
 
   it("returns 400 with fewer than 3 readings in the month, without calling the AI", async () => {
@@ -184,7 +201,7 @@ describe("POST /api/insights/recap (F-53)", () => {
 
     expect(mockComplete).toHaveBeenCalledTimes(1);
     const options = mockComplete.mock.calls[0][0];
-    expect(options).toMatchObject({ model: AI_MODELS.synthesis, effort: "medium", maxTokens: 2000 });
+    expect(options).toMatchObject({ model: AI_MODELS.synthesis, effort: "medium", maxTokens: 4000 });
     expect(options.user).toContain("«¿Cómo cuido mi energía en el trabajo?»");
     expect(options.user).toContain("Pasado: La Torre (invertida); Presente: La Estrella");
     expect(options.user).toContain("Resonancia: 5/5 — «Me hizo sentido»");

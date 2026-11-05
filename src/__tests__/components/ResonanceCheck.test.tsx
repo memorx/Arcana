@@ -1,4 +1,10 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+
+const mockRefresh = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: mockRefresh, push: jest.fn(), replace: jest.fn() }),
+}));
+
 import { ResonanceCheck } from "@/components/reading/ResonanceCheck";
 
 // next-intl is mocked in jest.setup.ts: t(key) returns the key.
@@ -28,6 +34,7 @@ function respond(status: number, body: object) {
 describe("ResonanceCheck (F-52)", () => {
   beforeEach(() => {
     mockFetch.mockReset();
+    mockRefresh.mockClear();
   });
 
   it("renders nothing for a reading younger than 24 hours", () => {
@@ -114,14 +121,31 @@ describe("ResonanceCheck (F-52)", () => {
     expect(screen.getAllByRole("button", { name: "starLabel" })).toHaveLength(5);
   });
 
-  it("says so when the reading was already rated", async () => {
+  it("hides the form and refreshes when the reading was already rated (409)", async () => {
     respond(409, { error: "already_rated" });
     render(<ResonanceCheck {...baseProps} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "starLabel" })[0]);
     fireEvent.click(screen.getByRole("button", { name: "submit" }));
 
-    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("alreadySaved"));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("alreadySaved"));
+    expect(screen.queryByRole("button", { name: "starLabel" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(mockRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the rating that comes back from the server after the refresh", async () => {
+    respond(409, { error: "already_rated" });
+    const { rerender } = render(<ResonanceCheck {...baseProps} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "starLabel" })[0]);
+    fireEvent.click(screen.getByRole("button", { name: "submit" }));
+    await waitFor(() => expect(mockRefresh).toHaveBeenCalled());
+
+    rerender(<ResonanceCheck {...baseProps} resonance={3} resonanceNote="Desde otra pestaña" />);
+
+    expect(screen.getByRole("img", { name: "result" })).toBeInTheDocument();
+    expect(screen.getByText(/Desde otra pestaña/)).toBeInTheDocument();
   });
 
   it("caps the note at 500 characters", () => {

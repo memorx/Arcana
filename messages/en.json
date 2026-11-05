@@ -795,12 +795,12 @@
       "subtitle": "The ones that came up most in the last {days} days.",
       "count": "{count, plural, one {# time} other {# times}}",
       "reversed": "{percent}% reversed",
-      "empty": "No readings in the last 90 days."
+      "empty": "No readings in the last {days} days."
     },
     "suits": {
       "title": "Your suits",
       "subtitle": "How your cards were spread across suits in the last {days} days.",
-      "empty": "No readings in the last 90 days.",
+      "empty": "No readings in the last {days} days.",
       "chartLabel": "Share by suit: {values}",
       "names": {
         "MAJOR": "Major Arcana",
@@ -824,7 +824,7 @@
     },
     "resonance": {
       "title": "How your readings resonated",
-      "empty": "You haven't rated any reading yet. A day after each reading we ask how it resonated.",
+      "empty": "You haven't rated any reading yet. A day after each reading you can tell us, on the reading itself, how it resonated.",
       "chartLabel": "Average resonance: {average} out of 5",
       "basedOn": "{count, plural, one {From # rated reading} other {From # rated readings}}"
     },
@@ -839,7 +839,7 @@
       "generating": "Reading your month…",
       "newReadings": "You have new readings since this recap.",
       "update": "Update",
-      "needMore": "A month needs 3 readings to be written (this one has {count}).",
+      "needMore": "A month needs {min} readings to be written (this one has {count}).",
       "unavailable": "We couldn't write your month right now. Try again in a moment.",
       "refused": "We couldn't write this month's recap.",
       "error": "Something went wrong. Try again."

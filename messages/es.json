@@ -795,12 +795,12 @@
       "subtitle": "Las que más te han salido en los últimos {days} días.",
       "count": "{count, plural, one {# vez} other {# veces}}",
       "reversed": "{percent}% invertida",
-      "empty": "No hay lecturas en los últimos 90 días."
+      "empty": "No hay lecturas en los últimos {days} días."
     },
     "suits": {
       "title": "Tus palos",
       "subtitle": "Cómo se repartieron tus cartas en los últimos {days} días.",
-      "empty": "No hay lecturas en los últimos 90 días.",
+      "empty": "No hay lecturas en los últimos {days} días.",
       "chartLabel": "Reparto por palo: {values}",
       "names": {
         "MAJOR": "Arcanos mayores",
@@ -824,9 +824,9 @@
     },
     "resonance": {
       "title": "Cómo resonaron tus lecturas",
-      "empty": "Todavía no has valorado ninguna lectura. Un día después de cada lectura te preguntamos cómo resonó.",
-      "chartLabel": "Resonancia media: {average} de 5",
-      "basedOn": "{count, plural, one {De # lectura valorada} other {De # lecturas valoradas}}"
+      "empty": "Todavía no has calificado ninguna lectura. Un día después de cada lectura puedes contarnos, en la misma lectura, cómo resonó.",
+      "chartLabel": "Resonancia promedio: {average} de 5",
+      "basedOn": "{count, plural, one {De # lectura calificada} other {De # lecturas calificadas}}"
     },
     "recap": {
       "title": "Tu mes en cartas",
@@ -839,7 +839,7 @@
       "generating": "Leyendo tu mes…",
       "newReadings": "Tienes lecturas nuevas desde este repaso.",
       "update": "Actualizar",
-      "needMore": "Hacen falta 3 lecturas en el mes para escribirlo (este tiene {count}).",
+      "needMore": "Hacen falta {min} lecturas en el mes para escribirlo (este tiene {count}).",
       "unavailable": "No pudimos escribir tu mes ahora. Inténtalo de nuevo en un momento.",
       "refused": "No pudimos escribir el repaso de este mes.",
       "error": "Algo salió mal. Inténtalo de nuevo."
@@ -858,7 +858,7 @@
     "title": "Resonancia",
     "question": "¿Cómo resonó esta lectura con lo que pasó?",
     "readingFrom": "Lectura del {date}",
-    "starsGroup": "Valora de 1 a 5",
+    "starsGroup": "Califica de 1 a 5",
     "starLabel": "{count, plural, one {# estrella de 5} other {# estrellas de 5}}",
     "scaleLow": "Nada",
     "scaleHigh": "Totalmente",
@@ -873,7 +873,7 @@
     "result": "Resonó {score}/5",
     "badge": "Resonó {score}/5",
     "error": "No se pudo guardar. Inténtalo de nuevo.",
-    "alreadySaved": "Esta lectura ya tiene una valoración.",
-    "tooSoon": "Podrás valorarla un día después de la lectura."
+    "alreadySaved": "Esta lectura ya tiene una calificación.",
+    "tooSoon": "Podrás calificarla un día después de la lectura."
   }
 }

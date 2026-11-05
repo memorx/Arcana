@@ -100,7 +100,8 @@ describe("SuitBars", () => {
   it("shows a short message when there are no cards", async () => {
     render(await SuitBars({ suits: { MAJOR: 0, WANDS: 0, CUPS: 0, SWORDS: 0, PENTACLES: 0 } }));
 
-    expect(screen.getByText("insights.suits.empty")).toBeInTheDocument();
+    // The window comes from INSIGHTS_WINDOW_DAYS, not from the text (N-4)
+    expect(screen.getByText('insights.suits.empty {"days":90}')).toBeInTheDocument();
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 });

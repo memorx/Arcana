@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { SUIT_KEYS, type SuitKey } from "@/lib/insights";
+import { INSIGHTS_WINDOW_DAYS, SUIT_KEYS, type SuitKey } from "@/lib/insights";
 
 const SUIT_STYLE: Record<SuitKey, { emoji: string; bar: string }> = {
   MAJOR: { emoji: "✦", bar: "from-purple-600 to-fuchsia-400" },
@@ -20,7 +20,7 @@ export async function SuitBars({ suits }: SuitBarsProps) {
   const total = SUIT_KEYS.reduce((sum, key) => sum + suits[key], 0);
 
   if (total === 0) {
-    return <p className="text-slate-400">{t("empty")}</p>;
+    return <p className="text-slate-400">{t("empty", { days: INSIGHTS_WINDOW_DAYS })}</p>;
   }
 
   const summary = SUIT_KEYS.map((key) => `${t(`names.${key}`)} ${suits[key]}%`).join(", ");

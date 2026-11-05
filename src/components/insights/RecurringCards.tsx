@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { TarotCardStatic } from "@/components/ui";
-import type { InsightsCard } from "@/lib/insights";
+import { INSIGHTS_WINDOW_DAYS, type InsightsCard } from "@/lib/insights";
 
 interface RecurringCardsProps {
   cards: InsightsCard[];
@@ -12,7 +12,7 @@ export async function RecurringCards({ cards }: RecurringCardsProps) {
   const locale = await getLocale();
 
   if (cards.length === 0) {
-    return <p className="text-slate-400">{t("empty")}</p>;
+    return <p className="text-slate-400">{t("empty", { days: INSIGHTS_WINDOW_DAYS })}</p>;
   }
 
   return (

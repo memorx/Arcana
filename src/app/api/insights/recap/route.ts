@@ -25,9 +25,9 @@ function serialize(recap: MonthlyRecap) {
 
 /**
  * POST /api/insights/recap  { year, month, locale? }  →  { recap, cached }
- * "Tu mes en cartas". Free. Needs at least 3 readings that month; closed
- * months are written once, the current month is rewritten only when it has
- * new readings since the last recap.
+ * "Tu mes en cartas". Free. Needs at least 3 readings that month. A saved
+ * recap is returned as is unless the month has readings it didn't cover
+ * (a recap written on the 5th gets rewritten once the month has more).
  */
 export async function POST(req: NextRequest) {
   const { success, resetIn } = rateLimit(req, 3, 60000);
@@ -67,15 +67,11 @@ export async function POST(req: NextRequest) {
   if (requestedKey > currentKey) {
     return NextResponse.json({ error: "future_month" }, { status: 400 });
   }
-  const isCurrentMonth = requestedKey === currentKey;
   const locale = body.locale === "en" ? "en" : "es";
 
   try {
     const key = { userId_year_month: { userId, year, month } };
     const existing = await prisma.monthlyRecap.findUnique({ where: key });
-    if (existing && !isCurrentMonth) {
-      return NextResponse.json({ recap: serialize(existing), cached: true });
-    }
 
     const readings = await prisma.reading.findMany({
       where: {
@@ -93,7 +89,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Current month with no new readings since the last recap: nothing new to say.
+    // No new readings since the last recap (any month): nothing new to say, no AI call.
     if (existing && existing.readingCount >= readings.length) {
       return NextResponse.json({ recap: serialize(existing), cached: true });
     }

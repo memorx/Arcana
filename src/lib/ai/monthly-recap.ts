@@ -2,10 +2,11 @@ import { AI_MODELS, complete } from "@/lib/ai/config";
 
 /**
  * "Tu mes en cartas": a short written recap of one month of readings.
- * Model `synthesis`, effort `medium`, 2000 output tokens (thinking included).
+ * Model `synthesis`, effort `medium`, 4000 output tokens: the thinking counts
+ * inside that budget, so less could cut the text short.
  */
 
-export const RECAP_MAX_TOKENS = 2000;
+export const RECAP_MAX_TOKENS = 4000;
 /** Readings sent to the model; a very busy month keeps the most recent ones. */
 export const RECAP_MAX_READINGS = 40;
 export const RECAP_INTENTION_MAX = 120;

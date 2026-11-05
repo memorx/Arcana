@@ -84,6 +84,20 @@ describe("RecapPanel (F-54)", () => {
     expect(screen.getByRole("button", { name: "update" })).toBeInTheDocument();
   });
 
+  it("offers an update for a closed month whose recap was written before it ended (C-1)", () => {
+    render(
+      <RecapPanel
+        months={months}
+        initialRecaps={[{ year: 2026, month: 9, content: "Septiembre a medias.", readingCount: 3 }]}
+      />
+    );
+
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "2026-9" } });
+
+    expect(screen.getByText("Septiembre a medias.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "update" })).toBeInTheDocument();
+  });
+
   it("tells the person to try again when the AI is unavailable", async () => {
     respond(503, { error: "recap_unavailable", retry: true });
     render(<RecapPanel months={months} initialRecaps={[]} />);

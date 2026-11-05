@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent } from "@/components/ui";
 
@@ -18,7 +19,7 @@ export interface ResonanceCheckProps {
   locale: string;
 }
 
-type ErrorKey = "error" | "alreadySaved" | "tooSoon";
+type ErrorKey = "error" | "tooSoon";
 
 function StarIcon({ filled, className = "" }: { filled: boolean; className?: string }) {
   return (
@@ -46,23 +47,34 @@ function StarIcon({ filled, className = "" }: { filled: boolean; className?: str
  */
 export function ResonanceCheck({ readingId, createdAt, resonance, resonanceNote, locale }: ResonanceCheckProps) {
   const t = useTranslations("resonance");
+  const router = useRouter();
   const headingId = useId();
   const noteId = useId();
-  // Read the clock once, so re-renders don't flip the visibility.
-  const [now] = useState(() => Date.now());
 
-  const [saved, setSaved] = useState<{ score: number; note: string | null } | null>(
-    resonance !== null ? { score: resonance, note: resonanceNote } : null
-  );
-  const [justSaved, setJustSaved] = useState<{ xp: number } | null>(null);
+  // Read the clock only after mounting: the server and the browser could disagree
+  // right at the 24 h mark and break hydration.
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    setNow(Date.now());
+  }, []);
+
+  // What this component just saved. Otherwise the props rule (they come back
+  // fresh from the server after router.refresh()).
+  const [justSaved, setJustSaved] = useState<{ score: number; note: string | null; xp: number } | null>(null);
+  const [alreadyRated, setAlreadyRated] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<ErrorKey | null>(null);
 
-  const createdAtMs = Date.parse(createdAt);
+  const saved = justSaved
+    ? { score: justSaved.score, note: justSaved.note }
+    : resonance !== null
+      ? { score: resonance, note: resonanceNote }
+      : null;
 
+  // The saved rating doesn't depend on the clock, so it renders on the server too.
   if (saved) {
     return (
       <section aria-labelledby={headingId} className="mt-8">
@@ -104,8 +116,27 @@ export function ResonanceCheck({ readingId, createdAt, resonance, resonanceNote,
     );
   }
 
-  // Too early (or an unreadable date): the reading hasn't had time to land.
-  if (Number.isNaN(createdAtMs) || now - createdAtMs < MIN_AGE_MS) {
+  // Rated somewhere else (another tab): no form; the refresh brings the rating.
+  if (alreadyRated) {
+    return (
+      <section aria-labelledby={headingId} className="mt-8">
+        <Card className="border-purple-500/30">
+          <CardContent className="p-6">
+            <h3 id={headingId} className="text-lg font-semibold text-slate-100 mb-2">
+              {t("title")}
+            </h3>
+            <p role="status" className="text-sm text-slate-300">
+              {t("alreadySaved")}
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+    );
+  }
+
+  // Before mounting, too early, or an unreadable date: nothing to ask yet.
+  const createdAtMs = Date.parse(createdAt);
+  if (now === null || Number.isNaN(createdAtMs) || now - createdAtMs < MIN_AGE_MS) {
     return null;
   }
 
@@ -130,13 +161,19 @@ export function ResonanceCheck({ readingId, createdAt, resonance, resonanceNote,
       const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
-        setSaved({ score: data.resonance ?? score, note: data.resonanceNote ?? (trimmed || null) });
-        setJustSaved({ xp: typeof data.xpAdded === "number" ? data.xpAdded : 0 });
+        setJustSaved({
+          score: data.resonance ?? score,
+          note: data.resonanceNote ?? (trimmed || null),
+          xp: typeof data.xpAdded === "number" ? data.xpAdded : 0,
+        });
         return;
       }
-      if (res.status === 409) setError("alreadySaved");
-      else if (data?.error === "too_soon") setError("tooSoon");
-      else setError("error");
+      if (res.status === 409) {
+        setAlreadyRated(true);
+        router.refresh();
+        return;
+      }
+      setError(data?.error === "too_soon" ? "tooSoon" : "error");
     } catch {
       setError("error");
     } finally {
