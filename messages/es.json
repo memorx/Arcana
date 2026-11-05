@@ -836,5 +836,34 @@
     "createError": "No pudimos guardar tu lectura. Inténtalo de nuevo.",
     "interpreting": "Arcana está leyendo tus cartas…",
     "submit": "Interpretar mis cartas"
+  },
+  "followUp": {
+    "title": "Pregúntale más a tu lectura",
+    "subtitle": "Haz hasta {limit} preguntas sobre esta lectura. La primera es gratis; después, {cost, plural, one {# crédito} other {# créditos}} cada una.",
+    "counter": "{used} de {limit}",
+    "counterLabel": "{used} de {limit} preguntas usadas",
+    "yourQuestion": "Tu pregunta",
+    "answerLabel": "Respuesta",
+    "placeholder": "¿Qué más quieres entender de esta lectura?",
+    "charCount": "{count}/{max}",
+    "costFree": "Esta pregunta es gratis.",
+    "costPaid": "Esta pregunta cuesta {cost, plural, one {# crédito} other {# créditos}}. Tienes {credits, plural, one {# crédito} other {# créditos}}.",
+    "noCredits": "No te alcanzan los créditos para otra pregunta.",
+    "buyCredits": "Conseguir créditos",
+    "submit": "Preguntar",
+    "submitPaid": "Preguntar · {cost, plural, one {# crédito} other {# créditos}}",
+    "sending": "Las cartas están respondiendo…",
+    "retry": "Intentar de nuevo",
+    "limitReached": "Ya hiciste las {limit} preguntas de esta lectura.",
+    "free": "Gratis",
+    "paid": "{count, plural, one {# crédito} other {# créditos}}",
+    "errors": {
+      "unavailable": "No pudimos responder en este momento. No se te cobró nada. Inténtalo de nuevo en un momento.",
+      "refused": "No pudimos responder esa pregunta tal como está escrita. No se te cobró nada. Prueba a reformularla.",
+      "credits": "No te alcanzan los créditos para esta pregunta. No se te cobró nada.",
+      "limit": "Esta lectura ya tiene sus {limit} preguntas.",
+      "rate": "Demasiadas preguntas seguidas. Espera un minuto e inténtalo de nuevo.",
+      "generic": "Algo salió mal. Inténtalo de nuevo."
+    }
   }
 }

@@ -836,5 +836,34 @@
     "createError": "We couldn't save your reading. Try again.",
     "interpreting": "Arcana is reading your cards…",
     "submit": "Interpret my cards"
+  },
+  "followUp": {
+    "title": "Ask your reading more",
+    "subtitle": "Ask up to {limit} questions about this reading. The first one is free; after that, {cost, plural, one {# credit} other {# credits}} each.",
+    "counter": "{used} of {limit}",
+    "counterLabel": "{used} of {limit} questions used",
+    "yourQuestion": "Your question",
+    "answerLabel": "Answer",
+    "placeholder": "What else would you like to understand about this reading?",
+    "charCount": "{count}/{max}",
+    "costFree": "This question is free.",
+    "costPaid": "This question costs {cost, plural, one {# credit} other {# credits}}. You have {credits, plural, one {# credit} other {# credits}}.",
+    "noCredits": "You don't have enough credits for another question.",
+    "buyCredits": "Get credits",
+    "submit": "Ask",
+    "submitPaid": "Ask · {cost, plural, one {# credit} other {# credits}}",
+    "sending": "The cards are answering…",
+    "retry": "Try again",
+    "limitReached": "You've asked the {limit} questions for this reading.",
+    "free": "Free",
+    "paid": "{count, plural, one {# credit} other {# credits}}",
+    "errors": {
+      "unavailable": "We couldn't answer right now. You weren't charged. Try again in a moment.",
+      "refused": "We couldn't answer that question as it's written. You weren't charged. Try rephrasing it.",
+      "credits": "You don't have enough credits for this question. You weren't charged.",
+      "limit": "This reading already has its {limit} questions.",
+      "rate": "Too many questions in a row. Wait a minute and try again.",
+      "generic": "Something went wrong. Try again."
+    }
   }
 }
