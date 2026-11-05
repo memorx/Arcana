@@ -772,5 +772,108 @@
     "cancel": "Cancel",
     "deleteError": "Error deleting account. Please try again.",
     "notAuthenticated": "You must be logged in to access settings."
+  },
+  "insights": {
+    "metaTitle": "My story",
+    "metaDescription": "Your recurring cards, your suits, your months and how your readings resonated.",
+    "title": "My story",
+    "myStory": "My story",
+    "subtitle": "What your cards have been telling you over time.",
+    "backToHistory": "Back to history",
+    "empty": {
+      "title": "Your story is just beginning",
+      "body": "With {required} readings we start showing your recurring cards, your suits and your months. You have {count} so far.",
+      "cta": "Start a reading"
+    },
+    "stats": {
+      "totalReadings": "Readings",
+      "monthStreak": "Months in a row",
+      "reversedRate": "Reversed ({days} days)"
+    },
+    "recurring": {
+      "title": "Your recurring cards",
+      "subtitle": "The ones that came up most in the last {days} days.",
+      "count": "{count, plural, one {# time} other {# times}}",
+      "reversed": "{percent}% reversed",
+      "empty": "No readings in the last 90 days."
+    },
+    "suits": {
+      "title": "Your suits",
+      "subtitle": "How your cards were spread across suits in the last {days} days.",
+      "empty": "No readings in the last 90 days.",
+      "chartLabel": "Share by suit: {values}",
+      "names": {
+        "MAJOR": "Major Arcana",
+        "WANDS": "Wands",
+        "CUPS": "Cups",
+        "SWORDS": "Swords",
+        "PENTACLES": "Pentacles"
+      },
+      "hints": {
+        "MAJOR": "The big themes and turning points of your life",
+        "WANDS": "Fire: drive, desire, action",
+        "CUPS": "Water: emotions and bonds",
+        "SWORDS": "Air: mind, decisions, conflict",
+        "PENTACLES": "Earth: body, work, money"
+      }
+    },
+    "months": {
+      "title": "Your months",
+      "streak": "{count, plural, =0 {Your month streak starts with your next reading.} one {# month in a row with readings.} other {# months in a row with readings.}}",
+      "chartLabel": "Readings per month: {values}"
+    },
+    "resonance": {
+      "title": "How your readings resonated",
+      "empty": "You haven't rated any reading yet. A day after each reading we ask how it resonated.",
+      "chartLabel": "Average resonance: {average} out of 5",
+      "basedOn": "{count, plural, one {From # rated reading} other {From # rated readings}}"
+    },
+    "recap": {
+      "title": "Your month in cards",
+      "subtitle": "A written look back at your month: the thread of your questions and the cards that came back.",
+      "selectMonth": "Month",
+      "monthOption": "{label} · {count, plural, one {# reading} other {# readings}}",
+      "free": "Free",
+      "ready": "{count, plural, one {This month has # reading.} other {This month has # readings.}}",
+      "generate": "Write my month",
+      "generating": "Reading your month…",
+      "newReadings": "You have new readings since this recap.",
+      "update": "Update",
+      "needMore": "A month needs 3 readings to be written (this one has {count}).",
+      "unavailable": "We couldn't write your month right now. Try again in a moment.",
+      "refused": "We couldn't write this month's recap.",
+      "error": "Something went wrong. Try again."
+    },
+    "widget": {
+      "title": "Your card of the month",
+      "count": "{count, plural, one {Came up # time this month} other {Came up # times this month}}",
+      "viewStory": "See my story",
+      "noReadingsMonth": "No readings this month yet.",
+      "emptyTitle": "Your card of the month will show up here",
+      "emptyBody": "The one that comes up most in your readings.",
+      "emptyCta": "Start a reading"
+    }
+  },
+  "resonance": {
+    "title": "Resonance",
+    "question": "How did this reading resonate with what happened?",
+    "readingFrom": "Reading from {date}",
+    "starsGroup": "Rate from 1 to 5",
+    "starLabel": "{count, plural, one {# star out of 5} other {# stars out of 5}}",
+    "scaleLow": "Not at all",
+    "scaleHigh": "Completely",
+    "noteLabel": "Anything you want to remember? (optional)",
+    "notePlaceholder": "What happened, what changed, what stayed with you…",
+    "noteCount": "{count}/{max}",
+    "submit": "Save",
+    "saving": "Saving…",
+    "thanks": "Thank you. This helps your story make sense.",
+    "xp": "+{xp} XP",
+    "xpHint": "+5 XP",
+    "result": "Resonated {score}/5",
+    "badge": "Resonated {score}/5",
+    "error": "We couldn't save it. Try again.",
+    "alreadySaved": "This reading already has a rating.",
+    "tooSoon": "You can rate it a day after the reading."
   }
 }
