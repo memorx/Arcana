@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+// The app picks the language from the locale cookie, then Accept-Language (default es).
+// These checks were written for the Spanish default, so the browser asks for Spanish.
+test.use({ locale: "es-MX" });
+
 test.describe("Home Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -13,7 +17,8 @@ test.describe("Home Page", () => {
   });
 
   test("should display navigation links", async ({ page }) => {
-    await expect(page.getByRole("link", { name: /inicio/i })).toBeVisible();
+    // Home is the logo link (there is no "Inicio" text link)
+    await expect(page.getByRole("link", { name: "Arcana", exact: true })).toHaveAttribute("href", "/");
     await expect(
       page.getByRole("link", { name: /iniciar sesion|log in/i })
     ).toBeVisible();
@@ -27,7 +32,8 @@ test.describe("Home Page", () => {
 
   test("should display how it works section", async ({ page }) => {
     await expect(
-      page.getByRole("heading", { name: /como funciona|how does it work/i })
+      // level 2: an FAQ question (h3) also starts with "Como funciona"
+      page.getByRole("heading", { level: 2, name: /como funciona|how does it work/i })
     ).toBeVisible();
   });
 
@@ -44,9 +50,11 @@ test.describe("Home Page", () => {
   });
 
   test("should display footer", async ({ page }) => {
-    await expect(
-      page.getByText(/todos los derechos|all rights/i)
-    ).toBeVisible();
+    // The footer shows "© <year>" and the legal links (no "all rights reserved" line)
+    const footer = page.getByRole("contentinfo");
+    await expect(footer).toBeVisible();
+    await expect(footer).toContainText(`© ${new Date().getFullYear()}`);
+    await expect(footer.getByRole("link", { name: /privacidad|privacy/i })).toBeVisible();
   });
 
   test("should navigate to login page", async ({ page }) => {
@@ -71,25 +79,12 @@ test.describe("Language Switching", () => {
   test("should be able to switch to English", async ({ page }) => {
     await page.goto("/");
 
-    // Find and click language selector
-    const languageButton = page.locator("button", { hasText: /es|en/i });
-    if (await languageButton.isVisible()) {
-      await languageButton.click();
+    // Open the language selector and pick English (options read "🇪🇸 ES" / "🇺🇸 EN")
+    await page.getByRole("button", { name: "Change language" }).click();
+    await page.getByRole("button", { name: /\bEN$/ }).click();
 
-      // Select English if available
-      const englishOption = page.getByText("English");
-      if (await englishOption.isVisible()) {
-        await englishOption.click();
-
-        // Wait for page to update
-        await page.waitForTimeout(500);
-
-        // Check for English content
-        await expect(
-          page.getByText(/discover your destiny/i)
-        ).toBeVisible();
-      }
-    }
+    // The locale cookie is set and the page re-renders in English
+    await expect(page.getByRole("heading", { name: /discover your destiny/i })).toBeVisible();
   });
 });
 

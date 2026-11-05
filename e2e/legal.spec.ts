@@ -44,7 +44,7 @@ test.describe("Legal Pages", () => {
 
     test("should display terms of service", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { name: /terminos|terms of service/i })
+        page.getByRole("heading", { level: 3, name: /terminos de servicio|terms of service/i })
       ).toBeVisible();
     });
 
