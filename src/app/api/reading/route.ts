@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTarotInterpretation } from "@/lib/anthropic";
-import { updateStreak } from "@/lib/streak";
-import { discoverCardsFromReading } from "@/lib/collection";
-import { checkAndUnlockAchievements } from "@/lib/achievements";
-import { addXP, type LevelUpResult } from "@/lib/xp";
-import { getXPForReading, XP_REWARDS } from "@/lib/levels";
-import { updateChallengeProgress, type CompletedChallenge } from "@/lib/challenges";
+import { AIRefusalError } from "@/lib/ai/config";
+import { InsufficientCreditsError } from "@/lib/credits";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
-import { rollForGoldenCard, processGoldenCards, type GoldenCardInfo } from "@/lib/golden-cards";
+import {
+  buildReadingResponse,
+  chargeAndCreateReading,
+  drawCards,
+  finalizeReading,
+  type SpreadPosition,
+} from "@/lib/reading-pipeline";
+
+// The interpretation can take a while on thinking models.
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   // Rate limit: 5 readings per minute per user
@@ -70,9 +75,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if user can afford the reading
-    const useFreeReading = user.freeReadingsLeft > 0;
-    const canAfford = useFreeReading || user.credits >= spreadType.creditCost;
+    // Early check so we don't call the AI for someone who can't pay.
+    // The actual charge is conditional and happens in chargeAndCreateReading.
+    const canAfford = user.freeReadingsLeft > 0 || user.credits >= spreadType.creditCost;
 
     if (!canAfford) {
       return NextResponse.json(
@@ -81,32 +86,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get all cards from database
+    // Draw the cards (reversed and golden rolled server-side)
     const allCards = await prisma.card.findMany();
+    const readingCards = drawCards(allCards, spreadType.cardCount);
 
-    // Randomly select cards for the spread
-    const shuffled = [...allCards].sort(() => Math.random() - 0.5);
-    const selectedCards = shuffled.slice(0, spreadType.cardCount);
-
-    // Determine reversed status (30% probability) and golden status (1% probability)
-    const readingCards = selectedCards.map((card, index) => ({
-      position: index + 1,
-      cardId: card.id,
-      isReversed: Math.random() < 0.3,
-      isGolden: rollForGoldenCard(), // 1% chance - rolled server-side to prevent manipulation
-    }));
-
-    // Get position information
-    const positions = spreadType.positions as Array<{
-      position: number;
-      name: string;
-      nameEs: string;
-      description: string;
-    }>;
+    const positions = spreadType.positions as unknown as SpreadPosition[];
 
     // Prepare cards for interpretation (simplified - Claude knows tarot deeply)
     const cardsForInterpretation = readingCards.map((rc) => {
-      const card = selectedCards.find((c) => c.id === rc.cardId)!;
+      const card = allCards.find((c) => c.id === rc.cardId)!;
       const position = positions.find((p) => p.position === rc.position)!;
 
       return {
@@ -118,7 +106,7 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // Generate interpretation using Claude
+    // Interpret first. If the AI fails, nothing is saved and nothing is charged.
     let interpretation: string;
     try {
       interpretation = await generateTarotInterpretation({
@@ -128,259 +116,58 @@ export async function POST(req: NextRequest) {
         locale,
       });
     } catch (error) {
+      if (error instanceof AIRefusalError) {
+        console.warn("Interpretation refused:", error.category);
+        return NextResponse.json(
+          { error: "interpretation_refused" },
+          { status: 422 }
+        );
+      }
       console.error("Error generating interpretation:", error);
-      // Fallback interpretation if API fails
-      const spreadDisplayName = locale === "en" ? spreadType.name : spreadType.nameEs;
-      interpretation = locale === "en"
-        ? `Your ${spreadDisplayName} reading has been completed.\n\nCards revealed:\n${cardsForInterpretation
-            .map(
-              (c) =>
-                `- Position ${c.position} (${c.positionName}): ${c.cardName}${c.isReversed ? " (Reversed)" : ""}`
-            )
-            .join("\n")}\n\nDetailed interpretation is not available at this time. Please reflect on the meaning of each card in relation to your question: "${intention}"`
-        : `Tu lectura de ${spreadDisplayName} ha sido completada.\n\nCartas reveladas:\n${cardsForInterpretation
-            .map(
-              (c) =>
-                `- Posicion ${c.position} (${c.positionName}): ${c.cardName}${c.isReversed ? " (Invertida)" : ""}`
-            )
-            .join("\n")}\n\nLa interpretacion detallada no esta disponible en este momento. Por favor, reflexiona sobre el significado de cada carta en relacion a tu pregunta: "${intention}"`;
-    }
-
-    // Create reading and update user in a transaction
-    const reading = await prisma.$transaction(async (tx) => {
-      // Create the reading
-      const newReading = await tx.reading.create({
-        data: {
-          userId: user.id,
-          spreadTypeId: spreadType.id,
-          intention,
-          cards: readingCards,
-          interpretation,
-        },
-        include: {
-          spreadType: true,
-        },
-      });
-
-      // Update user credits/free readings
-      if (useFreeReading) {
-        await tx.user.update({
-          where: { id: user.id },
-          data: { freeReadingsLeft: { decrement: 1 } },
-        });
-      } else {
-        await tx.user.update({
-          where: { id: user.id },
-          data: { credits: { decrement: spreadType.creditCost } },
-        });
-
-        // Create credit transaction
-        await tx.creditTransaction.create({
-          data: {
-            userId: user.id,
-            amount: -spreadType.creditCost,
-            type: "READING",
-            readingId: newReading.id,
-          },
-        });
-      }
-
-      return newReading;
-    });
-
-    // Update user streak (non-blocking, don't fail if this errors)
-    let streakInfo: {
-      currentStreak: number;
-      longestStreak: number;
-      reward: { milestone: number; creditsAwarded: number } | null;
-    } | null = null;
-    try {
-      streakInfo = await updateStreak(user.id);
-    } catch (error) {
-      console.error("Error updating streak:", error);
-    }
-
-    // Process golden cards (non-blocking)
-    let goldenCards: GoldenCardInfo[] = [];
-    try {
-      const goldenCardIds = readingCards
-        .filter((rc) => rc.isGolden)
-        .map((rc) => rc.cardId);
-
-      if (goldenCardIds.length > 0) {
-        goldenCards = await processGoldenCards(user.id, goldenCardIds, reading.id);
-      }
-    } catch (error) {
-      console.error("Error processing golden cards:", error);
-    }
-
-    // Discover new cards for collection (non-blocking)
-    let newlyDiscoveredCards: Array<{
-      id: string;
-      name: string;
-      nameEs: string;
-      imageUrl: string;
-      arcana: string;
-      suit: string | null;
-      keywords: string[];
-      meaningUpright: string;
-      meaningReversed: string;
-      meaningUprightEn: string | null;
-      meaningReversedEn: string | null;
-      isReversed: boolean;
-    }> = [];
-    try {
-      const cardIds = readingCards.map((rc) => rc.cardId);
-      const discoveredCards = await discoverCardsFromReading(user.id, cardIds);
-      // Add isReversed info from readingCards
-      newlyDiscoveredCards = discoveredCards.map((card) => {
-        const readingCard = readingCards.find((rc) => rc.cardId === card.id);
-        return {
-          ...card,
-          isReversed: readingCard?.isReversed ?? false,
-        };
-      });
-    } catch (error) {
-      console.error("Error discovering cards:", error);
-    }
-
-    // Check for newly unlocked achievements (non-blocking)
-    let unlockedAchievements: Array<{
-      id: string;
-      key: string;
-      name: string;
-      nameEs: string;
-      description: string;
-      descriptionEs: string;
-      icon: string;
-      category: string;
-      creditReward: number;
-    }> = [];
-    try {
-      unlockedAchievements = await checkAndUnlockAchievements(user.id);
-    } catch (error) {
-      console.error("Error checking achievements:", error);
-    }
-
-    // Calculate and award XP (non-blocking)
-    let levelUp: LevelUpResult | null = null;
-    try {
-      // Calculate total XP from this reading
-      let totalXP = getXPForReading(spreadType.cardCount);
-
-      // Add XP for newly discovered cards
-      totalXP += newlyDiscoveredCards.length * XP_REWARDS.NEW_CARD;
-
-      // Add XP for unlocked achievements
-      totalXP += unlockedAchievements.length * XP_REWARDS.ACHIEVEMENT;
-
-      // Add XP for streak continuation (only if streak increased)
-      if (streakInfo && streakInfo.currentStreak > 1) {
-        // Check if this is a new streak day (not same day reading)
-        const userBefore = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { lastReadingDate: true },
-        });
-        const lastDate = userBefore?.lastReadingDate;
-        const today = new Date();
-        const isNewStreakDay = !lastDate ||
-          new Date(lastDate).toDateString() !== today.toDateString();
-
-        if (isNewStreakDay && streakInfo.currentStreak > 1) {
-          totalXP += XP_REWARDS.STREAK_DAY;
-        }
-      }
-
-      // Award XP and check for level up
-      const xpResult = await addXP(user.id, totalXP, "reading_completion");
-      levelUp = xpResult.levelUp;
-    } catch (error) {
-      console.error("Error awarding XP:", error);
-    }
-
-    // Update challenge progress (non-blocking)
-    let completedChallenges: CompletedChallenge[] = [];
-    try {
-      // Update for reading completed
-      const readingChallenges = await updateChallengeProgress(user.id, "reading_completed");
-      completedChallenges.push(...readingChallenges);
-
-      // Update for spread type used
-      const spreadChallenges = await updateChallengeProgress(user.id, "spread_used", {
-        spreadTypeId: spreadType.id,
-        spreadName: spreadType.name,
-      });
-      completedChallenges.push(...spreadChallenges);
-
-      // Update for cards discovered
-      if (newlyDiscoveredCards.length > 0) {
-        const cardChallenges = await updateChallengeProgress(user.id, "cards_discovered", {
-          cardsDiscovered: newlyDiscoveredCards.length,
-        });
-        completedChallenges.push(...cardChallenges);
-      }
-
-      // Update for streak
-      if (streakInfo) {
-        const streakChallenges = await updateChallengeProgress(user.id, "streak_updated", {
-          currentStreak: streakInfo.currentStreak,
-        });
-        completedChallenges.push(...streakChallenges);
-      }
-
-      // Remove duplicates (in case same challenge completed by multiple actions)
-      completedChallenges = completedChallenges.filter(
-        (c, i, arr) => arr.findIndex((x) => x.id === c.id) === i
+      return NextResponse.json(
+        { error: "interpretation_unavailable", retry: true },
+        { status: 503 }
       );
-    } catch (error) {
-      console.error("Error updating challenges:", error);
     }
 
-    // Prepare response with full card details
-    const cardsWithDetails = readingCards.map((rc) => {
-      const card = selectedCards.find((c) => c.id === rc.cardId)!;
-      const positionInfo = positions.find((p) => p.position === rc.position)!;
+    // Save the reading and charge for it in one transaction
+    let charged: Awaited<ReturnType<typeof chargeAndCreateReading>>;
+    try {
+      charged = await chargeAndCreateReading({
+        userId: user.id,
+        spreadType,
+        intention,
+        readingCards,
+        interpretation,
+      });
+    } catch (error) {
+      if (error instanceof InsufficientCreditsError) {
+        return NextResponse.json(
+          { error: "Not enough credits for this reading" },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
 
-      return {
-        ...rc,
-        card: {
-          id: card.id,
-          name: card.name,
-          nameEs: card.nameEs,
-          arcana: card.arcana,
-          suit: card.suit,
-          keywords: card.keywords,
-          meaningUpright: card.meaningUpright,
-          meaningReversed: card.meaningReversed,
-          imageUrl: card.imageUrl,
-        },
-        positionInfo,
-      };
+    // Streak, golden cards, collection, achievements, XP and challenges
+    const extras = await finalizeReading({
+      userId: user.id,
+      readingId: charged.reading.id,
+      readingCards,
+      spreadType,
     });
 
-    return NextResponse.json({
-      reading: {
-        id: reading.id,
-        intention: reading.intention,
-        interpretation: reading.interpretation,
-        createdAt: reading.createdAt,
-        spreadType: reading.spreadType,
-      },
-      cards: cardsWithDetails,
-      usedFreeReading: useFreeReading,
-      streak: streakInfo,
-      newlyDiscoveredCards,
-      goldenCards, // Golden cards found in this reading
-      unlockedAchievements,
-      levelUp: levelUp ? {
-        newLevel: levelUp.newLevel,
-        levelName: levelUp.levelDefinition.name,
-        levelNameEs: levelUp.levelDefinition.nameEs,
-        levelIcon: levelUp.levelDefinition.icon,
-        creditsAwarded: levelUp.creditsAwarded,
-      } : null,
-      completedChallenges,
-    });
+    return NextResponse.json(
+      buildReadingResponse({
+        reading: charged.reading,
+        readingCards,
+        cards: allCards,
+        positions,
+        usedFreeReading: charged.usedFreeReading,
+        extras,
+      })
+    );
   } catch (error) {
     console.error("Error creating reading:", error);
     return NextResponse.json(

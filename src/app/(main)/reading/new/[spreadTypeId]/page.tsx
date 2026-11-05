@@ -161,6 +161,8 @@ export default function ReadingFlowPage({
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  // The AI couldn't interpret (503) or declined (422): nothing was charged, the intention is kept
+  const [aiError, setAiError] = useState<"unavailable" | "refused" | null>(null);
   const [readingResult, setReadingResult] = useState<ReadingResult | null>(null);
   const [revealedCards, setRevealedCards] = useState<number[]>([]);
   const [allRevealed, setAllRevealed] = useState(false);
@@ -298,6 +300,7 @@ export default function ReadingFlowPage({
     }
 
     setError("");
+    setAiError(null);
     setIsSubmitting(true);
     setStep("shuffling");
 
@@ -312,6 +315,12 @@ export default function ReadingFlowPage({
       });
 
       const data = await res.json();
+
+      if (res.status === 503 || res.status === 422) {
+        setAiError(res.status === 503 ? "unavailable" : "refused");
+        setStep("intention");
+        return;
+      }
 
       if (!res.ok) {
         throw new Error(data.error || t("createError"));
@@ -455,6 +464,19 @@ export default function ReadingFlowPage({
                 {error && <span className="text-xs text-red-400">{error}</span>}
               </div>
 
+              {aiError && (
+                <div
+                  role="alert"
+                  className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+                >
+                  <p className="text-sm text-amber-200">
+                    {aiError === "unavailable"
+                      ? t("interpretationUnavailable")
+                      : t("interpretationRefused")}
+                  </p>
+                </div>
+              )}
+
               <Button
                 onClick={handleStartReading}
                 disabled={intention.length < 10 || isSubmitting}
@@ -462,7 +484,7 @@ export default function ReadingFlowPage({
                 className="w-full mt-4"
                 size="lg"
               >
-                {t("startReading")}
+                {aiError ? t("retry") : t("startReading")}
               </Button>
             </CardContent>
           </Card>
