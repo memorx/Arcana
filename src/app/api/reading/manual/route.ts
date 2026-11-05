@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTarotInterpretation } from "@/lib/anthropic";
+import { buildHistoryContext } from "@/lib/reading-memory";
 import { AIRefusalError } from "@/lib/ai/config";
 import { InsufficientCreditsError } from "@/lib/credits";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
@@ -166,6 +167,14 @@ export async function POST(req: NextRequest) {
       };
     });
 
+    // Reading memory, same as /api/reading: previous readings as context. If it fails, read without memory.
+    let history: string | undefined;
+    try {
+      history = await buildHistoryContext(user.id, locale);
+    } catch (error) {
+      console.error("Error building reading memory:", error);
+    }
+
     // Interpret first. If the AI fails, nothing is saved and nothing is charged.
     let interpretation: string;
     try {
@@ -174,6 +183,7 @@ export async function POST(req: NextRequest) {
         intention,
         cards: cardsForInterpretation,
         locale,
+        history,
         source: "manual",
       });
     } catch (error) {

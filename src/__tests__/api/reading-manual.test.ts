@@ -41,6 +41,10 @@ jest.mock("@/lib/anthropic", () => ({
   generateTarotInterpretation: jest.fn().mockResolvedValue("Manual interpretation"),
 }));
 
+jest.mock("@/lib/reading-memory", () => ({
+  buildHistoryContext: jest.fn().mockResolvedValue(undefined),
+}));
+
 jest.mock("@/lib/streak", () => ({
   updateStreak: jest.fn().mockResolvedValue({ currentStreak: 1, longestStreak: 1, reward: null }),
 }));
@@ -70,6 +74,7 @@ import { discoverCardsFromReading } from "@/lib/collection";
 import { updateStreak } from "@/lib/streak";
 import { addXP } from "@/lib/xp";
 import { updateChallengeProgress } from "@/lib/challenges";
+import { buildHistoryContext } from "@/lib/reading-memory";
 
 const mockAuth = auth as jest.Mock;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
@@ -162,6 +167,36 @@ describe("POST /api/reading/manual (F-62)", () => {
     (rateLimit as jest.Mock).mockReturnValue({ success: true, remaining: 4, resetIn: 60000 });
     mockGenerate.mockResolvedValue("Manual interpretation");
     (discoverCardsFromReading as jest.Mock).mockResolvedValue([]);
+    (buildHistoryContext as jest.Mock).mockResolvedValue(undefined);
+  });
+
+  describe("reading memory (F-50 wired by the integrator)", () => {
+    it("passes the history of previous readings to the interpretation", async () => {
+      givenUser(3, 0);
+      mockTransaction([1]);
+      (buildHistoryContext as jest.Mock).mockResolvedValue("12 oct · Tres Cartas · La Torre");
+
+      const response = await POST(createRequest(validBody));
+
+      expect(response.status).toBe(200);
+      expect(buildHistoryContext).toHaveBeenCalledWith("user-123", "en");
+      expect(mockGenerate).toHaveBeenCalledWith(
+        expect.objectContaining({ history: "12 oct · Tres Cartas · La Torre", source: "manual" })
+      );
+    });
+
+    it("still reads (without memory) when building the history fails", async () => {
+      givenUser(3, 0);
+      mockTransaction([1]);
+      (buildHistoryContext as jest.Mock).mockRejectedValue(new Error("db down"));
+      jest.spyOn(console, "error").mockImplementation(() => {});
+
+      const response = await POST(createRequest(validBody));
+
+      expect(response.status).toBe(200);
+      expect(mockGenerate).toHaveBeenCalledWith(expect.objectContaining({ history: undefined, source: "manual" }));
+      (console.error as jest.Mock).mockRestore();
+    });
   });
 
   it("returns 429 when rate limited", async () => {
