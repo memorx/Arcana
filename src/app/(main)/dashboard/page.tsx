@@ -14,6 +14,10 @@ import { CollectionWidget } from "@/components/dashboard/CollectionWidget";
 import { AchievementsWidget } from "@/components/dashboard/AchievementsWidget";
 import { LevelWidget } from "@/components/dashboard/LevelWidget";
 import { ChallengesWidget } from "@/components/dashboard/ChallengesWidget";
+import { BirthdayBanner } from "@/components/dashboard/BirthdayBanner";
+import { TodayEnergiesWidget } from "@/components/dashboard/TodayEnergiesWidget";
+import { BlueprintWidget } from "@/components/dashboard/BlueprintWidget";
+import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -24,6 +28,7 @@ export default async function DashboardPage() {
 
   const t = await getTranslations("dashboard");
   const tCommon = await getTranslations("common");
+  const tPulse = await getTranslations("pulse");
   const locale = await getLocale();
 
   // Fetch user data and recent readings
@@ -64,8 +69,19 @@ export default async function DashboardPage() {
 
   const displayName = user?.name || session.user.email?.split("@")[0] || "";
 
+  // Same cards and texts as the landing's "More than tarot" (pulse.moreThanTarot.*)
+  const explore = [
+    { href: "/calendar", icon: "☾", key: "calendar" },
+    { href: "/compatibility", icon: "♡", key: "compatibility" },
+    { href: "/reading/manual", icon: "❖", key: "manual" },
+    { href: "/blueprint", icon: "✶", key: "blueprint" },
+  ] as const;
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      {/* Birthday greeting (renders nothing on other days) */}
+      <BirthdayBanner userId={session.user.id} />
+
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -89,6 +105,12 @@ export default async function DashboardPage() {
         />
       )}
 
+      {/* Today's energies + Arcana Map */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <TodayEnergiesWidget userId={session.user.id} />
+        <BlueprintWidget userId={session.user.id} />
+      </div>
+
       {/* Level Widget */}
       <LevelWidget userId={session.user.id} />
 
@@ -98,8 +120,11 @@ export default async function DashboardPage() {
       {/* Achievements Widget */}
       <AchievementsWidget userId={session.user.id} />
 
-      {/* Challenges Widget */}
-      <ChallengesWidget userId={session.user.id} />
+      {/* Challenges + My story */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <ChallengesWidget userId={session.user.id} />
+        <InsightsWidget userId={session.user.id} />
+      </div>
 
       {/* Complete Profile Prompt */}
       {!userProfile && (
@@ -211,6 +236,40 @@ export default async function DashboardPage() {
           </Link>
         </CardContent>
       </Card>
+
+      {/* Explore: the other ways of reading in Arcana */}
+      <section aria-labelledby="dashboard-explore-title">
+        <h2 id="dashboard-explore-title" className="text-xl font-semibold text-slate-100">
+          {t("explore.title")}
+        </h2>
+        <p className="text-sm text-slate-400 mt-1 mb-4">{tPulse("moreThanTarot.subtitle")}</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {explore.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            >
+              <Card variant="interactive" className="h-full">
+                <CardContent className="p-5 h-full flex flex-col">
+                  <div aria-hidden="true" className="text-3xl mb-3 text-amber-400">
+                    {item.icon}
+                  </div>
+                  <h3 className="font-medium text-slate-100">
+                    {tPulse(`moreThanTarot.${item.key}.title`)}
+                  </h3>
+                  <p className="text-sm text-slate-400 mt-1 flex-1">
+                    {tPulse(`moreThanTarot.${item.key}.description`)}
+                  </p>
+                  <span className="mt-3 text-sm text-purple-300 transition-colors group-hover:text-amber-300">
+                    {tPulse("moreThanTarot.cta")} <span aria-hidden="true">&rarr;</span>
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* Quick Actions - Spread Types */}
       <section>

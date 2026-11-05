@@ -236,7 +236,10 @@
     "subscribeCta": "Suscribirse $79 MXN/mes",
     "referralTitle": "Invita amigos, gana creditos",
     "referralDesc": "Obten 2 creditos por cada amigo que se registre",
-    "inviteFriends": "Invitar Amigos"
+    "inviteFriends": "Invitar Amigos",
+    "explore": {
+      "title": "Explora"
+    }
   },
   "reading": {
     "selectSpread": "Elige tu Tirada",

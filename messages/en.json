@@ -236,7 +236,10 @@
     "subscribeCta": "Subscribe $79 MXN/mo",
     "referralTitle": "Invite friends, earn credits",
     "referralDesc": "Get 2 credits for each friend who signs up",
-    "inviteFriends": "Invite Friends"
+    "inviteFriends": "Invite Friends",
+    "explore": {
+      "title": "Explore"
+    }
   },
   "reading": {
     "selectSpread": "Choose Your Spread",
