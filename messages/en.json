@@ -772,5 +772,93 @@
     "cancel": "Cancel",
     "deleteError": "Error deleting account. Please try again.",
     "notAuthenticated": "You must be logged in to access settings."
+  },
+  "compatibility": {
+    "metaTitle": "Reading for two | Arcana",
+    "metaDescription": "Compare two birth dates across the western and Chinese zodiac, numerology and the Mexica tonalpohualli, with three tarot cards for the bond.",
+    "title": "Reading for two",
+    "subtitle": "Two birth dates, four systems and three cards for the bond: how you meet, what you ask of each other and what to take care of.",
+    "profileRequired": {
+      "title": "First, your own map",
+      "description": "To compare two maps we need yours: add your birth date and full name to your profile.",
+      "cta": "Complete my profile"
+    },
+    "form": {
+      "title": "The other person",
+      "partnerName": "Name",
+      "partnerNameHint": "Optional. It's the name the reading will use.",
+      "partnerBirthDate": "Birth date",
+      "partnerFullName": "Full name",
+      "partnerFullNameHint": "Optional, for name numerology. It's only used for the calculation and isn't saved.",
+      "costLabel": "Cost",
+      "cost": "{cost} credits",
+      "balance": "You have {credits, plural, one {# credit} other {# credits}}",
+      "notEnoughCredits": "You need {cost} credits for a reading for two.",
+      "buyCredits": "Get credits",
+      "submit": "Read the bond",
+      "submitAria": "Read the bond for {cost} credits",
+      "loading": "Reading both maps…",
+      "loadingHint": "It takes about half a minute. Keep this page open.",
+      "retry": "Try again",
+      "noCharge": "Credits are only charged once the reading is ready."
+    },
+    "errors": {
+      "birthDateRequired": "Enter their birth date.",
+      "birthDateInvalid": "That date doesn't look right.",
+      "birthDateFuture": "The birth date can't be in the future.",
+      "birthDateTooOld": "Use a date from 1900 onwards.",
+      "nameTooLong": "Use up to 60 characters.",
+      "fullNameTooLong": "Use up to 80 characters.",
+      "insufficientCredits": "You don't have enough credits for this reading.",
+      "profileRequired": "Complete your profile first.",
+      "unavailable": "The reading couldn't be written right now. Nothing was charged; try again in a moment.",
+      "refused": "We couldn't write this reading. Nothing was charged.",
+      "rateLimited": "Too many readings in a row. Wait a minute and try again.",
+      "generic": "Something went wrong. Nothing was charged; try again."
+    },
+    "how": {
+      "title": "What we compare",
+      "western": "Western zodiac: how your elements get along.",
+      "chinese": "Chinese zodiac: trines, secret friends and opposite signs.",
+      "numerology": "Numerology: your life paths and the number of the bond.",
+      "tonalli": "Tonalpohualli: your day signs in the Mexica calendar.",
+      "cards": "Three cards: you, the other person and the bond."
+    },
+    "previous": {
+      "title": "Your readings for two",
+      "empty": "Your readings for two will appear here.",
+      "noName": "No name",
+      "bornOn": "Born {date}",
+      "open": "Open the reading with {name}"
+    },
+    "detail": {
+      "back": "Readings for two",
+      "title": "{me} & {partner}",
+      "createdOn": "Reading from {date}",
+      "metersTitle": "System by system",
+      "cardsTitle": "Three cards for the bond",
+      "readingTitle": "The reading",
+      "newReading": "New reading for two",
+      "summaryUnavailable": "The system details for this reading aren't available."
+    },
+    "systems": {
+      "western": "Western zodiac",
+      "chinese": "Chinese zodiac",
+      "numerology": "Numerology",
+      "tonalli": "Tonalpohualli",
+      "overall": "Overall"
+    },
+    "meterAria": "{system}: {score} of 5",
+    "scoreOutOf": "{score}/5",
+    "numerology": {
+      "lifePaths": "Life paths {a} and {b}",
+      "bondNumber": "Bond number {number} · {name}",
+      "names": "Name expression {a} and {b}"
+    },
+    "roles": {
+      "me": "You",
+      "partner": "The other person",
+      "bond": "The bond"
+    }
   }
 }

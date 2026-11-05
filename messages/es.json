@@ -772,5 +772,93 @@
     "cancel": "Cancelar",
     "deleteError": "Error al eliminar la cuenta. Por favor intenta de nuevo.",
     "notAuthenticated": "Debes iniciar sesion para acceder a la configuracion."
+  },
+  "compatibility": {
+    "metaTitle": "Lectura de dos | Arcana",
+    "metaDescription": "Compara dos fechas de nacimiento con el zodiaco occidental y chino, la numerología y el tonalpohualli mexica, más tres cartas de tarot para el vínculo.",
+    "title": "Lectura de dos",
+    "subtitle": "Dos fechas de nacimiento, cuatro sistemas y tres cartas para el vínculo: cómo se encuentran, qué se piden y qué cuidar.",
+    "profileRequired": {
+      "title": "Primero, tu propio mapa",
+      "description": "Para comparar dos mapas necesitamos el tuyo: agrega tu fecha de nacimiento y tu nombre completo en tu perfil.",
+      "cta": "Completar mi perfil"
+    },
+    "form": {
+      "title": "La otra persona",
+      "partnerName": "Nombre",
+      "partnerNameHint": "Opcional. Es el nombre que usará la lectura.",
+      "partnerBirthDate": "Fecha de nacimiento",
+      "partnerFullName": "Nombre completo",
+      "partnerFullNameHint": "Opcional, para la numerología del nombre. Sólo se usa para el cálculo y no se guarda.",
+      "costLabel": "Costo",
+      "cost": "{cost} créditos",
+      "balance": "Tienes {credits, plural, one {# crédito} other {# créditos}}",
+      "notEnoughCredits": "Necesitas {cost} créditos para una lectura de dos.",
+      "buyCredits": "Conseguir créditos",
+      "submit": "Leer el vínculo",
+      "submitAria": "Leer el vínculo por {cost} créditos",
+      "loading": "Leyendo los dos mapas…",
+      "loadingHint": "Tarda alrededor de medio minuto. Deja esta página abierta.",
+      "retry": "Reintentar",
+      "noCharge": "Los créditos se cobran sólo cuando la lectura está lista."
+    },
+    "errors": {
+      "birthDateRequired": "Escribe su fecha de nacimiento.",
+      "birthDateInvalid": "Esa fecha no parece correcta.",
+      "birthDateFuture": "La fecha de nacimiento no puede estar en el futuro.",
+      "birthDateTooOld": "Usa una fecha a partir de 1900.",
+      "nameTooLong": "Usa hasta 60 caracteres.",
+      "fullNameTooLong": "Usa hasta 80 caracteres.",
+      "insufficientCredits": "No tienes créditos suficientes para esta lectura.",
+      "profileRequired": "Primero completa tu perfil.",
+      "unavailable": "No se pudo escribir la lectura en este momento. No se cobró nada; inténtalo de nuevo en un momento.",
+      "refused": "No pudimos escribir esta lectura. No se cobró nada.",
+      "rateLimited": "Demasiadas lecturas seguidas. Espera un minuto y vuelve a intentarlo.",
+      "generic": "Algo salió mal. No se cobró nada; inténtalo de nuevo."
+    },
+    "how": {
+      "title": "Qué comparamos",
+      "western": "Zodiaco occidental: cómo se llevan sus elementos.",
+      "chinese": "Zodiaco chino: trinos, amigos secretos y signos opuestos.",
+      "numerology": "Numerología: sus caminos de vida y el número del vínculo.",
+      "tonalli": "Tonalpohualli: sus signos del día en el calendario mexica.",
+      "cards": "Tres cartas: tú, la otra persona y el vínculo."
+    },
+    "previous": {
+      "title": "Tus lecturas de dos",
+      "empty": "Aquí aparecerán tus lecturas de dos.",
+      "noName": "Sin nombre",
+      "bornOn": "Nació el {date}",
+      "open": "Abrir la lectura con {name}"
+    },
+    "detail": {
+      "back": "Lecturas de dos",
+      "title": "{me} y {partner}",
+      "createdOn": "Lectura del {date}",
+      "metersTitle": "Sistema por sistema",
+      "cardsTitle": "Tres cartas para el vínculo",
+      "readingTitle": "La lectura",
+      "newReading": "Nueva lectura de dos",
+      "summaryUnavailable": "Los detalles por sistema de esta lectura no están disponibles."
+    },
+    "systems": {
+      "western": "Zodiaco occidental",
+      "chinese": "Zodiaco chino",
+      "numerology": "Numerología",
+      "tonalli": "Tonalpohualli",
+      "overall": "Conjunto"
+    },
+    "meterAria": "{system}: {score} de 5",
+    "scoreOutOf": "{score}/5",
+    "numerology": {
+      "lifePaths": "Caminos de vida {a} y {b}",
+      "bondNumber": "Número del vínculo {number} · {name}",
+      "names": "Expresión del nombre {a} y {b}"
+    },
+    "roles": {
+      "me": "Tú",
+      "partner": "La otra persona",
+      "bond": "El vínculo"
+    }
   }
 }
