@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
       }
 
       if (outcome === "already_renewed") {
-        console.log(`[CRON RENEW] Subscription for ${sub.user.email} was already renewed for this period`);
+        console.log(`[CRON RENEW] Subscription ${sub.id} was already renewed for this period`);
         skipped++;
         continue;
       }

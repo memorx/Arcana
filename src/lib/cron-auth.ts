@@ -11,8 +11,9 @@ import { NextResponse } from "next/server";
  * buffers of the same length and the comparison leaks neither content nor length.
  */
 export function verifyCronRequest(req: Request): NextResponse | null {
-  const secret = process.env.CRON_SECRET;
-  if (!secret || !secret.trim()) {
+  // Trimmed: a trailing newline pasted into the env var must not make every run a 401
+  const secret = process.env.CRON_SECRET?.trim();
+  if (!secret) {
     console.error("[CRON] CRON_SECRET is not configured");
     return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 500 });
   }

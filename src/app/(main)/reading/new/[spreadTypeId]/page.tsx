@@ -314,7 +314,8 @@ export default function ReadingFlowPage({
         body: JSON.stringify({ spreadTypeId, intention, locale }),
       });
 
-      const data = await res.json();
+      // A 502/504 from Vercel comes as plain text, not JSON: never let parsing throw.
+      const data = await res.json().catch(() => null);
 
       if (res.status === 503 || res.status === 422) {
         setAiError(res.status === 503 ? "unavailable" : "refused");
@@ -322,8 +323,15 @@ export default function ReadingFlowPage({
         return;
       }
 
-      if (!res.ok) {
-        throw new Error(data.error || t("createError"));
+      if (res.status === 403) {
+        // Lost the race for the last credits: offer to buy instead of showing a raw server string
+        setShowCreditsModal(true);
+        setStep("intention");
+        return;
+      }
+
+      if (!res.ok || !data) {
+        throw new Error(data?.error || t("createError"));
       }
 
       setReadingResult(data);

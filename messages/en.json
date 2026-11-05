@@ -301,7 +301,7 @@
     "loadError": "Could not load spread type",
     "createError": "Error creating reading",
     "interpretationUnavailable": "We couldn't write your interpretation right now. You weren't charged. Try again in a moment.",
-    "interpretationRefused": "We couldn't interpret this reading as it's written. You weren't charged. Try rephrasing your intention.",
+    "interpretationRefused": "We couldn't interpret this reading this time. You weren't charged. If you like, try putting your intention in other words.",
     "retry": "Try again",
     "viewHistory": "View history",
     "share": "Share",
