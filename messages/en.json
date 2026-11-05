@@ -865,5 +865,17 @@
       "rate": "Too many questions in a row. Wait a minute and try again.",
       "generic": "Something went wrong. Try again."
     }
+  },
+  "readAloud": {
+    "label": "Read aloud",
+    "play": "Listen aloud",
+    "playShort": "Listen",
+    "pause": "Pause reading aloud",
+    "pauseShort": "Pause",
+    "resume": "Resume reading aloud",
+    "resumeShort": "Resume",
+    "stop": "Stop reading aloud",
+    "playing": "Reading aloud",
+    "paused": "Paused"
   }
 }

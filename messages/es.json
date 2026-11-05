@@ -865,5 +865,17 @@
       "rate": "Demasiadas preguntas seguidas. Espera un minuto e inténtalo de nuevo.",
       "generic": "Algo salió mal. Inténtalo de nuevo."
     }
+  },
+  "readAloud": {
+    "label": "Leer en voz alta",
+    "play": "Escuchar en voz alta",
+    "playShort": "Escuchar",
+    "pause": "Pausar la lectura en voz alta",
+    "pauseShort": "Pausar",
+    "resume": "Continuar la lectura en voz alta",
+    "resumeShort": "Continuar",
+    "stop": "Detener la lectura en voz alta",
+    "playing": "Leyendo en voz alta",
+    "paused": "En pausa"
   }
 }
