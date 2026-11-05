@@ -12,6 +12,8 @@ import {
   Badge,
   TarotCardStatic,
 } from "@/components/ui";
+import { TodayEnergies } from "@/components/energies/TodayEnergies";
+import { todayUtc } from "@/lib/systems";
 
 interface DailyReading {
   id: string;
@@ -39,7 +41,6 @@ interface Subscription {
 
 export default function DailyPage() {
   const t = useTranslations("daily");
-  const tSubscribe = useTranslations("subscribe");
   const locale = useLocale();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +48,7 @@ export default function DailyPage() {
   const [todayReading, setTodayReading] = useState<DailyReading | null>(null);
   const [recentReadings, setRecentReadings] = useState<DailyReading[]>([]);
   const [emailTime, setEmailTime] = useState("08:00");
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,6 +74,10 @@ export default function DailyPage() {
           const profileData = await profileRes.json();
           if (profileData.profile?.emailTime) {
             setEmailTime(profileData.profile.emailTime);
+          }
+          if (profileData.profile?.birthDate) {
+            const parsed = new Date(profileData.profile.birthDate);
+            if (!Number.isNaN(parsed.getTime())) setBirthDate(parsed);
           }
         }
       } catch (err) {
@@ -163,6 +169,9 @@ export default function DailyPage() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-slate-100">{t("title")}</h1>
       </div>
+
+      {/* Today's energies: tonalli, moon and personal day */}
+      <TodayEnergies date={todayUtc()} birthDate={birthDate} className="mb-8" />
 
       {/* Today's Card */}
       <Card variant="highlighted" className="mb-8">

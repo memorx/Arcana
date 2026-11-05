@@ -838,5 +838,15 @@
       "noProfileButton": "Completar perfil"
     },
     "about": "Sobre el tonalpohualli"
+  },
+  "energies": {
+    "title": "Energías de hoy",
+    "calendarLink": "Calendario",
+    "tonalli": "Tonalli",
+    "moon": "Luna",
+    "illumination": "{percent}%",
+    "personalDay": "Día personal",
+    "personalDayValue": "{number} · {name}",
+    "addBirthDate": "Agrega tu fecha de nacimiento"
   }
 }
