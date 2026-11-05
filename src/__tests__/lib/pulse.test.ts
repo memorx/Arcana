@@ -63,7 +63,7 @@ describe("computeCollectivePulse", () => {
     );
   });
 
-  it("reads today's daily cards and the spreads of the last 24 hours", async () => {
+  it("reads today's daily cards and the app's spreads of the last 24 hours", async () => {
     await computeCollectivePulse(TODAY, NOW);
 
     expect(mockPrisma.dailyReading.findMany).toHaveBeenCalledWith({
@@ -71,8 +71,37 @@ describe("computeCollectivePulse", () => {
       select: { userId: true, cardId: true },
     });
     expect(mockPrisma.reading.findMany).toHaveBeenCalledWith({
-      where: { createdAt: { gte: new Date("2026-11-03T15:30:00.000Z") } },
+      where: { createdAt: { gte: new Date("2026-11-03T15:30:00.000Z") }, source: "app" },
       select: { userId: true, cards: true },
+    });
+  });
+
+  it("leaves manual spreads (drawn with a physical deck) out of the threshold and the shares", async () => {
+    type Row = ReturnType<typeof spread> & { source: string };
+    const rows: Row[] = [
+      { ...spread("u1", "card-sun"), source: "app" },
+      { ...spread("u2", "card-sun"), source: "app" },
+      { ...spread("u3", "card-moon"), source: "app" },
+      { ...spread("u4", "card-moon"), source: "app" },
+      { ...spread("u5", "card-star", "card-moon"), source: "manual" },
+    ];
+    // Fake table: applies the source filter the way the database would
+    mockPrisma.reading.findMany.mockImplementation(
+      async ({ where }: { where: { source?: string; NOT?: { source?: string } } }) =>
+        rows.filter(
+          (r) => (where.source === undefined || r.source === where.source) && r.source !== where.NOT?.source
+        )
+    );
+
+    // Four people in the app plus one manual spread: still not enough
+    expect(await computeCollectivePulse(TODAY, NOW)).toEqual({ enough: false });
+
+    // A fifth person in the app: the manual spread still adds nothing to the shares
+    rows.push({ ...spread("u6", "card-sun"), source: "app" });
+    expect(await computeCollectivePulse(TODAY, NOW)).toEqual({
+      enough: true,
+      date: "2026-11-04",
+      cards: [publicCard(CARDS.sun, 60), publicCard(CARDS.moon, 40)],
     });
   });
 

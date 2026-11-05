@@ -52,7 +52,8 @@ function cardIdsOf(cards: unknown): string[] {
 
 /**
  * The cards that came up most in Arcana: today's daily cards plus every card
- * of the spreads read in the last 24 hours. User ids are read only to count
+ * of the spreads drawn in the app in the last 24 hours (manual spreads, read
+ * with a physical deck, don't count). User ids are read only to count
  * how many different people there are; the result has no ids and no counts.
  * Uncached; use `getCollectivePulse` in pages and routes.
  */
@@ -65,8 +66,10 @@ export async function computeCollectivePulse(
       where: { date: today },
       select: { userId: true, cardId: true },
     }),
+    // Only cards drawn by the app: in a manual spread the person drew them from
+    // their own physical deck, so they say nothing about what came up in Arcana.
     prisma.reading.findMany({
-      where: { createdAt: { gte: new Date(now.getTime() - DAY_MS) } },
+      where: { createdAt: { gte: new Date(now.getTime() - DAY_MS) }, source: "app" },
       select: { userId: true, cards: true },
     }),
   ]);
