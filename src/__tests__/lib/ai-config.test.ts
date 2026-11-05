@@ -5,23 +5,33 @@
 const mockCreate = jest.fn();
 const mockConstructor = jest.fn();
 
-jest.mock("@anthropic-ai/sdk", () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation((options: unknown) => {
-    mockConstructor(options);
-    return {
-      beta: {
-        messages: {
-          create: (...args: unknown[]) => mockCreate(...args),
+jest.mock("@anthropic-ai/sdk", () => {
+  // The real error classes: complete() decides its single retry with instanceof.
+  const actual = jest.requireActual("@anthropic-ai/sdk");
+  return {
+    __esModule: true,
+    APIError: actual.APIError,
+    APIConnectionError: actual.APIConnectionError,
+    APIConnectionTimeoutError: actual.APIConnectionTimeoutError,
+    default: jest.fn().mockImplementation((options: unknown) => {
+      mockConstructor(options);
+      return {
+        beta: {
+          messages: {
+            create: (...args: unknown[]) => mockCreate(...args),
+          },
         },
-      },
-    };
-  }),
-}));
+      };
+    }),
+  };
+});
 
+import { APIConnectionError, APIConnectionTimeoutError, APIError } from "@anthropic-ai/sdk";
 import {
   AI_DEFAULT_EFFORT,
+  AI_FAST_FAILURE_MS,
   AI_MODELS,
+  AI_TIMEOUT_MS,
   AIRefusalError,
   AIUnavailableError,
   complete,
@@ -60,7 +70,8 @@ describe("complete", () => {
         max_tokens: 4000,
         system: base.system,
         messages: [{ role: "user", content: base.user }],
-      })
+      }),
+      { timeout: 45_000 }
     );
   });
 
@@ -164,6 +175,98 @@ describe("complete", () => {
   });
 });
 
+describe("complete: time budget and the single fast retry (F-90)", () => {
+  const ok = { content: [{ type: "text", text: "ok" }], stop_reason: "end_turn" };
+  const overloaded = () =>
+    APIError.generate(529, { type: "error", error: { type: "overloaded_error", message: "Overloaded" } }, undefined, new Headers());
+
+  beforeEach(() => {
+    mockCreate.mockReset();
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("stays under Vercel's 60 s: one 45 s attempt, retries only failures under 5 s", () => {
+    expect(AI_TIMEOUT_MS).toBe(45_000);
+    expect(AI_FAST_FAILURE_MS).toBe(5_000);
+    expect(AI_FAST_FAILURE_MS + AI_TIMEOUT_MS).toBeLessThan(60_000);
+  });
+
+  it("passes timeoutMs to the SDK as the per-request timeout", async () => {
+    mockCreate.mockResolvedValue(ok);
+
+    await complete({ ...base, model: "claude-haiku-4-5", timeoutMs: 15_000 });
+
+    expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({ model: "claude-haiku-4-5" }), {
+      timeout: 15_000,
+    });
+  });
+
+  it("retries a fast 529 exactly once and returns the second answer", async () => {
+    mockCreate.mockRejectedValueOnce(overloaded()).mockResolvedValueOnce(ok);
+
+    await expect(complete({ ...base, model: "claude-opus-5-5" })).resolves.toBe("ok");
+    expect(mockCreate).toHaveBeenCalledTimes(2);
+    expect(mockCreate.mock.calls[1]).toEqual(mockCreate.mock.calls[0]);
+  });
+
+  it("gives up after the one retry", async () => {
+    const second = overloaded();
+    mockCreate.mockRejectedValueOnce(overloaded()).mockRejectedValueOnce(second).mockResolvedValue(ok);
+
+    const promise = complete({ ...base, model: "claude-opus-5-5" });
+    await expect(promise).rejects.toBeInstanceOf(AIUnavailableError);
+    await expect(promise).rejects.toMatchObject({ cause: second });
+    expect(mockCreate).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    ["a connection error", () => new APIConnectionError({ message: "socket hang up" })],
+    ["a 429", () => APIError.generate(429, { type: "error", error: { type: "rate_limit_error" } }, undefined, new Headers())],
+    ["a 500", () => APIError.generate(500, { type: "error", error: { type: "api_error" } }, undefined, new Headers())],
+    ["a 408", () => APIError.generate(408, undefined, "Request Timeout", new Headers())],
+    ["a 409", () => APIError.generate(409, undefined, "Conflict", new Headers())],
+  ])("retries %s that fails fast", async (_label, makeError) => {
+    mockCreate.mockRejectedValueOnce(makeError()).mockResolvedValueOnce(ok);
+
+    await expect(complete({ ...base, model: "claude-opus-5-5" })).resolves.toBe("ok");
+    expect(mockCreate).toHaveBeenCalledTimes(2);
+  });
+
+  it("never retries a timeout", async () => {
+    const timeout = new APIConnectionTimeoutError();
+    mockCreate.mockRejectedValueOnce(timeout).mockResolvedValue(ok);
+
+    const promise = complete({ ...base, model: "claude-opus-5-5" });
+    await expect(promise).rejects.toBeInstanceOf(AIUnavailableError);
+    await expect(promise).rejects.toMatchObject({ cause: timeout });
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not retry a retryable error that took 5 s or more", async () => {
+    const now = jest.spyOn(Date, "now");
+    now.mockReturnValueOnce(1_000_000).mockReturnValueOnce(1_000_000 + AI_FAST_FAILURE_MS);
+    mockCreate.mockRejectedValueOnce(overloaded()).mockResolvedValue(ok);
+
+    await expect(complete({ ...base, model: "claude-opus-5-5" })).rejects.toBeInstanceOf(AIUnavailableError);
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["a 400", () => APIError.generate(400, { type: "error", error: { type: "invalid_request_error" } }, undefined, new Headers())],
+    ["a 401", () => APIError.generate(401, { type: "error", error: { type: "authentication_error" } }, undefined, new Headers())],
+    ["a plain error", () => new Error("boom")],
+  ])("does not retry %s", async (_label, makeError) => {
+    mockCreate.mockRejectedValueOnce(makeError()).mockResolvedValue(ok);
+
+    await expect(complete({ ...base, model: "claude-opus-5-5" })).rejects.toBeInstanceOf(AIUnavailableError);
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+  });
+});
+
 /** Fresh copy of the module (re-reads env, new client singleton). */
 const loadConfig = () => {
   let config: typeof import("@/lib/ai/config") | undefined;
@@ -179,7 +282,7 @@ describe("getAnthropicClient", () => {
     expect(getAnthropicClient()).toBe(getAnthropicClient());
   });
 
-  it("creates a single client with a 50 s timeout and one retry", () => {
+  it("creates a single client with a 45 s timeout and no SDK retries (F-90)", () => {
     const config = loadConfig();
     mockConstructor.mockClear();
 
@@ -189,7 +292,7 @@ describe("getAnthropicClient", () => {
     expect(first).toBe(second);
     expect(mockConstructor).toHaveBeenCalledTimes(1);
     expect(mockConstructor).toHaveBeenCalledWith(
-      expect.objectContaining({ timeout: 50_000, maxRetries: 1 })
+      expect.objectContaining({ timeout: 45_000, maxRetries: 0 })
     );
   });
 });

@@ -140,12 +140,14 @@ interface DailyInterpretationRequest {
   locale: string;
   /** Plain-text "energies of the day" (tonalli, moon, personal day). */
   dayContext?: string;
+  /** Time budget for the AI call in ms (the daily cron uses 15 s per person). */
+  timeoutMs?: number;
 }
 
 export async function generateDailyInterpretation(
   request: DailyInterpretationRequest
 ): Promise<string> {
-  const { cardName, cardNameEs, isReversed, zodiacSign, focusArea, userName, locale, dayContext } =
+  const { cardName, cardNameEs, isReversed, zodiacSign, focusArea, userName, locale, dayContext, timeoutMs } =
     request;
 
   const isSpanish = locale === "es";
@@ -223,5 +225,6 @@ Write a personal, brief message to start the day.`;
     maxTokens: DAILY_MAX_TOKENS,
     system: systemPrompt,
     user: userPrompt,
+    ...(timeoutMs !== undefined ? { timeoutMs } : {}),
   });
 }

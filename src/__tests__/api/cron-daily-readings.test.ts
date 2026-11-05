@@ -136,6 +136,7 @@ describe("GET /api/cron/daily-readings", () => {
         focusArea: "career",
         userName: "Ana",
         locale: "es",
+        timeoutMs: 15_000, // F-90: one slow answer can't eat the whole cron run
       })
     );
 

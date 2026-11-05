@@ -6,6 +6,9 @@ import { verifyCronRequest } from "@/lib/cron-auth";
 import { claimBirthdayGift, isBirthdayToday } from "@/lib/birthday";
 import { describeDayEnergies, getDayEnergies } from "@/lib/systems";
 
+/** AI budget per person: one slow answer must not eat the whole cron run (maxDuration 60 s). */
+const DAILY_AI_TIMEOUT_MS = 15_000;
+
 /** Day energies as plain text for the prompt and the email; never blocks the card. */
 function buildDayContext(today: Date, birthDate: Date | null | undefined, locale: "en" | "es") {
   try {
@@ -156,6 +159,7 @@ export async function GET(req: NextRequest) {
           userName: profile.fullName.split(" ")[0], // First name only
           locale,
           dayContext,
+          timeoutMs: DAILY_AI_TIMEOUT_MS,
         });
 
         // Create or update daily reading

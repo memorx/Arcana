@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic, { APIConnectionError, APIConnectionTimeoutError, APIError } from "@anthropic-ai/sdk";
 
 /**
  * Central place for every Claude call in Arcana: which model each feature uses,
@@ -33,6 +33,19 @@ export const AI_DEFAULT_EFFORT: AIEffort = parseEffort(process.env.ARCANA_AI_EFF
 /** Default output budget. On thinking models the thinking tokens count inside it. */
 export const AI_DEFAULT_MAX_TOKENS = 4000;
 
+/**
+ * Time budget of one request. A Vercel function has 60 s (maxDuration); a 12-card reading
+ * takes 32–35 s on Opus 5.5, so 45 s leaves room for the rest of the route. The SDK never
+ * retries on its own (maxRetries 0): a timeout plus a second 45 s attempt would pass 60 s.
+ */
+export const AI_TIMEOUT_MS = 45_000;
+
+/** Only a first attempt that failed this fast, for a retryable cause, gets one more try. */
+export const AI_FAST_FAILURE_MS = 5_000;
+
+/** Pause before that single retry (gives a 429/529 a moment). */
+export const AI_RETRY_DELAY_MS = 500;
+
 /** Server-side fallback: if the requested model declines, the API retries on its default fallback. */
 const SERVER_SIDE_FALLBACK_BETA = "server-side-fallback-2026-07-01";
 
@@ -61,8 +74,8 @@ let client: Anthropic | null = null;
 export function getAnthropicClient(): Anthropic {
   if (!client) {
     client = new Anthropic({
-      timeout: 50_000, // stay under Vercel's 60 s function limit
-      maxRetries: 1,
+      timeout: AI_TIMEOUT_MS,
+      maxRetries: 0, // complete() decides the (single, fast) retry itself
     });
   }
   return client;
@@ -94,7 +107,25 @@ export interface CompleteOptions {
   model?: string;
   maxTokens?: number;
   effort?: AIEffort;
+  /** Per-call time budget in ms (default AI_TIMEOUT_MS), passed to the SDK as `{ timeout }`. */
+  timeoutMs?: number;
 }
+
+/**
+ * Worth one more try: a connection error or a 408/409/429/5xx answer.
+ * Never a timeout (that attempt already used the whole budget) nor a user abort.
+ */
+function isRetryable(error: unknown): boolean {
+  if (error instanceof APIConnectionTimeoutError) return false;
+  if (error instanceof APIConnectionError) return true;
+  if (error instanceof APIError) {
+    const status = error.status;
+    return status === 408 || status === 409 || status === 429 || (typeof status === "number" && status >= 500);
+  }
+  return false;
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * One text completion.
@@ -102,6 +133,10 @@ export interface CompleteOptions {
  * - Every other model gets `output_config: { effort }` and keeps its default
  *   (adaptive) thinking; `thinking` is never sent.
  * - Opus models opt into server-side fallback on refusals.
+ *
+ * Time budget: one request of `timeoutMs` (default 45 s). If it fails in under
+ * AI_FAST_FAILURE_MS for a retryable cause (connection, 408/409/429/5xx) it is
+ * retried once; a timeout is never retried.
  *
  * Throws AIRefusalError on `stop_reason: "refusal"` and wraps any SDK error
  * (or an empty answer) in AIUnavailableError.
@@ -111,21 +146,40 @@ export async function complete(opts: CompleteOptions): Promise<string> {
   const isHaiku = model.startsWith("claude-haiku");
   const isOpus = model.startsWith("claude-opus");
 
-  let message: Anthropic.Beta.BetaMessage;
-  try {
-    message = await getAnthropicClient().beta.messages.create({
-      model,
-      max_tokens: opts.maxTokens ?? AI_DEFAULT_MAX_TOKENS,
-      system: opts.system,
-      messages: [{ role: "user", content: opts.user }],
-      ...(isHaiku ? {} : { output_config: { effort: opts.effort ?? AI_DEFAULT_EFFORT } }),
-      ...(isOpus ? { betas: [SERVER_SIDE_FALLBACK_BETA], fallbacks: "default" as const } : {}),
-    });
-  } catch (error) {
-    throw new AIUnavailableError(
+  const send = () =>
+    getAnthropicClient().beta.messages.create(
+      {
+        model,
+        max_tokens: opts.maxTokens ?? AI_DEFAULT_MAX_TOKENS,
+        system: opts.system,
+        messages: [{ role: "user", content: opts.user }],
+        ...(isHaiku ? {} : { output_config: { effort: opts.effort ?? AI_DEFAULT_EFFORT } }),
+        ...(isOpus ? { betas: [SERVER_SIDE_FALLBACK_BETA], fallbacks: "default" as const } : {}),
+      },
+      { timeout: opts.timeoutMs ?? AI_TIMEOUT_MS }
+    );
+
+  const unavailable = (error: unknown) =>
+    new AIUnavailableError(
       error instanceof Error ? `Anthropic request failed: ${error.message}` : "Anthropic request failed",
       { cause: error }
     );
+
+  let message: Anthropic.Beta.BetaMessage;
+  const startedAt = Date.now();
+  try {
+    message = await send();
+  } catch (firstError) {
+    if (!isRetryable(firstError) || Date.now() - startedAt >= AI_FAST_FAILURE_MS) {
+      throw unavailable(firstError);
+    }
+    console.warn(`[AI] ${model} failed fast (${firstError instanceof Error ? firstError.message : "error"}); retrying once`);
+    await sleep(AI_RETRY_DELAY_MS);
+    try {
+      message = await send();
+    } catch (secondError) {
+      throw unavailable(secondError);
+    }
   }
 
   if (message.stop_reason === "refusal") {

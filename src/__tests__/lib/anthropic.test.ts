@@ -6,8 +6,13 @@
 const mockCreate = jest.fn();
 
 jest.mock("@anthropic-ai/sdk", () => {
+  // Real error classes: complete() uses instanceof on them to decide its single retry (F-90)
+  const actual = jest.requireActual("@anthropic-ai/sdk");
   return {
     __esModule: true,
+    APIError: actual.APIError,
+    APIConnectionError: actual.APIConnectionError,
+    APIConnectionTimeoutError: actual.APIConnectionTimeoutError,
     default: jest.fn().mockImplementation(() => ({
       beta: {
         messages: {
@@ -66,11 +71,13 @@ describe("generateTarotInterpretation", () => {
 
     await generateTarotInterpretation(baseRequest);
 
+    // Readings keep the default 45 s budget (F-90)
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         model: AI_MODELS.reading,
         max_tokens: 4000,
-      })
+      }),
+      { timeout: 45_000 }
     );
   });
 
@@ -215,8 +222,19 @@ describe("generateDailyInterpretation", () => {
       expect.objectContaining({
         model: AI_MODELS.daily,
         max_tokens: 700,
-      })
+      }),
+      { timeout: 45_000 }
     );
+  });
+
+  it("passes a per-call time budget to the SDK when given (the cron uses 15 s, F-90)", async () => {
+    mockCreate.mockResolvedValue(textResponse("Daily message..."));
+
+    await generateDailyInterpretation({ ...baseRequest, timeoutMs: 15_000 });
+
+    expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({ model: AI_MODELS.daily }), {
+      timeout: 15_000,
+    });
   });
 
   it("includes user name and zodiac sign in prompt", async () => {
