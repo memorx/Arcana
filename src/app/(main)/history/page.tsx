@@ -18,6 +18,8 @@ export default async function HistoryPage() {
   }
 
   const t = await getTranslations("history");
+  const tInsights = await getTranslations("insights");
+  const tResonance = await getTranslations("resonance");
   const locale = await getLocale();
 
   const readings = await prisma.reading.findMany({
@@ -62,9 +64,17 @@ export default async function HistoryPage() {
               : t("readingsTotal")}
           </p>
         </div>
-        <Link href="/reading/new">
-          <Button>{t("newReading")}</Button>
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/history/insights">
+            <Button variant="secondary">
+              <span aria-hidden="true" className="mr-1.5 text-amber-400">&#10022;</span>
+              {tInsights("myStory")}
+            </Button>
+          </Link>
+          <Link href="/reading/new">
+            <Button>{t("newReading")}</Button>
+          </Link>
+        </div>
       </div>
 
       {/* Readings List */}
@@ -127,6 +137,12 @@ export default async function HistoryPage() {
                                 <Badge variant="primary">
                                   {spreadName}
                                 </Badge>
+                                {reading.resonance !== null && (
+                                  <Badge variant="secondary">
+                                    <span aria-hidden="true" className="mr-1">&#9733;</span>
+                                    {tResonance("badge", { score: reading.resonance })}
+                                  </Badge>
+                                )}
                                 <span className="text-xs text-slate-500">
                                   {new Date(
                                     reading.createdAt

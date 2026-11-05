@@ -1002,5 +1002,108 @@
     "personalDay": "Día personal",
     "personalDayValue": "{number} · {name}",
     "addBirthDate": "Agrega tu fecha de nacimiento"
+  },
+  "insights": {
+    "metaTitle": "Mi historia",
+    "metaDescription": "Tus cartas recurrentes, tus palos, tus meses y cómo resonaron tus lecturas.",
+    "title": "Mi historia",
+    "myStory": "Mi historia",
+    "subtitle": "Lo que tus cartas te han ido diciendo con el tiempo.",
+    "backToHistory": "Volver al historial",
+    "empty": {
+      "title": "Tu historia apenas empieza",
+      "body": "Con {required} lecturas empezamos a mostrarte tus cartas recurrentes, tus palos y tus meses. Llevas {count}.",
+      "cta": "Hacer una lectura"
+    },
+    "stats": {
+      "totalReadings": "Lecturas",
+      "monthStreak": "Meses seguidos",
+      "reversedRate": "Invertidas ({days} días)"
+    },
+    "recurring": {
+      "title": "Tus cartas recurrentes",
+      "subtitle": "Las que más te han salido en los últimos {days} días.",
+      "count": "{count, plural, one {# vez} other {# veces}}",
+      "reversed": "{percent}% invertida",
+      "empty": "No hay lecturas en los últimos {days} días."
+    },
+    "suits": {
+      "title": "Tus palos",
+      "subtitle": "Cómo se repartieron tus cartas en los últimos {days} días.",
+      "empty": "No hay lecturas en los últimos {days} días.",
+      "chartLabel": "Reparto por palo: {values}",
+      "names": {
+        "MAJOR": "Arcanos mayores",
+        "WANDS": "Bastos",
+        "CUPS": "Copas",
+        "SWORDS": "Espadas",
+        "PENTACLES": "Oros"
+      },
+      "hints": {
+        "MAJOR": "Los grandes temas y giros de tu vida",
+        "WANDS": "Fuego: impulso, deseo, acción",
+        "CUPS": "Agua: emociones y vínculos",
+        "SWORDS": "Aire: mente, decisiones, conflictos",
+        "PENTACLES": "Tierra: cuerpo, trabajo, dinero"
+      }
+    },
+    "months": {
+      "title": "Tus meses",
+      "streak": "{count, plural, =0 {Tu racha de meses empieza con tu próxima lectura.} one {# mes seguido con lecturas.} other {# meses seguidos con lecturas.}}",
+      "chartLabel": "Lecturas por mes: {values}"
+    },
+    "resonance": {
+      "title": "Cómo resonaron tus lecturas",
+      "empty": "Todavía no has calificado ninguna lectura. Un día después de cada lectura puedes contarnos, en la misma lectura, cómo resonó.",
+      "chartLabel": "Resonancia promedio: {average} de 5",
+      "basedOn": "{count, plural, one {De # lectura calificada} other {De # lecturas calificadas}}"
+    },
+    "recap": {
+      "title": "Tu mes en cartas",
+      "subtitle": "Un repaso escrito de tu mes: el hilo de tus preguntas y las cartas que volvieron.",
+      "selectMonth": "Mes",
+      "monthOption": "{label} · {count, plural, one {# lectura} other {# lecturas}}",
+      "free": "Gratis",
+      "ready": "{count, plural, one {Este mes tiene # lectura.} other {Este mes tiene # lecturas.}}",
+      "generate": "Escribir mi mes",
+      "generating": "Leyendo tu mes…",
+      "newReadings": "Tienes lecturas nuevas desde este repaso.",
+      "update": "Actualizar",
+      "needMore": "Hacen falta {min} lecturas en el mes para escribirlo (este tiene {count}).",
+      "unavailable": "No pudimos escribir tu mes ahora. Inténtalo de nuevo en un momento.",
+      "refused": "No pudimos escribir el repaso de este mes.",
+      "error": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "widget": {
+      "title": "Tu carta del mes",
+      "count": "{count, plural, one {Salió # vez este mes} other {Salió # veces este mes}}",
+      "viewStory": "Ver mi historia",
+      "noReadingsMonth": "Aún no tienes lecturas este mes.",
+      "emptyTitle": "Aquí aparecerá tu carta del mes",
+      "emptyBody": "La que más te salga en tus lecturas.",
+      "emptyCta": "Hacer una lectura"
+    }
+  },
+  "resonance": {
+    "title": "Resonancia",
+    "question": "¿Cómo resonó esta lectura con lo que pasó?",
+    "readingFrom": "Lectura del {date}",
+    "starsGroup": "Califica de 1 a 5",
+    "starLabel": "{count, plural, one {# estrella de 5} other {# estrellas de 5}}",
+    "scaleLow": "Nada",
+    "scaleHigh": "Totalmente",
+    "noteLabel": "¿Algo que quieras recordar? (opcional)",
+    "notePlaceholder": "Qué pasó, qué cambió, qué te quedó…",
+    "noteCount": "{count}/{max}",
+    "submit": "Guardar",
+    "saving": "Guardando…",
+    "thanks": "Gracias. Esto le da sentido a tu historia.",
+    "xp": "+{xp} XP",
+    "xpHint": "+5 XP",
+    "result": "Resonó {score}/5",
+    "badge": "Resonó {score}/5",
+    "error": "No se pudo guardar. Inténtalo de nuevo.",
+    "alreadySaved": "Esta lectura ya tiene una calificación.",
+    "tooSoon": "Podrás calificarla un día después de la lectura."
   }
 }
