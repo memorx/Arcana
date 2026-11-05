@@ -133,6 +133,19 @@ export async function finalizeReading(opts: {
 }): Promise<ReadingExtras> {
   const { userId, readingId, readingCards, spreadType } = opts;
 
+  // The previous reading date, read BEFORE updateStreak moves it to now: it decides
+  // whether this reading opens a new streak day (XP bonus below). undefined = unknown.
+  let lastReadingDateBefore: Date | null | undefined;
+  try {
+    const userBefore = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { lastReadingDate: true },
+    });
+    lastReadingDateBefore = userBefore ? userBefore.lastReadingDate : undefined;
+  } catch (error) {
+    console.error("Error reading the last reading date:", error);
+  }
+
   // Update user streak
   let streak: StreakUpdateResult | null = null;
   try {
@@ -180,18 +193,14 @@ export async function finalizeReading(opts: {
     totalXP += newlyDiscoveredCards.length * XP_REWARDS.NEW_CARD;
     totalXP += unlockedAchievements.length * XP_REWARDS.ACHIEVEMENT;
 
-    // XP for streak continuation (only on a new streak day)
-    if (streak && streak.currentStreak > 1) {
-      const userBefore = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { lastReadingDate: true },
-      });
-      const lastDate = userBefore?.lastReadingDate;
-      const today = new Date();
+    // XP for streak continuation, only on a new streak day (same local-day rule as updateStreak).
+    // If the previous date couldn't be read, no bonus rather than a possible double one.
+    if (streak && streak.currentStreak > 1 && lastReadingDateBefore !== undefined) {
       const isNewStreakDay =
-        !lastDate || new Date(lastDate).toDateString() !== today.toDateString();
+        !lastReadingDateBefore ||
+        new Date(lastReadingDateBefore).toDateString() !== new Date().toDateString();
 
-      if (isNewStreakDay && streak.currentStreak > 1) {
+      if (isNewStreakDay) {
         totalXP += XP_REWARDS.STREAK_DAY;
       }
     }

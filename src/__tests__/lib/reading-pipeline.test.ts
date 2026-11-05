@@ -40,6 +40,7 @@ import { checkAndUnlockAchievements } from "@/lib/achievements";
 import { addXP } from "@/lib/xp";
 import { updateChallengeProgress } from "@/lib/challenges";
 import { processGoldenCards } from "@/lib/golden-cards";
+import { getXPForReading, XP_REWARDS } from "@/lib/levels";
 
 const deck = Array.from({ length: 78 }, (_, i) => ({ id: `card-${i}` }));
 
@@ -232,6 +233,48 @@ describe("finalizeReading", () => {
     expect(extras.newlyDiscoveredCards).toHaveLength(1);
     expect(extras.levelUp).not.toBeNull();
     errorSpy.mockRestore();
+  });
+
+  describe("streak-day XP (F-87)", () => {
+    // updateStreak writes lastReadingDate = now; simulate that so the test fails if the
+    // pipeline reads the date after the streak update (the original bug).
+    const givenStreak = (lastReadingDate: Date | null, currentStreak: number) => {
+      const findUnique = prisma.user.findUnique as jest.Mock;
+      findUnique.mockReset();
+      findUnique.mockResolvedValue({ lastReadingDate });
+      (updateStreak as jest.Mock).mockImplementation(async () => {
+        findUnique.mockResolvedValue({ lastReadingDate: new Date() });
+        return { currentStreak, longestStreak: currentStreak, reward: null };
+      });
+    };
+    // spreadType has 3 cards; one card is discovered, no achievements.
+    const base = getXPForReading(spreadType.cardCount) + XP_REWARDS.NEW_CARD;
+
+    it("adds STREAK_DAY when the last reading was yesterday and the streak is now 2", async () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      givenStreak(yesterday, 2);
+
+      await finalizeReading(opts);
+
+      expect(addXP).toHaveBeenCalledWith("user-1", base + XP_REWARDS.STREAK_DAY, "reading_completion");
+    });
+
+    it("does not add STREAK_DAY for a second reading on the same day", async () => {
+      givenStreak(new Date(), 2);
+
+      await finalizeReading(opts);
+
+      expect(addXP).toHaveBeenCalledWith("user-1", base, "reading_completion");
+    });
+
+    it("does not add STREAK_DAY on day one of a streak", async () => {
+      givenStreak(null, 1);
+
+      await finalizeReading(opts);
+
+      expect(addXP).toHaveBeenCalledWith("user-1", base, "reading_completion");
+    });
   });
 
   it("removes duplicated completed challenges", async () => {
