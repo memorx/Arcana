@@ -110,6 +110,17 @@
   top: var(--alto-cabecera, 96px);
   height: calc(100svh - var(--alto-cabecera, 96px));
 }
+/* Quieta en escritorio (sin JS o con reduced-motion) se ven el grabado y la lectura a la vez: en la geometría de la
+   maqueta se enciman ~2 % (allí el texto sólo aparece cuando el grabado ya se deshizo). Se separan un poco. */
+@media (min-width: 820.02px) {
+  .portada-grabado .gp:not(.gp--activa) .gp-grabado {
+    top: 10%;
+    height: 80%;
+  }
+  .portada-grabado .gp:not(.gp--activa) .gp-lectura {
+    width: 50%;
+  }
+}
 
 /* ======================================================================
    Escena 3 · La carta del día
@@ -390,19 +401,26 @@
     transform: translateX(-50%);
   }
 }
-/* Quieta: los veinte signos en filas, sin copia y sin nada que recortar. */
+/* Quieta: los veinte signos como un muestrario (retícula), sin copia y sin nada que recortar. */
 @media (prefers-reduced-motion: reduce) {
   .portada-marquesina__pista {
+    display: block;
     width: auto;
   }
   .portada-marquesina ul {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
   }
   .portada-marquesina .portada-marquesina__copia {
     display: none;
   }
-  .portada-signo {
-    padding: 16px 22px;
+  .portada-marquesina .portada-signo {
+    flex-wrap: wrap;
+    row-gap: 4px;
+    white-space: normal;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgb(236 234 230 / 0.15);
+    font-size: clamp(1.1rem, 0.95rem + 0.6vw, 1.5rem);
   }
 }
 @media (max-width: 820px) {
