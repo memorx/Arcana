@@ -672,6 +672,12 @@
       "career": "Carrera y Finanzas",
       "spirituality": "Espiritualidad y Crecimiento",
       "health": "Salud y Bienestar"
+    },
+    "eyebrow": "Tu perfil",
+    "emailTimeUtc": "Los horarios están en UTC. Ciudad de México es UTC-6.",
+    "meta": {
+      "title": "Tu perfil",
+      "description": "Completa tu perfil para personalizar tus lecturas de tarot con tu signo y tus preferencias."
     }
   },
   "daily": {
@@ -968,7 +974,8 @@
         "cooldown": "Tu síntesis se actualizó hace muy poco. Podrás generar una nueva en {minutes, plural, one {# minuto} other {# minutos}}.",
         "profile": "Primero necesitamos tu fecha de nacimiento. Completa tu perfil y regresa.",
         "generic": "Algo salió mal. Inténtalo de nuevo."
-      }
+      },
+      "eyebrow": "Escrita por IA"
     },
     "share": {
       "title": "Comparte tu mapa",
@@ -1363,7 +1370,8 @@
       "title": "Tus lecturas de dos",
       "empty": "Aquí aparecerán tus lecturas de dos.",
       "noName": "Sin nombre",
-      "bornOn": "Nació el {date}"
+      "bornOn": "Nació el {date}",
+      "count": "{count, plural, one {# lectura} other {# lecturas}}"
     },
     "detail": {
       "back": "Lecturas de dos",
@@ -1373,7 +1381,8 @@
       "cardsTitle": "Tres cartas para el vínculo",
       "readingTitle": "La lectura",
       "newReading": "Nueva lectura de dos",
-      "summaryUnavailable": "Los detalles por sistema de esta lectura no están disponibles."
+      "summaryUnavailable": "Los detalles por sistema de esta lectura no están disponibles.",
+      "readingEyebrow": "Escrita por IA"
     },
     "systems": {
       "western": "Zodiaco occidental",
@@ -1393,7 +1402,8 @@
       "me": "Tú",
       "partner": "La otra persona",
       "bond": "El vínculo"
-    }
+    },
+    "eyebrow": "Dos mapas · tres cartas"
   },
   "hora": {
     "hoy": "Hoy",

@@ -84,4 +84,27 @@ describe("Profile setup", () => {
     expect(await screen.findByRole("link", { name: "viewMap" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "continue" })).not.toBeInTheDocument();
   });
+
+  it("every field has its own id and label, and the option groups say which one is pressed", async () => {
+    mockFetch({ birthDate: "1990-07-15T00:00:00.000Z" });
+    render(<ProfileSetupPage />);
+    await screen.findByText("Cáncer");
+
+    expect(screen.getByLabelText("fullName")).toHaveAttribute("id", "profile-fullName");
+    expect(screen.getByLabelText("birthDate")).toHaveAttribute("id", "profile-birthDate");
+    expect(screen.getByLabelText("birthTime")).toHaveAttribute("id", "profile-birthTime");
+    // The birth time help is visible text tied to the field, not a hover tooltip.
+    expect(screen.getByLabelText("birthTime")).toHaveAccessibleDescription("birthTimeTooltip");
+
+    const general = screen.getByRole("button", { name: "Guía General" });
+    const amor = screen.getByRole("button", { name: "Amor y Relaciones" });
+    expect(general).toHaveAttribute("aria-pressed", "true");
+    expect(amor).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(amor);
+    expect(amor).toHaveAttribute("aria-pressed", "true");
+    expect(general).toHaveAttribute("aria-pressed", "false");
+
+    expect(screen.getByRole("group", { name: "emailTime" })).toBeInTheDocument();
+    expect(screen.getByText("emailTimeUtc")).toBeInTheDocument();
+  });
 });

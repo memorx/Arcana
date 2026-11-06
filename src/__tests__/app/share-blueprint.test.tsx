@@ -129,3 +129,24 @@ describe("/share/blueprint/[shareId]", () => {
     expect((metadata.robots as { index?: boolean }).index).toBe(false);
   });
 });
+
+describe("/share/blueprint/[shareId] in two inks", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("is complete without JavaScript: one h1, no entrance animation, the brand band and the footer", async () => {
+    findUnique.mockResolvedValue(sharedRow());
+    const { container } = render(await SharedBlueprintPage(params("abcdef1234")));
+
+    expect(container.querySelectorAll("h1")).toHaveLength(1);
+    // Nothing waits for an animation (or for hydration) to become visible.
+    expect(container.innerHTML).not.toMatch(/animate-|opacity-0/);
+    expect(container.querySelector("header.suelo-tinta a[href='/']")).toHaveTextContent("Arcana");
+    expect(container.querySelector("footer.suelo-tinta")).toBeInTheDocument();
+    // The five stamps are a labelled list; the call to action links to sign up.
+    const sellos = container.querySelector('ul[aria-label="blueprint.badgesLabel"]');
+    expect(sellos?.querySelectorAll("li")).toHaveLength(5);
+    expect(container.querySelector("a[href='/register']")).toHaveTextContent("blueprint.public.cta");
+  });
+});

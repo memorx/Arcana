@@ -4,7 +4,12 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/components/ui";
+import { Button, buttonClasses, Input } from "@/components/ui";
+import { ReversoCarta } from "@/components/tinta/ReversoCarta";
+
+/** Mono text link with a 44 px touch target (inside the error notice). */
+const ENLACE =
+  "inline-flex min-h-11 items-center font-dato text-[0.6875rem] tracking-[0.12em] text-letra uppercase underline underline-offset-[0.3em]";
 
 interface CompatibilityFormProps {
   credits: number;
@@ -138,33 +143,42 @@ export function CompatibilityForm({ credits, cost }: CompatibilityFormProps) {
 
   if (isSubmitting) {
     return (
-      <Card variant="highlighted" className="flex min-h-[22rem] items-center justify-center">
-        <div role="status" aria-live="polite" className="px-6 py-10 text-center">
-          <div aria-hidden="true" className="mb-6 flex justify-center gap-3">
+      <section
+        aria-labelledby="compatibility-form-title"
+        data-estado="leyendo"
+        className="grid min-h-[22rem] place-items-center border-t border-filete bg-papel-hondo px-6 py-10"
+      >
+        <h2 id="compatibility-form-title" className="sr-only">
+          {t("form.title")}
+        </h2>
+        <div role="status" aria-live="polite" className="grid justify-items-center gap-6 text-center">
+          <div aria-hidden="true" className="flex justify-center gap-3">
             {[0, 1, 2].map((i) => (
-              <div
+              <ReversoCarta
                 key={i}
-                className="h-24 w-16 rounded-lg border-2 border-amber-500/40 bg-gradient-to-br from-purple-800/70 to-slate-900 motion-safe:animate-pulse"
-                style={{ animationDelay: `${i * 200}ms` }}
+                className="h-28 w-16 rounded-[6px] motion-safe:animate-pulse"
+                style={{ animationDelay: `${i * 220}ms` }}
               />
             ))}
           </div>
-          <p className="text-lg font-medium text-slate-100">{t("form.loading")}</p>
-          <p className="mt-2 text-sm text-slate-400">{t("form.loadingHint")}</p>
+          <p className="text-[clamp(1.25rem,1.1rem+0.5vw,1.45rem)] leading-[1.4] italic">{t("form.loading")}</p>
+          <p className="max-w-[40ch] font-dato text-[0.6875rem] leading-[1.6] tracking-[0.08em] text-letra-suave uppercase">
+            {t("form.loadingHint")}
+          </p>
         </div>
-      </Card>
+      </section>
     );
   }
 
   const showRetry = formError === "unavailable";
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("form.title")}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+    <section aria-labelledby="compatibility-form-title" className="border-t border-filete pt-6">
+      <h2 id="compatibility-form-title" className="text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1]">
+        {t("form.title")}
+      </h2>
+      <form onSubmit={handleSubmit} noValidate className="mt-6 grid gap-6">
+        <div className="grid gap-6 sm:grid-cols-2">
           <Input
             id="partnerName"
             name="partnerName"
@@ -188,61 +202,58 @@ export function CompatibilityForm({ credits, cost }: CompatibilityFormProps) {
             max={today}
             required
             aria-required="true"
-            className="[color-scheme:dark]"
+            className="min-h-11"
             error={fieldErrors.partnerBirthDate}
           />
+        </div>
 
-          <Input
-            id="partnerFullName"
-            name="partnerFullName"
-            label={t("form.partnerFullName")}
-            hint={t("form.partnerFullNameHint")}
-            value={partnerFullName}
-            onChange={(e) => setPartnerFullName(e.target.value)}
-            maxLength={FULL_NAME_MAX}
-            autoComplete="off"
-            error={fieldErrors.partnerFullName}
-          />
+        <Input
+          id="partnerFullName"
+          name="partnerFullName"
+          label={t("form.partnerFullName")}
+          hint={t("form.partnerFullNameHint")}
+          value={partnerFullName}
+          onChange={(e) => setPartnerFullName(e.target.value)}
+          maxLength={FULL_NAME_MAX}
+          autoComplete="off"
+          error={fieldErrors.partnerFullName}
+        />
 
-          {/* Cost and balance */}
-          <div className="flex flex-col gap-2 rounded-lg border border-slate-800 bg-slate-950/40 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-slate-300">
-              {t("form.costLabel")}:{" "}
-              <span className="font-semibold text-amber-300">{t("form.cost", { cost })}</span>
-            </p>
-            <p className={canAfford ? "text-sm text-slate-400" : "text-sm text-orange-300"}>
-              {t("form.balance", { credits })}
-            </p>
+        {/* Cost and balance, as data */}
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-y border-filete/25 py-4 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] uppercase">
+          <p>
+            <span className="text-letra-suave">{t("form.costLabel")}: </span>
+            <span className="text-letra-acento">{t("form.cost", { cost })}</span>
+          </p>
+          <p className={canAfford ? "text-letra-suave" : "text-letra-error"}>{t("form.balance", { credits })}</p>
+        </div>
+
+        {!canAfford && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-l-2 border-rosa pl-4">
+            <p className="text-[1.0625rem] leading-[1.6]">{t("form.notEnoughCredits", { cost })}</p>
+            <Link href="/credits" className={buttonClasses({ variant: "linea", size: "sm", className: "shrink-0" })}>
+              {t("form.buyCredits")}
+            </Link>
           </div>
+        )}
 
-          {!canAfford && (
-            <div className="flex flex-col gap-3 rounded-lg border border-orange-500/30 bg-orange-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-orange-200">{t("form.notEnoughCredits", { cost })}</p>
-              <Link
-                href="/credits"
-                className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-              >
+        {formError && (
+          <div role="alert" className="grid gap-2 border-l-2 border-letra-error pl-4 text-[1.0625rem] leading-[1.6] text-letra-error">
+            <p>{t(`errors.${formError}`)}</p>
+            {formError === "insufficientCredits" && (
+              <Link href="/credits" className={ENLACE}>
                 {t("form.buyCredits")}
               </Link>
-            </div>
-          )}
+            )}
+            {formError === "profileRequired" && (
+              <Link href="/profile/setup" className={ENLACE}>
+                {t("profileRequired.cta")}
+              </Link>
+            )}
+          </div>
+        )}
 
-          {formError && (
-            <div role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
-              <p>{t(`errors.${formError}`)}</p>
-              {formError === "insufficientCredits" && (
-                <Link href="/credits" className="mt-2 inline-block font-medium text-amber-300 underline underline-offset-4">
-                  {t("form.buyCredits")}
-                </Link>
-              )}
-              {formError === "profileRequired" && (
-                <Link href="/profile/setup" className="mt-2 inline-block font-medium text-amber-300 underline underline-offset-4">
-                  {t("profileRequired.cta")}
-                </Link>
-              )}
-            </div>
-          )}
-
+        <div className="grid gap-3">
           <Button
             type="submit"
             size="lg"
@@ -252,9 +263,11 @@ export function CompatibilityForm({ credits, cost }: CompatibilityFormProps) {
           >
             {showRetry ? t("form.retry") : t("form.submit")}
           </Button>
-          <p className="text-center text-xs text-slate-500">{t("form.noCharge")}</p>
-        </form>
-      </CardContent>
-    </Card>
+          <p className="text-center font-dato text-[0.625rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+            {t("form.noCharge")}
+          </p>
+        </div>
+      </form>
+    </section>
   );
 }

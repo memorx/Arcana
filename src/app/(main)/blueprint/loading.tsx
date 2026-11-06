@@ -1,22 +1,29 @@
+/** Skeleton of the Arcana Map in papel-hondo: the hero, its stamps and the ruled plates. Still with reduced motion. */
 export default function BlueprintLoading() {
+  const bloque = "rounded-sm bg-papel-hondo motion-safe:animate-pulse";
   return (
-    <div className="mx-auto max-w-5xl space-y-10" aria-busy="true">
-      <div className="flex flex-col items-center gap-8 rounded-3xl border border-slate-800 bg-slate-900/40 px-5 py-8 sm:px-10 sm:py-12 md:flex-row">
-        <div className="h-44 w-44 shrink-0 rounded-full bg-slate-800/60 motion-safe:animate-pulse sm:h-52 sm:w-52" />
-        <div className="w-full flex-1 space-y-4">
-          <div className="mx-auto h-3 w-24 rounded bg-slate-800 motion-safe:animate-pulse md:mx-0" />
-          <div className="mx-auto h-8 w-3/4 rounded bg-slate-800 motion-safe:animate-pulse md:mx-0" />
-          <div className="flex flex-wrap justify-center gap-2 md:justify-start">
+    <div className="grid gap-14" aria-busy="true">
+      <div className="grid items-center gap-10 border-b border-filete pb-10 md:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
+        <div className="grid gap-5">
+          <div className={`h-3 w-28 ${bloque}`} />
+          <div className={`h-12 w-3/4 ${bloque}`} />
+          <div className={`h-3 w-1/2 ${bloque}`} />
+          <div className="flex flex-wrap gap-2">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-7 w-24 rounded-full bg-slate-800 motion-safe:animate-pulse" />
+              <div key={i} className={`h-10 w-36 rounded-full ${bloque}`} />
             ))}
           </div>
         </div>
+        <div className={`aspect-square w-48 justify-self-center rounded-full sm:w-60 md:justify-self-end ${bloque}`} />
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="h-56 rounded-xl border border-slate-800 bg-slate-900/40 motion-safe:animate-pulse md:col-span-2" />
+      <div className="grid gap-px border-y border-filete bg-filete/25 md:grid-cols-2">
+        <div className="h-64 bg-suelo p-7 md:col-span-2">
+          <div className={`h-full ${bloque}`} />
+        </div>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-72 rounded-xl border border-slate-800 bg-slate-900/40 motion-safe:animate-pulse" />
+          <div key={i} className="h-80 bg-suelo p-7">
+            <div className={`h-full ${bloque}`} />
+          </div>
         ))}
       </div>
     </div>

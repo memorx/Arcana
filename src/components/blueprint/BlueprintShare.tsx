@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui";
 
+/** A notice with the pink rule of the reading's intention (lectura.html). */
+const AVISO = "border-l-2 border-rosa pl-4 text-[1.0625rem] leading-[1.6]";
+
 interface BlueprintShareProps {
   initialShareId: string | null;
   /**
@@ -107,31 +110,37 @@ export function BlueprintShare({ initialShareId, canCreate = true }: BlueprintSh
   if (!shareId && !canCreate) return null;
 
   return (
-    <section aria-labelledby="blueprint-share-title" className="mt-8 border-t border-slate-800/80 pt-6">
-      <h3 id="blueprint-share-title" className="text-base font-semibold text-slate-100">
+    <section aria-labelledby="blueprint-share-title" className="mt-10 border-t border-filete/25 pt-7">
+      <h3 id="blueprint-share-title" className="text-[1.45rem] leading-[1.15]">
         {t("title")}
       </h3>
 
       {shareId ? (
-        <div className="mt-3 space-y-3">
-          <p className="text-sm text-slate-400">{t("note")}</p>
-          <label htmlFor="blueprint-share-url" className="block text-xs text-slate-500">
-            {t("linkLabel")}
-          </label>
-          <div className="flex flex-col gap-2 min-[420px]:flex-row">
-            <input
-              id="blueprint-share-url"
-              type="text"
-              readOnly
-              value={url}
-              onFocus={(e) => e.currentTarget.select()}
-              className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-300 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-            />
+        <div className="mt-4 grid gap-4">
+          <p className={AVISO}>{t("note")}</p>
+          <div className="flex flex-col gap-3 min-[480px]:flex-row min-[480px]:items-end">
+            <div className="min-w-0 flex-1">
+              <label
+                htmlFor="blueprint-share-url"
+                className="mb-1.5 block font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase"
+              >
+                {t("linkLabel")}
+              </label>
+              <input
+                id="blueprint-share-url"
+                type="text"
+                readOnly
+                value={url}
+                onFocus={(e) => e.currentTarget.select()}
+                className="min-h-11 w-full min-w-0 rounded-none border-0 border-b border-filete/50 bg-transparent px-0 py-2.5 font-dato text-[0.8125rem] text-letra focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none"
+              />
+            </div>
             <Button
               size="sm"
               onClick={() => copy(url)}
               aria-label={copied ? t("copied") : t("copyAria")}
               disabled={!url}
+              className="shrink-0"
             >
               {copied ? t("copied") : t("copy")}
             </Button>
@@ -141,11 +150,11 @@ export function BlueprintShare({ initialShareId, canCreate = true }: BlueprintSh
           </p>
           <div className="flex flex-wrap items-center gap-2">
             {canNativeShare && (
-              <Button variant="secondary" size="sm" onClick={nativeShare}>
+              <Button variant="linea" size="sm" onClick={nativeShare}>
                 {t("native")}
               </Button>
             )}
-            <Button variant="ghost" size="sm" onClick={stop} isLoading={busy === "stop"}>
+            <Button variant="fantasma" size="sm" onClick={stop} isLoading={busy === "stop"}>
               {t("stop")}
             </Button>
           </div>
@@ -156,17 +165,17 @@ export function BlueprintShare({ initialShareId, canCreate = true }: BlueprintSh
           tabIndex={-1}
           role="group"
           aria-labelledby="blueprint-share-notice"
-          className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+          className="mt-4 grid gap-4 bg-papel-hondo p-5 focus:outline-none focus-visible:outline-2 focus-visible:outline-rosa sm:p-6"
         >
-          <p id="blueprint-share-notice" className="text-sm leading-relaxed text-amber-100">
+          <p id="blueprint-share-notice" className={AVISO}>
             {t("note")}
           </p>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-wrap gap-2">
             <Button onClick={create} isLoading={busy === "create"} className="w-full sm:w-auto">
               {t("create")}
             </Button>
             <Button
-              variant="ghost"
+              variant="fantasma"
               onClick={() => setConfirming(false)}
               disabled={busy === "create"}
               className="w-full sm:w-auto"
@@ -176,16 +185,16 @@ export function BlueprintShare({ initialShareId, canCreate = true }: BlueprintSh
           </div>
         </div>
       ) : (
-        <>
-          <p className="mt-1 text-sm text-slate-400">{t("intro")}</p>
-          <Button variant="secondary" className="mt-4 w-full sm:w-auto" onClick={() => setConfirming(true)}>
+        <div className="mt-3 grid justify-items-start gap-4">
+          <p className="max-w-[56ch] text-letra-suave">{t("intro")}</p>
+          <Button variant="linea" className="w-full sm:w-auto" onClick={() => setConfirming(true)}>
             {t("start")}
           </Button>
-        </>
+        </div>
       )}
 
       {error && (
-        <p role="alert" className="mt-3 text-sm text-red-300">
+        <p role="alert" className={`${AVISO} mt-4 border-letra-error text-letra-error`}>
           {error}
         </p>
       )}
