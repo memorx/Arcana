@@ -1,0 +1,73 @@
+/* Celebraciones sobre tinta (modales de logro, reto, nivel y carta dorada).
+ * Sólo transform y opacity, una vez (nada infinito), con animation-fill-mode: both.
+ * Nada depende de la animación para verse: sin ella (reduced-motion) el sello ya está en su lugar
+ * y las chispas no existen. */
+
+/* El sello (o la palabra a pincel) se estampa: cae un poco girado y asienta. */
+.estampa {
+  animation: estampa 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes estampa {
+  0% {
+    opacity: 0;
+    transform: scale(1.32) rotate(-9deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.97) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Chispas en dos tintas (rosa y papel) que saltan una sola vez alrededor del sello. */
+.chispas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.chispa {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: chispa 900ms cubic-bezier(0.2, 0.7, 0.3, 1) 140ms both;
+}
+
+.rosa {
+  background: var(--color-rosa, #e4007c);
+}
+
+.papel {
+  background: var(--color-papel, #eceae6);
+}
+
+@keyframes chispa {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estampa {
+    animation: none;
+  }
+
+  .chispas {
+    display: none;
+  }
+}
