@@ -154,6 +154,73 @@
       "cta": "Start Daily Oracle",
       "emailPreview": "Your daily card awaits...",
       "emailTime": "Delivered at your preferred time"
+    },
+    "portada": {
+      "grabados": {
+        "etiqueta": "AI tarot · 78 engravings from 1909",
+        "pincel": "Ask",
+        "tesis1": "The cards are from 1909.",
+        "tesis2": "Who reads them today is an AI.",
+        "tesis3": "The question is still yours.",
+        "cta": "Get your reading",
+        "verHoy": "See today's card",
+        "irEspacio": "Go to my space",
+        "nota": "3 free readings when you sign up · no card needed"
+      },
+      "grabado": {
+        "etiqueta": "From engraving to AI",
+        "titulo": "A 1909 engraving becomes a reading written for you.",
+        "bajada": "Pamela Colman Smith drew the 78 cards in 1909. Arcana shuffles them, you write your question, and the AI reads how they speak to each other and to your moment. A mirror, not a crystal ball.",
+        "alt": "The Fool, engraving by Pamela Colman Smith, 1909",
+        "lectura1": "The Fool opens your reading with a step into the void that isn't carelessness: it's trust. Your question is about starting something without having the whole map.",
+        "lectura2": "This card doesn't promise it will turn out well; it asks what you carry in that bundle that you no longer need.",
+        "firma": "Sample reading · Arcana"
+      },
+      "carta": {
+        "etiqueta": "Today's card · {tonalli}",
+        "titulo": "One card a day, to start with a question.",
+        "estado": "Today's card is face down. Tap it to turn it over.",
+        "posicion": "today's card",
+        "fecha": "Card of the day · {fecha}",
+        "complemento": "Every morning yours arrives written for you, with a question to carry through the day.",
+        "firma": "Sample message · Arcana",
+        "cta": "Get it every morning"
+      },
+      "masQueTarot": {
+        "etiqueta": "Five ways to read yourself",
+        "blueprint": "Build yours",
+        "calendar": "See today",
+        "compatibility": "Read the bond",
+        "manual": "Use my deck",
+        "historia": {
+          "titulo": "Your history",
+          "descripcion": "Arcana remembers your readings: the cards that keep coming back and your month in cards.",
+          "cta": "See your history"
+        }
+      },
+      "hoy": {
+        "etiqueta": "Today in the tonalpohualli",
+        "titulo": "Today is {tonalli}, {nombre}.",
+        "trecena": "Trecena",
+        "senor": "Lord of the night",
+        "luna": "Moon",
+        "lunaValor": "{fase} · {luz}%",
+        "diaPersonal": "Your personal day",
+        "alRegistrarte": "When you sign up",
+        "enCalendario": "In your calendar",
+        "signos": "The twenty signs of the tonalpohualli",
+        "signoHoy": "today"
+      },
+      "faq": {
+        "etiqueta": "Before you ask"
+      },
+      "turno": {
+        "pincel": "Your turn",
+        "titulo": "Your turn",
+        "texto": "Write your question. The cards are already shuffled.",
+        "cta": "Get your reading · 3 free",
+        "ctaSesion": "Get your reading"
+      }
     }
   },
   "auth": {

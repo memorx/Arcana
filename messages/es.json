@@ -154,6 +154,73 @@
       "cta": "Comenzar Oraculo Diario",
       "emailPreview": "Tu carta del dia te espera...",
       "emailTime": "Entregada a tu hora preferida"
+    },
+    "portada": {
+      "grabados": {
+        "etiqueta": "Tarot con IA · 78 grabados de 1909",
+        "pincel": "Pregunta",
+        "tesis1": "Las cartas son de 1909.",
+        "tesis2": "Quien las lee hoy es una IA.",
+        "tesis3": "La pregunta sigue siendo tuya.",
+        "cta": "Haz tu lectura",
+        "verHoy": "Ver la carta de hoy",
+        "irEspacio": "Ir a mi espacio",
+        "nota": "3 lecturas gratis al registrarte · sin tarjeta"
+      },
+      "grabado": {
+        "etiqueta": "Del grabado a la IA",
+        "titulo": "Un grabado de 1909 se vuelve una lectura escrita para ti.",
+        "bajada": "Pamela Colman Smith dibujó las 78 cartas en 1909. Arcana las baraja, tú escribes tu pregunta y la IA lee cómo dialogan entre sí y con tu momento. Un espejo, no una bola de cristal.",
+        "alt": "El Loco, grabado de Pamela Colman Smith, 1909",
+        "lectura1": "El Loco abre tu lectura con un paso al vacío que no es descuido: es confianza. Tu pregunta habla de empezar algo sin tener el mapa completo.",
+        "lectura2": "Esta carta no te promete que saldrá bien; te pregunta qué cargas en ese hatillo que ya no necesitas llevar.",
+        "firma": "Lectura de ejemplo · Arcana"
+      },
+      "carta": {
+        "etiqueta": "La carta de hoy · {tonalli}",
+        "titulo": "Una carta al día, para empezar con una pregunta.",
+        "estado": "La carta de hoy está boca abajo. Tócala para voltearla.",
+        "posicion": "carta de hoy",
+        "fecha": "Carta del día · {fecha}",
+        "complemento": "Cada mañana la tuya llega escrita para ti, con una pregunta para llevarte.",
+        "firma": "Mensaje de ejemplo · Arcana",
+        "cta": "Recíbela cada mañana"
+      },
+      "masQueTarot": {
+        "etiqueta": "Cinco formas de leerte",
+        "blueprint": "Arma el tuyo",
+        "calendar": "Ver hoy",
+        "compatibility": "Leer el vínculo",
+        "manual": "Usar mi mazo",
+        "historia": {
+          "titulo": "Mi historia",
+          "descripcion": "Arcana recuerda tus lecturas: las cartas que se repiten y tu mes en cartas.",
+          "cta": "Ver mi historia"
+        }
+      },
+      "hoy": {
+        "etiqueta": "El día de hoy en el tonalpohualli",
+        "titulo": "Hoy es {tonalli}, {nombre}.",
+        "trecena": "Trecena",
+        "senor": "Señor de la noche",
+        "luna": "Luna",
+        "lunaValor": "{fase} · {luz}%",
+        "diaPersonal": "Tu día personal",
+        "alRegistrarte": "Al registrarte",
+        "enCalendario": "En tu calendario",
+        "signos": "Los veinte signos del tonalpohualli",
+        "signoHoy": "hoy"
+      },
+      "faq": {
+        "etiqueta": "Antes de preguntar"
+      },
+      "turno": {
+        "pincel": "Tu turno",
+        "titulo": "Tu turno",
+        "texto": "Escribe tu pregunta. Las cartas ya están barajadas.",
+        "cta": "Haz tu lectura · 3 gratis",
+        "ctaSesion": "Haz tu lectura"
+      }
     }
   },
   "auth": {
