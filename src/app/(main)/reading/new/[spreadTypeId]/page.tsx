@@ -453,8 +453,9 @@ export default function ReadingFlowPage({
     numero: Number(c.position),
     nombre: c.positionInfo ? getLocalizedName(c.positionInfo) : t("position", { number: c.position }),
   }));
-  // Small cards (short hint, smaller canvas) on phones and in the dense spreads
-  const smallCards = narrow || orderedCards.length > 5;
+  // Small cards (short hint, smaller canvas) on phones and in the year spread (12); the horseshoe (7) and the Celtic
+  // Cross (10, 176 px columns on desktop) burn with the medium canvas.
+  const smallCards = narrow || orderedCards.length > 10;
 
   const nameUnder = (cardData: ReadingCard, visible: boolean) => (
     <p

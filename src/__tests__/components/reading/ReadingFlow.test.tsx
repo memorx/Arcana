@@ -189,6 +189,34 @@ describe("revelar la tirada sobre papel (L2)", () => {
   });
 
   it.each([
+    [3, "Three Card Spread", "cq--media"],
+    [7, "Horseshoe Spread", "cq--media"],
+    [10, "Celtic Cross", "cq--media"],
+    [12, "Year Ahead", "cq--chica"],
+  ])("en escritorio, %i cartas (%s) queman con %s: sólo la tirada del año (12) va chica", async (n, nombre, clase) => {
+    const nombres = ["The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", "The Hierophant",
+      "The Lovers", "The Chariot", "Strength", "The Hermit", "Wheel of Fortune", "Justice"];
+    const spread = { ...SPREAD, name: nombre, cardCount: n };
+    answerReadingWith(200, {
+      ...RESULT,
+      reading: { ...RESULT.reading, spreadType: spread },
+      cards: nombres.slice(0, n).map((name, i) => ({
+        position: i + 1,
+        cardId: `major_${i}`,
+        isReversed: false,
+        isGolden: false,
+        card: card(`major_${i}`, name, name),
+        positionInfo: { position: i + 1, name: `Pos ${i + 1}`, nameEs: `Posición ${i + 1}`, description: "" },
+      })),
+    });
+    await startReading();
+
+    const cartas = screen.getAllByRole("button", { name: /^carta\.voltearPosicion/ });
+    expect(cartas).toHaveLength(n);
+    for (const boton of cartas) expect(boton.closest(".cq")).toHaveClass(clase);
+  });
+
+  it.each([
     [503, "reading.interpretationUnavailable"],
     [422, "reading.interpretationRefused"],
   ])("con %i vuelve a la intención con su aviso y sin perder lo escrito", async (status, aviso) => {
