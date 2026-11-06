@@ -10,9 +10,9 @@ test.describe("Home Page", () => {
   });
 
   test("should display the hero section", async ({ page }) => {
-    // Check for hero title (in Spanish by default)
+    // The thesis is the only h1 (in Spanish by default)
     await expect(
-      page.getByRole("heading", { name: /descubre tu destino/i })
+      page.getByRole("heading", { level: 1, name: /las cartas son de 1909/i })
     ).toBeVisible();
   });
 
@@ -25,22 +25,25 @@ test.describe("Home Page", () => {
   });
 
   test("should display CTA buttons", async ({ page }) => {
-    await expect(
-      page.getByRole("link", { name: /comenzar lectura|start reading/i })
-    ).toBeVisible();
+    // Guests: "Haz tu lectura" goes to sign-up; "Ver la carta de hoy" jumps to the card of the day
+    const cta = page.getByRole("link", { name: /^haz tu lectura|^get your reading/i }).first();
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveAttribute("href", "/register");
+    await expect(page.getByRole("link", { name: /ver la carta de hoy|see today's card/i })).toHaveAttribute("href", "#hoy");
   });
 
   test("should display how it works section", async ({ page }) => {
+    // «Del grabado a la IA» explains the product: a 1909 engraving becomes a reading
     await expect(
-      // level 2: an FAQ question (h3) also starts with "Como funciona"
-      page.getByRole("heading", { level: 2, name: /como funciona|how does it work/i })
+      page.getByRole("heading", { level: 2, name: /un grabado de 1909|a 1909 engraving/i })
     ).toBeVisible();
   });
 
   test("should display features section", async ({ page }) => {
     await expect(
-      page.getByText(/78 cartas|78 complete cards/i)
+      page.getByText(/78 grabados de 1909|78 engravings from 1909/i)
     ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: /más que tarot|more than tarot/i })).toBeVisible();
   });
 
   test("should display FAQ section", async ({ page }) => {
@@ -84,7 +87,7 @@ test.describe("Language Switching", () => {
     await page.getByRole("button", { name: /\bEN$/ }).click();
 
     // The locale cookie is set and the page re-renders in English
-    await expect(page.getByRole("heading", { name: /discover your destiny/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /who reads them today is an ai/i })).toBeVisible();
   });
 });
 
@@ -100,7 +103,7 @@ test.describe("Responsive Design", () => {
 
     // CTA button should be visible
     await expect(
-      page.getByRole("link", { name: /comenzar|start/i }).first()
+      page.getByRole("link", { name: /haz tu lectura|get your reading/i }).first()
     ).toBeVisible();
   });
 
