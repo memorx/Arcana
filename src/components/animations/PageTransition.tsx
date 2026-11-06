@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ReactNode } from "react";
 
 interface PageTransitionProps {
@@ -8,23 +8,14 @@ interface PageTransitionProps {
   className?: string;
 }
 
+/**
+ * Ya no anima en cada cambio de ruta (§5.4): lo de en medio de dos pantallas es
+ * quieto y rápido. La transición «a pincel» vive en los componentes de tinta y
+ * sólo se usa al entrar a revelar una tirada y a /daily. Se conserva la
+ * exportación y sus props para no romper a nadie.
+ */
 export function PageTransition({ children, className = "" }: PageTransitionProps) {
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{
-          duration: 0.3,
-          ease: [0.25, 0.1, 0.25, 1],
-        }}
-        className={className}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 // Stagger children animation wrapper
@@ -37,16 +28,17 @@ export function StaggerContainer({
   className?: string;
   staggerDelay?: number;
 }) {
+  const reducido = useReducedMotion();
   return (
     <motion.div
-      initial="hidden"
+      initial={reducido ? false : "hidden"}
       animate="visible"
       variants={{
         hidden: { opacity: 0 },
         visible: {
           opacity: 1,
           transition: {
-            staggerChildren: staggerDelay,
+            staggerChildren: reducido ? 0 : staggerDelay,
           },
         },
       }}
@@ -64,13 +56,14 @@ export function StaggerItem({
   children: ReactNode;
   className?: string;
 }) {
+  const reducido = useReducedMotion();
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 20 },
+        hidden: reducido ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 },
       }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: reducido ? 0 : 0.4 }}
       className={className}
     >
       {children}

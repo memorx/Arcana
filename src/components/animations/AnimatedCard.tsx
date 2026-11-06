@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ReactNode } from "react";
 
 interface AnimatedCardProps {
@@ -11,6 +11,11 @@ interface AnimatedCardProps {
   delay?: number;
 }
 
+/**
+ * Entra con un fundido y sube 4 px al pasar. `hoverGlow` ya no es un halo
+ * morado: es un filete rosa (en dos tintas no hay sombras de color).
+ * Con reduced-motion no se mueve.
+ */
 export function AnimatedCard({
   children,
   className = "",
@@ -18,24 +23,25 @@ export function AnimatedCard({
   hoverGlow = false,
   delay = 0,
 }: AnimatedCardProps) {
+  const reducido = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={reducido ? false : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.4,
         delay,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={
-        hoverLift
+        hoverLift && !reducido
           ? {
               y: -4,
               transition: { duration: 0.2 },
             }
           : undefined
       }
-      className={`${className} ${hoverGlow ? "hover:shadow-lg hover:shadow-purple-500/20" : ""}`}
+      className={`${className} ${hoverGlow ? "rounded-sm transition-shadow hover:ring-1 hover:ring-rosa" : ""}`}
     >
       {children}
     </motion.div>
@@ -52,12 +58,13 @@ export function FlipCard({
   isFlipped: boolean;
   className?: string;
 }) {
+  const reducido = useReducedMotion();
   return (
     <motion.div
       initial={false}
       animate={{ rotateY: isFlipped ? 180 : 0 }}
       transition={{
-        duration: 0.6,
+        duration: reducido ? 0 : 0.6,
         ease: [0.25, 0.1, 0.25, 1],
       }}
       style={{ transformStyle: "preserve-3d" }}
