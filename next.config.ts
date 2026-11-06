@@ -64,6 +64,13 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
+      {
+        // Card images (public/cartas): Vercel serves public/ with max-age=0, so the portada's 40
+        // engravings were revalidated on every visit. 30 days fresh + 7 of stale-while-revalidate;
+        // not `immutable`, because the file names carry no hash.
+        source: "/cartas/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=604800" }],
+      },
     ];
   },
 };

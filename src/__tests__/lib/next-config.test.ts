@@ -63,6 +63,15 @@ describe("next.config · service worker (next-pwa)", () => {
     expect(reglas.some((r) => String(r.urlPattern).includes("wikimedia"))).toBe(false);
   });
 
+  it("/cartas/* is cacheable for 30 days with 7 of stale-while-revalidate, and not immutable (no hash in names)", async () => {
+    const reglas = await nextConfig.headers!();
+    const cartas = reglas.find((r) => r.source === "/cartas/:path*");
+    expect(cartas?.headers).toEqual([
+      { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=604800" },
+    ]);
+    expect(JSON.stringify(cartas)).not.toMatch(/immutable/);
+  });
+
   it("keeps the rest of the config (distDir, security headers)", async () => {
     expect(nextConfig.distDir).toBe(process.env.ARCANA_DIST_DIR || ".next");
     const reglas = await nextConfig.headers!();
