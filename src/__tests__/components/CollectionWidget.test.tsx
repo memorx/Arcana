@@ -68,5 +68,8 @@ describe("CollectionWidget", () => {
     expect(screen.getByRole("link", { name: "Dos de Copas" })).toHaveAttribute("href", "/cards/two-of-cups");
     expect(screen.getByRole("link", { name: "El Loco" })).toHaveAttribute("href", "/collection");
     for (const enlace of screen.getAllByRole("link")) expect(enlace.getAttribute("href")).not.toMatch(/ckx/);
+    // The count is data: Martian Mono, like the /collection counter (not Gloock).
+    expect(screen.getByText("3/78")).toHaveClass("font-dato");
+    expect(screen.getByText("3/78")).not.toHaveClass("font-titulo");
   });
 });

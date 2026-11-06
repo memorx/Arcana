@@ -14,8 +14,8 @@ export const ENLACE_DATO =
 /** Rótulo de dato: mono chico en mayúsculas, color secundario del suelo. */
 export const ROTULO = "font-dato text-[0.6875rem] uppercase leading-[1.4] tracking-[0.12em] text-letra-suave";
 
-/** Cifra grande (contadores): Gloock con números tabulares. */
-export const CIFRA = "font-titulo text-[2rem] leading-none text-letra tabular-nums";
+/** Cifra grande (contadores): un dato, así que en Martian Mono con números tabulares (como /collection). */
+export const CIFRA = "font-dato text-[2rem] leading-none tracking-[-0.04em] text-letra tabular-nums";
 
 /**
  * Retícula editorial: las celdas van sobre el suelo y el hueco de 1 px entre ellas deja
