@@ -38,7 +38,8 @@ const martianMono = Martian_Mono({
 // en todas las pantallas. La palabra es decorativa (aria-hidden) y su alto lo fija el line-height,
 // así que el cambio de fuente no mueve nada.
 // Subset local (A–Z, a–z, acentos del español, ¿?¡!,. y el espacio): 35 KB en vez de los 65 KB
-// del latín completo que servía next/font/google.
+// del latín completo que servía next/font/google. Lo regenera scripts/fuente-pincel.py (licencia en
+// fuentes/OFL.txt) y src/__tests__/app/fuente-pincel.test.ts cuida que cada palabra a pincel quepa en él.
 const waterBrush = localFont({
   src: "./fuentes/water-brush-letras.woff2",
   weight: "400",
