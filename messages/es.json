@@ -1321,5 +1321,15 @@
     "senor": "Señor de la noche: {nombre}",
     "luna": "{fase} {luz}%",
     "lunaCorta": "Luna {luz}%"
+  },
+  "carta": {
+    "pista": "Toca para voltear",
+    "pistaCorta": "Toca",
+    "invertida": "invertida",
+    "desliza": "Desliza ↓",
+    "reverso": "Reverso de carta Arcana",
+    "voltear": "Voltear la carta",
+    "voltearPosicion": "Voltear la carta: {posicion}",
+    "voltearTodas": "Voltear todas"
   }
 }

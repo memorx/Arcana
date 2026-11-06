@@ -32,25 +32,22 @@ interface SavedReadingCardProps {
   };
 }
 
-export function SavedReadingCard({
-  card,
-  position,
-  isReversed,
-  locale,
-  translations,
-}: SavedReadingCardProps) {
+export function SavedReadingCard({ card, position, isReversed, locale, translations }: SavedReadingCardProps) {
   const cardName = locale === "en" ? card.name : card.nameEs;
   const positionName = locale === "en" ? position.name : position.nameEs;
+  const meaning = isReversed
+    ? locale === "en" && card.meaningReversedEn
+      ? card.meaningReversedEn
+      : card.meaningReversed
+    : locale === "en" && card.meaningUprightEn
+      ? card.meaningUprightEn
+      : card.meaningUpright;
 
   return (
-    <div className="bg-slate-900/50 border border-slate-800 rounded-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-purple-900/30 to-amber-900/20 px-4 py-2 border-b border-slate-800">
-        <p className="text-xs text-slate-400 uppercase tracking-wide">
-          {translations.position}
-        </p>
-        <p className="text-sm font-medium text-slate-200">
-          {positionName}
-        </p>
+    <div className="overflow-hidden rounded-[10px] border border-tinta/15 bg-papel text-tinta">
+      <div className="border-b border-tinta/15 px-4 py-3">
+        <p className="font-dato text-[11px] uppercase tracking-[0.12em] text-grafito">{translations.position}</p>
+        <p className="font-titulo text-lg leading-tight">{positionName}</p>
       </div>
       <div className="p-4">
         <div className="flex flex-col items-center">
@@ -71,9 +68,7 @@ export function SavedReadingCard({
           />
 
           <div className="text-center">
-            <h3 className="font-semibold text-slate-100">
-              {cardName}
-            </h3>
+            <h3 className="font-titulo text-xl leading-tight">{cardName}</h3>
             {isReversed && (
               <Badge variant="warning" className="mt-1">
                 {translations.reversed}
@@ -81,26 +76,16 @@ export function SavedReadingCard({
             )}
           </div>
 
-          <div className="mt-4 space-y-2 w-full">
-            <p className="text-xs text-slate-500 uppercase">
-              {translations.meaning}
-            </p>
-            <p className="text-sm text-slate-400">
-              {isReversed
-                ? (locale === "en" && card.meaningReversedEn
-                    ? card.meaningReversedEn
-                    : card.meaningReversed)
-                : (locale === "en" && card.meaningUprightEn
-                    ? card.meaningUprightEn
-                    : card.meaningUpright)}
-            </p>
+          <div className="mt-4 w-full space-y-2">
+            <p className="font-dato text-[11px] uppercase tracking-[0.12em] text-grafito">{translations.meaning}</p>
+            <p className="font-lectura text-base leading-relaxed">{meaning}</p>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-1 justify-center">
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
             {card.keywords.slice(0, 3).map((keyword, i) => (
               <span
                 key={i}
-                className="text-xs bg-slate-800/50 text-slate-500 px-2 py-0.5 rounded"
+                className="rounded-full border border-tinta/20 px-2 py-0.5 font-dato text-[10px] uppercase tracking-[0.08em] text-grafito"
               >
                 {keyword}
               </span>

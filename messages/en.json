@@ -1321,5 +1321,15 @@
     "senor": "Lord of the night: {nombre}",
     "luna": "{fase} {luz}%",
     "lunaCorta": "Moon {luz}%"
+  },
+  "carta": {
+    "pista": "Tap to turn over",
+    "pistaCorta": "Tap",
+    "invertida": "reversed",
+    "desliza": "Scroll ↓",
+    "reverso": "Arcana card back",
+    "voltear": "Turn the card over",
+    "voltearPosicion": "Turn the card over: {posicion}",
+    "voltearTodas": "Turn them all over"
   }
 }
