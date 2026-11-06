@@ -13,7 +13,7 @@ export async function ResonanceSummary({ resonance }: ResonanceSummaryProps) {
     return <p className="max-w-[60ch] font-lectura text-letra-suave">{t("empty")}</p>;
   }
 
-  const average = new Intl.NumberFormat(locale === "en" ? "en-US" : "es-ES", {
+  const average = new Intl.NumberFormat(locale === "en" ? "en-US" : "es-MX", {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   }).format(resonance.average);
