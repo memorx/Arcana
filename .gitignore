@@ -63,3 +63,4 @@ design/maqueta/img/cartas/
 /playwright-report/
 /e2e/.auth/
 /e2e/.generado/
+/.next-dev-e2e/

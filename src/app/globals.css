@@ -252,6 +252,12 @@
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
+
+  /* El spinner de carga comunica estado: sigue girando. */
+  .animate-spin {
+    animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 /* Componentes firma y carta dorada (dueño del contenido: F1-B). Se importa sólo aquí: ningún componente lo importa. */

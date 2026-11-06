@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, ReactNode, RefObject, useEffect, useId, useRef } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 /* --------------------------------------------------------------------------
@@ -179,7 +180,8 @@ export function Modal({
 
   if (!isOpen) return null;
 
-  return (
+  // Por portal en <body>: un ancestro con transform/filter no puede anclar el fondo fijo.
+  const capaModal = (
     <Fragment>
       {/* Fondo: el pliego se apaga en tinta */}
       <div className="fixed inset-0 z-50 bg-tinta/75" aria-hidden="true" />
@@ -215,6 +217,8 @@ export function Modal({
       </div>
     </Fragment>
   );
+
+  return typeof document === "undefined" ? capaModal : createPortal(capaModal, document.body);
 }
 
 export function ModalHeader({ children, className }: { children: ReactNode; className?: string }) {

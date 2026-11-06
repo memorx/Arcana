@@ -1,3 +1,7 @@
+// next/jest carga .env (PRODUCCIÓN) pero no pisa lo ya definido: base muerta y clave inválida para que ningún test toque producción.
+process.env.DATABASE_URL = "postgresql://nadie@127.0.0.1:1/ninguna?connect_timeout=1";
+process.env.DIRECT_URL = "postgresql://nadie@127.0.0.1:1/ninguna?connect_timeout=1";
+process.env.ANTHROPIC_API_KEY = "sk-ant-jest-invalid";
 process.env.TZ = "America/Mexico_City"; // los tests de fechas leen campos UTC; el huso fijo evita falsos verdes en CI
 import type { Config } from "jest";
 import nextJest from "next/jest.js";

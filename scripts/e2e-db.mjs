@@ -309,6 +309,48 @@ function serve() {
   child.on("exit", (code, signal) => process.exit(code ?? (signal ? 1 : 0)));
 }
 
+/**
+ * Development server wired to the local e2e database (never production's .env).
+ * Starts the cluster, resets the database only if it does not exist yet (or with --reset),
+ * and runs `next dev` on ARCANA_E2E_WEB_PORT with its own distDir. Restores tsconfig.json on exit.
+ */
+function dev() {
+  const env = applyE2eEnv();
+  start(env);
+  const existe = spawnSync(
+    pgExe("psql"),
+    ["-h", "127.0.0.1", "-p", String(PG_PORT), "-U", "postgres", "-d", "postgres", "-tAc", `SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'`],
+    { env, encoding: "utf8", windowsHide: true }
+  );
+  if (process.argv.includes("--reset") || (existe.stdout || "").trim() !== "1") reset(env);
+  else log(`database ${DB_NAME} already exists: keeping its data (use --reset to start over)`);
+
+  env.ARCANA_DIST_DIR = ".next-dev-e2e";
+  process.env.ARCANA_DIST_DIR = ".next-dev-e2e";
+  assertLocalEnv(env);
+  const tsconfig = path.join(ROOT, "tsconfig.json");
+  const tsconfigAntes = readFileSync(tsconfig, "utf8");
+  const restaurar = () => {
+    try {
+      if (readFileSync(tsconfig, "utf8") !== tsconfigAntes) writeFileSync(tsconfig, tsconfigAntes);
+    } catch {}
+  };
+  log(`$ next dev -p ${APP_PORT}  (database ${DB_NAME}, http://localhost:${APP_PORT})`);
+  const child = spawn(process.execPath, [NEXT_CLI, "dev", "-p", String(APP_PORT)], {
+    cwd: ROOT,
+    env: nextEnv(env),
+    stdio: "inherit",
+    windowsHide: true,
+  });
+  const forward = (signal) => () => child.kill(signal);
+  process.on("SIGINT", forward("SIGINT"));
+  process.on("SIGTERM", forward("SIGTERM"));
+  child.on("exit", (code, signal) => {
+    restaurar();
+    process.exit(code ?? (signal ? 1 : 0));
+  });
+}
+
 function stop() {
   if (!existsSync(path.join(PGDATA, "PG_VERSION"))) {
     log(`no cluster in ${PGDATA}`);
@@ -354,6 +396,9 @@ switch (command) {
   case "serve":
     serve();
     break;
+  case "dev":
+    dev();
+    break;
   case "stop":
     stop();
     break;
@@ -364,6 +409,6 @@ switch (command) {
     check(args);
     break;
   default:
-    console.log("usage: node scripts/e2e-db.mjs <start|reset|serve|stop|status|check [--root <dir>]>");
+    console.log("usage: node scripts/e2e-db.mjs <start|reset|serve|dev [--reset]|stop|status|check [--root <dir>]>");
     process.exit(command ? 1 : 0);
 }
