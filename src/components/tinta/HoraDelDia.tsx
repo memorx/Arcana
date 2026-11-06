@@ -66,6 +66,10 @@ export function HoraDelDia({ variante = "larga", fecha, className }: HoraDelDiaP
   return (
     <p
       data-variante={variante}
+      // La corta corta a propósito (puntos suspensivos, como la maqueta aprobada): en ~la mitad de los
+      // días no cabe entera a 360 (máx. «14 mar · 13 Cozcacuauhtli · Piltzintecuhtli · Luna 42%»).
+      // La larga completa vive en el menú móvil. `data-recorta` se lo dice a la red de desbordes (e2e).
+      data-recorta={variante === "corta" ? "" : undefined}
       className={cn(
         "font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] uppercase",
         // En 360 px la corta casi no cabe: menos tracking abajo de sm y puntos suspensivos si aún no alcanza.
