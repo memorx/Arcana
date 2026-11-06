@@ -472,6 +472,8 @@ export function CartaQuemable({
   const [w, h] = LIENZO[tamano];
   const nombreAnunciado = invertida ? `${carta.nombre} · ${t("invertida")}` : carta.nombre;
   const textoPista = pista === false ? "" : (pista ?? t(tamano === "chica" ? "pistaCorta" : "pista"));
+  // La pista por omisión lleva también su versión corta; el CSS la elige según el ancho real de la carta.
+  const pistaCorta = pista === undefined && tamano !== "chica" ? t("pistaCorta") : null;
   const estaRevelada = estado === "revelada";
   const clases = [
     "cq",
@@ -519,7 +521,14 @@ export function CartaQuemable({
         )}
         {estado === "boca-abajo" && textoPista ? (
           <span className="cq-pista" aria-hidden="true">
-            {textoPista}
+            {pistaCorta ? (
+              <>
+                <span className="cq-pista__larga">{textoPista}</span>
+                <span className="cq-pista__corta">{pistaCorta}</span>
+              </>
+            ) : (
+              textoPista
+            )}
           </span>
         ) : null}
       </button>

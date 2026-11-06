@@ -21,7 +21,10 @@
 /* ======================================================================
    <CartaQuemable> · el papel se quema y aparece la carta a color
    ====================================================================== */
-.cq { position: relative; display: block; width: var(--cq-ancho, var(--cq-base)); max-width: 100%; }
+.cq {
+  position: relative; display: block; width: var(--cq-ancho, var(--cq-base)); max-width: 100%;
+  container: cq / inline-size; /* la pista se acomoda al ancho real de la carta (abajo) */
+}
 .cq--chica { --cq-base: 92px; --cq-radio: 8px; }
 .cq--media { --cq-base: clamp(132px, 30vw, 220px); --cq-radio: 12px; }
 .cq--grande { --cq-base: min(360px, 78vw); --cq-radio: 14px; }
@@ -49,12 +52,23 @@
 .cq-brillo { pointer-events: none; }
 
 .cq-pista {
-  position: absolute; left: 50%; bottom: 12.5%; transform: translateX(-50%); white-space: nowrap; /* encima de «ARCANA» */
+  /* Centrada encima de «ARCANA», nunca más ancha que la carta (left/right + fit-content, no left: 50%). */
+  position: absolute; left: 6px; right: 6px; bottom: 12.5%; width: fit-content; max-width: calc(100% - 12px);
+  margin-inline: auto; white-space: nowrap; text-align: center;
   font: 400 .625rem/1 var(--font-dato, ui-monospace, monospace); letter-spacing: .18em; text-transform: uppercase;
   color: var(--color-papel, #ECEAE6);
   padding: 8px 12px; border-radius: 999px; background: rgb(14 13 12 / .72); border: 1px solid rgb(236 234 230 / .25);
 }
 .cq--chica .cq-pista { font-size: .5rem; letter-spacing: .1em; padding: 5px 7px; }
+/* Pista larga y corta: la corta («Toca») sólo cuando la carta es angosta (p. ej. `media` en un teléfono o en una
+   rejilla densa). Una pista propia sin versión corta se parte en renglones en vez de cortarse. La pista es
+   decorativa (aria-hidden): el nombre accesible del botón es su `etiqueta`. */
+.cq-pista__corta { display: none; }
+@container cq (max-width: 179.98px) {
+  .cq-pista__larga { display: none; }
+  .cq-pista__corta { display: inline; }
+  .cq-pista { white-space: normal; }
+}
 
 /* Revelada sin quemar (reduced-motion, sin canvas, «voltear» sin JS de canvas): fundido corto. */
 .cq--fundido .cq-cara { animation: cq-fundido 240ms ease-out both; }

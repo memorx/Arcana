@@ -300,6 +300,32 @@ describe("CartaQuemable", () => {
     expect(css).toMatch(/@media \(scripting: none\)\s*\{\s*\.cq-tapa, \.cq-pista \{ display: none; \}/);
   });
 
+  it("pista larga y corta: la corta toma su lugar cuando la carta es angosta (container query), sin cortar texto", () => {
+    const css = fs.readFileSync(path.join(process.cwd(), "src/components/tinta/tinta.css"), "utf8");
+    // media (por omisión): las dos versiones; el CSS muestra la corta sólo bajo 180 px de carta.
+    const { container, unmount } = render(<CartaQuemable carta={ESTRELLA} etiqueta="Voltear" />);
+    expect(container.querySelector(".cq-pista__larga")).toHaveTextContent(/^pista$/);
+    expect(container.querySelector(".cq-pista__corta")).toHaveTextContent(/^pistaCorta$/);
+    expect(container.querySelector(".cq-pista")).toHaveAttribute("aria-hidden", "true");
+    expect(css).toMatch(/\.cq \{[^}]*container: cq \/ inline-size;/);
+    expect(css).toMatch(/\.cq-pista__corta \{ display: none; \}/);
+    expect(css).toMatch(
+      /@container cq \(max-width: [\d.]+px\) \{\s*\.cq-pista__larga \{ display: none; \}\s*\.cq-pista__corta \{ display: inline; \}/
+    );
+    // La pista nunca es más ancha que la carta (antes: left: 50% + nowrap, se cortaba en cartas angostas).
+    expect(css).toMatch(/\.cq-pista \{[^}]*left: 6px; right: 6px;[^}]*width: fit-content;/);
+    unmount();
+    // chica: sólo la corta, sin duplicar.
+    const chica = render(<CartaQuemable carta={ESTRELLA} etiqueta="Voltear" tamano="chica" />);
+    expect(chica.container.querySelector(".cq-pista")).toHaveTextContent(/^pistaCorta$/);
+    expect(chica.container.querySelector(".cq-pista__larga")).toBeNull();
+    chica.unmount();
+    // Pista propia: tal cual (si es angosta, se parte en renglones).
+    const propia = render(<CartaQuemable carta={ESTRELLA} etiqueta="Voltear" pista="Elige" tamano="grande" />);
+    expect(propia.container.querySelector(".cq-pista")).toHaveTextContent(/^Elige$/);
+    expect(propia.container.querySelector(".cq-pista__corta")).toBeNull();
+  });
+
   it("el reverso llena su caja desde la capa de componentes: una utilidad (h-auto, w-16) le gana", () => {
     const css = fs.readFileSync(path.join(process.cwd(), "src/components/tinta/tinta.css"), "utf8");
     expect(css).toMatch(/@layer components \{\s*\.reverso-carta \{ display: block; width: 100%; height: 100%; \}\s*\}/);
