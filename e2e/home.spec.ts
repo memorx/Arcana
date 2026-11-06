@@ -83,7 +83,7 @@ test.describe("Language Switching", () => {
     await page.goto("/");
 
     // Open the language selector and pick English (options read "🇪🇸 ES" / "🇺🇸 EN")
-    await page.getByRole("button", { name: "Change language" }).click();
+    await page.getByRole("button", { name: /^(idioma|language)$/i }).click();
     await page.getByRole("button", { name: /\bEN$/ }).click();
 
     // The locale cookie is set and the page re-renders in English

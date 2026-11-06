@@ -18,7 +18,7 @@ describe("LanguageSelector", () => {
   it("al elegir otro idioma guarda la cookie y recarga la página completa (no depende del refresh RSC)", async () => {
     fetchSimulado.mockResolvedValue({ ok: true, status: 200 });
     render(<LanguageSelector />);
-    fireEvent.click(screen.getByRole("button", { name: "Change language" }));
+    fireEvent.click(screen.getByRole("button", { name: /^(idioma|language)$/i }));
     fireEvent.click(screen.getByRole("button", { name: /\bEN$/ }));
 
     await waitFor(() => expect(recargar).toHaveBeenCalledTimes(1));
@@ -27,12 +27,12 @@ describe("LanguageSelector", () => {
       expect.objectContaining({ method: "POST", body: JSON.stringify({ locale: "en" }) })
     );
     // Mientras recarga, el selector no acepta otro clic.
-    expect(screen.getByRole("button", { name: "Change language" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /^(idioma|language)$/i })).toBeDisabled();
   });
 
   it("el idioma actual no hace nada: cierra la lista sin pedir ni recargar", () => {
     render(<LanguageSelector />);
-    fireEvent.click(screen.getByRole("button", { name: "Change language" }));
+    fireEvent.click(screen.getByRole("button", { name: /^(idioma|language)$/i }));
     fireEvent.click(screen.getByRole("button", { name: /\bES$/ }));
     expect(fetchSimulado).not.toHaveBeenCalled();
     expect(recargar).not.toHaveBeenCalled();
@@ -43,12 +43,12 @@ describe("LanguageSelector", () => {
     const consola = jest.spyOn(console, "error").mockImplementation(() => {});
     fetchSimulado.mockResolvedValue({ ok: false, status: 500 });
     render(<LanguageSelector />);
-    fireEvent.click(screen.getByRole("button", { name: "Change language" }));
+    fireEvent.click(screen.getByRole("button", { name: /^(idioma|language)$/i }));
     fireEvent.click(screen.getByRole("button", { name: /\bEN$/ }));
 
     await waitFor(() => expect(consola).toHaveBeenCalled());
     expect(recargar).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Change language" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: /^(idioma|language)$/i })).toBeEnabled();
     consola.mockRestore();
   });
 
