@@ -10,18 +10,9 @@ const withPWA = withPWAInit({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
+  // Card images are self-hosted under /cartas/* (served from public/), so the
+  // old Wikimedia CacheFirst rule is gone.
   runtimeCaching: [
-    {
-      urlPattern: /^https:\/\/upload\.wikimedia\.org\/.*/i,
-      handler: "CacheFirst",
-      options: {
-        cacheName: "tarot-images",
-        expiration: {
-          maxEntries: 100,
-          maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-        },
-      },
-    },
     {
       urlPattern: /^https:\/\/www\.readarcana\.com\/api\/.*/i,
       handler: "NetworkFirst",
@@ -41,15 +32,9 @@ const nextConfig: NextConfig = {
   // from a parent folder (silences the "multiple lockfiles" warning).
   outputFileTracingRoot: path.join(process.cwd()),
 
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "upload.wikimedia.org",
-        pathname: "/wikipedia/commons/**",
-      },
-    ],
-  },
+  // Local e2e builds into their own folder (ARCANA_DIST_DIR=.next-e2e in .env.e2e)
+  // so they never clobber the `.next` of `next dev`.
+  distDir: process.env.ARCANA_DIST_DIR || ".next",
 
   async headers() {
     return [
