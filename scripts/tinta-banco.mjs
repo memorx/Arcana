@@ -358,6 +358,45 @@ for (const [ancho, alto] of [[1440, 900], [390, 844]]) {
   await p.close();
 }
 
+{
+  const { p, errores } = await abrir("vista=particulas", 390, 844);
+  await p.evaluate(() => document.querySelector(".gp").scrollIntoView());
+  await dormir(300);
+  await p.screenshot({ path: path.join(SALIDA, "particulas-390.jpg"), type: "jpeg", quality: 80 });
+  informe.particulas_390 = {
+    errores,
+    activa: await p.evaluate(() => document.querySelector(".gp").classList.contains("gp--activa")),
+    scroll_horizontal: await p.evaluate(() => document.documentElement.scrollWidth > innerWidth),
+  };
+  await p.close();
+}
+
+// Sin JavaScript: el HTML de las cartas boca abajo (como sale del servidor) con JS apagado. La carta debe verse
+// revelada: @media (scripting: none) esconde la tapa y la pista. Se lee el estilo calculado por CDP (sin JS de página).
+{
+  const { p } = await abrir("vista=quema&n=3&tam=grande", 1100, 640);
+  const marcado = await p.evaluate(() => document.querySelector(".banco-quema").outerHTML);
+  await p.close();
+  fs.writeFileSync(path.join(OBRA, "sinjs.html"), `<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
+<link rel="stylesheet" href="/banco/tw.css"><link rel="stylesheet" href="/banco/banco.css"></head><body>${marcado}</body></html>`);
+  const q = await navegador.newPage();
+  await q.setJavaScriptEnabled(false);
+  await q.setViewport({ width: 1100, height: 640 });
+  await q.goto(BASE + "banco/sinjs.html", { waitUntil: "networkidle0" });
+  await q.screenshot({ path: path.join(SALIDA, "sin-js.jpg"), type: "jpeg", quality: 80 });
+  const cdp = await q.createCDPSession();
+  await cdp.send("DOM.enable");
+  await cdp.send("CSS.enable");
+  const { root } = await cdp.send("DOM.getDocument");
+  const estilo = async (sel) => {
+    const { nodeId } = await cdp.send("DOM.querySelector", { nodeId: root.nodeId, selector: sel });
+    const { computedStyle } = await cdp.send("CSS.getComputedStyleForNode", { nodeId });
+    return computedStyle.find((c) => c.name === "display")?.value;
+  };
+  informe.sin_js = { tapa_display: await estilo(".cq-tapa"), pista_display: await estilo(".cq-pista"), cara_display: await estilo(".cq-cara") };
+  await q.close();
+}
+
 await navegador.close();
 srv.close();
 fs.writeFileSync(path.join(SALIDA, "informe.json"), JSON.stringify(informe, null, 2));
