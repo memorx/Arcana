@@ -19,6 +19,17 @@ describe("Button", () => {
     expect(screen.getByRole("button")).toHaveClass("font-dato", "uppercase", "tracking-[0.1em]", "rounded-full");
   });
 
+  it("the 2 px hover lift slides: Tailwind 4's -translate-y-* sets `translate`, so the transition lists it", () => {
+    for (const clases of [buttonClasses(), buttonClasses({ variant: "linea", size: "lg" })]) {
+      const lista = clases.split(" ");
+      expect(lista).toContain("hover:-translate-y-0.5");
+      const transicion = lista.find((c) => c.startsWith("transition-["));
+      expect(transicion?.slice("transition-[".length, -1).split(",")).toEqual(
+        expect.arrayContaining(["translate", "background-color", "color", "border-color"])
+      );
+    }
+  });
+
   it("renders with secondary variant (alias of linea): a rule in the letter color of its ground", () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole("button");

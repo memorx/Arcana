@@ -18,7 +18,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     const variants = {
       default: "",
       interactive:
-        "cursor-pointer transition-[transform,border-color] duration-300 ease-tinta hover:-translate-y-0.5 hover:border-rosa motion-reduce:hover:translate-y-0",
+        "cursor-pointer transition-[translate,border-color] duration-300 ease-tinta hover:-translate-y-0.5 hover:border-rosa motion-reduce:hover:translate-y-0",
       highlighted: "border-t-[3px] border-t-rosa",
     };
 

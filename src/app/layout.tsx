@@ -4,6 +4,7 @@ import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Providers } from "@/components/providers";
+import { auth } from "@/lib/auth";
 import "./globals.css";
 
 // «Dos tintas» (§5.7): autohospedadas por next/font. Las variables las leen
@@ -112,6 +113,9 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
   const t = await getTranslations("common");
+  // La sesión del servidor al proveedor: la cabecera pinta «Iniciar sesión» o el menú desde el primer render.
+  // (Todas las rutas ya eran dinámicas: el layout ya leía la cookie del idioma.)
+  const session = await auth();
 
   return (
     <html lang={locale} className={fuentes}>
@@ -165,7 +169,7 @@ export default async function RootLayout({
         </svg>
 
         <NextIntlClientProvider messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers session={session}>{children}</Providers>
         </NextIntlClientProvider>
       </body>
     </html>

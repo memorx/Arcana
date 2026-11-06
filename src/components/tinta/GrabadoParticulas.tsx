@@ -7,7 +7,8 @@
  * - La escena mide 320svh y el lienzo queda fijo (sticky); el avance sale del scroll.
  * - El grabado se corta de arriba abajo al mismo ritmo en que salen sus partículas, que viajan a los renglones del
  *   texto (lo de arriba del grabado llega a las primeras líneas). El 6 % de las partículas son rosas.
- * - Sólo dibuja en scroll/resize (un rAF por evento): no hay bucle eterno.
+ * - Sólo dibuja en scroll/resize (un rAF por evento): no hay bucle eterno. Pinta por cubetas de opacidad
+ *   (`pintarParticulas`): dos colores y unos cuantos `globalAlpha` por cuadro, no un color por partícula.
  * - En ≤ 820 px, con `prefers-reduced-motion` o sin JS: grabado y texto quietos, uno debajo del otro.
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -33,7 +34,7 @@ const suave = (t: number) => t * t * (3 - 2 * t);
 const SALIDA = 0.56; // en unidades de avance: cuándo sale el último renglón del grabado
 const VIAJE = 0.4; // cuánto tarda cada partícula en llegar
 
-interface Particula {
+export interface Particula {
   sx: number;
   sy: number;
   dx: number;
@@ -42,6 +43,71 @@ interface Particula {
   ny: number;
   rosa: boolean;
   sale: number;
+}
+
+/** Niveles de opacidad de las partículas negras: se pintan por cubetas, no con un color nuevo cada una. */
+export const NIVELES_ALFA = 8;
+const COLOR_TINTA = "rgb(14,13,12)";
+const COLOR_ROSA = "rgb(228,0,124)";
+
+/** Posición, tamaño y cubeta de cada partícula en el cuadro actual; se reusa entre cuadros (sin basura). */
+export interface LoteParticulas {
+  x: Float32Array;
+  y: Float32Array;
+  s: Float32Array;
+  /** 0…NIVELES_ALFA-1: negra en ese nivel; NIVELES_ALFA: rosa; 255: aún es parte del grabado. */
+  cubeta: Uint8Array;
+}
+export const nuevoLote = (n: number): LoteParticulas => ({
+  x: new Float32Array(n),
+  y: new Float32Array(n),
+  s: new Float32Array(n),
+  cubeta: new Uint8Array(n),
+});
+const EN_GRABADO = 255;
+
+/**
+ * Pinta las partículas en vuelo para el avance `m` con opacidad general `alfa`. Antes cada partícula estrenaba un
+ * `fillStyle` (`rgba(…, alfa)`, hasta 5200 cadenas por cuadro que el lienzo tenía que interpretar: con CPU ×4 el
+ * cuadro tardaba 33 ms de mediana). Ahora van por cubetas: las negras en NIVELES_ALFA niveles de la opacidad que les
+ * da el arco del viaje (0,55–1 × alfa) y las rosas en una; dos `fillStyle` y a lo más NIVELES_ALFA + 1 `globalAlpha`.
+ */
+export function pintarParticulas(
+  ctx: CanvasRenderingContext2D,
+  pts: readonly Particula[],
+  m: number,
+  alfa: number,
+  lote: LoteParticulas
+): void {
+  const n = Math.min(pts.length, lote.cubeta.length);
+  const cuenta = new Uint16Array(NIVELES_ALFA + 1);
+  for (let i = 0; i < n; i++) {
+    const q = pts[i];
+    if (m < q.sale) {
+      lote.cubeta[i] = EN_GRABADO; // aún es parte del grabado
+      continue;
+    }
+    const k = suave(clamp((m - q.sale) / VIAJE));
+    const arco = Math.sin(k * Math.PI);
+    lote.x[i] = q.sx + (q.dx - q.sx) * k + arco * q.nx * 16;
+    lote.y[i] = q.sy + (q.dy - q.sy) * k + arco * q.ny * 22 - arco * 26;
+    lote.s[i] = 1.3 + arco * 0.8;
+    const b = q.rosa ? NIVELES_ALFA : Math.min(NIVELES_ALFA - 1, Math.floor((1 - arco) * NIVELES_ALFA));
+    lote.cubeta[i] = b;
+    cuenta[b]++;
+  }
+  let color = "";
+  for (let b = 0; b <= NIVELES_ALFA; b++) {
+    if (!cuenta[b]) continue;
+    const rosa = b === NIVELES_ALFA;
+    const deseado = rosa ? COLOR_ROSA : COLOR_TINTA;
+    if (deseado !== color) ctx.fillStyle = color = deseado;
+    ctx.globalAlpha = rosa ? alfa : alfa * (0.55 + 0.45 * ((b + 0.5) / NIVELES_ALFA));
+    for (let i = 0; i < n; i++) {
+      if (lote.cubeta[i] === b) ctx.fillRect(lote.x[i], lote.y[i], lote.s[i], lote.s[i]);
+    }
+  }
+  ctx.globalAlpha = 1;
 }
 interface Caja {
   x: number;
@@ -120,6 +186,7 @@ export function GrabadoParticulas({ carta, texto, firma, alt = "", children, cla
       return;
     }
     let pts: Particula[] = [];
+    let lote = nuevoLote(0);
     let ancho = 0;
     let alto = 0;
     let raf = 0;
@@ -208,6 +275,7 @@ export function GrabadoParticulas({ carta, texto, firma, alt = "", children, cla
           sale: yN * SALIDA + Math.random() * 0.03,
         };
       });
+      lote = nuevoLote(pts.length);
     }
 
     function progreso() {
@@ -228,17 +296,7 @@ export function GrabadoParticulas({ carta, texto, firma, alt = "", children, cla
       const tx = clamp((p - 0.84) / 0.12); // aparece el texto real
       fijar(clamp(m / SALIDA), tx);
       if (m <= 0 || tx >= 1) return;
-      const alfa = 1 - tx;
-      for (const q of pts) {
-        if (m < q.sale) continue; // aún es parte del grabado
-        const k = suave(clamp((m - q.sale) / VIAJE));
-        const arco = Math.sin(k * Math.PI);
-        const x = q.sx + (q.dx - q.sx) * k + arco * q.nx * 16;
-        const y = q.sy + (q.dy - q.sy) * k + arco * q.ny * 22 - arco * 26;
-        ctx!.fillStyle = q.rosa ? `rgba(228,0,124,${alfa})` : `rgba(14,13,12,${alfa * (0.55 + 0.45 * (1 - arco))})`;
-        const s = 1.3 + arco * 0.8;
-        ctx!.fillRect(x, y, s, s);
-      }
+      pintarParticulas(ctx!, pts, m, 1 - tx, lote);
     }
 
     const pedir = () => {

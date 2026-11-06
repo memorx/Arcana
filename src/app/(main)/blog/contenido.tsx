@@ -1,18 +1,23 @@
 import type { ReactNode } from "react";
-import { CARTAS, cartaImagen } from "@/lib/cartas";
+import Image from "next/image";
+import { CARTAS, cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
+import { cn } from "@/lib/utils";
 
 /**
  * El cuerpo de un artículo del blog, del Markdown sencillo de `BlogPost.content` a HTML con estilos propios
  * (no hay plugin de typography). Reglas:
  * - La página ya tiene su h1 (el título del post): el `# ` del contenido se rebaja a h2, y si repite el
  *   título se omite (sería el mismo renglón dos veces). `## ` es h2 y `### ` es h3.
- * - Los renglones `- ` y `1. ` seguidos se agrupan en una lista real (<ul>/<ol>).
+ * - Los renglones `- ` y `1. ` seguidos se agrupan en una lista real (<ul>/<ol>). Un renglón en blanco cierra la
+ *   lista: dos listas separadas por uno son dos listas. Una numerada empieza en el número de su primer renglón
+ *   (`start`), así que la que sigue a un párrafo continúa la cuenta («3. …» tras el párrafo es un 3, no un 1).
  * - `**negritas**` dentro de cualquier renglón.
  */
 
 type Bloque =
   | { tipo: "h2" | "h3" | "p"; texto: string }
-  | { tipo: "ul" | "ol"; items: string[] };
+  | { tipo: "ul"; items: string[] }
+  | { tipo: "ol"; items: string[]; start?: number };
 
 const normalizar = (s: string) =>
   s
@@ -25,13 +30,19 @@ const normalizar = (s: string) =>
 export function bloquesDelArticulo(texto: string, titulo?: string): Bloque[] {
   const bloques: Bloque[] = [];
   let primero = true;
+  let enBlanco = false; // hubo un renglón en blanco desde el bloque anterior
 
   for (const crudo of texto.split(/\r?\n/)) {
     const linea = crudo.trimEnd();
-    if (linea.trim() === "") continue;
+    if (linea.trim() === "") {
+      enBlanco = true;
+      continue;
+    }
 
     const esPrimero = primero;
+    const separado = enBlanco;
     primero = false;
+    enBlanco = false;
 
     if (linea.startsWith("### ")) {
       bloques.push({ tipo: "h3", texto: linea.slice(4) });
@@ -50,13 +61,18 @@ export function bloquesDelArticulo(texto: string, titulo?: string): Bloque[] {
     }
 
     const vineta = linea.match(/^\s*[-*] (.+)$/);
-    const numero = linea.match(/^\s*\d+\. (.+)$/);
-    if (vineta || numero) {
-      const tipo = vineta ? "ul" : "ol";
-      const item = (vineta ?? numero)![1];
+    if (vineta) {
       const ultimo = bloques.at(-1);
-      if (ultimo && ultimo.tipo === tipo) ultimo.items.push(item);
-      else bloques.push({ tipo, items: [item] });
+      if (!separado && ultimo?.tipo === "ul") ultimo.items.push(vineta[1]);
+      else bloques.push({ tipo: "ul", items: [vineta[1]] });
+      continue;
+    }
+    const numero = linea.match(/^\s*(\d+)\. (.+)$/);
+    if (numero) {
+      const ultimo = bloques.at(-1);
+      const desde = Number(numero[1]);
+      if (!separado && ultimo?.tipo === "ol") ultimo.items.push(numero[2]);
+      else bloques.push(desde === 1 ? { tipo: "ol", items: [numero[2]] } : { tipo: "ol", items: [numero[2]], start: desde });
       continue;
     }
 
@@ -108,7 +124,11 @@ export function ContenidoArticulo({ texto, titulo }: { texto: string; titulo?: s
             );
           case "ol":
             return (
-              <ol key={i} className="grid list-decimal gap-2 pl-7 marker:font-dato marker:text-[0.85em] marker:text-rosa-texto">
+              <ol
+                key={i}
+                start={b.start}
+                className="grid list-decimal gap-2 pl-7 marker:font-dato marker:text-[0.85em] marker:text-rosa-texto"
+              >
                 {b.items.map((item, j) => (
                   <li key={j} className="pl-1">
                     {enLinea(item)}
@@ -121,6 +141,60 @@ export function ContenidoArticulo({ texto, titulo }: { texto: string; titulo?: s
         }
       })}
     </div>
+  );
+}
+
+/** ¿La portada vive en otro dominio? `next/image` sólo optimiza rutas propias: no hay `images.remotePatterns`. */
+export function portadaExterna(src: string): boolean {
+  return /^(https?:)?\/\//i.test(src.trim());
+}
+
+/**
+ * La imagen de un artículo, con la misma regla en el índice y en su página: la portada del post si la tiene (una
+ * externa va sin optimizar; si no, `/_next/image` contesta 400) y, si no, su grabado en tinta. Decorativa
+ * (`alt=""`); llena el ancho de su contenedor.
+ */
+export function ImagenDelArticulo({
+  slug,
+  portada,
+  sizes,
+  perezosa = false,
+  claseGrabado,
+}: {
+  slug: string;
+  portada?: string | null;
+  /** `sizes` de la portada: el ancho máximo de su contenedor. */
+  sizes: string;
+  perezosa?: boolean;
+  /** Clases extra del grabado en tinta. */
+  claseGrabado?: string;
+}) {
+  if (portada) {
+    return (
+      <div className="relative aspect-[7/12] w-full overflow-hidden border border-tinta/20">
+        <Image
+          src={portada}
+          alt=""
+          fill
+          sizes={sizes}
+          unoptimized={portadaExterna(portada)}
+          loading={perezosa ? "lazy" : undefined}
+          className="object-cover"
+        />
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- WebP autohospedada y ya optimizada (scripts/cartas.py)
+    <img
+      src={grabadoDelArticulo(slug)}
+      alt=""
+      width={MEDIDAS_CARTA.tinta.width}
+      height={MEDIDAS_CARTA.tinta.height}
+      loading={perezosa ? "lazy" : undefined}
+      decoding="async"
+      className={cn("h-auto w-full", claseGrabado)}
+    />
   );
 }
 
