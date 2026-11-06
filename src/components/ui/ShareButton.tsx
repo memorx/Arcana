@@ -16,6 +16,9 @@ interface ShareButtonProps {
     linkCopied: string;
     publicReading: string;
     privateReading: string;
+    /** Opcionales: textos que antes estaban fijos en inglés. */
+    shareLink?: string;
+    close?: string;
   };
 }
 
@@ -30,6 +33,7 @@ export function ShareButton({ readingId, translations }: ShareButtonProps) {
     if (isOpen) {
       fetchShareStatus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mismo comportamiento de siempre: se consulta al abrir
   }, [isOpen, readingId]);
 
   const fetchShareStatus = async () => {
@@ -77,16 +81,11 @@ export function ShareButton({ readingId, translations }: ShareButtonProps) {
   return (
     <>
       <Button variant="secondary" onClick={() => setIsOpen(true)}>
-        <svg
-          className="w-4 h-4 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
+            strokeWidth={1.6}
             d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
           />
         </svg>
@@ -95,24 +94,19 @@ export function ShareButton({ readingId, translations }: ShareButtonProps) {
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <ModalHeader>
-          <h2 className="text-xl font-bold text-slate-100">
-            {translations.shareReading}
-          </h2>
+          <h2 className="font-titulo text-2xl leading-tight text-papel">{translations.shareReading}</h2>
         </ModalHeader>
         <ModalBody>
-          <p className="text-slate-400 mb-6">{translations.shareDescription}</p>
+          <p className="mb-6 font-lectura text-niebla">{translations.shareDescription}</p>
 
-          <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg mb-4">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-papel/15 p-4">
             <div className="flex items-center gap-3">
-              <div
-                className={`w-3 h-3 rounded-full ${
-                  isPublic ? "bg-green-500" : "bg-slate-500"
-                }`}
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${isPublic ? "bg-rosa-luz" : "bg-niebla"}`}
+                aria-hidden="true"
               />
-              <span className="text-slate-200">
-                {isPublic
-                  ? translations.publicReading
-                  : translations.privateReading}
+              <span className="font-dato text-xs uppercase tracking-[0.1em] text-papel">
+                {isPublic ? translations.publicReading : translations.privateReading}
               </span>
             </div>
             <Button
@@ -126,14 +120,17 @@ export function ShareButton({ readingId, translations }: ShareButtonProps) {
           </div>
 
           {isPublic && shareUrl && (
-            <div className="p-4 bg-slate-800/50 rounded-lg">
-              <p className="text-xs text-slate-500 mb-2">Share link:</p>
-              <div className="flex items-center gap-2">
+            <div className="rounded-[10px] border border-papel/15 p-4">
+              <p className="mb-2 font-dato text-[11px] uppercase tracking-[0.12em] text-niebla">
+                {translations.shareLink ?? "Share link:"}
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
                   value={shareUrl}
                   readOnly
-                  className="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-300"
+                  aria-label={translations.shareLink ?? "Share link"}
+                  className="min-w-0 flex-1 border-0 border-b border-papel/30 bg-transparent px-1 py-2 font-dato text-sm text-papel focus:border-rosa-luz focus:outline-none"
                 />
                 <Button size="sm" onClick={copyLink}>
                   {copied ? translations.linkCopied : translations.copyLink}
@@ -144,7 +141,7 @@ export function ShareButton({ readingId, translations }: ShareButtonProps) {
         </ModalBody>
         <ModalFooter>
           <Button variant="secondary" onClick={() => setIsOpen(false)}>
-            Close
+            {translations.close ?? "Close"}
           </Button>
         </ModalFooter>
       </Modal>
