@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { cn } from "@/lib/utils";
 import type { MonthCount } from "@/lib/insights";
 
 interface MonthBarsProps {
@@ -6,7 +7,10 @@ interface MonthBarsProps {
   months: MonthCount[];
 }
 
-/** Twelve vertical bars (readings per month), pure CSS, labelled for screen readers. */
+/**
+ * Twelve vertical bars (readings per month) in two inks, pure CSS: past months in ink, the
+ * current one in pink, empty months as a hairline. Labelled for screen readers.
+ */
 export async function MonthBars({ months }: MonthBarsProps) {
   const t = await getTranslations("insights.months");
   const locale = await getLocale();
@@ -20,7 +24,7 @@ export async function MonthBars({ months }: MonthBarsProps) {
     return {
       key: `${m.year}-${m.month}`,
       count: m.count,
-      short: shortMonth.format(date).replace(".", ""),
+      short: shortMonth.format(date).replace(".", "").slice(0, 3),
       long: longMonth.format(date),
       // A month with readings always shows a visible bar
       height: m.count > 0 ? Math.max(8, Math.round((m.count * 100) / max)) : 0,
@@ -31,34 +35,29 @@ export async function MonthBars({ months }: MonthBarsProps) {
 
   return (
     <div role="img" aria-label={t("chartLabel", { values: summary })}>
-      <div className="flex items-stretch gap-1 sm:gap-2 h-36">
+      <div className="flex h-40 items-stretch gap-1 border-b border-filete sm:gap-2">
         {bars.map((bar) => (
-          <div key={bar.key} className="flex-1 min-w-0 flex flex-col items-center">
-            <span className="h-4 text-[10px] sm:text-xs leading-4 tabular-nums text-slate-300">
+          <div key={bar.key} className="flex min-w-0 flex-1 flex-col items-center">
+            <span className="h-5 font-dato text-[0.625rem] leading-5 tabular-nums text-letra sm:text-xs">
               {bar.count > 0 ? bar.count : ""}
             </span>
-            <div className="flex-1 w-full flex items-end">
+            <div className="flex w-full flex-1 items-end">
               <div
-                className={`w-full rounded-t-md ${
-                  bar.count === 0
-                    ? "bg-slate-800"
-                    : bar.isCurrent
-                      ? "bg-gradient-to-t from-amber-600 to-amber-400"
-                      : "bg-gradient-to-t from-purple-700 to-purple-400"
-                }`}
+                className={cn("w-full", bar.count === 0 ? "bg-letra/15" : bar.isCurrent ? "bg-rosa" : "bg-letra")}
                 style={{ height: bar.count > 0 ? `${bar.height}%` : "3px" }}
               />
             </div>
           </div>
         ))}
       </div>
-      <div className="flex gap-1 sm:gap-2 mt-2 border-t border-slate-800 pt-2">
+      <div className="mt-2 flex gap-1 sm:gap-2">
         {bars.map((bar) => (
           <span
             key={bar.key}
-            className={`flex-1 min-w-0 text-center text-[10px] sm:text-xs capitalize truncate ${
-              bar.isCurrent ? "text-amber-300 font-medium" : "text-slate-500"
-            }`}
+            className={cn(
+              "min-w-0 flex-1 truncate text-center font-dato text-[0.5625rem] uppercase tracking-[0.02em] sm:text-[0.625rem]",
+              bar.isCurrent ? "text-letra-acento" : "text-letra-suave"
+            )}
           >
             {bar.short}
           </span>
