@@ -148,42 +148,9 @@ const DEFECTOS: Record<string, Defectos> = {
       { motivo: "L6 · dos h1: el título de la cabecera del post y el «# » inicial del contenido convertido en h1" },
     ],
   },
-  "/share/[shareId]": {
-    maqueta: [
-      {
-        motivo:
-          "L2 · la fila de sellos (tirada, «Compartido por», fecha) no tiene flex-wrap: con los Badge nuevos (mono en mayúsculas) se sale a 390 y 360",
-        anchos: [390, 360],
-      },
-    ],
-    sinjs: [
-      {
-        motivo: "L2 · la misma fila de sellos sin flex-wrap se sale a 390 y 360 también sin JS",
-        anchos: [390, 360],
-      },
-    ],
-  },
   "/dashboard": { consola: [PROGRESO_404] },
-  "/reading/[id]": {
-    maqueta: [
-      {
-        motivo:
-          "L2 · la fila final «Hacer otra lectura» · compartir · «Ver historial» (flex sin wrap, <Link><Button/></Link>) no cabe a 390 y 360 con los botones nuevos en mono",
-        anchos: [390, 360],
-      },
-    ],
-  },
   "/subscribe/success (sin session_id)": { encabezados: [{ motivo: "L6 · sin session_id la página no muestra h1" }] },
   "/dashboard (vacío)": { consola: [PROGRESO_404] },
-  "/reading/new (vacío)": {
-    maqueta: [
-      {
-        motivo:
-          "L2 · los sellos «3 lecturas gratis» y «0 créditos disponibles» (Badge con text-sm) en una fila sin flex-wrap se salen a 390 y 360",
-        anchos: [390, 360],
-      },
-    ],
-  },
 };
 
 for (const nombre of Object.keys(DEFECTOS)) {
