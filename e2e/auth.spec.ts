@@ -9,7 +9,7 @@ test.describe("Authentication - Login", () => {
     await expect(page.getByLabel(/email|correo/i)).toBeVisible();
     await expect(page.getByLabel(/password|contrase[ñn]a/i)).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /iniciar sesion|sign in/i })
+      page.getByRole("button", { name: /iniciar sesi[oó]n|sign in/i })
     ).toBeVisible();
   });
 
@@ -17,12 +17,12 @@ test.describe("Authentication - Login", () => {
     await page.getByLabel(/email|correo/i).fill("invalid@example.com");
     await page.getByLabel(/password|contrase[ñn]a/i).fill("wrongpassword");
     await page
-      .getByRole("button", { name: /iniciar sesion|sign in/i })
+      .getByRole("button", { name: /iniciar sesi[oó]n|sign in/i })
       .click();
 
     // Should show error message
     await expect(
-      page.getByText(/credenciales invalidas|invalid credentials/i)
+      page.getByText(/credenciales inv[aá]lidas|invalid credentials/i)
     ).toBeVisible();
   });
 
@@ -104,13 +104,13 @@ test.describe("Authentication - Register", () => {
 
   test("should have link to login page", async ({ page }) => {
     await expect(
-      page.getByRole("link", { name: /iniciar sesion|sign in/i })
+      page.getByRole("link", { name: /iniciar sesi[oó]n|sign in/i })
     ).toBeVisible();
   });
 
   test("should display terms and privacy links", async ({ page }) => {
     await expect(
-      page.getByRole("link", { name: /terminos|terms/i })
+      page.getByRole("link", { name: /t[eé]rminos|terms/i })
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: /privacidad|privacy/i })

@@ -3,8 +3,10 @@
  * src/app/**\/page.tsx (plus the 404), public and signed-in, at the five widths of the
  * projects in playwright.config.ts (1440, 1024, 820, 390, 360):
  *
- * - maqueta: expected status, no horizontal scroll, nothing off screen unless an
- *   ancestor clips it, every rendered image loaded, no console errors.
+ * - maqueta: expected status, no horizontal scroll, nothing off screen (a scroller
+ *   excuses it; a box with overflow hidden/clip only excuses decoration or opts in with
+ *   data-recorta: see medirMaqueta in helpers/responsivo.ts), every rendered image
+ *   loaded, no console errors.
  * - encabezados: exactly one h1 and every visible heading exposed in the accessibility tree.
  * - movimiento reducido: with prefers-reduced-motion nothing keeps animating and nothing
  *   with .revelar / [data-revelar] stays faded.
@@ -225,7 +227,7 @@ async function revisarMaqueta(page: import("@playwright/test").Page, r: Ruta, te
   await recorrer(page);
   const m = await medirMaqueta(page);
   expect.soft(m.scrollHorizontal, "horizontal scroll (px)").toBe(0);
-  expect.soft(m.fueraDePantalla, "elements off screen (not clipped by an ancestor)").toEqual([]);
+  expect.soft(m.fueraDePantalla, "elements off screen (no scroller, no data-recorta, not decorative)").toEqual([]);
   expect.soft(m.imagenesRotas, "images that did not load").toEqual([]);
   expect.soft(errores, "console errors").toEqual([]);
 }
