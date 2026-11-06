@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { Button, Input, buttonClasses } from "@/components/ui";
+import { AvisoError, ENLACE_PLIEGO, Pliego } from "../pliego";
 
 export default function ForgotPasswordPage() {
   const t = useTranslations("auth");
@@ -27,13 +28,13 @@ export default function ForgotPasswordPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Something went wrong");
+        setError(data.error || t("errors.generic"));
         return;
       }
 
       setIsSubmitted(true);
     } catch {
-      setError("Something went wrong");
+      setError(t("errors.generic"));
     } finally {
       setIsLoading(false);
     }
@@ -41,71 +42,52 @@ export default function ForgotPasswordPage() {
 
   if (isSubmitted) {
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="text-4xl mb-2">&#9993;</div>
-          <CardTitle className="text-2xl">{t("resetLinkSent")}</CardTitle>
-          <p className="text-slate-400 text-sm mt-2">
-            {t("resetLinkSentSubtitle")}
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Link href="/login">
-            <Button variant="secondary" className="w-full">
-              {t("backToLogin")}
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
+      <Pliego
+        grabado="The Hermit"
+        tituloId="forgot-titulo"
+        etiqueta={t("sheetRecover")}
+        titulo={t("resetLinkSent")}
+        bajada={t("resetLinkSentSubtitle")}
+      >
+        <Link href="/login" className={buttonClasses({ variant: "linea", size: "lg", className: "w-full" })}>
+          {t("backToLogin")}
+        </Link>
+      </Pliego>
     );
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <div className="text-4xl mb-2">&#128274;</div>
-        <CardTitle className="text-2xl">{t("forgotPasswordTitle")}</CardTitle>
-        <p className="text-slate-400 text-sm mt-2">
-          {t("forgotPasswordSubtitle")}
-        </p>
-      </CardHeader>
+    <Pliego
+      grabado="The Hermit"
+      tituloId="forgot-titulo"
+      etiqueta={t("sheetRecover")}
+      titulo={t("forgotPasswordTitle")}
+      bajada={t("forgotPasswordSubtitle")}
+    >
+      {error && <AvisoError>{error}</AvisoError>}
 
-      <CardContent>
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-            {error}
-          </div>
-        )}
+      <form onSubmit={handleSubmit} className="grid gap-6">
+        <Input
+          id="forgot-email"
+          label={t("email")}
+          type="email"
+          autoComplete="email"
+          placeholder="tu@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label={t("email")}
-            type="email"
-            placeholder="tu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
+          {t("sendResetLink")}
+        </Button>
+      </form>
 
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            isLoading={isLoading}
-          >
-            {t("sendResetLink")}
-          </Button>
-        </form>
-
-        <p className="text-center text-sm text-slate-400 mt-6">
-          <Link
-            href="/login"
-            className="text-purple-400 hover:text-purple-300 font-medium"
-          >
-            {t("backToLogin")}
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+      <p className="mt-8 border-t border-tinta/15 pt-5 text-center">
+        <Link href="/login" className={`${ENLACE_PLIEGO} font-medium`}>
+          {t("backToLogin")}
+        </Link>
+      </p>
+    </Pliego>
   );
 }

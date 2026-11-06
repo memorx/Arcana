@@ -4,7 +4,8 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { Button, Input, buttonClasses } from "@/components/ui";
+import { AvisoError, CamposEsqueleto, ENLACE_PLIEGO, Pliego } from "../pliego";
 
 function ResetPasswordForm() {
   const t = useTranslations("auth");
@@ -43,13 +44,13 @@ function ResetPasswordForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Something went wrong");
+        setError(data.error || t("errors.generic"));
         return;
       }
 
       setIsSuccess(true);
     } catch {
-      setError("Something went wrong");
+      setError(t("errors.generic"));
     } finally {
       setIsLoading(false);
     }
@@ -57,117 +58,94 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="text-4xl mb-2">&#9888;</div>
-          <CardTitle className="text-2xl">Invalid Link</CardTitle>
-          <p className="text-slate-400 text-sm mt-2">
-            This password reset link is invalid or has expired.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Link href="/forgot-password">
-            <Button className="w-full">Request new link</Button>
-          </Link>
-        </CardContent>
-      </Card>
+      <Pliego
+        grabado="The Star"
+        tituloId="reset-titulo"
+        etiqueta={t("sheetRecover")}
+        titulo={t("invalidLinkTitle")}
+        bajada={t("invalidLinkSubtitle")}
+      >
+        <Link href="/forgot-password" className={buttonClasses({ size: "lg", className: "w-full" })}>
+          {t("requestNewLink")}
+        </Link>
+      </Pliego>
     );
   }
 
   if (isSuccess) {
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="text-4xl mb-2">&#10004;</div>
-          <CardTitle className="text-2xl">{t("passwordResetSuccess")}</CardTitle>
-          <p className="text-slate-400 text-sm mt-2">
-            {t("passwordResetSuccessSubtitle")}
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Link href="/login">
-            <Button className="w-full">{t("loginButton")}</Button>
-          </Link>
-        </CardContent>
-      </Card>
+      <Pliego
+        grabado="The Star"
+        tituloId="reset-titulo"
+        etiqueta={t("sheetRecover")}
+        titulo={t("passwordResetSuccess")}
+        bajada={t("passwordResetSuccessSubtitle")}
+      >
+        <Link href="/login" className={buttonClasses({ size: "lg", className: "w-full" })}>
+          {t("loginButton")}
+        </Link>
+      </Pliego>
     );
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <div className="text-4xl mb-2">&#128274;</div>
-        <CardTitle className="text-2xl">{t("resetPasswordTitle")}</CardTitle>
-        <p className="text-slate-400 text-sm mt-2">
-          {t("resetPasswordSubtitle")}
-        </p>
-      </CardHeader>
+    <Pliego
+      grabado="The Star"
+      tituloId="reset-titulo"
+      etiqueta={t("sheetRecover")}
+      titulo={t("resetPasswordTitle")}
+      bajada={t("resetPasswordSubtitle")}
+    >
+      {error && <AvisoError>{error}</AvisoError>}
 
-      <CardContent>
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-            {error}
-          </div>
-        )}
+      <form onSubmit={handleSubmit} className="grid gap-6">
+        <Input
+          id="reset-password"
+          label={t("newPassword")}
+          type="password"
+          autoComplete="new-password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label={t("newPassword")}
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <Input
+          id="reset-confirm"
+          label={t("confirmNewPassword")}
+          type="password"
+          autoComplete="new-password"
+          placeholder="••••••••"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
 
-          <Input
-            label={t("confirmNewPassword")}
-            type="password"
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+        <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
+          {t("resetPassword")}
+        </Button>
+      </form>
 
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            isLoading={isLoading}
-          >
-            {t("resetPassword")}
-          </Button>
-        </form>
-
-        <p className="text-center text-sm text-slate-400 mt-6">
-          <Link
-            href="/login"
-            className="text-purple-400 hover:text-purple-300 font-medium"
-          >
-            {t("backToLogin")}
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+      <p className="mt-8 border-t border-tinta/15 pt-5 text-center">
+        <Link href="/login" className={`${ENLACE_PLIEGO} font-medium`}>
+          {t("backToLogin")}
+        </Link>
+      </p>
+    </Pliego>
   );
 }
 
 function ResetPasswordSkeleton() {
+  const t = useTranslations("auth");
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <div className="text-4xl mb-2">&#128274;</div>
-        <CardTitle className="text-2xl">...</CardTitle>
-        <p className="text-slate-400 text-sm mt-2">...</p>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4 animate-pulse">
-          <div className="h-10 bg-slate-800 rounded-lg" />
-          <div className="h-10 bg-slate-800 rounded-lg" />
-          <div className="h-12 bg-slate-800 rounded-lg" />
-        </div>
-      </CardContent>
-    </Card>
+    <Pliego
+      grabado="The Star"
+      tituloId="reset-titulo"
+      etiqueta={t("sheetRecover")}
+      titulo={t("resetPasswordTitle")}
+    >
+      <CamposEsqueleto campos={2} />
+    </Pliego>
   );
 }
 
