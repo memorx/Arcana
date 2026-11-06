@@ -3,15 +3,18 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { Modal, ModalBody, Button } from "@/components/ui";
+import { Modal, ModalBody, Button, Badge } from "@/components/ui";
 import { CardPlaceholder } from "@/components/ui/CardPlaceholder";
+import { Pincel } from "@/components/tinta/Pincel";
+import { ESTAMPA } from "@/components/achievements/Celebracion";
 import { GOLDEN_CARD_CREDITS_REWARD } from "@/lib/golden-cards";
+import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
+import { cn } from "@/lib/utils";
 
 interface GoldenCard {
   id: string;
   name: string;
   nameEs: string;
-  imageUrl: string;
   arcana: string;
   suit: string | null;
   isNew: boolean;
@@ -24,6 +27,10 @@ interface GoldenCardModalProps {
   cards: GoldenCard[];
 }
 
+/**
+ * Carta dorada, sobre tinta: la carta a color con la brasa rosa persistente (`golden-card-*` de tinta.css, quieta
+ * con reduced-motion), la palabra a pincel y los créditos en mono. Nada de oro ni partículas.
+ */
 export function GoldenCardModal({
   isOpen,
   onClose,
@@ -31,15 +38,11 @@ export function GoldenCardModal({
 }: GoldenCardModalProps) {
   const t = useTranslations("goldenCards");
   const locale = useLocale();
-  const [showParticles, setShowParticles] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (isOpen) {
-      setShowParticles(true);
       setImageErrors({});
-      const timer = setTimeout(() => setShowParticles(false), 3000);
-      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -58,216 +61,82 @@ export function GoldenCardModal({
   const hasNewCard = cards.some(c => c.isNew);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="overflow-visible">
-      <ModalBody className="text-center py-8 relative">
-        {/* Golden particles effect */}
-        {showParticles && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute animate-golden-particle"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  animationDuration: `${2 + Math.random() * 2}s`,
-                }}
-              >
-                <span className="text-2xl opacity-80">&#10022;</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Header */}
-        <div className="mb-6 relative z-10">
-          <div className={`text-6xl mb-4 ${showParticles ? "animate-pulse" : ""}`}>
-            &#10024;
-          </div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent animate-shimmer-text">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg">
+      <ModalBody className="grid gap-6 px-[clamp(20px,6vw,36px)] pb-8 pt-9 text-center">
+        <div className="grid justify-items-center gap-2">
+          <Pincel aria-hidden="true" className={cn("text-[clamp(3.4rem,2.6rem+4vw,4.75rem)]", ESTAMPA)}>
+            {t("golden")}
+          </Pincel>
+          <h2 className="text-[clamp(1.6rem,1.3rem+1.4vw,2.1rem)] leading-[1.1] text-letra">
             {isSingle ? t("title") : t("titleMultiple", { count: cards.length })}
           </h2>
-          <p className="text-amber-200/80 mt-2">
-            {t("subtitle")}
-          </p>
+          <p className="font-lectura text-[1.0625rem] italic text-letra-suave">{t("subtitle")}</p>
         </div>
 
-        {/* Cards Display */}
-        <div className={`flex justify-center gap-4 mb-6 ${cards.length > 3 ? "flex-wrap" : ""}`}>
-          {cards.map((card, index) => (
-            <div
-              key={card.id}
-              className="relative flex flex-col items-center"
-              style={{
-                animationDelay: `${index * 0.15}s`,
-              }}
-            >
-              {/* Golden Card Container */}
-              <div
-                className={`relative w-28 h-40 rounded-lg overflow-hidden ${
-                  showParticles ? "animate-golden-glow" : ""
-                }`}
-              >
-                {/* Golden border */}
-                <div className="absolute inset-0 rounded-lg border-4 border-transparent bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 z-10 pointer-events-none golden-border-gradient" />
-
-                {/* Inner glow */}
-                <div className="absolute inset-0 rounded-lg shadow-[inset_0_0_20px_rgba(251,191,36,0.5)] z-10 pointer-events-none" />
-
-                {imageErrors[card.id] ? (
-                  <CardPlaceholder
-                    cardName={getCardName(card)}
-                    arcana={card.arcana as "MAJOR" | "MINOR"}
-                    suit={card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null}
-                    number={0}
-                    className="w-28 h-40"
-                  />
-                ) : (
-                  <Image
-                    src={card.imageUrl}
-                    alt={getCardName(card)}
-                    fill
-                    className="object-cover"
-                    sizes="112px"
-                    onError={() => handleImageError(card.id)}
-                    unoptimized
-                  />
-                )}
-
-                {/* Shimmer overlay */}
-                {showParticles && !imageErrors[card.id] && (
-                  <div className="absolute inset-0 overflow-hidden z-20">
-                    <div
-                      className="absolute inset-0 -translate-x-full animate-golden-shimmer"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, transparent, rgba(251,191,36,0.5), transparent)",
-                        animationDelay: `${index * 0.15}s`,
-                      }}
+        {/* Las cartas: lo único a color, con su brasa */}
+        <ul className="flex flex-wrap justify-center gap-x-5 gap-y-6">
+          {cards.map((card) => (
+            <li key={card.id} className="grid w-28 justify-items-center gap-2.5" data-carta="dorada">
+              <div className="golden-card-glow relative w-full rounded-[8px]">
+                <div className="golden-card-border relative overflow-hidden rounded-[8px] border-2">
+                  {imageErrors[card.id] ? (
+                    <CardPlaceholder
+                      cardName={getCardName(card)}
+                      arcana={card.arcana as "MAJOR" | "MINOR"}
+                      suit={card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null}
+                      number={0}
+                      className="w-full"
                     />
-                  </div>
-                )}
-
-                {/* NEW badge */}
+                  ) : (
+                    <Image
+                      src={cartaImagen(card)}
+                      alt={getCardName(card)}
+                      width={MEDIDAS_CARTA.color.width}
+                      height={MEDIDAS_CARTA.color.height}
+                      className="h-auto w-full"
+                      onError={() => handleImageError(card.id)}
+                      unoptimized
+                    />
+                  )}
+                  {!imageErrors[card.id] && (
+                    <span aria-hidden="true" className="golden-shimmer-effect pointer-events-none absolute inset-0" />
+                  )}
+                </div>
                 {card.isNew && (
-                  <div className="absolute top-1 right-1 z-20">
-                    <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-bold rounded-full uppercase">
-                      {t("new")}
-                    </span>
-                  </div>
+                  <Badge variant="warning" className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                    {t("new")}
+                  </Badge>
                 )}
               </div>
-
-              {/* Card Name */}
-              <p className="mt-2 text-sm text-amber-300 font-medium max-w-28 text-center leading-tight">
+              <p className="font-titulo text-[0.9375rem] leading-[1.15] text-balance text-letra">
                 {getCardName(card)}
               </p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
-        {/* Credits Reward */}
-        <div className="bg-gradient-to-r from-amber-900/40 via-yellow-900/40 to-amber-900/40 rounded-xl p-5 mb-6 border border-amber-500/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent animate-shimmer-bg" />
-          <p className="text-amber-200/80 text-sm mb-2 relative z-10">
+        {/* Créditos ganados */}
+        <div className="grid gap-1 border-y border-filete/20 py-4">
+          <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.12em] text-letra-suave uppercase">
             {t("creditsEarned")}
           </p>
-          <p className="text-4xl font-bold text-amber-300 relative z-10">
-            +{totalCredits} <span className="text-lg text-amber-400">{t("credits")}</span>
+          <p className="flex flex-wrap items-baseline justify-center gap-x-2.5 font-dato text-[2.5rem] leading-none tracking-[-0.03em] text-letra-acento tabular-nums">
+            <span>+{totalCredits}</span>
+            <span className="text-sm tracking-[0.12em] text-letra-suave uppercase">{t("credits")}</span>
           </p>
         </div>
 
         {/* Collection info */}
         {hasNewCard && (
-          <p className="text-slate-400 text-sm mb-4">
+          <p className="text-[0.9375rem] leading-[1.5] text-letra-suave">
             {t("addedToCollection")}
           </p>
         )}
 
-        {/* Continue Button */}
-        <Button
-          onClick={onClose}
-          size="lg"
-          className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-900 font-semibold"
-        >
+        <Button onClick={onClose} size="lg" className="w-full">
           {t("continue")}
         </Button>
       </ModalBody>
-
-      <style jsx global>{`
-        @keyframes golden-particle {
-          0% {
-            transform: translateY(0) scale(1);
-            opacity: 0;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(-100px) scale(0);
-            opacity: 0;
-          }
-        }
-        .animate-golden-particle {
-          animation: golden-particle 3s ease-out infinite;
-          color: #fbbf24;
-        }
-        @keyframes golden-glow {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5), 0 0 40px rgba(251, 191, 36, 0.3);
-          }
-          50% {
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.7), 0 0 60px rgba(251, 191, 36, 0.5);
-          }
-        }
-        .animate-golden-glow {
-          animation: golden-glow 1.5s ease-in-out infinite;
-        }
-        @keyframes golden-shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(200%);
-          }
-        }
-        .animate-golden-shimmer {
-          animation: golden-shimmer 1.5s ease-in-out infinite;
-        }
-        @keyframes shimmer-text {
-          0%, 100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-        .animate-shimmer-text {
-          background-size: 200% 200%;
-          animation: shimmer-text 3s ease-in-out infinite;
-        }
-        @keyframes shimmer-bg {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-        .animate-shimmer-bg {
-          animation: shimmer-bg 2s ease-in-out infinite;
-        }
-        .golden-border-gradient {
-          background: linear-gradient(135deg, #fbbf24, #fde047, #fbbf24);
-          -webkit-mask:
-            linear-gradient(#fff 0 0) content-box,
-            linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          padding: 3px;
-        }
-      `}</style>
     </Modal>
   );
 }

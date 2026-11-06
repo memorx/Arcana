@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Modal, ModalBody, Button } from "@/components/ui";
+import { Pincel } from "@/components/tinta/Pincel";
+import { Chispas, ESTAMPA } from "@/components/achievements/Celebracion";
+import { Sello } from "@/components/achievements/Sello";
+import { cn } from "@/lib/utils";
 
 interface CompletedChallenge {
   id: string;
@@ -19,6 +22,7 @@ interface ChallengeCompletedModalProps {
   challenges: CompletedChallenge[];
 }
 
+/** Desafío cumplido, sobre tinta: chispas en dos tintas (una vez), pincel, Gloock y créditos en mono. */
 export function ChallengeCompletedModal({
   isOpen,
   onClose,
@@ -26,21 +30,6 @@ export function ChallengeCompletedModal({
 }: ChallengeCompletedModalProps) {
   const t = useTranslations("challenges");
   const locale = useLocale();
-  const [showGlow, setShowGlow] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShowGlow(true);
-      setShowConfetti(true);
-      const glowTimer = setTimeout(() => setShowGlow(false), 2000);
-      const confettiTimer = setTimeout(() => setShowConfetti(false), 3000);
-      return () => {
-        clearTimeout(glowTimer);
-        clearTimeout(confettiTimer);
-      };
-    }
-  }, [isOpen]);
 
   if (challenges.length === 0) return null;
 
@@ -51,94 +40,50 @@ export function ChallengeCompletedModal({
   const totalCredits = challenges.reduce((sum, c) => sum + c.creditReward, 0);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="overflow-visible">
-      <ModalBody className="text-center py-8 relative">
-        {/* Confetti particles */}
-        {showConfetti && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className={`absolute w-2 h-2 rounded-full animate-ping ${
-                  i % 4 === 0
-                    ? "bg-purple-500"
-                    : i % 4 === 1
-                    ? "bg-pink-500"
-                    : i % 4 === 2
-                    ? "bg-amber-500"
-                    : "bg-emerald-500"
-                }`}
-                style={{
-                  left: `${10 + Math.random() * 80}%`,
-                  top: `${10 + Math.random() * 80}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: "1.5s",
-                }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Trophy Icon */}
-        <div className="relative inline-block mb-6">
-          <div
-            className={`w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 flex items-center justify-center text-5xl ${
-              showGlow ? "animate-pulse shadow-lg shadow-purple-500/50" : ""
-            }`}
-          >
-            🎯
-          </div>
-          {showGlow && (
-            <div className="absolute inset-0 rounded-full bg-purple-500/30 animate-ping" />
-          )}
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-md">
+      <ModalBody className="grid gap-6 px-[clamp(20px,6vw,36px)] pb-8 pt-9 text-center">
+        <div className="relative grid justify-items-center gap-2">
+          <Chispas />
+          <Pincel aria-hidden="true" className={cn("relative text-[clamp(3.4rem,2.6rem+4vw,4.75rem)]", ESTAMPA)}>
+            {t("completedModal.pincel")}
+          </Pincel>
+          <h2 className="relative text-[clamp(1.6rem,1.3rem+1.4vw,2.1rem)] leading-[1.1] text-letra">
+            {t("completedModal.title")}
+          </h2>
         </div>
 
-        {/* Title */}
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-          {t("completedModal.title")}
-        </h2>
-
-        {/* Challenges List */}
-        <div className="space-y-3 mb-6">
-          {challenges.map((challenge, index) => (
-            <div
+        {/* Los desafíos cumplidos */}
+        <ul className="grid border-t border-filete/20 text-left">
+          {challenges.map((challenge) => (
+            <li
               key={challenge.id}
-              className="bg-slate-800/50 rounded-xl p-4 border border-purple-500/30"
-              style={{
-                animationDelay: `${index * 0.1}s`,
-              }}
+              className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 border-b border-filete/20 py-4"
             >
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">{challenge.icon}</span>
-                <div className="text-left flex-1">
-                  <h3 className="font-semibold text-purple-400">
-                    {getLocalizedName(challenge)}
-                  </h3>
-                </div>
-                <span className="text-emerald-400 font-medium">
-                  +{challenge.creditReward}
-                </span>
+              <Sello estado="logrado">
+                <span className="font-lectura text-lg">✓</span>
+              </Sello>
+              <div className="grid min-w-0 gap-1">
+                <h3 className="text-[1.15rem] leading-[1.15] text-letra">{getLocalizedName(challenge)}</h3>
+                <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-acento uppercase tabular-nums">
+                  +{challenge.creditReward} {t("credits")}
+                </p>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
-        {/* Total Credits */}
-        <div className="bg-emerald-900/30 rounded-xl p-4 mb-6 border border-emerald-500/30">
-          <p className="text-slate-400 text-sm mb-1">
+        {/* Créditos ganados */}
+        <div className="grid gap-1">
+          <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.12em] text-letra-suave uppercase">
             {t("completedModal.earned", { credits: totalCredits })}
           </p>
-          <p className="text-3xl font-bold text-emerald-400">
-            +{totalCredits} <span className="text-lg">{t("credits")}</span>
+          <p className="flex flex-wrap items-baseline justify-center gap-x-2.5 font-dato text-[2.5rem] leading-none tracking-[-0.03em] text-letra-acento tabular-nums">
+            <span>+{totalCredits}</span>
+            <span className="text-sm tracking-[0.12em] text-letra-suave uppercase">{t("credits")}</span>
           </p>
         </div>
 
-        {/* Continue Button */}
-        <Button
-          onClick={onClose}
-          size="lg"
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90"
-        >
+        <Button onClick={onClose} size="lg" className="w-full">
           {t("continue")}
         </Button>
       </ModalBody>
