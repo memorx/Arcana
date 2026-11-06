@@ -1,0 +1,541 @@
+/* Arcana · «Dos tintas» — la portada (src/app/page.tsx, src/components/landing/*).
+ * Réplica de las seis escenas de design/maqueta/{index.html,estilos.css} sobre los componentes firma de
+ * src/components/tinta. Reglas fuera de capa, todas bajo `.portada` o con prefijo `portada-`.
+ * Movimiento: sólo transform/opacity; nada depende de una animación para verse; con reduced-motion no corre nada
+ * (la marquesina se queda quieta y acomoda los 20 signos en filas); sin JS todo se ve completo.
+ */
+
+.portada {
+  /* Las fuentes de next/font (clases en <html>); las de Tailwind van `inline` y no siempre existen como variable. */
+  --p-titulo: var(--fuente-gloock), "Bodoni Moda", Didot, Georgia, serif;
+  --p-lectura: var(--fuente-newsreader), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --p-dato: var(--fuente-martian), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --p-ease: var(--ease-tinta, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.portada-contenido {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--container-escena, 1440px);
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter, clamp(16px, 4vw, 56px));
+}
+
+.portada-h2 {
+  font-size: clamp(2rem, 1.3rem + 2.4vw, 3.4rem);
+  line-height: 1.05;
+}
+.portada-h2-chico {
+  font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.2rem);
+  line-height: 1.05;
+}
+.portada-flecha {
+  font-family: var(--p-lectura);
+  font-size: 1.1em;
+  letter-spacing: 0;
+}
+
+/* ======================================================================
+   Escena 1 · Los grabados
+   ====================================================================== */
+.portada-grabados {
+  display: grid;
+  align-items: end;
+  min-height: max(620px, calc(100svh - var(--alto-cabecera, 96px)));
+}
+.portada-velo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(14 13 12 / 0.96) 0%, rgb(14 13 12 / 0.86) 38%, rgb(14 13 12 / 0.25) 72%, rgb(14 13 12 / 0.45) 100%),
+    linear-gradient(0deg, rgb(14 13 12 / 0.9) 0%, transparent 40%);
+}
+.portada-grabados__contenido {
+  display: grid;
+  justify-items: start;
+  gap: 28px;
+  padding-block: clamp(56px, 12vh, 128px) clamp(48px, 9vh, 96px);
+}
+.portada-grabados__pincel {
+  margin-left: -0.06em;
+  font-size: clamp(5.5rem, 3rem + 10vw, 12.5rem);
+}
+.portada-tesis {
+  max-width: 19ch;
+  font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.6rem);
+  line-height: 1.12;
+  color: var(--color-papel);
+}
+.portada-tesis span {
+  display: block;
+}
+.portada-tesis .portada-tesis__tuya {
+  color: var(--color-rosa-luz); /* ≥ 25 px sobre tinta: 5.51:1 */
+}
+.portada-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 24px;
+}
+.portada-nota {
+  font: 400 0.75rem/1.5 var(--p-dato);
+  letter-spacing: 0.06em;
+  color: var(--color-niebla);
+}
+@media (max-width: 719.98px) {
+  .portada-velo {
+    background: linear-gradient(
+      180deg,
+      rgb(14 13 12 / 0.15) 0%,
+      rgb(14 13 12 / 0.55) 30%,
+      rgb(14 13 12 / 0.94) 55%,
+      rgb(14 13 12 / 0.98) 100%
+    );
+  }
+  .portada-grabados__contenido {
+    gap: 22px;
+    padding-top: 160px;
+  }
+}
+
+/* ======================================================================
+   Escena 2 · Del grabado a la IA (GrabadoParticulas)
+   ====================================================================== */
+/* La cabecera es sticky: el lienzo fijo se queda debajo de ella, no detrás. */
+.portada-grabado .gp--activa .gp-fijo {
+  top: var(--alto-cabecera, 96px);
+  height: calc(100svh - var(--alto-cabecera, 96px));
+}
+
+/* ======================================================================
+   Escena 3 · La carta del día
+   ====================================================================== */
+.portada-carta {
+  padding-block: clamp(80px, 13vh, 150px);
+}
+.portada-carta__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(32px, 6vw, 96px);
+}
+.portada-carta__texto {
+  display: grid;
+  align-content: center;
+  gap: 22px;
+}
+.portada-carta__estado {
+  max-width: 40ch;
+  color: var(--color-niebla);
+}
+.portada-carta__mensaje {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 44ch;
+}
+.portada-carta__fecha,
+.portada-carta__firma {
+  font: 400 0.75rem/1.4 var(--p-dato);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-rosa-luz);
+}
+.portada-carta__firma {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+}
+.portada-carta__nombre {
+  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.4rem);
+  line-height: 1.05;
+}
+.portada-carta__lamina {
+  justify-self: center;
+}
+/* Con JS el mensaje espera a que la carta se voltee; sin JS (la carta ya se ve revelada) se ve completo. */
+@media (scripting: enabled) {
+  .portada-carta__mensaje[data-oculto] {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@media (scripting: none) {
+  .portada-carta__estado {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .portada-carta__mensaje {
+    transition:
+      opacity 0.9s var(--p-ease),
+      transform 0.9s var(--p-ease);
+  }
+}
+@media (max-width: 820px) {
+  .portada-carta__contenido {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portada-carta__lamina {
+    grid-row: 1;
+  }
+}
+/* En una columna el mensaje va debajo de la carta: no se reserva su hueco; entra al voltearla. */
+@media (scripting: enabled) and (max-width: 820px) {
+  .portada-carta__mensaje[data-oculto] {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 820px) {
+  .portada-carta__mensaje:not([data-oculto]) {
+    animation: portada-entra 0.9s var(--p-ease) both;
+  }
+}
+@keyframes portada-entra {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ======================================================================
+   Escena 4 · Más que tarot (tira densa)
+   ====================================================================== */
+.portada-mas {
+  padding-block: 72px 80px;
+  border-top: 1px solid rgb(14 13 12 / 0.12);
+}
+.portada-mas__cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.portada-tira {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block: 1px solid var(--color-tinta);
+}
+.portada-tira li {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 22px 18px 18px;
+}
+.portada-tira li + li {
+  border-left: 1px solid rgb(14 13 12 / 0.25);
+}
+.portada-tira__glifo {
+  width: 44px;
+  height: 44px;
+  color: var(--color-tinta);
+}
+.portada-tira h3 {
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+.portada-tira p {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--color-grafito);
+}
+.portada-tira__enlace {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+  font: 500 0.6875rem/1.2 var(--p-dato);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-rosa-texto);
+}
+.portada-tira__enlace:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+@media (max-width: 1020px) {
+  .portada-tira {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .portada-tira li + li {
+    border-left: 0;
+  }
+  .portada-tira li {
+    border-bottom: 1px solid rgb(14 13 12 / 0.2);
+  }
+  .portada-tira li:nth-child(even) {
+    border-left: 1px solid rgb(14 13 12 / 0.2);
+  }
+  .portada-tira li:last-child {
+    grid-column: 1 / -1;
+    border-bottom: 0;
+  }
+}
+@media (max-width: 480px) {
+  .portada-tira {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portada-tira li:nth-child(even) {
+    border-left: 0;
+  }
+  .portada-tira li {
+    padding-inline: 0;
+  }
+}
+
+/* ======================================================================
+   Escena 5 · El día de hoy (marquesina de los 20 signos)
+   ====================================================================== */
+.portada-hoy {
+  padding-top: 72px;
+}
+.portada-hoy__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: end;
+  gap: clamp(24px, 5vw, 80px);
+  padding-bottom: 48px;
+}
+.portada-hoy__detalle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 28px;
+  margin: 0;
+}
+.portada-hoy__detalle dt {
+  font: 400 0.6875rem/1.4 var(--p-dato);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-grafito);
+}
+.portada-hoy__detalle dd {
+  margin: 4px 0 0;
+  font-family: var(--p-titulo);
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+.portada-hoy__enlace {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-block: -10px;
+  color: var(--color-tinta);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rosa);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+.portada-marquesina {
+  overflow: hidden;
+  border-block: 1px solid var(--color-tinta);
+}
+.portada-marquesina__pista {
+  display: flex;
+  width: max-content;
+}
+.portada-marquesina ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.portada-signo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55em;
+  padding: 22px 28px;
+  border-right: 1px solid rgb(236 234 230 / 0.15);
+  font-family: var(--p-titulo);
+  font-size: clamp(1.4rem, 1rem + 1.2vw, 2rem);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.portada-signo small {
+  font: 400 0.6875rem/1 var(--p-dato);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-niebla);
+}
+.portada-signo[data-hoy],
+.portada-signo[data-hoy] small {
+  color: var(--color-rosa-luz);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .portada-marquesina__pista {
+    animation: portada-correr 90s linear infinite;
+  }
+  .portada-marquesina:hover .portada-marquesina__pista {
+    animation-play-state: paused;
+  }
+}
+@keyframes portada-correr {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+/* Quieta: los veinte signos en filas, sin copia y sin nada que recortar. */
+@media (prefers-reduced-motion: reduce) {
+  .portada-marquesina__pista {
+    width: auto;
+  }
+  .portada-marquesina ul {
+    flex-wrap: wrap;
+  }
+  .portada-marquesina .portada-marquesina__copia {
+    display: none;
+  }
+  .portada-signo {
+    padding: 16px 22px;
+  }
+}
+@media (max-width: 820px) {
+  .portada-hoy__contenido {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portada-signo {
+    padding: 18px 22px;
+  }
+}
+/* «Mictlantecuhtli», «Piltzintecuhtli»: los señores de la noche más largos caben en media columna a 360. */
+@media (max-width: 440px) {
+  .portada-hoy__detalle {
+    column-gap: 20px;
+  }
+  .portada-hoy__detalle dd {
+    font-size: 1.15rem;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ======================================================================
+   Preguntas frecuentes (pliego)
+   ====================================================================== */
+.portada-faq {
+  padding-block: 80px 96px;
+}
+.portada-faq__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: start;
+  gap: clamp(28px, 5vw, 80px);
+}
+.portada-faq__cabeza {
+  display: grid;
+  gap: 14px;
+  max-width: 34ch;
+}
+.portada-faq__lista {
+  border-top: 1px solid var(--color-tinta);
+}
+.portada-faq__item {
+  border-bottom: 1px solid rgb(14 13 12 / 0.25);
+}
+.portada-faq__item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 44px;
+  padding-block: 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.portada-faq__item summary::-webkit-details-marker {
+  display: none;
+}
+.portada-faq__item h3 {
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+  line-height: 1.2;
+}
+.portada-faq__signo {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.portada-faq__signo::before,
+.portada-faq__signo::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: var(--color-rosa-texto);
+  transform: translateY(-50%);
+}
+.portada-faq__signo::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+.portada-faq__item[open] .portada-faq__signo::after {
+  transform: translateY(-50%) rotate(0deg);
+}
+.portada-faq__item p {
+  max-width: 62ch;
+  padding-bottom: 22px;
+  color: var(--color-grafito);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .portada-faq__signo::after {
+    transition: transform 0.3s var(--p-ease);
+  }
+}
+@media (max-width: 820px) {
+  .portada-faq__contenido {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ======================================================================
+   Escena 6 · Tu turno
+   ====================================================================== */
+.portada-turno {
+  padding-block: clamp(96px, 16vh, 180px) clamp(64px, 10vh, 112px);
+}
+.portada-turno__contenido {
+  display: grid;
+  justify-items: start;
+  gap: 30px;
+}
+.portada-turno__pincel {
+  font-size: clamp(5rem, 2.6rem + 9vw, 11rem);
+}
+.portada-turno__texto {
+  max-width: 26ch;
+  font-family: var(--p-titulo);
+  font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+  line-height: 1.2;
+}
+
+/* ======================================================================
+   Revelado editorial al scroll (RevelarAlScroll). Sólo con JS montado y con movimiento:
+   el atributo en <html> lo pone el componente después de marcar lo que ya está a la vista.
+   ====================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-portada-revelar] .portada [data-revelar] {
+    transition:
+      opacity 0.9s var(--p-ease),
+      transform 0.9s var(--p-ease);
+  }
+  html[data-portada-revelar] .portada [data-revelar]:not([data-visible]) {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
