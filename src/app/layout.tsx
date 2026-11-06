@@ -30,11 +30,15 @@ const martianMono = Martian_Mono({
 });
 
 // Sólo para la palabra a pincel; sin fallback ajustado (su métrica no se parece a ninguna).
+// Sin precarga: pesa 65 KB y sólo la usan unas cuantas escenas; no debe competir con el LCP
+// (la tesis en Gloock) en todas las pantallas. La palabra es decorativa (aria-hidden) y su alto
+// lo fija el line-height, así que el cambio de fuente no mueve nada.
 const waterBrush = Water_Brush({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
   adjustFontFallback: false,
+  preload: false,
   variable: "--fuente-water-brush",
 });
 
