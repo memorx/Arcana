@@ -11,8 +11,12 @@
 
 /* ======================================================================
    Reverso de carta
+   En la capa de componentes (la única regla de este archivo que vive en capa): llena su caja por omisión,
+   pero una utilidad de la página gana (h-auto, w-16, h-28…), así <ReversoCarta> también sirve suelta.
    ====================================================================== */
-.reverso-carta { display: block; width: 100%; height: 100%; }
+@layer components {
+  .reverso-carta { display: block; width: 100%; height: 100%; }
+}
 
 /* ======================================================================
    <CartaQuemable> · el papel se quema y aparece la carta a color

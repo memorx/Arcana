@@ -300,6 +300,14 @@ describe("CartaQuemable", () => {
     expect(css).toMatch(/@media \(scripting: none\)\s*\{\s*\.cq-tapa, \.cq-pista \{ display: none; \}/);
   });
 
+  it("el reverso llena su caja desde la capa de componentes: una utilidad (h-auto, w-16) le gana", () => {
+    const css = fs.readFileSync(path.join(process.cwd(), "src/components/tinta/tinta.css"), "utf8");
+    expect(css).toMatch(/@layer components \{\s*\.reverso-carta \{ display: block; width: 100%; height: 100%; \}\s*\}/);
+    // Fuera de la capa no queda otra regla de .reverso-carta que ganaría a las utilidades.
+    const sinCapa = css.replace(/@layer components \{[\s\S]*?\n\}/, "");
+    expect(sinCapa).not.toMatch(/\.reverso-carta\s*\{/);
+  });
+
   it("el resplandor no usa filter ni mix-blend-mode", () => {
     const css = fs.readFileSync(path.join(process.cwd(), "src/components/tinta/tinta.css"), "utf8");
     const reglasCq = css.split("}").filter((r) => /\.cq[-\w]*/.test(r.split("{")[0] ?? ""));
