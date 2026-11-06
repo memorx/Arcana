@@ -169,16 +169,17 @@ describe("/subscribe/success", () => {
 describe("/subscribe", () => {
   const perfil = { fullName: "Ana López", zodiacSign: "Taurus", focusArea: "love", emailTime: "08:00" };
 
-  it("sin suscripción: un h1, la lámina del plan con lo que incluye y el precio en mono", async () => {
+  it("sin suscripción: un h1, la lámina con lo que incluye (sin repetir el nombre del plan) y el precio en mono", async () => {
     apis({
       "/api/profile": { body: { profile: perfil } },
       "/api/subscription": { body: { subscription: null } },
       "/api/user/credits": { body: { credits: 3 } },
     });
     render(<SubscribePage />);
-    await waitFor(() => expect(screen.getByRole("region", { name: SUBSCRIPTION_PLANS[0].nameEs })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("region", { name: "included" })).toBeInTheDocument());
     expect(unSoloH1()).toHaveTextContent("title");
-    const plan = screen.getByRole("region", { name: SUBSCRIPTION_PLANS[0].nameEs });
+    expect(screen.queryByRole("heading", { name: SUBSCRIPTION_PLANS[0].nameEs })).toBeNull();
+    const plan = screen.getByRole("region", { name: "included" });
     expect(within(plan).getAllByRole("listitem")).toHaveLength(SUBSCRIPTION_PLANS[0].featuresEs.length);
     expect(within(plan).getByText(SUBSCRIPTION_PLANS[0].priceDisplay)).toHaveClass("font-dato");
     // Con 3 créditos no alcanza: el botón de créditos está deshabilitado y aparece «comprar créditos»
@@ -196,6 +197,7 @@ describe("/subscribe", () => {
     });
     render(<SubscribePage />);
     await waitFor(() => expect(unSoloH1()).toHaveTextContent("alreadySubscribed"));
+    expect(screen.getByRole("heading", { level: 2, name: SUBSCRIPTION_PLANS[0].nameEs })).toBeInTheDocument();
     expect(screen.getByText("cancelsAtPeriodEnd")).toBeInTheDocument();
     const portal = screen.getByRole("link", { name: "manageSubscription" });
     expect(portal).toHaveAttribute("href", "/api/stripe/portal");

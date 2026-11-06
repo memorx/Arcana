@@ -143,16 +143,27 @@ export default function SubscribePage() {
     </header>
   );
 
-  /** Lámina del plan: nombre, descripción, lo que incluye con filetes y el precio en mono. */
-  const laminaPlan = (
+  /**
+   * Lámina del plan: descripción, lo que incluye con filetes y el precio en mono. Con `conNombre` (vista «ya
+   * suscrito») el h2 es el nombre del plan; en el alta el h1 ya lo dice, así que el h2 es «Incluye».
+   */
+  const laminaPlan = (conNombre: boolean) => (
     <section aria-labelledby="plan-titulo" className="grid gap-6 border-t border-tinta pt-6">
-      <h2 id="plan-titulo" className="text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1]">
-        {locale === "en" ? plan.name : plan.nameEs}
-      </h2>
+      {conNombre && (
+        <h2 id="plan-titulo" className="text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1]">
+          {locale === "en" ? plan.name : plan.nameEs}
+        </h2>
+      )}
       <p className="max-w-[56ch] text-[1.0625rem] leading-relaxed">{t("description")}</p>
 
       <div className="grid gap-3">
-        <Etiqueta>{t("included")}</Etiqueta>
+        {conNombre ? (
+          <Etiqueta>{t("included")}</Etiqueta>
+        ) : (
+          <Etiqueta as="h2" id="plan-titulo">
+            {t("included")}
+          </Etiqueta>
+        )}
         <ul className="border-b border-tinta/15">
           {features.map((feature, i) => (
             <li key={i} className="flex items-baseline gap-3 border-t border-tinta/15 py-3">
@@ -220,7 +231,7 @@ export default function SubscribePage() {
             </div>
           </div>
 
-          {laminaPlan}
+          {laminaPlan(true)}
         </div>
       </div>
     );
@@ -231,7 +242,7 @@ export default function SubscribePage() {
       {encabezado(t("title"), t("subtitle"))}
 
       <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10">
-        {laminaPlan}
+        {laminaPlan(false)}
 
         {/* Pliego para suscribirse */}
         <section
