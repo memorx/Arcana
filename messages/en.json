@@ -198,7 +198,8 @@
       "passwordMismatch": "Passwords do not match",
       "invalidEmail": "Invalid email",
       "createAccount": "Error creating account",
-      "loginAfterRegister": "Account created but there was an error signing in"
+      "loginAfterRegister": "Account created but there was an error signing in",
+      "generic": "Something went wrong"
     },
     "passwordReset": {
       "subject": "Reset your password - Arcana",
@@ -207,7 +208,13 @@
       "button": "Reset password",
       "expiry": "This link will expire in 1 hour.",
       "ignore": "If you didn't request this, you can ignore this email."
-    }
+    },
+    "sheetLogin": "Your account",
+    "sheetRegister": "New account",
+    "sheetRecover": "Account recovery",
+    "invalidLinkTitle": "Invalid Link",
+    "invalidLinkSubtitle": "This password reset link is invalid or has expired.",
+    "requestNewLink": "Request new link"
   },
   "dashboard": {
     "welcome": "Hello, {name}",
@@ -357,7 +364,8 @@
       "creditsAdded": "Credits added",
       "amountPaid": "Amount paid",
       "startReading": "Start a reading",
-      "viewCredits": "View my credits"
+      "viewCredits": "View my credits",
+      "verifying": "Verifying your payment…"
     },
     "error": {
       "title": "Payment error",
@@ -366,7 +374,11 @@
       "sessionError": "Error getting session",
       "verifyError": "Error verifying payment",
       "retry": "Try again"
-    }
+    },
+    "eyebrow": "Credits",
+    "costsTitle": "What each spread costs",
+    "packagesTitle": "Choose a package",
+    "costCredits": "{count, plural, one {# credit} other {# credits}}"
   },
   "history": {
     "title": "Reading History",
@@ -424,7 +436,8 @@
       "disclaimer": {
         "title": "Disclaimer",
         "content": "Tarot readings are intended for entertainment and self-reflection purposes only. They should not be used as a substitute for professional advice in legal, financial, medical, or psychological matters."
-      }
+      },
+      "eyebrow": "Who we are"
     },
     "terms": {
       "title": "Terms of Service",
@@ -486,7 +499,8 @@
         "title": "Contact Us",
         "content": "If you have any questions about this Privacy Policy, please contact us."
       }
-    }
+    },
+    "back": "Back to home"
   },
   "metadata": {
     "title": "Arcana - AI Tarot Readings",
@@ -561,7 +575,9 @@
       "tryAgain": "Try Again",
       "noSession": "No session found",
       "sessionNotFound": "Session not found",
-      "verifyError": "Error verifying subscription"
+      "verifyError": "Error verifying subscription",
+      "verifying": "Confirming your subscription…",
+      "errorTitle": "We couldn't confirm your subscription"
     },
     "orPayWithCredits": "or pay with credits",
     "payWithCredits": "Pay with credits",
@@ -571,7 +587,12 @@
     "buyCredits": "Buy credits",
     "paidWithCredits": "Paid with credits",
     "renewsAutomatically": "Renews automatically if you have enough credits",
-    "subscriptionError": "Error processing subscription. Please try again."
+    "subscriptionError": "Error processing subscription. Please try again.",
+    "eyebrow": "Monthly subscription",
+    "included": "Included",
+    "cancelsAtPeriodEnd": "Cancels at period end",
+    "editProfile": "Edit profile",
+    "securePayment": "Secure payments processed by Stripe"
   },
   "profile": {
     "title": "Complete Your Profile",
@@ -633,7 +654,10 @@
     "twitterText": "I've been using Arcana for tarot readings and it's amazing! Sign up with my link and we both get free credits",
     "limit": "Maximum 10 referrals per user",
     "loginRequired": "Login Required",
-    "loginRequiredDesc": "Please log in to access your referral link"
+    "loginRequiredDesc": "Please log in to access your referral link",
+    "eyebrow": "Invite someone",
+    "yourCode": "Your code",
+    "linkLabel": "Link to share"
   },
   "pwa": {
     "installTitle": "Install Arcana",
@@ -650,7 +674,8 @@
     "backToBlog": "Back to blog",
     "ctaTitle": "Ready for Your Reading?",
     "ctaDescription": "Put your knowledge into practice with a personalized tarot reading",
-    "ctaButton": "Start Free Reading"
+    "ctaButton": "Start Free Reading",
+    "eyebrow": "Arcana blog"
   },
   "streakReward": {
     "title": "Streak Reward!",
@@ -786,7 +811,8 @@
     "deleting": "Deleting...",
     "cancel": "Cancel",
     "deleteError": "Error deleting account. Please try again.",
-    "notAuthenticated": "You must be logged in to access settings."
+    "notAuthenticated": "You must be logged in to access settings.",
+    "eyebrow": "Your account"
   },
   "blueprint": {
     "meta": {
