@@ -128,22 +128,7 @@ const RUTAS: Ruta[] = [
  * that lot deletes the entry when it fixes it (Fase 2) and the integrator checks that this
  * table ends up empty.
  */
-const SIN_H1_AUTH: Defecto = { motivo: "L6 · sin h1: el título del formulario es el h3 de CardTitle" };
-const SIN_H1_LEGAL: Defecto = { motivo: "L6 · páginas legales sin h1: los títulos son h3" };
-
 const DEFECTOS: Record<string, Defectos> = {
-  "/login": { encabezados: [SIN_H1_AUTH] },
-  "/register": { encabezados: [SIN_H1_AUTH] },
-  "/forgot-password": { encabezados: [SIN_H1_AUTH] },
-  "/reset-password (sin token)": { encabezados: [SIN_H1_AUTH] },
-  "/about": { encabezados: [SIN_H1_LEGAL] },
-  "/privacy": { encabezados: [SIN_H1_LEGAL] },
-  "/terms": { encabezados: [SIN_H1_LEGAL] },
-  "/blog/[slug]": {
-    encabezados: [
-      { motivo: "L6 · dos h1: el título de la cabecera del post y el «# » inicial del contenido convertido en h1" },
-    ],
-  },
   "/share/[shareId]": {
     maqueta: [
       {
@@ -168,7 +153,6 @@ const DEFECTOS: Record<string, Defectos> = {
       },
     ],
   },
-  "/subscribe/success (sin session_id)": { encabezados: [{ motivo: "L6 · sin session_id la página no muestra h1" }] },
   "/reading/new (vacío)": {
     maqueta: [
       {
@@ -231,7 +215,8 @@ async function revisarEncabezados(page: import("@playwright/test").Page, r: Ruta
   await expect(page.getByRole("heading", { level: 1 }), "exactly one h1").toHaveCount(1);
 
   const arbol = await page.locator("body").ariaSnapshot();
-  expect(arbol, "the accessibility tree keeps the h1").toMatch(/- heading .*\[level=1\]/);
+  // The YAML snapshot quotes the whole line when the name has a colon: - 'heading "A: B" [level=1]'
+  expect(arbol, "the accessibility tree keeps the h1").toMatch(/- '?heading .*\[level=1\]/);
 
   const escondidos = await page.evaluate(() =>
     [...document.querySelectorAll("h1, h2, h3, h4, h5, h6")]

@@ -32,7 +32,7 @@ test.describe("Legal Pages", () => {
 
     test("should have back link", async ({ page }) => {
       await expect(
-        page.getByRole("link", { name: /back/i })
+        page.getByRole("link", { name: /volver|back/i })
       ).toBeVisible();
     });
   });
@@ -44,7 +44,7 @@ test.describe("Legal Pages", () => {
 
     test("should display terms of service", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { level: 3, name: /t[eé]rminos de servicio|terms of service/i })
+        page.getByRole("heading", { level: 1, name: /t[eé]rminos de servicio|terms of service/i })
       ).toBeVisible();
     });
 

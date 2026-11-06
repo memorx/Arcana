@@ -265,7 +265,8 @@
       "passwordMismatch": "Las contraseñas no coinciden",
       "invalidEmail": "Email inválido",
       "createAccount": "Error al crear la cuenta",
-      "loginAfterRegister": "Cuenta creada pero hubo un error al iniciar sesión"
+      "loginAfterRegister": "Cuenta creada pero hubo un error al iniciar sesión",
+      "generic": "Algo salió mal"
     },
     "passwordReset": {
       "subject": "Restablece tu contraseña - Arcana",
@@ -274,7 +275,13 @@
       "button": "Restablecer contraseña",
       "expiry": "Este enlace expirará en 1 hora.",
       "ignore": "Si no solicitaste esto, ignora este email."
-    }
+    },
+    "sheetLogin": "Tu cuenta",
+    "sheetRegister": "Cuenta nueva",
+    "sheetRecover": "Recuperar acceso",
+    "invalidLinkTitle": "Enlace no válido",
+    "invalidLinkSubtitle": "Este enlace para restablecer tu contraseña no es válido o ya venció.",
+    "requestNewLink": "Pedir un enlace nuevo"
   },
   "dashboard": {
     "welcome": "Hola, {name}",
@@ -432,7 +439,8 @@
       "creditsAdded": "Créditos agregados",
       "amountPaid": "Monto pagado",
       "startReading": "Hacer una lectura",
-      "viewCredits": "Ver mis créditos"
+      "viewCredits": "Ver mis créditos",
+      "verifying": "Verificando tu pago…"
     },
     "error": {
       "title": "Error en el pago",
@@ -441,7 +449,11 @@
       "sessionError": "Error al obtener sesión",
       "verifyError": "Error al verificar el pago",
       "retry": "Volver a intentar"
-    }
+    },
+    "eyebrow": "Créditos",
+    "costsTitle": "Lo que cuesta cada tirada",
+    "packagesTitle": "Elige un paquete",
+    "costCredits": "{count, plural, one {# crédito} other {# créditos}}"
   },
   "history": {
     "title": "Historial de Lecturas",
@@ -500,7 +512,8 @@
       "disclaimer": {
         "title": "Aviso Legal",
         "content": "Las lecturas de tarot están destinadas únicamente a fines de entretenimiento y reflexión personal. No deben utilizarse como sustituto de asesoramiento profesional en asuntos legales, financieros, médicos o psicológicos."
-      }
+      },
+      "eyebrow": "Quiénes somos"
     },
     "terms": {
       "title": "Términos de Servicio",
@@ -562,7 +575,8 @@
         "title": "Contáctanos",
         "content": "Si tienes alguna pregunta sobre esta Política de Privacidad, por favor contáctanos."
       }
-    }
+    },
+    "back": "Volver al inicio"
   },
   "metadata": {
     "title": "Arcana - Lecturas de Tarot con IA",
@@ -642,7 +656,9 @@
       "tryAgain": "Intentar de nuevo",
       "noSession": "No se encontró sesión",
       "sessionNotFound": "Sesión no encontrada",
-      "verifyError": "Error al verificar suscripción"
+      "verifyError": "Error al verificar suscripción",
+      "verifying": "Confirmando tu suscripción…",
+      "errorTitle": "No pudimos confirmar tu suscripción"
     },
     "orPayWithCredits": "o paga con créditos",
     "payWithCredits": "Pagar con créditos",
@@ -652,7 +668,12 @@
     "buyCredits": "Comprar créditos",
     "paidWithCredits": "Pagado con créditos",
     "renewsAutomatically": "Se renueva automáticamente si tienes créditos suficientes",
-    "subscriptionError": "Error procesando suscripción. Intenta de nuevo."
+    "subscriptionError": "Error procesando suscripción. Intenta de nuevo.",
+    "eyebrow": "Suscripción mensual",
+    "included": "Incluye",
+    "cancelsAtPeriodEnd": "Se cancela al terminar el periodo",
+    "editProfile": "Editar perfil",
+    "securePayment": "Pagos seguros procesados por Stripe"
   },
   "profile": {
     "title": "Completa tu Perfil",
@@ -722,7 +743,10 @@
     "twitterText": "¡He estado usando Arcana para lecturas de tarot y es increíble! Regístrate con mi enlace y ambos obtenemos créditos gratis",
     "limit": "Máximo 10 referidos por usuario",
     "loginRequired": "Inicio de Sesión Requerido",
-    "loginRequiredDesc": "Por favor inicia sesión para acceder a tu enlace de referidos"
+    "loginRequiredDesc": "Por favor inicia sesión para acceder a tu enlace de referidos",
+    "eyebrow": "Invita a alguien",
+    "yourCode": "Tu código",
+    "linkLabel": "Enlace para compartir"
   },
   "pwa": {
     "installTitle": "Instala Arcana",
@@ -739,7 +763,8 @@
     "backToBlog": "Volver al blog",
     "ctaTitle": "¿Listo para tu Lectura?",
     "ctaDescription": "Pon tu conocimiento en práctica con una lectura de tarot personalizada",
-    "ctaButton": "Comenzar Lectura Gratis"
+    "ctaButton": "Comenzar Lectura Gratis",
+    "eyebrow": "Blog de Arcana"
   },
   "streakReward": {
     "title": "¡Recompensa de Racha!",
@@ -890,7 +915,8 @@
     "deleting": "Eliminando...",
     "cancel": "Cancelar",
     "deleteError": "Error al eliminar la cuenta. Por favor intenta de nuevo.",
-    "notAuthenticated": "Debes iniciar sesión para acceder a la configuración."
+    "notAuthenticated": "Debes iniciar sesión para acceder a la configuración.",
+    "eyebrow": "Tu cuenta"
   },
   "blueprint": {
     "meta": {

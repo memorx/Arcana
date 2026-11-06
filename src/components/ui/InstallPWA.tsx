@@ -8,42 +8,23 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-function CloseIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  );
-}
-
 function DownloadIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-      />
+    <svg aria-hidden="true" focusable="false" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
     </svg>
   );
 }
 
+/**
+ * Invitación a instalar la PWA, en dos tintas: una banda de tinta `sticky` al pie de la ventana. Como es
+ * sticky (no fixed) y es el último hijo del body, al final de la página ocupa su propio lugar: no tapa de
+ * forma permanente ningún contenido, tampoco en móvil. Entra con un fundido corto (nada con movimiento
+ * reducido) y sólo aparece cuando el navegador ofrece instalar.
+ */
 export function InstallPWA() {
   const t = useTranslations("pwa");
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstall, setShowInstall] = useState(false);
 
   useEffect(() => {
@@ -91,41 +72,39 @@ export function InstallPWA() {
   if (!showInstall) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-purple-900/95 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4 shadow-xl z-50 animate-in slide-in-from-bottom-4 duration-300">
-      <button
-        onClick={handleDismiss}
-        className="absolute top-2 right-2 p-1 text-purple-300 hover:text-white transition-colors"
-        aria-label={t("later")}
-      >
-        <CloseIcon className="w-4 h-4" />
-      </button>
-
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-10 h-10 bg-purple-600/50 rounded-lg flex items-center justify-center">
-          <DownloadIcon className="w-5 h-5 text-purple-200" />
+    <aside
+      aria-labelledby="pwa-titulo"
+      className="suelo-tinta sticky bottom-0 z-40 w-full border-t border-papel/15 pb-[env(safe-area-inset-bottom,0px)] motion-safe:animate-entra"
+    >
+      <div className="mx-auto flex max-w-escena flex-wrap items-center gap-x-6 gap-y-3 px-gutter py-3.5">
+        <div className="flex min-w-0 flex-[1_1_16rem] items-start gap-3">
+          <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-rosa-luz/60 text-rosa-luz">
+            <DownloadIcon className="size-[18px]" />
+          </span>
+          <div className="grid min-w-0 gap-0.5">
+            <p id="pwa-titulo" className="font-titulo text-[1.15rem] leading-tight text-papel">
+              {t("installTitle")}
+            </p>
+            <p className="text-[0.9375rem] leading-snug text-niebla">{t("installPrompt")}</p>
+          </div>
         </div>
-        <div className="flex-1 pr-4">
-          <p className="text-white text-sm font-medium mb-1">
-            {t("installTitle")}
-          </p>
-          <p className="text-purple-200 text-xs mb-3">{t("installPrompt")}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleInstall}
+            className="inline-flex min-h-11 cursor-pointer items-center rounded-full bg-rosa-luz px-5 font-dato text-[0.6875rem] font-medium tracking-[0.1em] text-tinta uppercase transition-colors hover:bg-brasa"
+          >
+            {t("install")}
+          </button>
+          <button
+            type="button"
+            onClick={handleDismiss}
+            className="inline-flex min-h-11 cursor-pointer items-center rounded-full px-4 font-dato text-[0.6875rem] font-medium tracking-[0.1em] text-niebla uppercase transition-colors hover:bg-papel/10 hover:text-papel"
+          >
+            {t("later")}
+          </button>
         </div>
       </div>
-
-      <div className="flex gap-2 mt-2">
-        <button
-          onClick={handleInstall}
-          className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-sm py-2 px-4 rounded-lg transition-colors font-medium"
-        >
-          {t("install")}
-        </button>
-        <button
-          onClick={handleDismiss}
-          className="px-4 py-2 text-purple-300 hover:text-white text-sm transition-colors"
-        >
-          {t("later")}
-        </button>
-      </div>
-    </div>
+    </aside>
   );
 }
