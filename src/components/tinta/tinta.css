@@ -1,0 +1,175 @@
+/* Arcana · «Dos tintas» — estilos de los componentes firma (src/components/tinta/*) y de la carta dorada.
+ *
+ * Reglas fuera de capa a propósito: así ganan a las utilidades de Tailwind (que viven en @layer) sin importar el
+ * orden en que Next junte los CSS. Para que una página ajuste un componente se exponen variables:
+ *   --cq-ancho        ancho de <CartaQuemable> (por omisión lo pone `tamano`)
+ *   --mdg-opacidad    opacidad de la mesa de grabados
+ * Los colores leen los tokens de globals.css (@theme) con su valor de respaldo.
+ * Movimiento: sólo transform, opacity y clip-path; nada de filter ni mix-blend-mode en lo que se anima.
+ */
+
+/* ======================================================================
+   Reverso de carta
+   ====================================================================== */
+.reverso-carta { display: block; width: 100%; height: 100%; }
+
+/* ======================================================================
+   <CartaQuemable> · el papel se quema y aparece la carta a color
+   ====================================================================== */
+.cq { position: relative; display: block; width: var(--cq-ancho, var(--cq-base)); max-width: 100%; }
+.cq--chica { --cq-base: 92px; --cq-radio: 8px; }
+.cq--media { --cq-base: clamp(132px, 30vw, 220px); --cq-radio: 12px; }
+.cq--grande { --cq-base: min(360px, 78vw); --cq-radio: 14px; }
+
+.cq-boton {
+  position: relative; display: block; width: 100%; aspect-ratio: 300 / 520;
+  margin: 0; padding: 0; border: 0; border-radius: var(--cq-radio, 12px); overflow: hidden;
+  background: var(--color-tinta, #0E0D0C); color: inherit; font: inherit; cursor: pointer;
+  box-shadow: 0 24px 48px -28px rgb(0 0 0 / .6);
+  -webkit-tap-highlight-color: transparent;
+}
+.cq-boton:focus-visible { outline: 2px solid var(--color-rosa, #E4007C); outline-offset: 3px; }
+.cq[data-estado="revelada"] .cq-boton { cursor: default; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cq-boton { transition: transform .6s cubic-bezier(.16, 1, .3, 1); }
+  .cq[data-estado="boca-abajo"] .cq-boton:hover { transform: translateY(-4px) rotate(-.6deg); }
+}
+
+.cq-cara, .cq-reverso, .cq-lienzo, .cq-brillo {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.cq-cara { object-fit: cover; user-select: none; }
+.cq--invertida .cq-cara { transform: rotate(180deg); }
+.cq-brillo { pointer-events: none; }
+
+.cq-pista {
+  position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); white-space: nowrap;
+  font: 400 .625rem/1 var(--font-dato, ui-monospace, monospace); letter-spacing: .18em; text-transform: uppercase;
+  color: var(--color-papel, #ECEAE6);
+  padding: 8px 12px; border-radius: 999px; background: rgb(14 13 12 / .72); border: 1px solid rgb(236 234 230 / .25);
+}
+.cq--chica .cq-pista { font-size: .5rem; letter-spacing: .1em; padding: 5px 7px; }
+
+/* Revelada sin quemar (reduced-motion, sin canvas, «voltear» sin JS de canvas): fundido corto. */
+.cq--fundido .cq-cara { animation: cq-fundido 240ms ease-out both; }
+@keyframes cq-fundido { from { opacity: 0; } to { opacity: 1; } }
+
+/* Sin JavaScript la carta se ve revelada: el reverso y la pista sólo existen para quien puede voltearla. */
+@media (scripting: none) {
+  .cq-reverso, .cq-pista { display: none; }
+}
+
+/* ======================================================================
+   Carta dorada: la única con brasa rosa persistente
+   (clases que ya usan TarotCard y la colección: golden-card-border / golden-card-glow / golden-shimmer-effect)
+   ====================================================================== */
+.golden-card-border {
+  border-color: var(--color-rosa, #E4007C);
+  box-shadow: inset 0 0 0 1px rgb(255 107 181 / .55);
+}
+.golden-card-glow, .cq--dorada .cq-boton {
+  box-shadow:
+    0 0 0 1.5px var(--color-rosa, #E4007C),
+    0 0 18px 2px rgb(228 0 124 / .38),
+    0 24px 48px -28px rgb(0 0 0 / .6);
+}
+.golden-shimmer-effect {
+  background: linear-gradient(105deg, transparent 38%, rgb(255 107 181 / .26) 47%, rgb(255 255 255 / .2) 50%, rgb(255 107 181 / .26) 53%, transparent 62%);
+  background-size: 250% 100%;
+  background-position: 120% 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* La brasa respira: sólo opacity y transform en una capa propia. */
+  .golden-card-glow, .cq--dorada .cq-boton { position: relative; }
+  .golden-card-glow::after, .cq--dorada .cq-boton::after {
+    content: ""; position: absolute; inset: -6px; border-radius: inherit; pointer-events: none;
+    box-shadow: 0 0 22px 4px rgb(228 0 124 / .45);
+    animation: brasa-respira 2.6s ease-in-out infinite alternate;
+  }
+  .golden-shimmer-effect { animation: brasa-barrido 3.2s ease-in-out infinite; }
+}
+@keyframes brasa-respira { from { opacity: .25; } to { opacity: 1; } }
+@keyframes brasa-barrido { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+/* ======================================================================
+   <GrabadoParticulas> · el grabado se deshace en partículas y escribe la lectura
+   ====================================================================== */
+.gp { position: relative; }
+.gp-fijo { position: relative; display: grid; align-items: center; padding-block: 96px 72px; }
+.gp-contenido {
+  position: relative; width: 100%; max-width: 1440px; margin-inline: auto; padding-inline: var(--gutter, clamp(16px, 4vw, 56px));
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 5vw, 80px); align-items: center;
+}
+.gp-contenido--solo { grid-template-columns: minmax(0, 1fr); }
+.gp-texto { display: grid; gap: 20px; align-content: center; }
+.gp-lienzo { position: relative; aspect-ratio: 7 / 6; width: 100%; }
+.gp-lienzo canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.gp-grabado {
+  position: absolute; left: 4%; top: 6%; height: 88%; width: auto; max-width: none; border-radius: 8px;
+  mix-blend-mode: multiply; /* el papel blanco del grabado se funde con el papel de la escena; no se anima */
+}
+.gp-lectura {
+  position: absolute; right: 0; top: 12%; width: 54%;
+  font: italic 400 clamp(1.05rem, .78rem + .82vw, 1.5rem)/1.48 var(--font-lectura, Georgia, serif);
+  color: var(--color-tinta, #0E0D0C);
+}
+.gp-lectura p { margin: 0; }
+.gp-lectura p + p { margin-top: .7em; }
+.gp-lectura .gp-firma {
+  margin-top: 1.1em; font: normal 400 .6875rem/1.4 var(--font-dato, ui-monospace, monospace);
+  letter-spacing: .1em; text-transform: uppercase; color: var(--color-rosa-texto, #B10061);
+}
+.gp-progreso {
+  position: absolute; left: var(--gutter, clamp(16px, 4vw, 56px)); bottom: 28px; margin: 0; display: none;
+  font: 400 .6875rem/1 var(--font-dato, ui-monospace, monospace); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-grafito, #55524D);
+}
+/* Activa (con JS, > 820 px y con movimiento): escena alta con el lienzo fijo; el canvas dibuja la transición. */
+.gp--activa { height: 320svh; }
+.gp--activa .gp-fijo { position: sticky; top: 0; height: 100svh; padding-block: 0; }
+.gp--activa .gp-progreso { display: block; }
+.gp--activa .gp-grabado { clip-path: inset(calc(var(--p-corte, 0) * 100%) 0 0 0); }
+.gp--activa .gp-lectura { opacity: var(--p-texto, 0); transform: translateY(calc((1 - var(--p-texto, 0)) * 10px)); }
+@media (max-width: 820px) {
+  .gp-contenido { grid-template-columns: minmax(0, 1fr); }
+  .gp-lienzo { aspect-ratio: auto; display: grid; gap: 28px; justify-items: center; }
+  .gp-grabado { position: relative; left: auto; top: auto; height: auto; width: min(64%, 300px); }
+  .gp-lectura { position: relative; right: auto; top: auto; width: 100%; }
+}
+
+/* ======================================================================
+   <MesaDeGrabados> · retícula girada de grabados que deriva lento
+   ====================================================================== */
+.mdg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.mdg-reticula {
+  position: absolute; inset: -30% -20%;
+  display: grid; grid-template-columns: repeat(var(--mdg-columnas, 8), minmax(0, 1fr)); gap: 22px;
+  transform: rotate(-14deg); opacity: var(--mdg-opacidad, .62);
+}
+.mdg-columna { display: grid; gap: 22px; align-content: start; }
+.mdg-columna:nth-child(even) { margin-top: -140px; }
+.mdg-columna img { display: block; width: 100%; height: auto; border-radius: 6px; }
+@media (max-width: 719.98px) {
+  .mdg-reticula { inset: -12% -28% 16% -28%; grid-template-columns: repeat(var(--mdg-columnas-movil, 4), minmax(0, 1fr)); gap: 14px; opacity: var(--mdg-opacidad, .8); }
+  .mdg-columna { gap: 14px; }
+  .mdg-columna:nth-child(even) { margin-top: -80px; }
+  .mdg-columna--ancha { display: none; } /* 4 × 5: las columnas de más ni se piden (loading="lazy") */
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mdg-columna { animation: mdg-deriva 70s linear infinite alternate; will-change: transform; }
+  .mdg-columna:nth-child(even) { animation-direction: alternate-reverse; animation-duration: 84s; }
+  .mdg--pausada .mdg-columna { animation-play-state: paused; }
+}
+@keyframes mdg-deriva { from { transform: translateY(-6%); } to { transform: translateY(6%); } }
+
+/* ======================================================================
+   <TransicionPincel> · una barra de tinta barre la pantalla (≈ 450 ms)
+   ====================================================================== */
+.tp { position: fixed; inset: 0; z-index: 70; pointer-events: none; overflow: hidden; }
+.tp-barra {
+  position: absolute; top: 0; left: 0; width: 72vw; height: 100%;
+  transform: translateX(-80vw);
+  animation: tp-barrer 450ms cubic-bezier(.65, 0, .35, 1) forwards;
+}
+@keyframes tp-barrer { to { transform: translateX(108vw); } }
+@media (prefers-reduced-motion: reduce) { .tp { display: none; } }

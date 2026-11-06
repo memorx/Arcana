@@ -1304,5 +1304,15 @@
       "partner": "The other person",
       "bond": "The bond"
     }
+  },
+  "carta": {
+    "pista": "Tap to turn over",
+    "pistaCorta": "Tap",
+    "invertida": "reversed",
+    "desliza": "Scroll ↓",
+    "reverso": "Arcana card back",
+    "voltear": "Turn the card over",
+    "voltearPosicion": "Turn the card over: {posicion}",
+    "voltearTodas": "Turn them all over"
   }
 }

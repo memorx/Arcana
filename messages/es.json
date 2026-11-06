@@ -1304,5 +1304,15 @@
       "partner": "La otra persona",
       "bond": "El vínculo"
     }
+  },
+  "carta": {
+    "pista": "Toca para voltear",
+    "pistaCorta": "Toca",
+    "invertida": "invertida",
+    "desliza": "Desliza ↓",
+    "reverso": "Reverso de carta Arcana",
+    "voltear": "Voltear la carta",
+    "voltearPosicion": "Voltear la carta: {posicion}",
+    "voltearTodas": "Voltear todas"
   }
 }
