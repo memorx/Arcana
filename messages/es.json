@@ -22,7 +22,8 @@
       "message": "Las cartas se confundieron. Por favor, intenta de nuevo.",
       "tryAgain": "Intentar de nuevo",
       "goHome": "Ir al inicio"
-    }
+    },
+    "cardsCredit": "Cartas: Pamela Colman Smith, 1909 · dominio público"
   },
   "nav": {
     "home": "Inicio",
@@ -46,7 +47,14 @@
     "blueprint": "Mi Mapa Arcano",
     "calendar": "Calendario",
     "insights": "Mi historia",
-    "compatibility": "Lectura de dos"
+    "compatibility": "Lectura de dos",
+    "mainNav": "Navegación principal",
+    "openNav": "Abrir menú",
+    "closeNav": "Cerrar menú",
+    "navMenu": "Menú",
+    "yourArcana": "Tu Arcana",
+    "account": "Tu cuenta",
+    "language": "Idioma"
   },
   "landing": {
     "readingCounter": "lecturas realizadas",
@@ -1304,5 +1312,14 @@
       "partner": "La otra persona",
       "bond": "El vínculo"
     }
+  },
+  "hora": {
+    "hoy": "Hoy",
+    "fechaLarga": "{diaSemana, select, 0 {dom} 1 {lun} 2 {mar} 3 {mié} 4 {jue} 5 {vie} other {sáb}} {dia} {mes, select, 1 {ene} 2 {feb} 3 {mar} 4 {abr} 5 {may} 6 {jun} 7 {jul} 8 {ago} 9 {sep} 10 {oct} 11 {nov} other {dic}} {anio}",
+    "fechaCorta": "{dia} {mes, select, 1 {ene} 2 {feb} 3 {mar} 4 {abr} 5 {may} 6 {jun} 7 {jul} 8 {ago} 9 {sep} 10 {oct} 11 {nov} other {dic}}",
+    "tonalli": "{numero} {signo} ({nombre})",
+    "senor": "Señor de la noche: {nombre}",
+    "luna": "{fase} {luz}%",
+    "lunaCorta": "Luna {luz}%"
   }
 }
