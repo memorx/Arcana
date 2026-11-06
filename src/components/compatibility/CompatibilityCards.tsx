@@ -1,5 +1,6 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { TarotCardStatic } from "@/components/ui";
+import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import type { CompatibilityCard } from "@/lib/compatibility";
 
 interface CompatibilityCardsProps {
@@ -9,37 +10,45 @@ interface CompatibilityCardsProps {
   locale: string;
 }
 
-/** The three cards: You / The other person / The bond. */
+/**
+ * The three cards: You / The other person / The bond. They are revealed
+ * cards, so they are the one thing in full color (the self-hosted engraving,
+ * turned when it came out reversed); role in mono, name in Gloock.
+ */
 export function CompatibilityCards({ cards, partnerName, locale }: CompatibilityCardsProps) {
   const t = useTranslations("compatibility");
+  const tCarta = useTranslations("carta");
 
   return (
-    <ul className="grid grid-cols-3 gap-2 sm:gap-6">
+    <ul className="grid grid-cols-3 gap-2 sm:gap-6 lg:gap-10">
       {cards.map((card) => {
         const role = card.role === "partner" && partnerName ? partnerName : t(`roles.${card.role}`);
         const name = locale === "en" ? card.name : card.nameEs;
-        const tarotCard = {
-          name: card.name,
-          nameEs: card.nameEs,
-          arcana: card.arcana,
-          suit: card.suit,
-          number: card.number,
-          imageUrl: card.imageUrl,
-        };
 
         return (
-          <li key={card.position} className="flex min-w-0 flex-col items-center text-center">
-            <span className="mb-3 max-w-full line-clamp-2 break-words text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <li key={card.position} data-rol={card.role} className="flex min-w-0 flex-col items-center gap-3 text-center">
+            <span className="line-clamp-2 max-w-full font-dato text-[0.625rem] leading-[1.4] tracking-[0.1em] break-words text-letra-acento uppercase sm:text-[0.6875rem] sm:tracking-[0.12em]">
               {role}
             </span>
-            {/* Same image URL in both sizes, so it is only downloaded once */}
-            <div className="sm:hidden">
-              <TarotCardStatic card={tarotCard} isReversed={card.isReversed} size="md" locale={locale} />
+            <div className="w-full max-w-[220px] overflow-hidden rounded-[8px] border border-filete/20 bg-papel-hondo">
+              <Image
+                src={cartaImagen(card)}
+                alt={name}
+                width={MEDIDAS_CARTA.color.width}
+                height={MEDIDAS_CARTA.color.height}
+                sizes="(min-width: 1024px) 220px, (min-width: 640px) 28vw, 30vw"
+                unoptimized
+                className={`h-auto w-full ${card.isReversed ? "rotate-180" : ""}`}
+              />
             </div>
-            <div className="hidden sm:block">
-              <TarotCardStatic card={tarotCard} isReversed={card.isReversed} size="lg" locale={locale} />
-            </div>
-            <span className="mt-3 text-sm font-medium text-slate-200 break-words">{name}</span>
+            <span className="font-titulo text-[clamp(0.95rem,0.8rem+0.7vw,1.35rem)] leading-[1.15] break-words">
+              {name}
+            </span>
+            {card.isReversed && (
+              <span className="-mt-1.5 font-dato text-[0.5625rem] leading-[1.4] tracking-[0.1em] text-letra-suave uppercase sm:text-[0.625rem]">
+                {tCarta("invertida")}
+              </span>
+            )}
           </li>
         );
       })}

@@ -20,7 +20,13 @@ interface ScoreMeterProps {
 
 const SEGMENTS = [1, 2, 3, 4, 5];
 
-/** A five-segment bar for one system's score. Plain markup: works in server and client components. */
+/**
+ * One system's score as five printed segments: filled in pink (the second
+ * ink, used here as a graphic), empty ones as an ink outline, so the count
+ * reads without color. The value is a `meter` (1–5) with its spoken label and
+ * the score in mono. Plain markup: works in server and client components, on
+ * paper or ink.
+ */
 export function ScoreMeter({
   label,
   score,
@@ -34,26 +40,39 @@ export function ScoreMeter({
   const value = Math.min(5, Math.max(1, Math.round(score)));
 
   return (
-    <div
-      className={cn(
-        "rounded-xl border p-4 sm:p-5",
-        emphasis
-          ? "border-amber-500/40 bg-gradient-to-br from-purple-900/30 to-amber-900/20"
-          : "border-slate-800 bg-slate-900/50",
-        className
-      )}
-    >
+    <div className={cn("flex h-full flex-col bg-suelo text-letra", emphasis ? "gap-4" : "gap-3", className)}>
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className={cn("font-semibold text-slate-100", emphasis ? "text-base" : "text-sm")}>{label}</h3>
+        <h3
+          className={cn(
+            emphasis
+              ? "text-[clamp(1.45rem,1.2rem+0.8vw,1.85rem)] leading-[1.1]"
+              : "font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase"
+          )}
+        >
+          {label}
+        </h3>
         <span
           aria-hidden="true"
-          className={cn("font-semibold tabular-nums text-amber-300", emphasis ? "text-lg" : "text-sm")}
+          data-valor
+          className={cn(
+            "shrink-0 tabular-nums",
+            emphasis ? "font-titulo text-[clamp(2.2rem,1.7rem+1.6vw,3rem)] leading-none" : "font-dato text-sm tracking-[0.06em]"
+          )}
         >
           {scoreText}
         </span>
       </div>
 
-      {detail && <div className="mt-1 text-sm text-slate-400 break-words">{detail}</div>}
+      {detail && (
+        <div
+          className={cn(
+            "break-words",
+            emphasis ? "text-[1.125rem] leading-[1.5] italic" : "font-titulo text-[1.05rem] leading-[1.35]"
+          )}
+        >
+          {detail}
+        </div>
+      )}
 
       <div
         role="meter"
@@ -61,7 +80,7 @@ export function ScoreMeter({
         aria-valuemin={1}
         aria-valuemax={5}
         aria-valuenow={value}
-        className="mt-3 grid grid-cols-5 gap-1"
+        className={cn("grid grid-cols-5", emphasis ? "gap-1.5" : "gap-1")}
       >
         {SEGMENTS.map((segment) => (
           <div
@@ -69,17 +88,15 @@ export function ScoreMeter({
             aria-hidden="true"
             data-filled={segment <= value}
             className={cn(
-              "rounded-full",
-              emphasis ? "h-3" : "h-2",
-              segment <= value
-                ? "bg-gradient-to-r from-purple-500 to-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.25)]"
-                : "bg-slate-800"
+              "rounded-[2px]",
+              emphasis ? "h-3.5" : "h-2",
+              segment <= value ? "bg-rosa" : "border border-filete/45"
             )}
           />
         ))}
       </div>
 
-      {summary && <p className="mt-3 text-sm leading-relaxed text-slate-300">{summary}</p>}
+      {summary && <p className="text-[0.9875rem] leading-[1.6] text-letra-suave">{summary}</p>}
     </div>
   );
 }

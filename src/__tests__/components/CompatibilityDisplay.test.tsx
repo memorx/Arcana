@@ -8,9 +8,9 @@ import { CARD_ROLES, computeCompatibility, type CompatibilityCard } from "@/lib/
 
 jest.mock("next/image", () => ({
   __esModule: true,
-  default: (props: { alt: string; src: string }) => {
+  default: (props: { alt: string; src: string; className?: string }) => {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img alt={props.alt} src={props.src} />;
+    return <img alt={props.alt} src={props.src} className={props.className} />;
   },
 }));
 
@@ -149,5 +149,78 @@ describe("CompatibilityHistory", () => {
     const meters = screen.getAllByRole("meter");
     expect(meters).toHaveLength(1);
     expect(meters[0]).toHaveAttribute("aria-valuenow", "4");
+  });
+});
+
+describe("Dos tintas", () => {
+  const cards: CompatibilityCard[] = CARD_ROLES.map((r, i) => ({
+    position: i + 1,
+    role: r.role,
+    roleLabel: r.label,
+    cardId: `major_${i}`,
+    isReversed: i === 2,
+    name: ["The Magician", "The Moon", "The Lovers"][i],
+    nameEs: ["El Mago", "La Luna", "Los Enamorados"][i],
+    imageUrl: `/cards/${i}.jpg`,
+    arcana: "MAJOR",
+    suit: null,
+    number: i,
+  }));
+
+  it("the three cards are the self-hosted color engravings (never the stored imageUrl), the reversed one turned", () => {
+    render(<CompatibilityCards cards={cards} partnerName={null} locale="es" />);
+    const [me, partner, bond] = screen.getAllByRole("listitem");
+    expect(within(me).getByAltText("El Mago")).toHaveAttribute("src", "/cartas/rws-tarot-01-magician-color.webp");
+    expect(within(partner).getByAltText("La Luna")).toHaveAttribute("src", "/cartas/rws-tarot-18-moon-color.webp");
+    const enamorados = within(bond).getByAltText("Los Enamorados");
+    expect(enamorados).toHaveAttribute("src", "/cartas/rws-tarot-06-lovers-color.webp");
+    expect(enamorados).toHaveClass("rotate-180");
+    expect(within(bond).getByText("invertida")).toBeInTheDocument();
+    expect(within(me).queryByText("invertida")).not.toBeInTheDocument();
+    expect(document.querySelectorAll('img[src^="/cards/"]')).toHaveLength(0);
+  });
+
+  it("a meter prints its value: filled segments in pink, empty ones outlined, the score in mono for sight only", () => {
+    const { container } = render(
+      <ScoreMeter label="Numerología" score={2} scoreText="2/5" ariaLabel="Numerología: 2 de 5" />
+    );
+    const meter = screen.getByRole("meter", { name: "Numerología: 2 de 5" });
+    const llenos = meter.querySelectorAll('[data-filled="true"]');
+    const vacios = meter.querySelectorAll('[data-filled="false"]');
+    expect(llenos).toHaveLength(2);
+    expect(vacios).toHaveLength(3);
+    llenos.forEach((s) => expect(s).toHaveClass("bg-rosa"));
+    vacios.forEach((s) => expect(s).not.toHaveClass("bg-rosa"));
+    const valor = container.querySelector("[data-valor]");
+    expect(valor).toHaveTextContent("2/5");
+    expect(valor).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("every meter of a reading has its spoken value, and the glyphs of the pairs are in one ink", () => {
+    const systems = computeCompatibility({ birthDate: utc(1990, 7, 15) }, { birthDate: utc(1992, 3, 3) });
+    const { container } = render(<CompatibilityMeters systems={systems} locale="es" />);
+    for (const meter of screen.getAllByRole("meter")) {
+      const valor = Number(meter.getAttribute("aria-valuenow"));
+      expect(valor).toBeGreaterThanOrEqual(1);
+      expect(valor).toBeLessThanOrEqual(5);
+      expect(meter).toHaveAccessibleName("meterAria");
+      expect(meter.querySelectorAll('[data-filled="true"]')).toHaveLength(valor);
+    }
+    const glifos = container.querySelectorAll("[data-glifo]");
+    expect(glifos.length).toBe(6);
+    glifos.forEach((g) => expect(g).toHaveClass("grayscale"));
+  });
+
+  it("the archive row keeps its meter and links to the reading", () => {
+    render(
+      <CompatibilityHistory
+        locale="es"
+        readings={[{ id: "c9", partnerName: "Luis", partnerBirthDate: "1988-11-02", overall: 3, createdAt: "2026-11-03T12:00:00Z" }]}
+      />
+    );
+    const link = screen.getByRole("link", { name: /Luis/ });
+    expect(link).toHaveAttribute("href", "/compatibility/c9");
+    const meter = within(link).getByRole("meter");
+    expect(meter.querySelectorAll('[data-filled="true"]')).toHaveLength(3);
   });
 });
