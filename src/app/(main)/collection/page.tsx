@@ -9,7 +9,7 @@ import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { BarraProgreso } from "@/components/achievements/BarraProgreso";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { cn } from "@/lib/utils";
-import { numeroRomano } from "../cards/indice";
+import { numeralDeCarta } from "../cards/indice";
 
 interface CollectionCard {
   id: string;
@@ -291,7 +291,8 @@ function CartaDelIndice({
   porDescubrir: string;
   dorada: string;
 }) {
-  const numero = numeroRomano(card.number);
+  // Las cortes no llevan número: un espacio duro guarda el renglón para que los nombres alineen.
+  const numero = numeralDeCarta(card) ?? "\u00a0";
 
   if (!card.isDiscovered && !card.isGolden) {
     return (

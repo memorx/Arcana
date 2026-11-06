@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Card, Badge, buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
-import { numeroRomano } from "../indice";
+import { numeralDeCarta } from "../indice";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -93,7 +93,7 @@ export default async function CardDetailPage({ params }: Props) {
 
   const uprightText = locale === "en" && card.meaningUprightEn ? card.meaningUprightEn : card.meaningUpright;
   const reversedText = locale === "en" && card.meaningReversedEn ? card.meaningReversedEn : card.meaningReversed;
-  const numeral = numeroRomano(card.number);
+  const numeral = numeralDeCarta(card);
 
   return (
     <div className="grid gap-[clamp(36px,7vh,72px)]">
@@ -112,12 +112,14 @@ export default async function CardDetailPage({ params }: Props) {
       <article className="grid gap-x-[clamp(32px,6vw,96px)] gap-y-9 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <header className="grid min-w-0 content-start gap-3 md:col-start-2 md:row-start-1">
           <Etiqueta>{arcanaLabel}</Etiqueta>
-          <p
-            aria-hidden="true"
-            className="font-dato text-[clamp(2.75rem,2rem+3vw,4.5rem)] leading-none tracking-[-0.02em] text-rosa"
-          >
-            {numeral}
-          </p>
+          {numeral && (
+            <p
+              aria-hidden="true"
+              className="font-dato text-[clamp(2.75rem,2rem+3vw,4.5rem)] leading-none tracking-[-0.02em] text-rosa"
+            >
+              {numeral}
+            </p>
+          )}
           <h1 className="text-[clamp(2.2rem,1.5rem+2.4vw,3.6rem)] leading-[1.02]">{displayName}</h1>
           <p className="font-lectura text-[1.1875rem] italic text-letra-suave">{otherName}</p>
         </header>

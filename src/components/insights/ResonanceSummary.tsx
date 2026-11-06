@@ -4,7 +4,7 @@ interface ResonanceSummaryProps {
   resonance: { count: number; average: number | null };
 }
 
-/** Average resonance (1–5) of the readings the person rated: the figure in Gloock and a bar in two inks. */
+/** Average resonance (1–5) of the readings the person rated: the figure in Martian Mono (data) and a bar in two inks. */
 export async function ResonanceSummary({ resonance }: ResonanceSummaryProps) {
   const t = await getTranslations("insights.resonance");
   const locale = await getLocale();
@@ -13,7 +13,7 @@ export async function ResonanceSummary({ resonance }: ResonanceSummaryProps) {
     return <p className="max-w-[60ch] font-lectura text-letra-suave">{t("empty")}</p>;
   }
 
-  const average = new Intl.NumberFormat(locale === "en" ? "en-US" : "es-ES", {
+  const average = new Intl.NumberFormat(locale === "en" ? "en-US" : "es-MX", {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   }).format(resonance.average);
@@ -21,7 +21,7 @@ export async function ResonanceSummary({ resonance }: ResonanceSummaryProps) {
 
   return (
     <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-10">
-      <p className="font-titulo text-[3.5rem] leading-none text-letra tabular-nums">
+      <p className="font-dato text-[3.5rem] leading-none tracking-[-0.04em] text-letra tabular-nums">
         {average}
         <span className="ml-1 font-dato text-base text-letra-suave">/5</span>
       </p>

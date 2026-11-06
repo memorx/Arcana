@@ -197,6 +197,7 @@
   },
   "dashboard": {
     "welcome": "Hello, {name}",
+    "welcomeDefault": "Your account",
     "welcomeSubtitle": "Welcome to your reading space",
     "streak": {
       "days": "day streak",
@@ -209,6 +210,7 @@
     "credits": "{count} credits",
     "credit": "credit",
     "creditPlural": "credits",
+    "streakReward": "{count, plural, one {+# credit} other {+# credits}}",
     "creditsLabel": "Credits",
     "totalReadingsLabel": "Total Readings",
     "noCredits": "No credits",
@@ -323,6 +325,8 @@
     "publicReading": "Public reading",
     "privateReading": "Private reading",
     "sharedBy": "Shared by",
+    "sharedTitle": "{name}'s reading",
+    "sharedTitleAnonymous": "A shared reading",
     "anonymous": "Anonymous",
     "shareCta": {
       "title": "Want your own reading?",
@@ -729,6 +733,7 @@
     "unlocked": "Unlocked",
     "locked": "Locked",
     "credits": "credits",
+    "reward": "{count, plural, one {+# credit} other {+# credits}}",
     "latest": "Latest",
     "next": "Next",
     "viewAll": "View All",
@@ -798,6 +803,7 @@
     "completed": "Completed",
     "inProgress": "In Progress",
     "credits": "credits",
+    "reward": "{count, plural, one {+# credit} other {+# credits}}",
     "resetsIn": "Resets in {time}",
     "noChallenges": "No challenges available",
     "viewAll": "View All",

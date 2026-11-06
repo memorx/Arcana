@@ -44,6 +44,8 @@ test.describe.serial("suscribirse al oráculo diario con créditos", () => {
       await expect(page).toHaveURL(/\/subscribe/);
       await page.getByRole("button", { name: /suscribirse con cr[eé]ditos|subscribe with credits/i }).click();
       await expect(page).toHaveURL(/\/subscribe\/success/, { timeout: 20_000 });
+      // The welcome only appears once /api/subscription confirms the subscription is active.
+      await expect(page.getByRole("heading", { level: 1 })).toContainText(/bienvenid|welcome/i);
       await expect.poll(() => creditosDe(page)).toBeLessThan(antes);
       await page.goto("/daily");
     }

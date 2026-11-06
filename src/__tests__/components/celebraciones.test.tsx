@@ -1,7 +1,8 @@
 /**
  * Modales de logro, desafío, nivel y carta dorada (L5) sobre tinta: cada uno con su `h2` que nombra el diálogo,
  * créditos en mono, botón que cierra, nada de la paleta vieja ni de imageUrl, y la carta dorada como la única con
- * brasa rosa. Las props son las que les pasa reading/new/[spreadTypeId]/page.tsx.
+ * brasa rosa. Las props son las que les pasa reading/new/[spreadTypeId]/page.tsx. Las recompensas («+1 crédito»,
+ * «+5 créditos») usan plural ICU, también la de la próxima meta de racha (StreakDisplay).
  */
 import { render, screen, fireEvent } from "@testing-library/react";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -9,6 +10,7 @@ import { ChallengeCompletedModal } from "@/components/challenges/ChallengeComple
 import { LevelUpModal } from "@/components/levels/LevelUpModal";
 import { GoldenCardModal } from "@/components/golden";
 import { GOLDEN_CARD_CREDITS_REWARD } from "@/lib/golden-cards";
+import { StreakDisplay } from "@/components/dashboard/StreakDisplay";
 
 let mockLocale: "es" | "en" = "es";
 const mockMensajes: Record<string, unknown> = {
@@ -23,15 +25,57 @@ jest.mock("next-intl", () => ({
       .split(".")
       .reduce<unknown>((o, k) => (o == null ? undefined : (o as Record<string, unknown>)[k]), mockMensajes[mockLocale]);
     if (typeof msg !== "string") throw new Error(`falta ${ns}.${key}`);
-    return msg.replace(/\{(\w+)\}/g, (_, k: string) => String(values?.[k] ?? `{${k}}`));
+    return mockIcu(msg, values, mockLocale);
   },
 }));
+
+/** ICU mínimo para las pruebas: `{x}` y `{x, plural, =N {…} one {…} other {…}}` con `#`. */
+function mockIcu(msg: string, values: Record<string, unknown> = {}, locale = "es"): string {
+  let out = "";
+  for (let i = 0; i < msg.length; i++) {
+    if (msg[i] !== "{") {
+      out += msg[i];
+      continue;
+    }
+    let fin = i;
+    let nivel = 0;
+    do {
+      if (msg[fin] === "{") nivel++;
+      else if (msg[fin] === "}") nivel--;
+      fin++;
+    } while (nivel > 0 && fin < msg.length);
+    const [nombre, tipo, ...resto] = msg.slice(i + 1, fin - 1).split(",");
+    i = fin - 1;
+    const valor = values[nombre.trim()];
+    if (tipo?.trim() !== "plural") {
+      out += String(valor ?? `{${nombre.trim()}}`);
+      continue;
+    }
+    const texto = resto.join(",");
+    const opciones = new Map<string, string>();
+    for (let p = 0; p < texto.length; ) {
+      const m = /^\s*(=\d+|\w+)\s*\{/.exec(texto.slice(p));
+      if (!m) break;
+      let q = p + m[0].length;
+      for (let n = 1; n > 0; q++) {
+        if (texto[q] === "{") n++;
+        else if (texto[q] === "}") n--;
+      }
+      opciones.set(m[1], texto.slice(p + m[0].length, q - 1));
+      p = q;
+    }
+    const num = Number(valor);
+    const rama = opciones.get(`=${num}`) ?? opciones.get(new Intl.PluralRules(locale).select(num)) ?? opciones.get("other") ?? "";
+    out += mockIcu(rama.replace(/#/g, String(num)), values, locale);
+  }
+  return out;
+}
 
 const PALETA_VIEJA =
   /(slate|purple|violet|indigo|fuchsia|pink|amber|yellow|orange|red|rose|emerald|green|teal|blue|sky|cyan)-\d{2,3}|text-white|bg-gradient/;
 
 /** El diálogo abierto está sobre tinta y su nombre accesible es el h2 visible. */
-function dialogoNombradoPor(titulo: string) {
+function dialogoNombradoPor(titulo: string | RegExp) {
   const dialogo = screen.getByRole("dialog", { name: titulo });
   expect(dialogo).toHaveClass("suelo-tinta");
   const h2 = screen.getByRole("heading", { level: 2, name: titulo });
@@ -54,7 +98,7 @@ describe("AchievementUnlockedModal", () => {
   it("h2, cada logro con su sello y el total de créditos; Continuar cierra", () => {
     const onClose = jest.fn();
     render(<AchievementUnlockedModal isOpen onClose={onClose} achievements={logros} />);
-    dialogoNombradoPor("¡Logro Desbloqueado!");
+    dialogoNombradoPor(/^¡logro desbloqueado!$/i);
 
     expect(screen.getByRole("heading", { level: 3, name: "Primera Lectura" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Madrugador" })).toBeInTheDocument();
@@ -66,6 +110,23 @@ describe("AchievementUnlockedModal", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("la recompensa de cada logro con plural ICU: +1 crédito, +5 créditos (también en inglés)", () => {
+    const dos = [
+      { ...logros[0], creditReward: 1 },
+      { ...logros[1], creditReward: 5 },
+    ];
+    const { unmount } = render(<AchievementUnlockedModal isOpen onClose={jest.fn()} achievements={dos} />);
+    expect(screen.getByText("+1 crédito")).toBeInTheDocument();
+    expect(screen.getByText("+5 créditos")).toBeInTheDocument();
+    expect(screen.queryByText(/\+1 créditos/)).toBeNull();
+    unmount();
+
+    mockLocale = "en";
+    render(<AchievementUnlockedModal isOpen onClose={jest.fn()} achievements={dos} />);
+    expect(screen.getByText("+1 credit")).toBeInTheDocument();
+    expect(screen.getByText("+5 credits")).toBeInTheDocument();
   });
 
   it("sin logros no pinta nada", () => {
@@ -85,7 +146,7 @@ describe("ChallengeCompletedModal", () => {
         challenges={[{ id: "c1", key: "weekly_explorer", name: "Weekly Explorer", nameEs: "Explorador Semanal", icon: "🔍", creditReward: 3 }]}
       />
     );
-    dialogoNombradoPor("¡Desafío Completado!");
+    dialogoNombradoPor(/^¡desafío completado!$/i);
 
     const chispas = document.querySelector("[data-chispas]")!;
     expect(chispas).toHaveAttribute("aria-hidden", "true");
@@ -96,6 +157,32 @@ describe("ChallengeCompletedModal", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(onClose).toHaveBeenCalled();
   });
+
+  it("la recompensa de cada desafío con plural ICU: +1 crédito, +5 créditos", () => {
+    render(
+      <ChallengeCompletedModal
+        isOpen
+        onClose={jest.fn()}
+        challenges={[
+          { id: "c1", key: "weekly_explorer", name: "Weekly Explorer", nameEs: "Explorador Semanal", icon: "🔍", creditReward: 1 },
+          { id: "c2", key: "monthly_dedicated", name: "Dedicated", nameEs: "Dedicado", icon: "📅", creditReward: 5 },
+        ]}
+      />
+    );
+    expect(screen.getByText("+1 crédito")).toBeInTheDocument();
+    expect(screen.getByText("+5 créditos")).toBeInTheDocument();
+  });
+});
+
+describe("StreakDisplay (recompensa de la próxima meta de racha)", () => {
+  it("con plural ICU: 1 día → meta de 3 días, +1 crédito; 10 días → meta de 14, +5 créditos", () => {
+    const { unmount } = render(<StreakDisplay currentStreak={1} longestStreak={1} />);
+    expect(screen.getByText("+1 crédito")).toBeInTheDocument();
+    unmount();
+
+    render(<StreakDisplay currentStreak={10} longestStreak={10} />);
+    expect(screen.getByText("+5 créditos")).toBeInTheDocument();
+  });
 });
 
 describe("LevelUpModal", () => {
@@ -103,7 +190,7 @@ describe("LevelUpModal", () => {
     render(
       <LevelUpModal isOpen onClose={jest.fn()} newLevel={3} levelName="Adept" levelNameEs="Adepto" levelIcon="🔮" creditsAwarded={5} />
     );
-    dialogoNombradoPor("¡Subiste de Nivel!");
+    dialogoNombradoPor(/^¡subiste de nivel!$/i);
 
     expect(screen.getByText("III")).toBeInTheDocument();
     expect(screen.getByText("¡Ahora eres Adepto!")).toBeInTheDocument();

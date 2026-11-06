@@ -65,7 +65,7 @@ describe("/collection", () => {
     const { container } = render(<CollectionPage />);
     await screen.findByRole("heading", { level: 2, name: "Arcanos Mayores" });
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tu Colección");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/^tu colección$/i);
     expect(container.querySelector("[data-contador]")?.textContent?.replace(/\s+/g, " ").trim()).toBe("3 de 78");
 
     const barra = screen.getByRole("progressbar", { name: "3 de 78 cartas descubiertas" });
@@ -106,6 +106,21 @@ describe("/collection", () => {
     for (const img of container.querySelectorAll("img")) expect(img.getAttribute("src")).toMatch(/^\/cartas\//);
   });
 
+  it("las cortes no llevan número romano, descubiertas o no (el Rey de Bastos no es XIV)", async () => {
+    responder({ ...HISTORIA, cards: coleccion(["King of Wands", "Temperance"], []) });
+    const { container } = render(<CollectionPage />);
+    await screen.findByRole("heading", { level: 2, name: "Arcanos Mayores" });
+
+    const numeral = (li: Element) => li.querySelector("span[aria-hidden='true'].font-dato, span.font-dato > span[aria-hidden='true']")?.textContent;
+    expect(numeral(screen.getByRole("link", { name: /es King of Wands/ }).closest("li")!)).toBe(" ");
+    expect(numeral(screen.getByRole("link", { name: /es Temperance/ }).closest("li")!)).toBe("XIV");
+    // Sin descubrir: las otras 15 cortes tampoco llevan número (ningún XIV queda: La Templanza está descubierta).
+    const porDescubrir = [...container.querySelectorAll("li[data-carta='por-descubrir']")].map(numeral);
+    expect(porDescubrir.filter((n) => n === "XIV")).toHaveLength(0);
+    expect(porDescubrir.filter((n) => n === " ")).toHaveLength(15);
+    expect(porDescubrir.filter((n) => n === "X")).toHaveLength(5); // la Rueda y los cuatro Dieces
+  });
+
   it("la dorada es la única con brasa rosa persistente", async () => {
     responder(HISTORIA);
     const { container } = render(<CollectionPage />);
@@ -142,7 +157,7 @@ describe("/collection", () => {
     expect(screen.queryByRole("heading", { level: 2, name: "Bastos" })).toBeNull();
     expect(container.querySelectorAll("li[data-carta]")).toHaveLength(14);
 
-    fireEvent.click(within(grupo).getByRole("button", { name: /Cartas Doradas/ }));
+    fireEvent.click(within(grupo).getByRole("button", { name: /cartas doradas/i }));
     expect(container.querySelectorAll("li[data-carta]")).toHaveLength(1);
     expect(container.querySelector("li[data-carta]")).toHaveAttribute("data-carta", "dorada");
   });
@@ -159,9 +174,9 @@ describe("/collection", () => {
     expect(container.querySelector("[data-contador]")?.textContent?.replace(/\s+/g, " ").trim()).toBe("0 de 78");
     expect(container.querySelectorAll("li[data-carta='por-descubrir']")).toHaveLength(78);
     expect(container.querySelectorAll(".golden-card-glow")).toHaveLength(0);
-    expect(screen.getByRole("link", { name: "Iniciar Lectura" })).toHaveAttribute("href", "/reading/new");
+    expect(screen.getByRole("link", { name: /^iniciar lectura$/i })).toHaveAttribute("href", "/reading/new");
 
-    fireEvent.click(screen.getByRole("button", { name: /Cartas Doradas/ }));
+    fireEvent.click(screen.getByRole("button", { name: /cartas doradas/i }));
     expect(screen.getByText("1% de probabilidad por carta")).toBeInTheDocument();
   });
 
@@ -180,6 +195,6 @@ describe("/collection", () => {
   it("si la API falla, no se rompe", async () => {
     responder({ error: "Unauthorized" });
     render(<CollectionPage />);
-    expect(await screen.findByRole("link", { name: "Iniciar Lectura" })).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /^iniciar lectura$/i })).toBeInTheDocument();
   });
 });

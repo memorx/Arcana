@@ -148,13 +148,32 @@ describe("/subscribe/success", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("success.noSession");
   });
 
-  it("pagada con créditos (?method=credits): da la bienvenida sin buscar una sesión de Stripe", async () => {
+  it("pagada con créditos (?method=credits) y suscripción activa: da la bienvenida sin buscar una sesión de Stripe", async () => {
     parametros = new URLSearchParams("method=credits");
-    const mock = apis({});
+    const mock = apis({ "/api/subscription": { body: { subscription: { id: "s", status: "active" } } } });
     render(<SubscribeSuccessPage />);
     await waitFor(() => expect(unSoloH1()).toHaveTextContent("success.title"));
     expect(screen.getByText("paidWithCredits")).toBeInTheDocument();
-    expect(mock).not.toHaveBeenCalled();
+    // Only the subscription API (the mocked t() changes on every render, so the effect may run twice): never Stripe.
+    expect(mock).toHaveBeenCalledWith("/api/subscription");
+    expect(mock.mock.calls.every(([url]) => url === "/api/subscription")).toBe(true);
+  });
+
+  it("?method=credits sin suscripción activa (URL del historial): el error de siempre, sin bienvenida", async () => {
+    parametros = new URLSearchParams("method=credits");
+    for (const respuesta of [
+      { body: { subscription: null } },
+      { body: { subscription: { id: "s", status: "canceled" } } },
+      { ok: false, body: { error: "Unauthorized" } },
+    ]) {
+      apis({ "/api/subscription": respuesta });
+      const { unmount } = render(<SubscribeSuccessPage />);
+      await waitFor(() => expect(unSoloH1()).toHaveTextContent("success.errorTitle"));
+      expect(screen.getByRole("alert")).toHaveTextContent("success.verifyError");
+      expect(screen.queryByText("paidWithCredits")).toBeNull();
+      expect(screen.queryByText("success.active")).toBeNull();
+      unmount();
+    }
   });
 
   it("con session_id válido: un solo h1 de bienvenida", async () => {

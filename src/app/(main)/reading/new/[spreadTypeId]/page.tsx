@@ -453,8 +453,9 @@ export default function ReadingFlowPage({
     numero: Number(c.position),
     nombre: c.positionInfo ? getLocalizedName(c.positionInfo) : t("position", { number: c.position }),
   }));
-  // Small cards (short hint, smaller canvas) on phones and in the dense spreads
-  const smallCards = narrow || orderedCards.length > 5;
+  // Small cards (short hint, smaller canvas) on phones and in the year spread (12); the horseshoe (7) and the Celtic
+  // Cross (10, 176 px columns on desktop) burn with the medium canvas.
+  const smallCards = narrow || orderedCards.length > 10;
 
   const nameUnder = (cardData: ReadingCard, visible: boolean) => (
     <p
@@ -621,12 +622,28 @@ export default function ReadingFlowPage({
           />
 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+            {/* One <button> (same key) that goes from «Voltear todas» to «Ver interpretación»: while the cards burn it
+                is aria-disabled, not disabled (a disabled button drops the keyboard focus to <body>), so the focus
+                stays on it and lands on «Ver interpretación» when the reading is complete. */}
             {allRevealed ? (
-              <Button onClick={() => setStep("interpretation")} size="lg" className="motion-safe:animate-entra">
+              <Button
+                key="accion-tirada"
+                onClick={() => setStep("interpretation")}
+                size="lg"
+                className="motion-safe:animate-entra"
+              >
                 {t("viewInterpretation")}
               </Button>
             ) : (
-              <Button variant="linea" onClick={() => setRevealAll(true)} disabled={revealAll}>
+              <Button
+                key="accion-tirada"
+                variant="linea"
+                aria-disabled={revealAll || undefined}
+                onClick={() => {
+                  if (!revealAll) setRevealAll(true);
+                }}
+                className="aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
                 {tCarta("voltearTodas")}
               </Button>
             )}

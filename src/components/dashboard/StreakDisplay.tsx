@@ -11,7 +11,7 @@ interface StreakDisplayProps {
 
 const ROTULO = "font-dato text-[0.6875rem] uppercase leading-[1.4] tracking-[0.12em] text-letra-suave";
 
-/** La racha de días: el número en Gloock y la barra hasta la próxima recompensa. Nada a los 0 días. */
+/** La racha de días: el número en Martian Mono (es un dato) y la barra hasta la próxima recompensa. Nada a los 0 días. */
 export function StreakDisplay({ currentStreak, longestStreak }: StreakDisplayProps) {
   const t = useTranslations("dashboard");
   const tReward = useTranslations("streakReward");
@@ -25,7 +25,7 @@ export function StreakDisplay({ currentStreak, longestStreak }: StreakDisplayPro
   return (
     <div className="space-y-3">
       <p className="flex flex-wrap items-baseline gap-x-3">
-        <span className="font-titulo text-[2.5rem] leading-none text-letra tabular-nums">{currentStreak}</span>
+        <span className="font-dato text-[2.5rem] leading-none tracking-[-0.04em] text-letra tabular-nums">{currentStreak}</span>
         <span className="font-lectura text-letra-suave">{t("streak.days")}</span>
       </p>
       {longestStreak > currentStreak && <p className={ROTULO}>{t("streak.best", { count: longestStreak })}</p>}
@@ -36,7 +36,7 @@ export function StreakDisplay({ currentStreak, longestStreak }: StreakDisplayPro
           <p className="flex flex-wrap items-baseline justify-between gap-x-3 text-[0.9375rem] leading-snug">
             <span className="text-letra">{tReward("nextMilestone", { days: nextMilestone.days })}</span>
             <span className="font-dato text-xs text-letra-acento">
-              +{nextMilestone.credits} {t("creditPlural")}
+              {t("streakReward", { count: nextMilestone.credits })}
             </span>
           </p>
           <Barra valor={progress} etiqueta={tReward("nextMilestone", { days: nextMilestone.days })} acento />

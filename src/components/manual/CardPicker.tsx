@@ -41,7 +41,8 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
   const gridRef = useRef<HTMLUListElement>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<DeckFilter>("all");
-  // Images that failed to load: the card shows its name instead.
+  // Images that failed to load, by card AND variant (`${id}-mesa`, `${id}-tinta`): the card shows its name instead,
+  // and a failed grey `mesa` does not stop the inked `tinta` (another URL) from loading once the card is placed.
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   // Roving tabindex: only one card is in the Tab order; arrows move between cards.
   const [focusId, setFocusId] = useState<string | null>(null);
@@ -57,7 +58,8 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
       ? activeCardId
       : (visible[0]?.id ?? null);
 
-  const markImageFailed = (card: DeckCard) => setFailedImages((prev) => ({ ...prev, [card.id]: true }));
+  const imageKey = (card: DeckCard, placed: boolean) => `${card.id}-${placed ? "tinta" : "mesa"}`;
+  const markImageFailed = (key: string) => setFailedImages((prev) => ({ ...prev, [key]: true }));
 
   // Left/right step by one, up/down by a row, Home/End to the ends.
   const handleGridKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
@@ -137,7 +139,8 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
             const placedAt = takenAt[card.id];
             const isActive = activeCardId === card.id;
             const isTaken = placedAt !== undefined && !isActive;
-            const showImage = !failedImages[card.id];
+            const variantKey = imageKey(card, placedAt !== undefined);
+            const showImage = !failedImages[variantKey];
 
             return (
               <li key={card.id}>
@@ -175,7 +178,7 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
                         loading="lazy"
                         decoding="async"
                         className="absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-200 group-hover:motion-safe:scale-105"
-                        onError={() => markImageFailed(card)}
+                        onError={() => markImageFailed(variantKey)}
                       />
                     ) : (
                       <span className="absolute inset-0 flex items-center justify-center p-1 font-lectura text-[0.625rem] leading-tight text-letra-suave">

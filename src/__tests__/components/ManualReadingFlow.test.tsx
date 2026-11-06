@@ -147,6 +147,26 @@ describe("CardPicker (F-61)", () => {
     expect(screen.getAllByText("El Loco").length).toBeGreaterThan(0);
   });
 
+  it("remembers a failed image per card AND variant: a broken grey `mesa` still lets the inked `tinta` load", () => {
+    const props = { cards: [deck[0]], activeCardId: null, onPick: jest.fn(), locale: "es" as const };
+    const { container, rerender } = render(<CardPicker {...props} takenAt={{}} />);
+
+    // The grey engraving fails: the card shows its name.
+    fireEvent.error(container.querySelector("img")!);
+    expect(container.querySelector("img")).toBeNull();
+    expect(screen.getAllByText("El Loco").length).toBeGreaterThan(0);
+
+    // Once placed it asks for the inked variant (another URL): it is tried, not skipped.
+    rerender(<CardPicker {...props} takenAt={{ major_0: 1 }} />);
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/cartas/rws-tarot-00-fool-tinta.webp");
+
+    // If the inked one fails too, the name again; back to free, the grey one stays remembered as failed.
+    fireEvent.error(container.querySelector("img")!);
+    expect(container.querySelector("img")).toBeNull();
+    rerender(<CardPicker {...props} takenAt={{}} />);
+    expect(container.querySelector("img")).toBeNull();
+  });
+
   it("moves focus between cards with the arrow keys", () => {
     renderPicker();
     const first = screen.getByRole("button", { name: "pickCard El Loco" });

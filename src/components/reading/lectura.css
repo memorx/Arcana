@@ -102,6 +102,13 @@
 }
 @media (min-width: 1024px) {
   .tirada--anio { --tirada-cols: 6; --tirada-carta: 150px; }
+  /* Cruz Celta en escritorio: es el momento firma, cartas de 176 px y báculo a 32 px (la figura mide ≈ 860 px). */
+  .tirada--celta {
+    grid-template-columns:
+      repeat(3, minmax(0, calc(176px * var(--tirada-escala))))
+      minmax(0, calc(32px * var(--tirada-escala)))
+      minmax(0, calc(176px * var(--tirada-escala)));
+  }
 }
 
 /* Versión de consulta (la interpretación y la lectura guardada): la misma figura, más chica. */

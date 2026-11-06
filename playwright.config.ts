@@ -24,6 +24,8 @@ const BASE_URL = `http://localhost:${process.env.ARCANA_E2E_WEB_PORT || "3000"}`
 
 /** Only the responsive pass runs at every width; flows and the older specs run at 1440. */
 const RESPONSIVO = /responsivo\.spec\.ts$/;
+/** The functional specs (everything but the responsive pass): they also run in desktop WebKit. */
+const FUNCIONALES = /(^|[\\/])(auth|home|legal|reading|smoke|red-desbordes)\.spec\.ts$|[\\/]flujos[\\/][^\\/]+\.spec\.ts$/;
 
 const escritorio = (width: number, height: number) => ({
   ...devices["Desktop Chrome"],
@@ -70,6 +72,13 @@ export default defineConfig({
     { name: "chromium-820", use: tactil(820, 1180), testMatch: RESPONSIVO, grepInvert: /@en/ },
     { name: "chromium-390", use: tactil(390, 844), testMatch: RESPONSIVO },
     { name: "chromium-360", use: tactil(360, 740), testMatch: RESPONSIVO, grepInvert: /@en/ },
+    // Safari engine at desktop width for the functional specs and flows (Firefox is not installed here).
+    {
+      name: "webkit-1440",
+      use: { ...devices["Desktop Safari"], viewport: { width: 1440, height: 900 } },
+      testMatch: FUNCIONALES,
+      grepInvert: /@en/,
+    },
     // Safari engine at phone width, public routes only (§5.2).
     {
       name: "webkit-390",

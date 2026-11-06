@@ -106,7 +106,7 @@ export function LanguageSelector({ variant = "menu", className }: LanguageSelect
         onClick={() => setIsOpen(!isOpen)}
         disabled={cambiando}
         className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 font-dato text-[0.6875rem] tracking-[0.1em] uppercase transition-colors hover:bg-current/10 disabled:opacity-50"
-        aria-label="Change language"
+        aria-label={t("language")}
         aria-haspopup="true"
         aria-expanded={isOpen}
       >

@@ -19,9 +19,51 @@ jest.mock("next-intl", () => ({
       .split(".")
       .reduce<unknown>((o, k) => (o == null ? undefined : (o as Record<string, unknown>)[k]), mockMensajes[mockLocale]);
     if (typeof msg !== "string") throw new Error(`falta ${ns}.${key}`);
-    return msg.replace(/\{(\w+)\}/g, (_, k: string) => String(values?.[k] ?? `{${k}}`));
+    return mockIcu(msg, values, mockLocale);
   },
 }));
+
+/** ICU mínimo para las pruebas: `{x}` y `{x, plural, =N {…} one {…} other {…}}` con `#`. */
+function mockIcu(msg: string, values: Record<string, unknown> = {}, locale = "es"): string {
+  let out = "";
+  for (let i = 0; i < msg.length; i++) {
+    if (msg[i] !== "{") {
+      out += msg[i];
+      continue;
+    }
+    let fin = i;
+    let nivel = 0;
+    do {
+      if (msg[fin] === "{") nivel++;
+      else if (msg[fin] === "}") nivel--;
+      fin++;
+    } while (nivel > 0 && fin < msg.length);
+    const [nombre, tipo, ...resto] = msg.slice(i + 1, fin - 1).split(",");
+    i = fin - 1;
+    const valor = values[nombre.trim()];
+    if (tipo?.trim() !== "plural") {
+      out += String(valor ?? `{${nombre.trim()}}`);
+      continue;
+    }
+    const texto = resto.join(",");
+    const opciones = new Map<string, string>();
+    for (let p = 0; p < texto.length; ) {
+      const m = /^\s*(=\d+|\w+)\s*\{/.exec(texto.slice(p));
+      if (!m) break;
+      let q = p + m[0].length;
+      for (let n = 1; n > 0; q++) {
+        if (texto[q] === "{") n++;
+        else if (texto[q] === "}") n--;
+      }
+      opciones.set(m[1], texto.slice(p + m[0].length, q - 1));
+      p = q;
+    }
+    const num = Number(valor);
+    const rama = opciones.get(`=${num}`) ?? opciones.get(new Intl.PluralRules(locale).select(num)) ?? opciones.get("other") ?? "";
+    out += mockIcu(rama.replace(/#/g, String(num)), values, locale);
+  }
+  return out;
+}
 
 function responder(datos: unknown) {
   global.fetch = jest.fn().mockResolvedValue({ json: () => Promise.resolve(datos) }) as unknown as typeof fetch;
@@ -47,7 +89,7 @@ const logro = (o: Partial<Record<string, unknown>>) => ({
 const LOGROS = {
   achievements: [
     logro({ id: "a1", nameEs: "Primera Lectura", requirement: 1, isUnlocked: true, unlockedAt: "2026-11-02T12:00:00Z", progress: 1 }),
-    logro({ id: "a2", nameEs: "Buscador de Respuestas", requirement: 10, progress: 3, creditReward: 2 }),
+    logro({ id: "a2", nameEs: "Buscador de Respuestas", requirement: 10, progress: 3, creditReward: 5 }),
     logro({ id: "a3", nameEs: "Constante", category: "streak", requirement: 7, progress: 0 }),
     logro({ id: "a4", nameEs: "Primer Oro", category: "golden", requirement: 1, isUnlocked: true, unlockedAt: "2026-11-03T12:00:00Z", progress: 1 }),
   ],
@@ -94,7 +136,9 @@ describe("/achievements", () => {
     expect(barra).toHaveAttribute("aria-valuenow", "3");
     expect(barra).toHaveAttribute("aria-valuemax", "10");
     expect(barra).toHaveAttribute("aria-valuetext", "3 de 10");
-    expect(within(enCurso).getByText("+2 créditos")).toBeInTheDocument();
+    // Plural ICU: 1 → «+1 crédito», 5 → «+5 créditos».
+    expect(within(enCurso).getByText("+5 créditos")).toBeInTheDocument();
+    expect(within(logrado).getByText("+1 crédito")).toBeInTheDocument();
 
     const bloqueado = fila("Constante");
     expect(bloqueado).toHaveAttribute("data-estado", "bloqueado");
@@ -107,7 +151,7 @@ describe("/achievements", () => {
   it("las cartas doradas también tienen su archivo (las cuenta el total)", async () => {
     responder(LOGROS);
     render(<AchievementsPage />);
-    expect(await screen.findByRole("heading", { level: 2, name: "Cartas Doradas" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: /^cartas doradas$/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Primer Oro" })).toBeInTheDocument();
   });
 });
@@ -131,8 +175,8 @@ const reto = (o: Partial<Record<string, unknown>>) => ({
 
 const RETOS = {
   weekly: [
-    reto({ id: "r1", nameEs: "Explorador Semanal", target: 5, progress: 5, completed: true }),
-    reto({ id: "r2", nameEs: "Variedad", target: 3, progress: 2 }),
+    reto({ id: "r1", nameEs: "Explorador Semanal", target: 5, progress: 5, completed: true, creditReward: 5 }),
+    reto({ id: "r2", nameEs: "Variedad", target: 3, progress: 2, creditReward: 1 }),
   ],
   monthly: [reto({ id: "r3", nameEs: "Dedicado", type: "monthly", target: 20, progress: 0 })],
   stats: { weekly: { completed: 1, total: 2 }, monthly: { completed: 0, total: 1 } },
@@ -183,13 +227,15 @@ describe("/challenges", () => {
     expect(lleno).toHaveAttribute("aria-valuenow", "5");
     expect(lleno).toHaveAttribute("aria-valuemax", "5");
     expect(lleno).toHaveAttribute("data-logrado", "true");
+    expect(within(cumplido).getByText("+5 créditos")).toBeInTheDocument();
 
     const enCurso = screen.getByRole("heading", { level: 2, name: "Variedad" }).closest("li")!;
-    expect(within(enCurso).getByText("En Progreso")).toBeInTheDocument();
+    expect(within(enCurso).getByText(/^en progreso$/i)).toBeInTheDocument();
     const barra = within(enCurso).getByRole("progressbar", { name: "Variedad" });
     expect(barra).toHaveAttribute("aria-valuenow", "2");
     expect(barra).toHaveAttribute("aria-valuetext", "2 de 3");
     expect(barra).not.toHaveAttribute("data-logrado");
+    expect(within(enCurso).getByText("+1 crédito")).toBeInTheDocument();
 
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(container.innerHTML).not.toMatch(/(slate|purple|pink|emerald|teal)-\d{2,3}|text-white/);

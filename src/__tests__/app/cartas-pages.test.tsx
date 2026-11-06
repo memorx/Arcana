@@ -7,9 +7,10 @@ import { render, screen, within, fireEvent } from "@testing-library/react";
 import CardsPage from "@/app/(main)/cards/page";
 import CardDetailPage, { generateMetadata } from "@/app/(main)/cards/[slug]/page";
 import { CARTAS } from "@/lib/cartas";
-import { numeroRomano } from "@/app/(main)/cards/indice";
+import { numeralDeCarta, numeroRomano } from "@/app/(main)/cards/indice";
 
 let mockLocale: "es" | "en" = "es";
+let mockUrl = "";
 const mockMensajes: Record<string, unknown> = {
   es: jest.requireActual("../../../messages/es.json"),
   en: jest.requireActual("../../../messages/en.json"),
@@ -41,7 +42,8 @@ jest.mock("next/navigation", () => ({
   }),
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), refresh: jest.fn(), prefetch: jest.fn() }),
   usePathname: () => "/cards",
-  useSearchParams: () => new URLSearchParams(),
+  // The URL the client sees (Next keeps it in sync with history.replaceState and navigations).
+  useSearchParams: () => new URLSearchParams(mockUrl),
 }));
 
 import { prisma } from "@/lib/prisma";
@@ -67,12 +69,24 @@ const BARAJA = CARTAS.map((c, i) => {
   };
 });
 
-const pagina = async (searchParams: Record<string, string> = {}) =>
-  render(await CardsPage({ searchParams: Promise.resolve(searchParams) }));
+const pagina = async (searchParams: Record<string, string> = {}) => {
+  mockUrl = new URLSearchParams(searchParams).toString();
+  return render(await CardsPage({ searchParams: Promise.resolve(searchParams) }));
+};
 
 describe("numeroRomano", () => {
   it("0 se queda 0 (El Loco); 17 → XVII; 14 → XIV; 21 → XXI", () => {
     expect([0, 1, 4, 9, 14, 17, 21].map(numeroRomano)).toEqual(["0", "I", "IV", "IX", "XIV", "XVII", "XXI"]);
+  });
+});
+
+describe("numeralDeCarta", () => {
+  it("Mayores y del As al Diez con su romano; las cortes (11–14 de los Menores) sin número", () => {
+    expect(numeralDeCarta({ arcana: "MAJOR", number: 14 })).toBe("XIV");
+    expect(numeralDeCarta({ arcana: "MAJOR", number: 0 })).toBe("0");
+    expect(numeralDeCarta({ arcana: "MINOR", number: 1 })).toBe("I");
+    expect(numeralDeCarta({ arcana: "MINOR", number: 10 })).toBe("X");
+    for (const n of [11, 12, 13, 14]) expect(numeralDeCarta({ arcana: "MINOR", number: n })).toBeNull();
   });
 });
 
@@ -91,7 +105,7 @@ describe("/cards", () => {
       expect.objectContaining({ orderBy: [{ arcana: "asc" }, { suit: "asc" }, { number: "asc" }] })
     );
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Explora el Tarot");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/^explora el tarot$/i);
     for (const nombre of ["Arcanos Mayores", "Bastos", "Copas", "Espadas", "Oros"]) {
       expect(screen.getByRole("heading", { level: 2, name: nombre })).toBeInTheDocument();
     }
@@ -103,7 +117,7 @@ describe("/cards", () => {
     for (const img of container.querySelectorAll("section li img")) {
       expect(img.getAttribute("src")).toMatch(/^\/cartas\/[a-z0-9-]+-tinta\.webp$/);
     }
-    expect(screen.getByRole("link", { name: "Comenzar Lectura" })).toHaveAttribute("href", "/reading/new");
+    expect(screen.getByRole("link", { name: /^comenzar lectura$/i })).toHaveAttribute("href", "/reading/new");
   });
 
   it("los filtros son enlaces (sirven sin JS) con aria-current; ?palo=cups pinta sólo Copas", async () => {
@@ -153,6 +167,50 @@ describe("/cards", () => {
     expect(window.history.replaceState).toHaveBeenLastCalledWith(null, "", "/cards");
   });
 
+  it("los filtros siguen a la URL: tras «Copas» y una búsqueda, un enlace a /cards limpio vuelve a las 78", async () => {
+    const vista = await pagina();
+    const nav = screen.getByRole("navigation", { name: "Filtrar por palo" });
+    const otraVez = async () => vista.rerender(await CardsPage({ searchParams: Promise.resolve({}) }));
+
+    // «Copas» con JS: filtra y Next le pasa la URL nueva (replaceState) a useSearchParams.
+    fireEvent.click(within(nav).getByRole("link", { name: "Copas" }));
+    mockUrl = "palo=cups";
+    await otraVez();
+    expect(within(nav).getByRole("link", { name: "Copas" })).toHaveAttribute("aria-current", "page");
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(14);
+
+    fireEvent.change(screen.getByLabelText("Buscar una carta"), { target: { value: "two of" } });
+    fireEvent.submit(screen.getByRole("search"));
+    mockUrl = "palo=cups&q=two+of";
+    await otraVez();
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(1);
+
+    // El enlace «Cartas» del pie lleva a /cards: el servidor pinta lo mismo (misma key) y la URL ya no tiene filtros.
+    mockUrl = "";
+    await otraVez();
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(78);
+    expect(within(nav).getByRole("link", { name: "Todas" })).toHaveAttribute("aria-current", "page");
+    expect(within(nav).getByRole("link", { name: "Copas" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByLabelText("Buscar una carta")).toHaveValue("");
+
+    // «Atrás» a ?palo=swords: los filtros la siguen.
+    mockUrl = "palo=swords";
+    await otraVez();
+    expect(within(nav).getByRole("link", { name: "Espadas" })).toHaveAttribute("aria-current", "page");
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(14);
+  });
+
+  it("las cortes no llevan número romano: el Rey de Bastos no se lleva el XIV de La Templanza", async () => {
+    await pagina();
+    const numeral = (nombre: string) =>
+      screen.getByRole("link", { name: nombre }).querySelector("span[aria-hidden='true'].font-dato")?.textContent;
+    expect(numeral("es Temperance")).toBe("XIV");
+    expect(numeral("es Ten of Wands")).toBe("X");
+    for (const corte of ["es Page of Wands", "es Knight of Cups", "es Queen of Swords", "es King of Wands"]) {
+      expect(numeral(corte)).toBe(" ");
+    }
+  });
+
   it("en inglés, los nombres en inglés", async () => {
     mockLocale = "en";
     await pagina({ palo: "major" });
@@ -200,17 +258,17 @@ describe("/cards/[slug]", () => {
     expect(img).toHaveAttribute("src", "/cartas/rws-tarot-17-star-color.webp");
     expect(container.innerHTML).not.toMatch(/wikimedia/);
 
-    const claves = screen.getByRole("heading", { level: 2, name: "Palabras Clave" }).closest("section")!;
+    const claves = screen.getByRole("heading", { level: 2, name: /^palabras clave$/i }).closest("section")!;
     expect(within(claves).getAllByRole("listitem").map((li) => li.textContent)).toEqual(ESTRELLA.keywords);
 
-    expect(screen.getByRole("heading", { level: 2, name: "Significado al Derecho" }).closest("section")).toHaveTextContent(
+    expect(screen.getByRole("heading", { level: 2, name: /^significado al derecho$/i }).closest("section")).toHaveTextContent(
       "Esperanza tras la tormenta."
     );
-    expect(screen.getByRole("heading", { level: 2, name: "Significado Invertido" }).closest("section")).toHaveTextContent(
+    expect(screen.getByRole("heading", { level: 2, name: /^significado invertido$/i }).closest("section")).toHaveTextContent(
       "Desaliento pasajero."
     );
     expect(screen.getByRole("link", { name: /Volver a las cartas/ })).toHaveAttribute("href", "/cards");
-    expect(screen.getByRole("link", { name: "Comenzar Lectura" })).toHaveAttribute("href", "/reading/new");
+    expect(screen.getByRole("link", { name: /^comenzar lectura$/i })).toHaveAttribute("href", "/reading/new");
     expect(container.innerHTML).not.toMatch(/(slate|purple|amber|red)-\d{2,3}|text-white|prose/);
   });
 
@@ -220,6 +278,23 @@ describe("/cards/[slug]", () => {
     render(await CardDetailPage(params("the-star")));
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("The Star");
     expect(screen.getByText("Hope after the storm.")).toBeInTheDocument();
+  });
+
+  it("la ficha de una corte (Rey de Bastos, 14) no pinta número romano", async () => {
+    findUnique.mockResolvedValue({
+      ...ESTRELLA,
+      id: "c35",
+      name: "King of Wands",
+      nameEs: "Rey de Bastos",
+      slug: "king-of-wands",
+      arcana: "MINOR",
+      suit: "WANDS",
+      number: 14,
+    });
+    const { container } = render(await CardDetailPage(params("king-of-wands")));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Rey de Bastos");
+    expect(screen.queryByText("XIV")).toBeNull();
+    expect(container.querySelector("header p.text-rosa")).toBeNull();
   });
 
   it("una carta que no existe → notFound()", async () => {

@@ -74,7 +74,7 @@ export function AchievementUnlockedModal({
                   {getLocalizedDescription(achievement)}
                 </p>
                 <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-acento uppercase tabular-nums">
-                  +{achievement.creditReward} {t("credits")}
+                  {t("reward", { count: achievement.creditReward })}
                 </p>
               </div>
             </li>

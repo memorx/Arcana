@@ -96,8 +96,8 @@ describe("Profile setup", () => {
     // The birth time help is visible text tied to the field, not a hover tooltip.
     expect(screen.getByLabelText("birthTime")).toHaveAccessibleDescription("birthTimeTooltip");
 
-    const general = screen.getByRole("button", { name: "Guía General" });
-    const amor = screen.getByRole("button", { name: "Amor y Relaciones" });
+    const general = screen.getByRole("button", { name: "focusAreas.general" });
+    const amor = screen.getByRole("button", { name: "focusAreas.love" });
     expect(general).toHaveAttribute("aria-pressed", "true");
     expect(amor).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(amor);

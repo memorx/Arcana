@@ -65,7 +65,7 @@ export function ChallengeCompletedModal({
               <div className="grid min-w-0 gap-1">
                 <h3 className="text-[1.15rem] leading-[1.15] text-letra">{getLocalizedName(challenge)}</h3>
                 <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-acento uppercase tabular-nums">
-                  +{challenge.creditReward} {t("credits")}
+                  {t("reward", { count: challenge.creditReward })}
                 </p>
               </div>
             </li>

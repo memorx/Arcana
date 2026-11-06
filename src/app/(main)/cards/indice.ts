@@ -47,6 +47,16 @@ export function numeroRomano(n: number): string {
   return salida;
 }
 
+/**
+ * El número impreso de una carta: romano en los Mayores y del As al Diez. Las cortes (Sota, Caballo, Reina y Rey;
+ * 11–14 en la base) no llevan número en el Rider-Waite: devuelve null, para no darle al Rey de Bastos el XIV de
+ * La Templanza.
+ */
+export function numeralDeCarta(carta: { arcana: string; number: number }): string | null {
+  if (carta.arcana === "MINOR" && carta.number > 10) return null;
+  return numeroRomano(carta.number);
+}
+
 /** Agrupa en el orden de PALOS conservando el orden de cada grupo; omite los palos vacíos. */
 export function agruparPorPalo<T extends { arcana: string; suit: string | null }>(
   cartas: readonly T[]

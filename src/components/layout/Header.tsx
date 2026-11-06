@@ -188,6 +188,24 @@ export function Header() {
   const inicial =
     session?.user?.name?.[0]?.toUpperCase() || session?.user?.email?.[0]?.toUpperCase() || "?";
 
+  // Sello de la cuenta: la inicial y el nivel (botón del menú de escritorio y bloque de cuenta del menú móvil).
+  const nivel = LEVELS[userLevel - 1] ?? LEVELS[0];
+  const etiquetaNivel = `${tLevels("level")} ${nivel.level}: ${tLevels(`names.${nivel.name.toLowerCase()}`)}`;
+  const sello = (
+    <>
+      <span className="flex size-9 items-center justify-center rounded-full border border-papel/40 font-titulo text-base text-papel">
+        {inicial}
+      </span>
+      {/* Nivel */}
+      <span
+        className="absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-rosa-luz font-dato text-[9px] leading-none text-tinta"
+        title={etiquetaNivel}
+      >
+        {nivel.level}
+      </span>
+    </>
+  );
+
   return (
     <header className="suelo-tinta sticky top-0 z-40 w-full border-b border-papel/12 pt-[env(safe-area-inset-top,0px)]">
       <div className="mx-auto flex max-w-escena items-center gap-4 px-gutter py-2 lg:gap-8 lg:py-2.5">
@@ -250,18 +268,7 @@ export function Header() {
                   aria-expanded={isMenuOpen}
                   aria-haspopup="true"
                 >
-                  <span className="relative">
-                    <span className="flex size-9 items-center justify-center rounded-full border border-papel/40 font-titulo text-base text-papel">
-                      {inicial}
-                    </span>
-                    {/* Nivel */}
-                    <span
-                      className="absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-rosa-luz font-dato text-[9px] leading-none text-tinta"
-                      title={`${tLevels("level")} ${userLevel}: ${LEVELS[userLevel - 1]?.name || ""}`}
-                    >
-                      {userLevel}
-                    </span>
-                  </span>
+                  <span className="relative">{sello}</span>
                   <svg
                     aria-hidden="true"
                     className={cn("h-4 w-4 text-niebla transition-transform", isMenuOpen && "rotate-180")}
@@ -440,13 +447,27 @@ export function Header() {
             <div className="mt-auto grid gap-5 border-t border-papel/12 px-gutter pt-6 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
               {autenticado && session?.user && (
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <Etiqueta punto={false} className="mb-0.5">
-                      {t("account")}
-                    </Etiqueta>
-                    <p className="truncate font-titulo text-lg leading-tight">
-                      {session.user.name || tDashboard("welcomeDefault")}
-                    </p>
+                  <div className="flex min-w-0 items-center gap-3" data-cuenta>
+                    {/* El mismo sello del menú de escritorio: inicial y nivel (con su nombre para el lector). */}
+                    <span role="img" aria-label={etiquetaNivel} className="relative shrink-0">
+                      {sello}
+                    </span>
+                    <div className="min-w-0">
+                      <Etiqueta punto={false} className="mb-0.5">
+                        {t("account")}
+                      </Etiqueta>
+                      {/* Sin nombre, el correo basta: «Tu cuenta» ya lo dice la etiqueta. */}
+                      {(session.user.name || !session.user.email) && (
+                        <p className="truncate font-titulo text-lg leading-tight">
+                          {session.user.name || tDashboard("welcomeDefault")}
+                        </p>
+                      )}
+                      {session.user.email && (
+                        <p className="truncate font-dato text-[0.6875rem] tracking-[0.04em] text-niebla">
+                          {session.user.email}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <Link
                     href="/credits"

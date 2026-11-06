@@ -312,7 +312,7 @@ describe("Portada · lo que ya no va", () => {
 
   it("conserva las preguntas frecuentes (SEO) como <details> nativos", async () => {
     await pintar();
-    const escena = screen.getByRole("region", { name: "Preguntas Frecuentes" });
+    const escena = screen.getByRole("region", { name: /^preguntas frecuentes$/i });
     expect(escena.querySelectorAll("details")).toHaveLength(3);
     expect(within(escena).getAllByRole("heading", { level: 3 })).toHaveLength(3);
   });
