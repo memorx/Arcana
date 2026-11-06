@@ -57,75 +57,6 @@
     "language": "Idioma"
   },
   "landing": {
-    "readingCounter": "lecturas realizadas",
-    "dailyCard": {
-      "title": "Tu Carta del Día",
-      "cta": "Regístrate para una lectura completa",
-      "ctaAuthenticated": "Obtener lectura completa"
-    },
-    "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "t1": {
-        "name": "María G.",
-        "text": "Las lecturas son sorprendentemente precisas. Me ayudó a tomar una decisión importante."
-      },
-      "t2": {
-        "name": "Carlos R.",
-        "text": "Uso Arcana todas las mañanas. Mi carta del día me da perspectiva para el día."
-      },
-      "t3": {
-        "name": "Ana L.",
-        "text": "Escéptica al principio, pero las interpretaciones son muy profundas y personalizadas."
-      }
-    },
-    "hero": {
-      "title": "Descubre tu destino",
-      "subtitle": "Las cartas del tarot guardan secretos ancestrales. Deja que revelen los mensajes que el universo tiene para ti.",
-      "cta": "Comenzar Lectura",
-      "ctaSecondary": "Crear Cuenta Gratis",
-      "ctaAuthenticated": "Ir a Mi Espacio",
-      "trustBadge": "3 lecturas gratuitas al registrarte - Sin tarjeta de crédito"
-    },
-    "howItWorks": {
-      "title": "¿Cómo funciona?",
-      "subtitle": "Tu lectura de tarot en cuatro simples pasos",
-      "step1": {
-        "title": "Elige tu tirada",
-        "description": "Selecciona entre 4 tipos de tiradas según la profundidad que busques."
-      },
-      "step2": {
-        "title": "Enfoca tu intención",
-        "description": "Formula tu pregunta o situación con claridad y concentración."
-      },
-      "step3": {
-        "title": "Revela las cartas",
-        "description": "Las cartas se seleccionan y revelan una a una para ti."
-      },
-      "step4": {
-        "title": "Recibe tu guía",
-        "description": "Obtén una interpretación profunda que conecta las cartas con tu pregunta."
-      }
-    },
-    "features": {
-      "title": "Por qué elegir Arcana",
-      "cards": {
-        "title": "78 Cartas Completas",
-        "description": "Mazo tradicional Rider-Waite con interpretaciones profundas en español."
-      },
-      "spreads": {
-        "title": "Múltiples Tiradas",
-        "description": "Desde la clásica de 3 cartas hasta la poderosa Cruz Celta de 10."
-      },
-      "ai": {
-        "title": "IA Interpretativa",
-        "description": "Lecturas personalizadas que conectan las cartas con tu pregunta."
-      }
-    },
-    "spreadsSection": {
-      "title": "Tipos de Tirada",
-      "subtitle": "Desde consultas rápidas hasta análisis profundos, tenemos la tirada perfecta para cada pregunta.",
-      "viewAll": "Ver todas las tiradas"
-    },
     "faq": {
       "title": "Preguntas Frecuentes",
       "subtitle": "Todo lo que necesitas saber sobre las lecturas de tarot",
@@ -135,25 +66,6 @@
       "a2": "Nuestra IA ha sido entrenada con conocimiento profundo del simbolismo del tarot tradicional. Analiza la combinación específica de cartas que aparecen en tu lectura, sus posiciones y orientaciones, para ofrecerte una interpretación coherente y personalizada que conecta con tu pregunta original.",
       "q3": "¿Mis lecturas son privadas?",
       "a3": "Absolutamente. Tus lecturas son completamente privadas y solo tú puedes acceder a ellas. No compartimos tu información con terceros y puedes eliminar tu historial en cualquier momento. Tu viaje espiritual es solo tuyo."
-    },
-    "cta": {
-      "title": "Comienza tu viaje espiritual",
-      "subtitle": "Regístrate ahora y recibe 3 lecturas gratuitas. Descubre lo que las cartas tienen preparado para ti.",
-      "button": "Crear Cuenta Gratis",
-      "titleAuthenticated": "¿Listo para tu próxima lectura?",
-      "subtitleAuthenticated": "Las cartas esperan revelarte nuevos mensajes.",
-      "buttonAuthenticated": "Comenzar Nueva Lectura"
-    },
-    "dailyOracle": {
-      "badge": "Nuevo",
-      "title": "Tu Carta del Día, Cada Mañana",
-      "description": "Comienza cada día con guía cósmica. Recibe una carta de tarot personalizada en tu correo, interpretada específicamente para tu signo zodiacal y enfoque de vida.",
-      "feature1": "Personalizada a tu signo zodiacal",
-      "feature2": "1 lectura completa gratis al mes",
-      "feature3": "Cancela cuando quieras",
-      "cta": "Comenzar Oráculo Diario",
-      "emailPreview": "Tu carta del día te espera...",
-      "emailTime": "Entregada a tu hora preferida"
     },
     "portada": {
       "grabados": {
