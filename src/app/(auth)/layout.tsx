@@ -1,33 +1,36 @@
 import Link from "next/link";
+import { HoraDelDia } from "@/components/tinta/HoraDelDia";
 
+/**
+ * Entrar y registrarse: franja de tinta con la marca y la hora del día, y el
+ * formulario sobre papel, centrado. Sin adornos (nada de estrellas ni lunas).
+ */
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Simple header */}
-      <header className="p-4">
-        <Link href="/" className="inline-block">
-          <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-amber-400 bg-clip-text text-transparent">
+    <div className="flex min-h-screen flex-col">
+      <header className="suelo-tinta border-b border-papel/12 pt-[env(safe-area-inset-top,0px)]">
+        <div className="mx-auto flex max-w-escena items-center gap-6 px-gutter py-2 lg:py-2.5">
+          <Link
+            href="/"
+            className="inline-flex min-h-11 shrink-0 items-center font-titulo text-[1.45rem] leading-none tracking-[0.01em] text-papel"
+          >
             Arcana
-          </span>
-        </Link>
+          </Link>
+          <HoraDelDia variante="larga" className="ml-auto hidden text-right text-niebla lg:block" />
+          <HoraDelDia variante="corta" className="ml-auto min-w-0 text-right text-[0.625rem] text-niebla lg:hidden" />
+        </div>
       </header>
 
-      {/* Main content */}
-      <main id="main-content" className="flex-1 flex items-center justify-center p-4">
+      <main
+        id="main-content"
+        className="flex flex-1 items-center justify-center px-gutter py-[clamp(32px,8vh,96px)]"
+      >
         {children}
       </main>
-
-      {/* Decorative elements */}
-      <div className="fixed top-1/4 left-10 text-6xl text-purple-500/10 pointer-events-none">
-        &#9790;
-      </div>
-      <div className="fixed bottom-1/4 right-10 text-6xl text-amber-500/10 pointer-events-none">
-        &#9733;
-      </div>
     </div>
   );
 }
