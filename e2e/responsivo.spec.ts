@@ -287,6 +287,8 @@ for (const r of RUTAS) {
           // The content is in the server HTML (how many h1 is the "encabezados" check's business)
           await expect(page.getByRole("heading").first(), "headings rendered without JS").toBeVisible();
           expect.soft(await textoInvisible(page), "text that stays invisible without JS").toEqual([]);
+          // Measure the layout at rest, as "maqueta" does: mid font swap the fallback face is wider
+          await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
           const m = await medirMaqueta(page);
           expect.soft(m.scrollHorizontal, "horizontal scroll without JS (px)").toBe(0);
           expect.soft(m.fueraDePantalla, "elements off screen without JS").toEqual([]);
