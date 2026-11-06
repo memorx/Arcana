@@ -53,10 +53,12 @@ test.describe("Spread Selection Page", () => {
 
 test.describe("Shared Readings", () => {
   test("should show 404 for non-existent shared reading", async ({ page }) => {
-    await page.goto("/share/non-existent-id");
+    const response = await page.goto("/share/non-existent-id");
 
-    // Should show not found (today's 404 reads "404 · Esta página no existe en el mazo")
-    await expect(page.locator("body")).toContainText(/not found|no encontrad|no existe|404/i);
+    // A real 404 (not a 200 page that happens to say "404"), with the "lost card" page's h1
+    // ("Esta página no existe en el mazo..." / "This page doesn't exist in the deck...").
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/no existe|doesn't exist/i);
   });
 
   test("public shared reading page should be accessible", async ({ page }) => {
