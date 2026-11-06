@@ -203,6 +203,19 @@ describe("Header in two inks (F1-A)", () => {
     expect(within(menu).getByRole("group", { name: "language" })).toBeInTheDocument();
   });
 
+  it("a user without a name sees dashboard.welcomeDefault, which exists in es and en («Tu cuenta» / «Your account»)", () => {
+    mockUseSession.mockReturnValue({ ...ANA, data: { user: { ...ANA.data.user, name: null } } });
+    render(<Header />);
+    fireEvent.click(screen.getByRole("button", { name: "openMenu" }));
+    expect(screen.getByText("welcomeDefault")).toBeInTheDocument();
+    expect(screen.getByText("ana@example.com")).toBeInTheDocument();
+
+    const es = jest.requireActual("../../../messages/es.json");
+    const en = jest.requireActual("../../../messages/en.json");
+    expect(es.dashboard.welcomeDefault).toBe("Tu cuenta");
+    expect(en.dashboard.welcomeDefault).toBe("Your account");
+  });
+
   it("Esc closes the desktop user menu and returns focus to the avatar button", async () => {
     const user = userEvent.setup();
     mockUseSession.mockReturnValue(ANA);

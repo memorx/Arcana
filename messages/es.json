@@ -197,6 +197,7 @@
   },
   "dashboard": {
     "welcome": "Hola, {name}",
+    "welcomeDefault": "Tu cuenta",
     "welcomeSubtitle": "Bienvenido a tu espacio de lecturas",
     "streak": {
       "days": "días seguidos",
