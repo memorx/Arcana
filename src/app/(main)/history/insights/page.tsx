@@ -6,8 +6,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMonthStreak, getUserInsights, INSIGHTS_WINDOW_DAYS } from "@/lib/insights";
 import { cn } from "@/lib/utils";
+import { buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
-import { EnlaceBoton } from "@/components/dashboard/EnlaceBoton";
 import { Glifo } from "@/components/dashboard/Glifos";
 import { RETICULA, ROTULO } from "@/components/dashboard/estilos";
 import { RecurringCards } from "@/components/insights/RecurringCards";
@@ -103,9 +103,9 @@ export default async function InsightsPage() {
             <p className="mt-2 max-w-[52ch] font-lectura text-lg text-letra-suave">
               {t("empty.body", { count: insights.totalReadings, required: MIN_READINGS })}
             </p>
-            <EnlaceBoton href="/reading/new" className="mt-6">
+            <Link href="/reading/new" className={buttonClasses({ className: "mt-6" })}>
               {t("empty.cta")}
-            </EnlaceBoton>
+            </Link>
           </div>
         </section>
       </div>

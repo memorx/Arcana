@@ -4,8 +4,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui";
-import { EnlaceBoton } from "@/components/dashboard/EnlaceBoton";
+import { Badge, buttonClasses } from "@/components/ui";
 import { Escena } from "@/components/tinta/Escena";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { Pincel } from "@/components/tinta/Pincel";
@@ -135,9 +134,9 @@ export default async function DashboardPage() {
           <p className="max-w-[46ch] font-lectura text-[1.0625rem] leading-relaxed text-letra">{t("welcomeSubtitle")}</p>
           <HoraDelDia variante="larga" className="max-w-[60ch] text-letra-suave" />
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
-            <EnlaceBoton href="/reading/new" prefetch={true} size="lg">
+            <Link href="/reading/new" prefetch={true} className={buttonClasses({ size: "lg" })}>
               {t("startReading")} <span aria-hidden="true" className="font-lectura text-[1.1em] tracking-normal">→</span>
-            </EnlaceBoton>
+            </Link>
             <p className="max-w-[40ch] font-dato text-[0.6875rem] leading-relaxed tracking-[0.06em] text-letra-suave">
               {mesaConHistoria ? t("mesa.notaRecientes") : t("mesa.notaFijas")}
             </p>
@@ -169,9 +168,9 @@ export default async function DashboardPage() {
             </h2>
             <p className="mt-1 font-lectura text-letra-suave">{t("completeProfileDesc")}</p>
           </div>
-          <EnlaceBoton href="/profile/setup" variant="linea" size="sm" className="self-start sm:self-auto">
+          <Link href="/profile/setup" className={buttonClasses({ variant: "linea", size: "sm", className: "self-start sm:self-auto" })}>
             {t("setupProfile")}
-          </EnlaceBoton>
+          </Link>
         </section>
       )}
 
@@ -204,9 +203,9 @@ export default async function DashboardPage() {
               </span>
               <div>
                 <p className="font-lectura text-letra-suave">{t("noReadings")}</p>
-                <EnlaceBoton href="/reading/new" variant="linea" size="sm" className="mt-3">
+                <Link href="/reading/new" className={buttonClasses({ variant: "linea", size: "sm", className: "mt-3" })}>
                   {t("firstReading")}
-                </EnlaceBoton>
+                </Link>
               </div>
             </div>
           ) : (
@@ -289,13 +288,13 @@ export default async function DashboardPage() {
           </div>
           <p className="mt-2 max-w-[52ch] font-lectura text-letra-suave">{t("dailyOracleDesc")}</p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <EnlaceBoton href="/daily" prefetch={true} variant={isSubscribed ? "primario" : "linea"} size="sm">
+            <Link href="/daily" prefetch={true} className={buttonClasses({ variant: isSubscribed ? "primario" : "linea", size: "sm" })}>
               {isSubscribed ? t("todayCardDone") : t("viewDaily")}
-            </EnlaceBoton>
+            </Link>
             {!isSubscribed && (
-              <EnlaceBoton href="/subscribe" prefetch={true} size="sm">
+              <Link href="/subscribe" prefetch={true} className={buttonClasses({ size: "sm" })}>
                 {t("subscribeCta")}
-              </EnlaceBoton>
+              </Link>
             )}
           </div>
         </section>
@@ -389,9 +388,9 @@ export default async function DashboardPage() {
             <p className="mt-1 font-lectura text-letra-suave">{t("referralDesc")}</p>
           </div>
         </div>
-        <EnlaceBoton href="/referral" variant="linea" size="sm" className="self-start sm:shrink-0 sm:self-auto">
+        <Link href="/referral" className={buttonClasses({ variant: "linea", size: "sm", className: "self-start sm:shrink-0 sm:self-auto" })}>
           {t("inviteFriends")}
-        </EnlaceBoton>
+        </Link>
       </section>
     </div>
   );

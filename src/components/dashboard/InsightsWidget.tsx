@@ -1,9 +1,9 @@
 import Link from "next/link";
+import { buttonClasses } from "@/components/ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getCardOfTheMonth } from "@/lib/insights";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
-import { EnlaceBoton } from "./EnlaceBoton";
 import { ENLACE_DATO, TITULO_CELDA } from "./estilos";
 
 interface InsightsWidgetProps {
@@ -36,9 +36,9 @@ export async function InsightsWidget({ userId }: InsightsWidgetProps) {
       <div className="flex h-full flex-col gap-3">
         <h2 className={TITULO_CELDA}>{t("emptyTitle")}</h2>
         <p className="font-lectura text-[0.9375rem] leading-snug text-letra-suave">{t("emptyBody")}</p>
-        <EnlaceBoton href="/reading/new" variant="linea" size="sm" className="mt-auto self-start">
+        <Link href="/reading/new" className={buttonClasses({ variant: "linea", size: "sm", className: "mt-auto self-start" })}>
           {t("emptyCta")}
-        </EnlaceBoton>
+        </Link>
       </div>
     );
   }

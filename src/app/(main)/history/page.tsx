@@ -3,11 +3,10 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Badge } from "@/components/ui";
+import { Badge, buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { ReversoCarta } from "@/components/tinta/ReversoCarta";
 import { Abanico } from "@/components/dashboard/Abanico";
-import { EnlaceBoton } from "@/components/dashboard/EnlaceBoton";
 import { Glifo } from "@/components/dashboard/Glifos";
 import { cartasDeLectura, nombresDeCartas } from "@/components/dashboard/mesa";
 
@@ -67,11 +66,11 @@ export default async function HistoryPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <EnlaceBoton href="/history/insights" variant="linea">
+          <Link href="/history/insights" className={buttonClasses({ variant: "linea" })}>
             <Glifo nombre="history" className="-my-2 size-7" />
             {tInsights("myStory")}
-          </EnlaceBoton>
-          <EnlaceBoton href="/reading/new">{t("newReading")}</EnlaceBoton>
+          </Link>
+          <Link href="/reading/new" className={buttonClasses()}>{t("newReading")}</Link>
         </div>
       </header>
 
@@ -89,9 +88,9 @@ export default async function HistoryPage() {
               {t("emptyTitle")}
             </h2>
             <p className="mt-2 max-w-[48ch] font-lectura text-lg text-letra-suave">{t("emptySubtitle")}</p>
-            <EnlaceBoton href="/reading/new" className="mt-6">
+            <Link href="/reading/new" className={buttonClasses({ className: "mt-6" })}>
               {t("startReading")}
-            </EnlaceBoton>
+            </Link>
           </div>
         </section>
       ) : (

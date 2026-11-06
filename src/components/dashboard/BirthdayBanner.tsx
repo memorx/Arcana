@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { EnlaceBoton } from "./EnlaceBoton";
+import { buttonClasses } from "@/components/ui";
 import { claimBirthdayGift, type BirthdayGiftResult } from "@/lib/birthday";
 
 interface BirthdayBannerProps {
@@ -40,9 +41,9 @@ export async function BirthdayBanner({ userId }: BirthdayBannerProps) {
               : t("greetingOnly")}
         </p>
       </div>
-      <EnlaceBoton href="/reading/new" size="sm" className="self-start sm:shrink-0 sm:self-auto">
+      <Link href="/reading/new" className={buttonClasses({ size: "sm", className: "self-start sm:shrink-0 sm:self-auto" })}>
         {t("cta")}
-      </EnlaceBoton>
+      </Link>
     </section>
   );
 }

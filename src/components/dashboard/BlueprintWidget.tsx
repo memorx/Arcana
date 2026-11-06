@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { buttonClasses } from "@/components/ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { EnlaceBoton } from "./EnlaceBoton";
 import { getArcanaBlueprint } from "@/lib/systems";
 import { blueprintInputsHash, toBlueprintLocale } from "@/lib/ai/blueprint-synthesis";
 import { BlueprintBadges } from "@/components/blueprint/BlueprintBadges";
@@ -45,9 +45,9 @@ export async function BlueprintWidget({ userId }: BlueprintWidgetProps) {
       <div className="flex h-full flex-col gap-3">
         <h2 className={TITULO_CELDA}>{t("widget.setupTitle")}</h2>
         <p className="font-lectura text-[0.9375rem] leading-snug text-letra-suave">{t("widget.setupText")}</p>
-        <EnlaceBoton href="/profile/setup" variant="primario" size="sm" className="mt-auto self-start">
+        <Link href="/profile/setup" className={buttonClasses({ variant: "primario", size: "sm", className: "mt-auto self-start" })}>
           {t("widget.setupCta")}
-        </EnlaceBoton>
+        </Link>
       </div>
     );
   }
