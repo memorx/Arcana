@@ -16,10 +16,12 @@ const gloock = Gloock({
   variable: "--fuente-gloock",
 });
 
+// Estática 400 + itálica 400 (22 + 24 KB) en vez de la variable opsz+wght (132 + 147 KB): el sitio sólo
+// la usa a 15–24 px y en peso 400, y Lantern cuenta cada byte de fuente en el FCP y el LCP simulados.
 const newsreader = Newsreader({
+  weight: "400",
   subsets: ["latin"],
   style: ["normal", "italic"],
-  axes: ["opsz"],
   display: "swap",
   variable: "--fuente-newsreader",
 });
