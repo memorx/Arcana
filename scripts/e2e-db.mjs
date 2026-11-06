@@ -128,6 +128,10 @@ function loadE2eEnv(root = ROOT) {
 function applyE2eEnv() {
   const e2e = loadE2eEnv();
   Object.assign(process.env, e2e);
+  // No update checks or telemetry calls from the tools while testing.
+  process.env.CHECKPOINT_DISABLE ??= "1";
+  process.env.PRISMA_HIDE_UPDATE_MESSAGE ??= "1";
+  process.env.NEXT_TELEMETRY_DISABLED ??= "1";
   return childEnv();
 }
 
