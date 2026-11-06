@@ -46,7 +46,7 @@ export async function CollectionWidget({ userId }: CollectionWidgetProps) {
             {recentCards.map((card) => (
               <li key={card.id}>
                 <Link
-                  href={`/cards/${card.id}`}
+                  href={card.slug ? `/cards/${card.slug}` : "/collection"}
                   className="block w-14 overflow-hidden rounded-[4px] border border-filete/30 transition-colors hover:border-rosa"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element -- grabado autohospedado de 200 px (scripts/cartas.py) */}
