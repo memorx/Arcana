@@ -1,19 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Badge,
-  TarotCardStatic,
-} from "@/components/ui";
+import { Badge, buttonClasses } from "@/components/ui";
 import { TodayEnergies } from "@/components/energies/TodayEnergies";
-import { todayUtc } from "@/lib/systems";
+import { CartaQuemable } from "@/components/tinta/CartaQuemable";
+import { TransicionPincel } from "@/components/tinta/TransicionPincel";
+import { ReversoCarta } from "@/components/tinta/ReversoCarta";
+import { Escena } from "@/components/tinta/Escena";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { Pincel } from "@/components/tinta/Pincel";
+import { cartaImagen, MEDIDAS_CARTA, slugCarta } from "@/lib/cartas";
+import { getTonalli, todayUtc } from "@/lib/systems";
 
 interface DailyReading {
   id: string;
@@ -28,7 +27,6 @@ interface DailyReading {
     nameEs: string;
     arcana: string;
     suit: string | null;
-    imageUrl: string;
   };
 }
 
@@ -39,9 +37,46 @@ interface Subscription {
   paymentMethod?: string;
 }
 
+/**
+ * Today's card stays turned over once it has been burned (per reading, in this browser): a
+ * convenience, so coming back later the same day doesn't hide the message again.
+ */
+const claveRevelada = (id: string) => `arcana:carta-del-dia:${id}`;
+
+function leerRevelada(id: string): boolean {
+  try {
+    return window.localStorage.getItem(claveRevelada(id)) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function guardarRevelada(id: string) {
+  try {
+    window.localStorage.setItem(claveRevelada(id), "1");
+  } catch {
+    // Private mode or blocked storage: the card simply starts face down next time.
+  }
+}
+
+/** Daily cards are UTC days (`@db.Date`): format them in UTC so Mexico doesn't see the day before. */
+const DIA_UTC = { timeZone: "UTC" } as const;
+
+/** Paper card back used where there is nothing to burn yet (preview, waiting for the first card). */
+function CartaBocaAbajo({ children }: { children?: ReactNode }) {
+  return (
+    <div className="relative aspect-[300/520] w-[min(300px,70vw)] overflow-hidden rounded-[14px] shadow-[0_24px_48px_-28px_rgb(0_0_0/.6)] md:w-[min(340px,34vw)]">
+      <ReversoCarta />
+      {children}
+    </div>
+  );
+}
+
 export default function DailyPage() {
   const t = useTranslations("daily");
+  const tCarta = useTranslations("carta");
   const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "es-ES";
 
   const [isLoading, setIsLoading] = useState(true);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
@@ -49,6 +84,7 @@ export default function DailyPage() {
   const [recentReadings, setRecentReadings] = useState<DailyReading[]>([]);
   const [emailTime, setEmailTime] = useState("08:00");
   const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [revelada, setRevelada] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +104,7 @@ export default function DailyPage() {
           const dailyData = await dailyRes.json();
           setTodayReading(dailyData.today);
           setRecentReadings(dailyData.recent || []);
+          setRevelada(dailyData.today?.id ? leerRevelada(dailyData.today.id) : false);
         }
 
         if (profileRes.ok) {
@@ -90,6 +127,12 @@ export default function DailyPage() {
     fetchData();
   }, []);
 
+  const todayId = todayReading?.id;
+  const onRevelada = useCallback(() => {
+    setRevelada(true);
+    if (todayId) guardarRevelada(todayId);
+  }, [todayId]);
+
   const getCardName = (card: { name: string; nameEs: string }) => {
     return locale === "en" ? card.name : card.nameEs;
   };
@@ -97,211 +140,210 @@ export default function DailyPage() {
   const hasActiveSubscription = subscription?.status === "active";
   const isCreditsExhausted = subscription?.status === "credits_exhausted";
 
+  const hoy = todayUtc();
+  const tonalli = getTonalli(hoy);
+  const etiquetaDia = `${t("todayCard")} · ${tonalli.number} ${tonalli.sign.nahuatl}`;
+
+  /** The scene on ink: title on top, the card, and what goes under it (message, waiting, CTA). */
+  const escena = (titulo: string, carta: ReactNode, debajo: ReactNode) => (
+    <Escena
+      suelo="tinta"
+      aria-labelledby="daily-titulo"
+      className="-mx-gutter px-gutter py-[clamp(48px,9vh,112px)]"
+    >
+      <div className="mx-auto grid max-w-[1100px] gap-x-[clamp(32px,6vw,96px)] gap-y-8 [grid-template-areas:'cabeza'_'carta'_'debajo'] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:[grid-template-areas:'cabeza_carta'_'debajo_carta']">
+        <div className="grid content-end gap-4 [grid-area:cabeza]">
+          <Etiqueta>{etiquetaDia}</Etiqueta>
+          <Pincel aria-hidden="true" className="-ml-[0.04em] text-[clamp(3.5rem,2rem+5vw,5.5rem)]">
+            {t("pincel")}
+          </Pincel>
+          <h1 id="daily-titulo" className="font-titulo text-[clamp(2rem,1.3rem+2.4vw,3.4rem)] leading-[1.05] text-letra">
+            {titulo}
+          </h1>
+        </div>
+        <div className="justify-self-center [grid-area:carta] md:self-center">{carta}</div>
+        <div className="min-w-0 [grid-area:debajo]">{debajo}</div>
+      </div>
+    </Escena>
+  );
+
+  let contenido: ReactNode;
+
   if (isLoading) {
-    return (
-      <div className="max-w-4xl mx-auto py-12">
-        <div className="animate-pulse space-y-8">
-          <div className="h-12 bg-slate-800 rounded w-1/3 mx-auto" />
-          <div className="h-96 bg-slate-800 rounded" />
-        </div>
-      </div>
-    );
-  }
-
-  // Credits exhausted - show resubscribe CTA
-  if (isCreditsExhausted) {
-    return (
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="text-6xl mb-6">&#128176;</div>
-        <h1 className="text-3xl font-bold text-slate-100 mb-4">
-          {t("creditsExhausted")}
-        </h1>
-        <p className="text-slate-400 mb-8">{t("creditsExhaustedDesc")}</p>
-        <div className="flex gap-4 justify-center flex-wrap">
-          <Link href="/credits">
-            <Button size="lg">{t("buyCredits")}</Button>
-          </Link>
-          <Link href="/subscribe">
-            <Button variant="secondary" size="lg">
-              {t("resubscribe")}
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // No subscription - show CTA
-  if (!hasActiveSubscription) {
-    return (
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="text-6xl mb-6">&#9788;</div>
-        <h1 className="text-3xl font-bold text-slate-100 mb-4">
-          {t("noSubscription")}
-        </h1>
-        <p className="text-slate-400 mb-8">{t("noSubscriptionDesc")}</p>
-
-        {/* Preview Card */}
-        <Card className="mb-8 overflow-hidden">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
-            <div className="p-8 filter blur-sm">
-              <div className="w-32 h-48 mx-auto bg-gradient-to-br from-purple-800/50 to-purple-900/50 rounded-lg border border-purple-500/30" />
+    contenido = (
+      <div aria-busy="true">
+        <Escena suelo="tinta" className="-mx-gutter px-gutter py-[clamp(48px,9vh,112px)]">
+          <div className="mx-auto grid max-w-[1100px] items-center gap-10 md:grid-cols-2">
+            <div className="space-y-4" aria-hidden="true">
+              <div className="h-3 w-40 bg-papel/10 motion-safe:animate-pulse" />
+              <div className="h-12 w-3/4 bg-papel/10 motion-safe:animate-pulse" />
+              <div className="h-4 w-2/3 bg-papel/10 motion-safe:animate-pulse" />
             </div>
-            <div className="absolute inset-0 flex items-center justify-center z-20">
-              <Badge variant="secondary" className="text-lg px-4 py-2">
-                {t("preview")}
-              </Badge>
-            </div>
+            <div
+              aria-hidden="true"
+              className="aspect-[300/520] w-[min(300px,70vw)] justify-self-center rounded-[14px] bg-papel/10 motion-safe:animate-pulse md:w-[min(340px,34vw)]"
+            />
           </div>
-        </Card>
-
-        <Link href="/subscribe">
-          <Button size="lg">{t("subscribeNow")}</Button>
+        </Escena>
+      </div>
+    );
+  } else if (isCreditsExhausted) {
+    // Credits exhausted - show resubscribe CTA
+    contenido = escena(
+      t("creditsExhausted"),
+      <CartaBocaAbajo />,
+      <div className="grid max-w-[44ch] gap-6">
+        <p className="font-lectura text-lg leading-relaxed text-letra-suave">{t("creditsExhaustedDesc")}</p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/credits" className={buttonClasses({ size: "lg" })}>
+            {t("buyCredits")}
+          </Link>
+          <Link href="/subscribe" className={buttonClasses({ variant: "linea", size: "lg" })}>
+            {t("resubscribe")}
+          </Link>
+        </div>
+      </div>
+    );
+  } else if (!hasActiveSubscription) {
+    // No subscription - show CTA
+    contenido = escena(
+      t("noSubscription"),
+      <CartaBocaAbajo>
+        <span className="absolute inset-x-0 bottom-[12%] flex justify-center">
+          <Badge variant="warning">{t("preview")}</Badge>
+        </span>
+      </CartaBocaAbajo>,
+      <div className="grid max-w-[44ch] gap-6">
+        <p className="font-lectura text-lg leading-relaxed text-letra-suave">{t("noSubscriptionDesc")}</p>
+        <Link href="/subscribe" className={buttonClasses({ size: "lg", className: "justify-self-start" })}>
+          {t("subscribeNow")}
         </Link>
+      </div>
+    );
+  } else if (todayReading) {
+    const nombre = getCardName(todayReading.card);
+    const parrafos = todayReading.interpretation
+      .split("\n")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    contenido = escena(
+      t("title"),
+      <CartaQuemable
+        key={todayReading.card.id}
+        carta={{ nombre, slug: slugCarta(todayReading.card.name) }}
+        invertida={todayReading.isReversed}
+        revelada={revelada}
+        onRevelada={onRevelada}
+        etiqueta={tCarta("voltearPosicion", { posicion: t("todayCard") })}
+        tamano="grande"
+        prioridad
+      />,
+      revelada ? (
+        <article aria-labelledby="daily-carta" className="grid max-w-[60ch] gap-4 motion-safe:animate-entra">
+          <p className="font-dato text-xs uppercase tracking-[0.12em] text-letra-acento">
+            {new Date(todayReading.date).toLocaleDateString(dateLocale, {
+              ...DIA_UTC,
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <h2 id="daily-carta" className="font-titulo text-[clamp(1.6rem,1.2rem+1.4vw,2.4rem)] leading-tight text-letra">
+              {nombre}
+            </h2>
+            {todayReading.isReversed && <Badge variant="warning">{t("reversed")}</Badge>}
+          </div>
+          <div className="space-y-4 font-lectura text-lg leading-[1.7] text-letra">
+            {parrafos.map((paragraph, i) => (
+              <p key={i}>{paragraph}</p>
+            ))}
+          </div>
+          {todayReading.sentAt && (
+            <p className="font-dato text-[0.6875rem] uppercase tracking-[0.1em] text-letra-suave">
+              {t("sentAt", {
+                time: new Date(todayReading.sentAt).toLocaleTimeString(dateLocale, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              })}
+            </p>
+          )}
+        </article>
+      ) : (
+        <p className="max-w-[40ch] font-lectura text-lg leading-relaxed text-letra-suave">{t("boca")}</p>
+      )
+    );
+  } else {
+    // Subscribed, but today's card hasn't been drawn yet (the cron draws it)
+    contenido = escena(
+      t("title"),
+      <CartaBocaAbajo />,
+      <div className="grid max-w-[44ch] gap-2">
+        <p className="font-titulo text-2xl leading-tight text-letra">{t("noCardYet")}</p>
+        <p className="font-lectura text-lg text-letra-suave">{t("cardWillArrive", { time: emailTime })}</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-100">{t("title")}</h1>
-      </div>
+    <>
+      {/* The brush sweep plays once when you arrive at /daily (§5.4), whatever state loads */}
+      <TransicionPincel />
+      {contenido}
 
-      {/* Today's energies: tonalli, moon and personal day */}
-      <TodayEnergies date={todayUtc()} birthDate={birthDate} className="mb-8" />
+      {!isLoading && !isCreditsExhausted && hasActiveSubscription && (
+        <div className="mt-[clamp(48px,8vh,88px)] space-y-[clamp(48px,8vh,88px)]">
+          {/* Today's energies: tonalli, moon and personal day */}
+          <TodayEnergies date={todayUtc()} birthDate={birthDate} />
 
-      {/* Today's Card */}
-      <Card variant="highlighted" className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-amber-400">&#9788;</span>
-            {t("todayCard")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {todayReading ? (
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Card Display */}
-              <div className="flex justify-center">
-                <TarotCardStatic
-                  card={{
-                    name: todayReading.card.name,
-                    nameEs: todayReading.card.nameEs,
-                    arcana: todayReading.card.arcana as "MAJOR" | "MINOR",
-                    suit: todayReading.card.suit as
-                      | "WANDS"
-                      | "CUPS"
-                      | "SWORDS"
-                      | "PENTACLES"
-                      | null,
-                    number: parseInt(
-                      todayReading.card.id.split("_").pop() || "0"
-                    ),
-                    imageUrl: todayReading.card.imageUrl,
-                  }}
-                  isReversed={todayReading.isReversed}
-                  size="lg"
-                  locale={locale}
-                />
+          {/* Recent Cards History */}
+          {recentReadings.length > 0 && (
+            <section aria-labelledby="daily-historial">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-filete pb-2">
+                <h2 id="daily-historial" className="font-titulo text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-tight text-letra">
+                  {t("history")}
+                </h2>
+                <p className="font-dato text-[0.6875rem] uppercase tracking-[0.12em] text-letra-suave">{t("last7days")}</p>
               </div>
-
-              {/* Interpretation */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-xl font-semibold text-slate-100 mb-1">
-                    {getCardName(todayReading.card)}
-                  </h3>
-                  {todayReading.isReversed && (
-                    <Badge variant="warning">{t("reversed")}</Badge>
-                  )}
-                </div>
-
-                <div className="prose prose-invert prose-sm max-w-none">
-                  {todayReading.interpretation
-                    .split("\n")
-                    .map((paragraph, i) => (
-                      <p key={i} className="text-slate-300 mb-3">
-                        {paragraph}
+              <ol className="grid grid-cols-2 gap-x-4 gap-y-2 min-[480px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-7">
+                {recentReadings.map((reading) => {
+                  const nombre = getCardName(reading.card);
+                  return (
+                    <li key={reading.id} className="flex min-w-0 flex-col gap-2 py-4">
+                      <p className="font-dato text-[0.6875rem] uppercase tracking-[0.08em] text-letra-suave">
+                        {new Date(reading.date).toLocaleDateString(dateLocale, {
+                          ...DIA_UTC,
+                          weekday: "short",
+                          day: "numeric",
+                        })}
                       </p>
-                    ))}
-                </div>
-
-                {todayReading.sentAt && (
-                  <p className="text-xs text-slate-500">
-                    {t("sentAt", {
-                      time: new Date(todayReading.sentAt).toLocaleTimeString(
-                        locale === "en" ? "en-US" : "es-ES",
-                        { hour: "2-digit", minute: "2-digit" }
-                      ),
-                    })}
-                  </p>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-5xl mb-4 opacity-50">&#10022;</div>
-              <p className="text-slate-400 mb-2">{t("noCardYet")}</p>
-              <p className="text-slate-500 text-sm">
-                {t("cardWillArrive", { time: emailTime })}
-              </p>
-            </div>
+                      {/* eslint-disable-next-line @next/next/no-img-element -- grabado autohospedado (scripts/cartas.py) */}
+                      <img
+                        src={cartaImagen(reading.card, "tinta")}
+                        alt={nombre}
+                        width={MEDIDAS_CARTA.tinta.width}
+                        height={MEDIDAS_CARTA.tinta.height}
+                        loading="lazy"
+                        decoding="async"
+                        className={`h-auto w-full max-w-[120px] rounded-[4px] border border-filete/30 ${
+                          reading.isReversed ? "rotate-180" : ""
+                        }`}
+                      />
+                      <p className="font-titulo text-[0.9375rem] leading-tight text-letra">{nombre}</p>
+                      {reading.isReversed && (
+                        <Badge variant="primary" className="self-start">
+                          {t("reversed")}
+                        </Badge>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Recent Cards History */}
-      {recentReadings.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{t("history")}</CardTitle>
-            <p className="text-sm text-slate-400">{t("last7days")}</p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
-              {recentReadings.map((reading) => (
-                <div
-                  key={reading.id}
-                  className="text-center p-2 bg-slate-800/50 rounded-lg"
-                >
-                  <p className="text-xs text-slate-500 mb-2">
-                    {new Date(reading.date).toLocaleDateString(
-                      locale === "en" ? "en-US" : "es-ES",
-                      { weekday: "short", day: "numeric" }
-                    )}
-                  </p>
-                  <TarotCardStatic
-                    card={{
-                      name: reading.card.name,
-                      nameEs: reading.card.nameEs,
-                      arcana: reading.card.arcana as "MAJOR" | "MINOR",
-                      suit: reading.card.suit as
-                        | "WANDS"
-                        | "CUPS"
-                        | "SWORDS"
-                        | "PENTACLES"
-                        | null,
-                      number: parseInt(reading.card.id.split("_").pop() || "0"),
-                      imageUrl: reading.card.imageUrl,
-                    }}
-                    isReversed={reading.isReversed}
-                    size="sm"
-                    locale={locale}
-                  />
-                  {reading.isReversed && (
-                    <Badge variant="warning" className="mt-1 text-xs">
-                      R
-                    </Badge>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        </div>
       )}
-    </div>
+    </>
   );
 }

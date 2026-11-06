@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
-import { Card, CardContent, Button } from "@/components/ui";
 import {
   getAchievementStats,
   getRecentAchievements,
   getClosestAchievement,
 } from "@/lib/achievements";
+import { Barra } from "./Barra";
+import { CIFRA, ENLACE_DATO, ROTULO, TITULO_CELDA } from "./estilos";
 
 interface AchievementsWidgetProps {
   userId: string;
@@ -28,65 +29,46 @@ export async function AchievementsWidget({ userId }: AchievementsWidgetProps) {
   };
 
   return (
-    <Card className="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 border-amber-500/20">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🏆</span>
-            <div>
-              <h3 className="font-medium text-slate-100">{t("title")}</h3>
-              <p className="text-sm text-slate-400">
-                {stats.unlocked}/{stats.total} ({stats.percentage}%)
-              </p>
-            </div>
+    <div className="flex h-full flex-col gap-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+        <h2 className={TITULO_CELDA}>{t("title")}</h2>
+        <Link href="/achievements" className={ENLACE_DATO}>
+          {t("viewAll")} <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+
+      <p className="flex flex-wrap items-baseline gap-x-3">
+        <span className={CIFRA}>
+          {stats.unlocked}/{stats.total}
+        </span>
+        <span className={ROTULO}>{stats.percentage}%</span>
+      </p>
+      <Barra valor={stats.percentage} etiqueta={`${t("title")}: ${stats.percentage}%`} />
+
+      <dl className="space-y-2 text-[0.9375rem] leading-snug">
+        {latestAchievement && (
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <dt className={ROTULO}>{t("latest")}</dt>
+            <dd className="min-w-0 text-letra">{getLocalizedName(latestAchievement)}</dd>
           </div>
-          <Link href="/achievements">
-            <Button variant="secondary" size="sm">{t("viewAll")}</Button>
-          </Link>
-        </div>
+        )}
 
-        {/* Progress Bar */}
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-3">
-          <div
-            className="h-full bg-gradient-to-r from-amber-500 to-yellow-500 transition-all duration-500"
-            style={{ width: `${stats.percentage}%` }}
-          />
-        </div>
-
-        <div className="space-y-2">
-          {/* Latest Achievement */}
-          {latestAchievement && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-amber-400">{t("latest")}:</span>
-              <span>{latestAchievement.icon}</span>
-              <span className="text-slate-300 truncate">
-                {getLocalizedName(latestAchievement)}
-              </span>
-            </div>
-          )}
-
-          {/* Closest to Unlock */}
-          {closest && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-slate-500">{t("next")}:</span>
-              <span className="opacity-50">{closest.icon}</span>
-              <span className="text-slate-400 truncate">
-                {getLocalizedName(closest)}
-              </span>
-              <span className="text-slate-500 text-xs">
+        {closest && (
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <dt className={ROTULO}>{t("next")}</dt>
+            <dd className="min-w-0 text-letra-suave">
+              {getLocalizedName(closest)}{" "}
+              <span className="font-dato text-xs tabular-nums">
                 ({closest.progress}/{closest.requirement})
               </span>
-            </div>
-          )}
+            </dd>
+          </div>
+        )}
+      </dl>
 
-          {/* All completed */}
-          {!closest && stats.unlocked === stats.total && (
-            <p className="text-amber-400 text-sm text-center">
-              {t("allCompleted")}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      {!closest && stats.unlocked === stats.total && (
+        <p className="font-lectura text-letra-acento">{t("allCompleted")}</p>
+      )}
+    </div>
   );
 }

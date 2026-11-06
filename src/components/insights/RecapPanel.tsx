@@ -94,9 +94,12 @@ export function RecapPanel({ months, initialRecaps }: RecapPanelProps) {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-end gap-3 mb-5">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
-          <label htmlFor={selectId} className="block text-sm text-slate-400 mb-1.5">
+          <label
+            htmlFor={selectId}
+            className="mb-1.5 block font-dato text-[0.6875rem] uppercase tracking-[0.12em] text-letra-suave"
+          >
             {t("selectMonth")}
           </label>
           <select
@@ -107,7 +110,7 @@ export function RecapPanel({ months, initialRecaps }: RecapPanelProps) {
               setError(null);
             }}
             disabled={loading}
-            className="w-full sm:max-w-xs px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="min-h-11 w-full rounded-none border-0 border-b border-filete/50 bg-transparent py-2 font-lectura text-[1.0625rem] text-letra focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none sm:max-w-xs"
           >
             {newestFirst.map((m) => (
               <option key={keyOf(m.year, m.month)} value={keyOf(m.year, m.month)}>
@@ -124,41 +127,41 @@ export function RecapPanel({ months, initialRecaps }: RecapPanelProps) {
       <div aria-live="polite" aria-busy={loading}>
         {loading ? (
           <div className="space-y-3" role="status">
-            <p className="text-purple-300 motion-safe:animate-pulse">{t("generating")}</p>
+            <p className="font-lectura italic text-letra-acento motion-safe:animate-pulse">{t("generating")}</p>
             <div className="space-y-2" aria-hidden="true">
-              <div className="h-3 rounded bg-slate-800 w-full motion-safe:animate-pulse" />
-              <div className="h-3 rounded bg-slate-800 w-11/12 motion-safe:animate-pulse" />
-              <div className="h-3 rounded bg-slate-800 w-4/5 motion-safe:animate-pulse" />
+              <div className="h-3 w-full bg-papel-hondo motion-safe:animate-pulse" />
+              <div className="h-3 w-11/12 bg-papel-hondo motion-safe:animate-pulse" />
+              <div className="h-3 w-4/5 bg-papel-hondo motion-safe:animate-pulse" />
             </div>
           </div>
         ) : recap ? (
-          <article>
-            <h3 className="text-lg font-semibold text-amber-200 mb-3">{month.label}</h3>
-            <div className="space-y-4 text-slate-300 leading-relaxed">
+          <article className="max-w-[66ch]">
+            <h3 className="mb-4 font-titulo text-2xl leading-tight text-letra">{month.label}</h3>
+            <div className="space-y-4 font-lectura text-lg leading-[1.7] text-letra">
               {paragraphs.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
             </div>
             {hasNewReadings && (
-              <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
-                <p className="text-sm text-slate-400">{t("newReadings")}</p>
-                <Button variant="secondary" size="sm" onClick={generate}>
+              <div className="mt-6 flex flex-col gap-3 border-t border-filete/20 pt-4 sm:flex-row sm:items-center">
+                <p className="font-lectura text-letra-suave">{t("newReadings")}</p>
+                <Button variant="linea" size="sm" onClick={generate}>
                   {t("update")}
                 </Button>
               </div>
             )}
           </article>
         ) : canWrite ? (
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <p className="text-slate-300 flex-1">{t("ready", { count: month.count })}</p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <p className="flex-1 font-lectura text-lg text-letra">{t("ready", { count: month.count })}</p>
             <Button onClick={generate}>{t("generate")}</Button>
           </div>
         ) : (
-          <p className="text-slate-400">{t("needMore", { count: month.count, min: MIN_READINGS })}</p>
+          <p className="font-lectura text-letra-suave">{t("needMore", { count: month.count, min: MIN_READINGS })}</p>
         )}
 
         {error && !loading && (
-          <p role="alert" className="mt-4 text-sm text-red-300">
+          <p role="alert" className="mt-4 font-lectura text-letra-error">
             {error === "needMore" ? t("needMore", { count: month.count, min: MIN_READINGS }) : t(error)}
           </p>
         )}

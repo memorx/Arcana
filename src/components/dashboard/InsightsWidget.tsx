@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { buttonClasses } from "@/components/ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getCardOfTheMonth } from "@/lib/insights";
-import { Button, Card, CardContent, TarotCardStatic } from "@/components/ui";
+import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
+import { ENLACE_DATO, TITULO_CELDA } from "./estilos";
 
 interface InsightsWidgetProps {
   userId: string;
@@ -31,78 +33,53 @@ export async function InsightsWidget({ userId }: InsightsWidgetProps) {
   // No readings at all: a short invitation
   if (!card && totalReadings === 0) {
     return (
-      <Card className="border-purple-500/20 bg-gradient-to-r from-purple-900/20 to-slate-900/50">
-        <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl text-amber-400/70" aria-hidden="true">
-              &#10022;
-            </span>
-            <div>
-              <p className="font-medium text-slate-100">{t("emptyTitle")}</p>
-              <p className="text-sm text-slate-400">{t("emptyBody")}</p>
-            </div>
-          </div>
-          <Link href="/reading/new" className="self-start sm:self-auto">
-            <Button size="sm">{t("emptyCta")}</Button>
-          </Link>
-        </CardContent>
-      </Card>
+      <div className="flex h-full flex-col gap-3">
+        <h2 className={TITULO_CELDA}>{t("emptyTitle")}</h2>
+        <p className="font-lectura text-[0.9375rem] leading-snug text-letra-suave">{t("emptyBody")}</p>
+        <Link href="/reading/new" className={buttonClasses({ variant: "linea", size: "sm", className: "mt-auto self-start" })}>
+          {t("emptyCta")}
+        </Link>
+      </div>
     );
   }
 
   // Readings, but none this month yet
   if (!card) {
     return (
-      <Card className="border-purple-500/20">
-        <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <p className="text-sm text-purple-300 font-medium">{t("title")}</p>
-            <p className="text-slate-300 mt-0.5">{t("noReadingsMonth")}</p>
-          </div>
-          <Link href="/history/insights" className="self-start sm:self-auto">
-            <Button variant="secondary" size="sm">
-              {t("viewStory")}
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
+      <div className="flex h-full flex-col gap-3">
+        <h2 className={TITULO_CELDA}>{t("title")}</h2>
+        <p className="font-lectura text-[0.9375rem] leading-snug text-letra-suave">{t("noReadingsMonth")}</p>
+        <Link href="/history/insights" className={`${ENLACE_DATO} mt-auto self-start`}>
+          {t("viewStory")} <span aria-hidden="true">→</span>
+        </Link>
+      </div>
     );
   }
 
   const name = locale === "en" ? card.name : card.nameEs;
 
   return (
-    <Card className="border-amber-500/30 bg-gradient-to-r from-purple-900/30 to-amber-900/20">
-      <CardContent className="p-4 flex items-center gap-4">
-        <TarotCardStatic
-          card={{
-            name: card.name,
-            nameEs: card.nameEs,
-            arcana: card.arcana,
-            suit: card.suit,
-            number: card.number,
-            imageUrl: card.imageUrl,
-          }}
-          size="sm"
-          showReversedBadge={false}
-          locale={locale}
-          className="shrink-0"
+    <div className="flex h-full flex-col gap-3">
+      <h2 className={TITULO_CELDA}>{t("title")}</h2>
+      <div className="flex items-start gap-4">
+        {/* eslint-disable-next-line @next/next/no-img-element -- grabado autohospedado (scripts/cartas.py) */}
+        <img
+          src={cartaImagen(card, "tinta")}
+          alt=""
+          width={MEDIDAS_CARTA.tinta.width}
+          height={MEDIDAS_CARTA.tinta.height}
+          loading="lazy"
+          decoding="async"
+          className="h-auto w-16 shrink-0 rounded-[4px] border border-filete/30"
         />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-purple-300 font-medium">{t("title")}</p>
-          <p className="text-lg font-semibold text-slate-100 truncate">{name}</p>
-          <p className="text-sm text-amber-300 tabular-nums">{t("count", { count: card.count })}</p>
-          <Link
-            href="/history/insights"
-            className="inline-flex items-center gap-1 mt-2 text-sm text-slate-300 hover:text-amber-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"
-          >
-            {t("viewStory")}
-            <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+        <div className="min-w-0">
+          <p className="break-words font-titulo text-xl leading-tight text-letra">{name}</p>
+          <p className="mt-1 font-dato text-xs tabular-nums text-letra-acento">{t("count", { count: card.count })}</p>
+          <Link href="/history/insights" className={ENLACE_DATO}>
+            {t("viewStory")} <span aria-hidden="true">→</span>
           </Link>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

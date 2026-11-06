@@ -281,7 +281,9 @@
     "welcomeSubtitle": "Bienvenido a tu espacio de lecturas",
     "streak": {
       "days": "días seguidos",
-      "best": "Mejor: {count} días"
+      "best": "Mejor: {count} días",
+      "title": "Racha",
+      "empty": "Tu racha empieza con tu próxima lectura."
     },
     "freeReadings": "{count, plural, one {# lectura gratis} other {# lecturas gratis}}",
     "freeReadingsLabel": "Lecturas Gratis",
@@ -314,6 +316,12 @@
     "inviteFriends": "Invitar Amigos",
     "explore": {
       "title": "Explora"
+    },
+    "mesa": {
+      "etiqueta": "Mi espacio",
+      "pincel": "Tu mesa",
+      "notaRecientes": "Los grabados de la mesa son las cartas de tus últimas lecturas.",
+      "notaFijas": "Cuando hagas tus lecturas, sus cartas quedarán en esta mesa."
     }
   },
   "reading": {
@@ -444,7 +452,8 @@
     "emptyTitle": "No tienes lecturas aún",
     "emptySubtitle": "Comienza tu viaje espiritual con tu primera lectura de tarot",
     "startReading": "Hacer mi primera lectura",
-    "newReading": "Nueva Lectura"
+    "newReading": "Nueva Lectura",
+    "etiqueta": "Tu archivo"
   },
   "spreads": {
     "threeCard": {
@@ -682,7 +691,9 @@
     "creditsExhausted": "Suscripción Expirada",
     "creditsExhaustedDesc": "Tu suscripción con créditos ha expirado. Agrega más créditos o vuelve a suscribirte para seguir recibiendo lecturas diarias.",
     "buyCredits": "Comprar Créditos",
-    "resubscribe": "Volver a Suscribirse"
+    "resubscribe": "Volver a Suscribirse",
+    "pincel": "Hoy",
+    "boca": "Tu carta de hoy está boca abajo. Tócala para voltearla."
   },
   "referral": {
     "title": "Invita Amigos, Gana Créditos",
@@ -727,7 +738,8 @@
     "keepGoing": "¡Sigue así! Tu dedicación está dando frutos.",
     "continue": "¡Genial!",
     "nextMilestone": "Próxima recompensa en {days} días",
-    "allCompleted": "¡Todos los hitos completados!"
+    "allCompleted": "¡Todos los hitos completados!",
+    "pincel": "Racha"
   },
   "collection": {
     "title": "Tu Colección",
@@ -814,7 +826,8 @@
       "adept": "Adepto",
       "master": "Maestro",
       "oracle": "Oráculo"
-    }
+    },
+    "viewAchievements": "Ver logros"
   },
   "challenges": {
     "title": "Desafíos",
@@ -1073,7 +1086,9 @@
       "noProfileCta": "Agrega tu fecha de nacimiento a tu perfil para ver tu día personal.",
       "noProfileButton": "Completar perfil"
     },
-    "about": "Sobre el tonalpohualli"
+    "about": "Sobre el tonalpohualli",
+    "etiqueta": "Tonalpohualli · luna · día personal",
+    "signos": "Los veinte signos del tonalpohualli"
   },
   "energies": {
     "title": "Energías de hoy",

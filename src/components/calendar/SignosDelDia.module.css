@@ -1,0 +1,21 @@
+/* Marquesina de los veinte signos (escena 5 de la maqueta). Sólo transform; quieta con reduced-motion. */
+.pista {
+  display: flex;
+  width: max-content;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pista {
+    animation: correr 110s linear infinite;
+  }
+  .marquesina:hover .pista,
+  .marquesina:focus-within .pista {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes correr {
+  to {
+    transform: translateX(-50%);
+  }
+}

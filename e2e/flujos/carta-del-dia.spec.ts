@@ -10,10 +10,22 @@ import { expect, test } from "../helpers/sesion";
 test.describe("carta del día con suscripción", () => {
   test.use({ cuenta: "historia" });
 
-  test("la carta de hoy y su mensaje", async ({ page }) => {
+  test("la carta de hoy boca abajo, se voltea y deja su mensaje", async ({ page }) => {
     await page.goto("/daily");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/tu carta diaria|your daily card/i);
+
+    // On ink, face down: the message waits until the card is turned (burned)
+    const carta = page.getByRole("button", { name: /voltear|turn over|flip/i });
+    await expect(carta).toBeVisible();
+    await expect(page.getByText(FAKE_FRASE_DIARIA.es)).toHaveCount(0);
+    await carta.click();
+    await expect(page.locator('.cq[data-estado="revelada"]')).toHaveCount(1, { timeout: 10_000 });
     await expect(page.getByRole("heading", { name: /la estrella|the star/i }).first()).toBeVisible();
+    await expect(page.getByText(FAKE_FRASE_DIARIA.es).first()).toBeVisible();
+
+    // Back the same day: already turned
+    await page.reload();
+    await expect(page.locator('.cq[data-estado="revelada"]')).toHaveCount(1);
     await expect(page.getByText(FAKE_FRASE_DIARIA.es).first()).toBeVisible();
   });
 });

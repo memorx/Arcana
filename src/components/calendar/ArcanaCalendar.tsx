@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Button, Card, CardContent } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { LunaGlifo } from "@/components/energies/LunaGlifo";
 import { getDayEnergies, type DayEnergies } from "@/lib/systems";
 import { cn } from "@/lib/utils";
 import {
@@ -181,150 +182,168 @@ export function ArcanaCalendar({ today }: ArcanaCalendarProps) {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-      <Card className="min-w-0">
-        <CardContent className="p-3 sm:p-6">
-          {/* Month navigation */}
-          <div className="mb-3 sm:mb-4 flex items-center justify-between gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => select(shiftMonthKeepingDay(selected, -1))}
-              aria-label={t("previousMonth")}
-            >
-              <ChevronIcon direction="left" />
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-12">
+      <div className="min-w-0">
+        {/* Month navigation */}
+        <div className="mb-4 flex items-center gap-2 border-b border-filete pb-3">
+          <Button
+            variant="fantasma"
+            size="sm"
+            className="w-11 shrink-0 px-0"
+            onClick={() => select(shiftMonthKeepingDay(selected, -1))}
+            aria-label={t("previousMonth")}
+          >
+            <ChevronIcon direction="left" />
+          </Button>
+          <h2
+            id={headingId}
+            aria-live="polite"
+            className="min-w-0 flex-1 text-center font-titulo text-xl leading-tight text-letra first-letter:uppercase sm:text-3xl"
+          >
+            {formatMonthYear(view.year, view.month, locale)}
+          </h2>
+          <div className="flex shrink-0 items-center gap-1">
+            <Button variant="linea" size="sm" className="px-3" onClick={() => select(today)} aria-label={t("goToToday")}>
+              {t("today")}
             </Button>
-            <h2
-              id={headingId}
-              aria-live="polite"
-              className="text-lg sm:text-xl font-semibold text-slate-100 text-center first-letter:uppercase"
+            <Button
+              variant="fantasma"
+              size="sm"
+              className="w-11 px-0"
+              onClick={() => select(shiftMonthKeepingDay(selected, 1))}
+              aria-label={t("nextMonth")}
             >
-              {formatMonthYear(view.year, view.month, locale)}
-            </h2>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => select(today)}
-                aria-label={t("goToToday")}
-              >
-                {t("today")}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => select(shiftMonthKeepingDay(selected, 1))}
-                aria-label={t("nextMonth")}
-              >
-                <ChevronIcon direction="right" />
-              </Button>
-            </div>
+              <ChevronIcon direction="right" />
+            </Button>
           </div>
+        </div>
 
-          {/* Month grid */}
-          <table role="grid" aria-labelledby={headingId} className="w-full table-fixed border-separate border-spacing-0.5 sm:border-spacing-1">
-            <thead>
-              <tr>
-                {weekdays.map((day) => (
-                  <th key={day.long} scope="col" className="pb-1 sm:pb-2 text-xs font-medium text-slate-400">
-                    <span aria-hidden="true" className="sm:hidden">
-                      {day.narrow}
-                    </span>
-                    <span aria-hidden="true" className="hidden sm:inline">
-                      {day.short}
-                    </span>
-                    <span className="sr-only">{day.long}</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {weeks.map((week, w) => (
-                <tr key={week.find(Boolean) ?? w}>
-                  {week.map((key, i) => {
-                    if (!key) return <td key={`pad-${w}-${i}`} aria-hidden="true" />;
-                    const { energies: day, label } = days.get(key)!;
-                    const isSelected = key === selected;
-                    const isToday = key === today;
+        {/* Month grid */}
+        <table role="grid" aria-labelledby={headingId} className="w-full table-fixed border-collapse">
+          <thead>
+            <tr>
+              {weekdays.map((day) => (
+                <th
+                  key={day.long}
+                  scope="col"
+                  className="pb-2 text-center font-dato text-[0.6875rem] font-normal uppercase tracking-[0.08em] text-letra-suave"
+                >
+                  <span aria-hidden="true" className="sm:hidden">
+                    {day.narrow}
+                  </span>
+                  <span aria-hidden="true" className="hidden sm:inline">
+                    {day.short.replace(".", "")}
+                  </span>
+                  <span className="sr-only">{day.long}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {weeks.map((week, w) => (
+              <tr key={week.find(Boolean) ?? w}>
+                {week.map((key, i) => {
+                  if (!key) {
                     return (
-                      <td key={key} role="gridcell" aria-selected={isSelected} className="p-0 align-top">
-                        <button
-                          ref={(el) => {
-                            if (el) cellRefs.current.set(key, el);
-                            else cellRefs.current.delete(key);
-                          }}
-                          type="button"
-                          tabIndex={isSelected ? 0 : -1}
-                          aria-label={label}
-                          aria-current={isToday ? "date" : undefined}
-                          onClick={() => {
-                            select(key);
-                            showDetailOnSmallScreens();
-                          }}
-                          onKeyDown={(event) => onCellKeyDown(event, key)}
-                          className={cn(
-                            "flex w-full min-h-[3.75rem] sm:min-h-[5.25rem] flex-col rounded-lg border p-1 sm:p-2 text-left transition-colors",
-                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950",
-                            isSelected
-                              ? "border-purple-400/80 bg-purple-900/40"
-                              : "border-slate-800 bg-slate-900/40 hover:border-purple-500/50 hover:bg-slate-900/80",
-                            isToday && !isSelected && "border-amber-500/60"
-                          )}
-                        >
+                      <td key={`pad-${w}-${i}`} aria-hidden="true" className="border border-filete/15 bg-papel-hondo/50" />
+                    );
+                  }
+                  const { energies: day, label } = days.get(key)!;
+                  const isSelected = key === selected;
+                  const isToday = key === today;
+                  return (
+                    <td key={key} role="gridcell" aria-selected={isSelected} className="border border-filete/15 p-0 align-top">
+                      <button
+                        ref={(el) => {
+                          if (el) cellRefs.current.set(key, el);
+                          else cellRefs.current.delete(key);
+                        }}
+                        type="button"
+                        tabIndex={isSelected ? 0 : -1}
+                        aria-label={label}
+                        aria-current={isToday ? "date" : undefined}
+                        onClick={() => {
+                          select(key);
+                          showDetailOnSmallScreens();
+                        }}
+                        onKeyDown={(event) => onCellKeyDown(event, key)}
+                        className={cn(
+                          "relative flex min-h-14 w-full flex-col items-stretch gap-1 p-1.5 text-left transition-colors sm:min-h-[5.5rem] sm:p-2.5",
+                          "focus-visible:z-10 focus-visible:outline-offset-[-3px]",
+                          isSelected ? "bg-tinta text-papel [--luna-sombra:var(--color-grafito)]" : "text-tinta hover:bg-papel-hondo",
+                          // Today in the second ink: a pink rule on top and a pink day number
+                          isToday && "shadow-[inset_0_3px_0_var(--color-rosa)]"
+                        )}
+                      >
+                        <span className="flex flex-col items-start gap-1 sm:flex-row sm:justify-between">
                           <span
                             className={cn(
-                              "text-xs sm:text-sm font-semibold leading-none",
-                              isToday ? "text-amber-300" : "text-slate-300"
+                              "font-titulo text-base leading-none sm:text-xl",
+                              isToday && (isSelected ? "text-rosa-luz" : "text-rosa-texto")
                             )}
                           >
                             {Number(key.slice(8))}
                           </span>
+                          <LunaGlifo luna={day.moon} className="mt-px size-3 sm:size-4" />
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "hidden truncate font-dato text-[0.625rem] uppercase leading-tight tracking-[0.04em] sm:block",
+                            isSelected ? "text-niebla" : "text-grafito"
+                          )}
+                        >
+                          {day.tonalli.number} {day.tonalli.sign.nahuatl}
+                        </span>
+                        {day.personalDay !== null && (
                           <span
                             aria-hidden="true"
-                            className="mt-1 flex flex-wrap items-center justify-center gap-0.5 text-[13px] sm:text-lg leading-none"
+                            className={cn(
+                              "mt-auto font-dato text-[0.625rem] leading-none sm:text-[0.6875rem]",
+                              isSelected ? "text-rosa-luz" : "text-rosa-texto"
+                            )}
                           >
-                            <span>{day.tonalli.sign.glyph}</span>
-                            <span>{day.moon.emoji}</span>
+                            {day.personalDay}
                           </span>
-                          {day.personalDay !== null && (
-                            <span
-                              aria-hidden="true"
-                              className="mt-auto pt-1 text-center text-[10px] sm:text-xs font-medium leading-none text-amber-300/90"
-                            >
-                              {day.personalDay}
-                            </span>
-                          )}
-                        </button>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        )}
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-          {/* Legend */}
-          <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
-            <li>
-              <span aria-hidden="true">🐊</span> {t("legend.sign")}
+        {/* Legend */}
+        <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 font-dato text-[0.6875rem] uppercase tracking-[0.08em] text-letra-suave">
+          <li className="flex items-center gap-2">
+            <span aria-hidden="true" className="block h-[3px] w-5 bg-rosa" />
+            {t("today")}
+          </li>
+          <li className="hidden items-center gap-2 sm:flex">
+            <span aria-hidden="true" className="text-letra">
+              1 Cipactli
+            </span>
+            {t("legend.sign")}
+          </li>
+          <li className="flex items-center gap-2">
+            <LunaGlifo luna={{ illumination: 0.5, age: 7.4 }} className="size-4 text-letra" />
+            {t("legend.moon")}
+          </li>
+          {profile.birthDate && (
+            <li className="flex items-center gap-2">
+              <span aria-hidden="true" className="text-letra-acento">
+                1–9
+              </span>
+              {t("legend.personalDay")}
             </li>
-            <li>
-              <span aria-hidden="true">🌕</span> {t("legend.moon")}
-            </li>
-            {profile.birthDate && (
-              <li>
-                <span aria-hidden="true" className="font-medium text-amber-300/90">
-                  1–9
-                </span>{" "}
-                {t("legend.personalDay")}
-              </li>
-            )}
-          </ul>
-          <p className="mt-2 text-xs text-slate-400 sr-only sm:not-sr-only">{t("keyboardHint")}</p>
-        </CardContent>
-      </Card>
+          )}
+        </ul>
+        <p className="mt-2 font-lectura text-[0.9375rem] text-letra-suave sr-only sm:not-sr-only">{t("keyboardHint")}</p>
+      </div>
 
-      <div ref={detailRef} className="scroll-mt-24 lg:sticky lg:top-24">
+      <div ref={detailRef} className="scroll-mt-(--alto-cabecera) lg:sticky lg:top-[calc(var(--alto-cabecera)+1rem)]">
         <DayDetail
           dayKey={selected}
           birthDate={profile.birthDate}
