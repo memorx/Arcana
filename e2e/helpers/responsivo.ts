@@ -4,11 +4,21 @@
  */
 import type { Page, Response } from "@playwright/test";
 
-/** Loads a route and lets it settle: network quiet (or 6 s), fonts ready, a short pause. */
+/**
+ * Loads a route and lets it settle: network quiet (or 6 s), fonts ready, a short pause.
+ * Then makes sure the page has painted: on a loaded machine, headless Chromium sometimes
+ * never paints the first page of a freshly launched browser (no first-paint entry, no
+ * requestAnimationFrame, document.timeline stuck at 0, so every CSS animation stays
+ * "pending"), even for a bare setContent page. A screenshot forces that first frame.
+ */
 export async function cargar(page: Page, ruta: string): Promise<Response | null> {
   const respuesta = await page.goto(ruta, { waitUntil: "load" });
   await page.waitForLoadState("networkidle", { timeout: 6_000 }).catch(() => undefined);
   await page.evaluate(() => document.fonts?.ready).catch(() => undefined);
+  const pinto = await page
+    .evaluate(() => performance.getEntriesByType("paint").length > 0)
+    .catch(() => true);
+  if (!pinto) await page.screenshot({ timeout: 15_000 }).catch(() => undefined);
   await page.waitForTimeout(400);
   return respuesta;
 }
