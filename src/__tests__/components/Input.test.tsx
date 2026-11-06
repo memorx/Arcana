@@ -17,13 +17,15 @@ describe("Input", () => {
   it("shows error message", () => {
     render(<Input label="Email" error="Invalid email" />);
     expect(screen.getByText("Invalid email")).toBeInTheDocument();
-    expect(screen.getByText("Invalid email")).toHaveClass("text-red-400");
+    expect(screen.getByText("Invalid email")).toHaveClass("text-letra-error");
   });
 
   it("applies error styles when error is present", () => {
     render(<Input label="Email" error="Error" />);
     const input = screen.getByRole("textbox");
-    expect(input).toHaveClass("border-red-500");
+    expect(input).toHaveClass("border-letra-error");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveAttribute("aria-describedby", "email-error");
   });
 
   it("handles value changes", async () => {
@@ -53,6 +55,13 @@ describe("Input", () => {
   it("supports disabled attribute", () => {
     render(<Input label="Disabled" disabled />);
     expect(screen.getByRole("textbox")).toBeDisabled();
+  });
+
+  it("is a paper field: bottom rule only, Newsreader letters, mono label", () => {
+    render(<Input label="Nombre" />);
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveClass("border-0", "border-b", "bg-transparent", "font-lectura");
+    expect(screen.getByText("Nombre")).toHaveClass("font-dato", "uppercase");
   });
 
   it("applies custom className", () => {

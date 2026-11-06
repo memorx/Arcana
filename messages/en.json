@@ -22,7 +22,8 @@
       "message": "The cards got confused. Please try again.",
       "tryAgain": "Try Again",
       "goHome": "Go Home"
-    }
+    },
+    "cardsCredit": "Cards: Pamela Colman Smith, 1909 · public domain"
   },
   "nav": {
     "home": "Home",
@@ -46,7 +47,14 @@
     "blueprint": "My Arcana Map",
     "calendar": "Calendar",
     "insights": "My story",
-    "compatibility": "Reading for two"
+    "compatibility": "Reading for two",
+    "mainNav": "Main navigation",
+    "openNav": "Open menu",
+    "closeNav": "Close menu",
+    "navMenu": "Menu",
+    "yourArcana": "Your Arcana",
+    "account": "Your account",
+    "language": "Language"
   },
   "landing": {
     "readingCounter": "readings performed",
@@ -1304,5 +1312,14 @@
       "partner": "The other person",
       "bond": "The bond"
     }
+  },
+  "hora": {
+    "hoy": "Today",
+    "fechaLarga": "{diaSemana, select, 0 {Sun} 1 {Mon} 2 {Tue} 3 {Wed} 4 {Thu} 5 {Fri} other {Sat}} {mes, select, 1 {Jan} 2 {Feb} 3 {Mar} 4 {Apr} 5 {May} 6 {Jun} 7 {Jul} 8 {Aug} 9 {Sep} 10 {Oct} 11 {Nov} other {Dec}} {dia}, {anio}",
+    "fechaCorta": "{mes, select, 1 {Jan} 2 {Feb} 3 {Mar} 4 {Apr} 5 {May} 6 {Jun} 7 {Jul} 8 {Aug} 9 {Sep} 10 {Oct} 11 {Nov} other {Dec}} {dia}",
+    "tonalli": "{numero} {signo} ({nombre})",
+    "senor": "Lord of the night: {nombre}",
+    "luna": "{fase} {luz}%",
+    "lunaCorta": "Moon {luz}%"
   }
 }

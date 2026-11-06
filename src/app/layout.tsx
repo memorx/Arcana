@@ -1,9 +1,53 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Gloock, Martian_Mono, Newsreader, Water_Brush } from "next/font/google";
 import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Providers } from "@/components/providers";
 import "./globals.css";
+
+// «Dos tintas» (§5.7): autohospedadas por next/font. Las variables las leen
+// los tokens --font-titulo/lectura/dato/pincel de globals.css (@theme inline).
+const gloock = Gloock({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--fuente-gloock",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  display: "swap",
+  variable: "--fuente-newsreader",
+});
+
+const martianMono = Martian_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--fuente-martian",
+});
+
+// Sólo para la palabra a pincel; sin fallback ajustado (su métrica no se parece a ninguna).
+// Sin precarga: pesa 65 KB y sólo la usan unas cuantas escenas; no debe competir con el LCP
+// (la tesis en Gloock) en todas las pantallas. La palabra es decorativa (aria-hidden) y su alto
+// lo fija el line-height, así que el cambio de fuente no mueve nada.
+const waterBrush = Water_Brush({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  adjustFontFallback: false,
+  preload: false,
+  variable: "--fuente-water-brush",
+});
+
+const fuentes = [gloock, newsreader, martianMono, waterBrush].map((f) => f.variable).join(" ");
+
+export const viewport: Viewport = {
+  themeColor: "#0E0D0C",
+  colorScheme: "light",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.readarcana.com"),
@@ -70,7 +114,7 @@ export default async function RootLayout({
   const t = await getTranslations("common");
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={fuentes}>
       <head>
         {/* PWA Meta Tags for iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -89,13 +133,36 @@ export default async function RootLayout({
         )}
       </head>
       <body className="antialiased min-h-screen flex flex-col">
-        {/* Skip Link for Accessibility */}
+        {/* Skip link: rosa-luz con letra tinta (5.51:1), en mono como los botones */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-full focus:bg-rosa-luz focus:px-5 focus:font-dato focus:text-xs focus:uppercase focus:tracking-[0.1em] focus:text-tinta"
         >
           {t("skipToContent")}
         </a>
+
+        {/* Pincel seco: vetas horizontales que comen el trazo, como brocha con poca tinta.
+            Lo usa <Pincel> (y la utilidad `pincel-seco`) con filter: url(#pincel-seco). */}
+        <svg
+          width="0"
+          height="0"
+          aria-hidden="true"
+          focusable="false"
+          style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
+        >
+          <filter id="pincel-seco" x="-5%" y="-10%" width="110%" height="120%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.42" numOctaves={2} seed={11} result="vetas" />
+            <feColorMatrix
+              in="vetas"
+              type="matrix"
+              values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3.2 2.25"
+              result="huecos"
+            />
+            <feComposite in="SourceGraphic" in2="huecos" operator="in" result="seco" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves={1} seed={4} result="grano" />
+            <feDisplacementMap in="seco" in2="grano" scale={5} xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </svg>
 
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>

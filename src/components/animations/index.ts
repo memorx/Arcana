@@ -1,4 +1,4 @@
 export { FadeIn } from "./FadeIn";
-export { AnimatedCard } from "./AnimatedCard";
-export { PageTransition } from "./PageTransition";
+export { AnimatedCard, FlipCard } from "./AnimatedCard";
+export { PageTransition, StaggerContainer, StaggerItem } from "./PageTransition";
 export { NumberTicker } from "./NumberTicker";

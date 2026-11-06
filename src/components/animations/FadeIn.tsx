@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ReactNode } from "react";
 
 interface FadeInProps {
@@ -11,6 +11,7 @@ interface FadeInProps {
   className?: string;
 }
 
+/** Aparece con un fundido corto. Con reduced-motion se muestra quieto desde el principio. */
 export function FadeIn({
   children,
   delay = 0,
@@ -18,6 +19,7 @@ export function FadeIn({
   direction = "up",
   className = "",
 }: FadeInProps) {
+  const reducido = useReducedMotion();
   const directions = {
     up: { y: 20 },
     down: { y: -20 },
@@ -28,12 +30,12 @@ export function FadeIn({
 
   return (
     <motion.div
-      initial={{ opacity: 0, ...directions[direction] }}
+      initial={reducido ? false : { opacity: 0, ...directions[direction] }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{
         duration,
         delay,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.16, 1, 0.3, 1],
       }}
       className={className}
     >

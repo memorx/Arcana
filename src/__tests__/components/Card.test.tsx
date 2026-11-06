@@ -14,20 +14,30 @@ describe("Card", () => {
     expect(screen.getByText("Card content")).toBeInTheDocument();
   });
 
-  it("renders with default variant", () => {
+  it("renders with default variant: its ground with an ink rule, no generic shadow", () => {
     render(<Card data-testid="card">Content</Card>);
     const card = screen.getByTestId("card");
-    expect(card).toHaveClass("bg-slate-900/50");
+    expect(card).toHaveClass("bg-suelo", "border", "border-filete", "rounded-sm");
+    expect(card.className).not.toMatch(/shadow|rounded-xl|backdrop-blur/);
   });
 
-  it("renders with highlighted variant", () => {
+  it("renders with highlighted variant: a thick pink rule on top", () => {
     render(
       <Card variant="highlighted" data-testid="card">
         Highlighted
       </Card>
     );
     const card = screen.getByTestId("card");
-    expect(card).toHaveClass("bg-gradient-to-br");
+    expect(card).toHaveClass("border-t-rosa", "border-t-[3px]");
+  });
+
+  it("renders with interactive variant: pink rule on hover", () => {
+    render(
+      <Card variant="interactive" data-testid="card">
+        Interactive
+      </Card>
+    );
+    expect(screen.getByTestId("card")).toHaveClass("cursor-pointer", "hover:border-rosa");
   });
 
   it("applies custom className", () => {
@@ -61,7 +71,7 @@ describe("CardTitle", () => {
 
   it("applies title styles", () => {
     render(<CardTitle data-testid="title">Title</CardTitle>);
-    expect(screen.getByTestId("title")).toHaveClass("text-xl", "font-semibold");
+    expect(screen.getByTestId("title")).toHaveClass("text-xl", "font-titulo");
   });
 });
 
@@ -69,7 +79,7 @@ describe("CardDescription", () => {
   it("renders with muted text", () => {
     render(<CardDescription>Description text</CardDescription>);
     const description = screen.getByText("Description text");
-    expect(description).toHaveClass("text-slate-400");
+    expect(description).toHaveClass("text-letra-suave");
   });
 });
 
