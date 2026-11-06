@@ -203,6 +203,36 @@ describe("Header in two inks (F1-A)", () => {
     expect(within(menu).getByRole("group", { name: "language" })).toBeInTheDocument();
   });
 
+  it("the mobile menu's account block shows the level seal and the account email, like the desktop menu", async () => {
+    const user = userEvent.setup();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ credits: 7, freeReadingsLeft: 0, level: 3 }),
+    }) as unknown as typeof fetch;
+    mockUseSession.mockReturnValue(ANA);
+    render(<Header />);
+
+    await user.click(screen.getByRole("button", { name: "openNav" }));
+    const cuenta = within(screen.getByRole("dialog")).getByText("account").closest("[data-cuenta]") as HTMLElement;
+    // level 3 is Adept: the seal says so to the screen reader and shows the number
+    const sello = await within(cuenta).findByRole("img", { name: "level 3: names.adept" });
+    expect(sello).toHaveTextContent(/^A3$/);
+    expect(within(cuenta).getByText("Ana")).toHaveClass("font-titulo");
+    expect(within(cuenta).getByText("ana@example.com")).toHaveClass("font-dato", "text-niebla");
+  });
+
+  it("a nameless account: the mobile block shows the email under «Tu cuenta», without repeating it", async () => {
+    const user = userEvent.setup();
+    mockUseSession.mockReturnValue({ ...ANA, data: { user: { ...ANA.data.user, name: null } } });
+    render(<Header />);
+
+    await user.click(screen.getByRole("button", { name: "openNav" }));
+    const cuenta = within(screen.getByRole("dialog")).getByText("account").closest("[data-cuenta]") as HTMLElement;
+    expect(within(cuenta).getByText("ana@example.com")).toBeInTheDocument();
+    expect(within(cuenta).queryByText("welcomeDefault")).toBeNull();
+    expect(within(cuenta).getByRole("img", { name: "level 1: names.novice" })).toHaveTextContent(/^A1$/);
+  });
+
   it("a user without a name sees dashboard.welcomeDefault, which exists in es and en («Tu cuenta» / «Your account»)", () => {
     mockUseSession.mockReturnValue({ ...ANA, data: { user: { ...ANA.data.user, name: null } } });
     render(<Header />);
