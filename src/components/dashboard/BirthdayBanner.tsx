@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Button, Card, CardContent } from "@/components/ui";
+import { EnlaceBoton } from "./EnlaceBoton";
 import { claimBirthdayGift, type BirthdayGiftResult } from "@/lib/birthday";
 
 interface BirthdayBannerProps {
@@ -25,43 +24,25 @@ export async function BirthdayBanner({ userId }: BirthdayBannerProps) {
   const t = await getTranslations("birthday");
 
   return (
-    <Card
-      variant="highlighted"
-      className="relative overflow-hidden border-amber-400/40 bg-gradient-to-r from-amber-900/30 via-purple-900/30 to-amber-900/20"
+    <section
+      aria-labelledby="birthday-banner-title"
+      className="flex flex-col gap-4 border-y border-filete border-t-[3px] border-t-rosa py-5 sm:flex-row sm:items-center sm:justify-between"
     >
-      <section aria-labelledby="birthday-banner-title">
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-2 -top-3 text-7xl text-amber-400/10 select-none"
-        >
-          &#10022;
-        </span>
-        <CardContent className="relative p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
-          <span
-            aria-hidden="true"
-            className="text-5xl leading-none motion-safe:animate-[float_6s_ease-in-out_infinite]"
-          >
-            🎂
-          </span>
-          <div className="flex-1 min-w-0">
-            <h2 id="birthday-banner-title" className="text-xl font-semibold text-amber-300">
-              {t("title")}
-            </h2>
-            <p className="text-sm text-slate-300 mt-1">
-              {result.granted
-                ? t("granted", { credits: result.credits })
-                : result.alreadyGranted
-                  ? t("alreadyGranted", { credits: result.credits })
-                  : t("greetingOnly")}
-            </p>
-          </div>
-          <Link href="/reading/new" className="sm:shrink-0">
-            <Button size="sm" className="w-full sm:w-auto">
-              {t("cta")}
-            </Button>
-          </Link>
-        </CardContent>
-      </section>
-    </Card>
+      <div className="min-w-0">
+        <h2 id="birthday-banner-title" className="font-titulo text-2xl leading-tight text-letra">
+          {t("title")}
+        </h2>
+        <p className="mt-1 max-w-[60ch] font-lectura text-letra-suave">
+          {result.granted
+            ? t("granted", { credits: result.credits })
+            : result.alreadyGranted
+              ? t("alreadyGranted", { credits: result.credits })
+              : t("greetingOnly")}
+        </p>
+      </div>
+      <EnlaceBoton href="/reading/new" size="sm" className="self-start sm:shrink-0 sm:self-auto">
+        {t("cta")}
+      </EnlaceBoton>
+    </section>
   );
 }

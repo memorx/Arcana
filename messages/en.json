@@ -214,7 +214,9 @@
     "welcomeSubtitle": "Welcome to your reading space",
     "streak": {
       "days": "day streak",
-      "best": "Best: {count} days"
+      "best": "Best: {count} days",
+      "title": "Streak",
+      "empty": "Your streak starts with your next reading."
     },
     "freeReadings": "{count, plural, one {# free reading} other {# free readings}}",
     "freeReadingsLabel": "Free Readings",
@@ -247,6 +249,12 @@
     "inviteFriends": "Invite Friends",
     "explore": {
       "title": "Explore"
+    },
+    "mesa": {
+      "etiqueta": "My space",
+      "pincel": "Your table",
+      "notaRecientes": "The engravings on the table are the cards from your latest readings.",
+      "notaFijas": "Once you do your readings, their cards will gather on this table."
     }
   },
   "reading": {
@@ -377,7 +385,8 @@
     "emptyTitle": "You don't have any readings yet",
     "emptySubtitle": "Begin your spiritual journey with your first tarot reading",
     "startReading": "Start my first reading",
-    "newReading": "New Reading"
+    "newReading": "New Reading",
+    "etiqueta": "Your archive"
   },
   "spreads": {
     "threeCard": {
@@ -615,7 +624,9 @@
     "creditsExhausted": "Subscription Expired",
     "creditsExhaustedDesc": "Your credit-based subscription has expired. Add more credits or resubscribe to continue receiving daily readings.",
     "buyCredits": "Buy Credits",
-    "resubscribe": "Resubscribe"
+    "resubscribe": "Resubscribe",
+    "pincel": "Today",
+    "boca": "Today's card is face down. Tap it to turn it over."
   },
   "referral": {
     "title": "Invite Friends, Earn Credits",
@@ -660,7 +671,8 @@
     "keepGoing": "Keep up the great work! Your dedication is paying off.",
     "continue": "Awesome!",
     "nextMilestone": "Next reward at {days} days",
-    "allCompleted": "All milestones completed!"
+    "allCompleted": "All milestones completed!",
+    "pincel": "Streak"
   },
   "collection": {
     "title": "Your Collection",
@@ -747,7 +759,8 @@
       "adept": "Adept",
       "master": "Master",
       "oracle": "Oracle"
-    }
+    },
+    "viewAchievements": "See achievements"
   },
   "challenges": {
     "title": "Challenges",
@@ -1006,7 +1019,9 @@
       "noProfileCta": "Add your birth date to your profile to see your personal day.",
       "noProfileButton": "Complete profile"
     },
-    "about": "About the tonalpohualli"
+    "about": "About the tonalpohualli",
+    "etiqueta": "Tonalpohualli · moon · personal day",
+    "signos": "The twenty day signs of the tonalpohualli"
   },
   "energies": {
     "title": "Today's energies",

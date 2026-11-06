@@ -130,10 +130,6 @@ const RUTAS: Ruta[] = [
  */
 const SIN_H1_AUTH: Defecto = { motivo: "L6 · sin h1: el título del formulario es el h3 de CardTitle" };
 const SIN_H1_LEGAL: Defecto = { motivo: "L6 · páginas legales sin h1: los títulos son h3" };
-const PROGRESO_404 = {
-  patron: /status of 404 .* @ \/progress\?/,
-  motivo: "L3 · LevelWidget enlaza a /progress, que no existe: el prefetch da 404 en consola",
-};
 
 const DEFECTOS: Record<string, Defectos> = {
   "/login": { encabezados: [SIN_H1_AUTH] },
@@ -163,7 +159,6 @@ const DEFECTOS: Record<string, Defectos> = {
       },
     ],
   },
-  "/dashboard": { consola: [PROGRESO_404] },
   "/reading/[id]": {
     maqueta: [
       {
@@ -174,7 +169,6 @@ const DEFECTOS: Record<string, Defectos> = {
     ],
   },
   "/subscribe/success (sin session_id)": { encabezados: [{ motivo: "L6 · sin session_id la página no muestra h1" }] },
-  "/dashboard (vacío)": { consola: [PROGRESO_404] },
   "/reading/new (vacío)": {
     maqueta: [
       {

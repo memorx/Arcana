@@ -3,12 +3,15 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  Button,
-  Card,
-  CardContent,
-  Badge,
-} from "@/components/ui";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui";
+import { EnlaceBoton } from "@/components/dashboard/EnlaceBoton";
+import { Escena } from "@/components/tinta/Escena";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { Pincel } from "@/components/tinta/Pincel";
+import { HoraDelDia } from "@/components/tinta/HoraDelDia";
+import { MesaDeGrabados } from "@/components/tinta/MesaDeGrabados";
+import { ReversoCarta } from "@/components/tinta/ReversoCarta";
 import { StreakDisplay } from "@/components/dashboard/StreakDisplay";
 import { CollectionWidget } from "@/components/dashboard/CollectionWidget";
 import { AchievementsWidget } from "@/components/dashboard/AchievementsWidget";
@@ -18,6 +21,17 @@ import { BirthdayBanner } from "@/components/dashboard/BirthdayBanner";
 import { TodayEnergiesWidget } from "@/components/dashboard/TodayEnergiesWidget";
 import { BlueprintWidget } from "@/components/dashboard/BlueprintWidget";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { Abanico } from "@/components/dashboard/Abanico";
+import { Glifo } from "@/components/dashboard/Glifos";
+import { cartasDeLectura, nombresDeCartas, slugsParaMesa } from "@/components/dashboard/mesa";
+import { CELDA, ENLACE_DATO, RETICULA, ROTULO, TITULO_CELDA, ultimaCelda } from "@/components/dashboard/estilos";
+
+/** Readings read for the table of engravings; the list shows the first three. */
+const LECTURAS_DE_LA_MESA = 6;
+const LECTURAS_RECIENTES = 3;
+
+/** Título de sección fuera de la retícula (Explora, tiradas). */
+const TITULO_SECCION = "font-titulo text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-tight text-letra";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -30,11 +44,12 @@ export default async function DashboardPage() {
   const tCommon = await getTranslations("common");
   const tPulse = await getTranslations("pulse");
   const locale = await getLocale();
+  const userId = session.user.id;
 
   // Fetch user data and recent readings
-  const [user, recentReadings, spreadTypes, userProfile, subscription] = await Promise.all([
+  const [user, readings, spreadTypes, userProfile, subscription] = await Promise.all([
     prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: {
         freeReadingsLeft: true,
         credits: true,
@@ -44,19 +59,19 @@ export default async function DashboardPage() {
       },
     }),
     prisma.reading.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       include: { spreadType: true },
       orderBy: { createdAt: "desc" },
-      take: 3,
+      take: LECTURAS_DE_LA_MESA,
     }),
     prisma.spreadType.findMany({
       orderBy: { cardCount: "asc" },
     }),
     prisma.userProfile.findUnique({
-      where: { userId: session.user.id },
+      where: { userId },
     }),
     prisma.subscription.findUnique({
-      where: { userId: session.user.id },
+      where: { userId },
       select: { status: true },
     }),
   ]);
@@ -64,356 +79,319 @@ export default async function DashboardPage() {
   const isSubscribed = subscription?.status === "active";
 
   const totalReadings = await prisma.reading.count({
-    where: { userId: session.user.id },
+    where: { userId },
   });
 
+  // The table: the engravings of your latest cards (fixed ones for a new account)
+  const nombres = await nombresDeCartas(readings);
+  const slugsMesa = slugsParaMesa(readings.flatMap((r) => cartasDeLectura(r.cards, nombres).map((c) => c.name)));
+  const mesaConHistoria = nombres.size > 0;
+  const recentReadings = readings.slice(0, LECTURAS_RECIENTES);
+
   const displayName = user?.name || session.user.email?.split("@")[0] || "";
+  const freeLeft = user?.freeReadingsLeft || 0;
+  const credits = user?.credits || 0;
+  const streak = user?.currentStreak || 0;
+  const dateLocale = locale === "en" ? "en-US" : "es-ES";
+
+  const stats = [
+    { key: "free", label: t("freeReadingsLabel"), value: freeLeft },
+    { key: "credits", label: t("creditsLabel"), value: credits },
+    { key: "total", label: t("totalReadingsLabel"), value: totalReadings },
+  ];
 
   // Same cards and texts as the landing's "More than tarot" (pulse.moreThanTarot.*)
   const explore = [
-    { href: "/calendar", icon: "☾", key: "calendar" },
-    { href: "/compatibility", icon: "♡", key: "compatibility" },
-    { href: "/reading/manual", icon: "❖", key: "manual" },
-    { href: "/blueprint", icon: "✶", key: "blueprint" },
+    { href: "/calendar", key: "calendar" },
+    { href: "/compatibility", key: "compatibility" },
+    { href: "/reading/manual", key: "manual" },
+    { href: "/blueprint", key: "blueprint" },
   ] as const;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="space-y-12 sm:space-y-16">
       {/* Birthday greeting (renders nothing on other days) */}
-      <BirthdayBanner userId={session.user.id} />
+      <BirthdayBanner userId={userId} />
 
-      {/* Welcome Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-100">
+      {/* La mesa: banda de tinta con los grabados de tus cartas recientes, el saludo y la hora */}
+      <Escena
+        suelo="tinta"
+        aria-labelledby="mesa-titulo"
+        className="-mx-gutter flex min-h-[clamp(360px,54vh,460px)] flex-col justify-end"
+      >
+        <MesaDeGrabados slugs={slugsMesa} columnas={8} filas={2} className="[--mdg-opacidad:.58]" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(14_13_12/.45)_0%,rgb(14_13_12/.82)_40%,rgb(14_13_12/.97)_100%)] md:bg-[linear-gradient(90deg,rgb(14_13_12/.97)_0%,rgb(14_13_12/.88)_40%,rgb(14_13_12/.3)_76%,rgb(14_13_12/.55)_100%)]"
+        />
+        <div className="relative flex flex-col items-start gap-4 px-gutter pt-16 pb-8 sm:pb-10">
+          <Etiqueta>{t("mesa.etiqueta")}</Etiqueta>
+          <Pincel aria-hidden="true" className="-ml-[0.04em] text-[clamp(3.75rem,2.2rem+6vw,6.5rem)]">
+            {t("mesa.pincel")}
+          </Pincel>
+          <h1 id="mesa-titulo" className="max-w-[18ch] font-titulo text-[clamp(2rem,1.4rem+2.2vw,3.25rem)] leading-[1.05] text-letra">
             {t("welcome", { name: displayName })}
           </h1>
-          <p className="text-slate-400 mt-1">
-            {t("welcomeSubtitle")}
-          </p>
+          <p className="max-w-[46ch] font-lectura text-[1.0625rem] leading-relaxed text-letra">{t("welcomeSubtitle")}</p>
+          <HoraDelDia variante="larga" className="max-w-[60ch] text-letra-suave" />
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
+            <EnlaceBoton href="/reading/new" prefetch={true} size="lg">
+              {t("startReading")} <span aria-hidden="true" className="font-lectura text-[1.1em] tracking-normal">→</span>
+            </EnlaceBoton>
+            <p className="max-w-[40ch] font-dato text-[0.6875rem] leading-relaxed tracking-[0.06em] text-letra-suave">
+              {mesaConHistoria ? t("mesa.notaRecientes") : t("mesa.notaFijas")}
+            </p>
+          </div>
         </div>
-        <Link href="/reading/new" prefetch={true}>
-          <Button size="lg">{t("startReading")}</Button>
-        </Link>
-      </div>
+      </Escena>
 
-      {/* Streak Display */}
-      {(user?.currentStreak || 0) > 0 && (
-        <StreakDisplay
-          currentStreak={user?.currentStreak || 0}
-          longestStreak={user?.longestStreak || 0}
-        />
-      )}
-
-      {/* Today's energies + Arcana Map */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <TodayEnergiesWidget userId={session.user.id} />
-        <BlueprintWidget userId={session.user.id} />
-      </div>
-
-      {/* Level Widget */}
-      <LevelWidget userId={session.user.id} />
-
-      {/* Collection Widget */}
-      <CollectionWidget userId={session.user.id} />
-
-      {/* Achievements Widget */}
-      <AchievementsWidget userId={session.user.id} />
-
-      {/* Challenges + My story */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <ChallengesWidget userId={session.user.id} />
-        <InsightsWidget userId={session.user.id} />
-      </div>
+      {/* Contadores: gratis, créditos y lecturas */}
+      <dl className={cn(RETICULA, "-mt-4 grid-cols-3 sm:-mt-8")}>
+        {stats.map((stat) => (
+          <div key={stat.key} className="min-w-0 bg-suelo px-1 py-4 sm:px-6 sm:py-5">
+            <dt className={ROTULO}>{stat.label}</dt>
+            <dd className="mt-2 font-titulo text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)] leading-none text-letra tabular-nums">
+              {stat.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
 
       {/* Complete Profile Prompt */}
       {!userProfile && (
-        <Card className="border-amber-500/30 bg-amber-900/10">
-          <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">&#128100;</span>
-              <div>
-                <p className="font-medium text-slate-100">{t("completeProfile")}</p>
-                <p className="text-sm text-slate-400">{t("completeProfileDesc")}</p>
-              </div>
-            </div>
-            <Link href="/profile/setup">
-              <Button size="sm">{t("setupProfile")}</Button>
-            </Link>
-          </CardContent>
-        </Card>
+        <section
+          aria-labelledby="perfil-titulo"
+          className="flex flex-col gap-4 border-l-[3px] border-rosa py-1 pl-5 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="min-w-0">
+            <h2 id="perfil-titulo" className={TITULO_CELDA}>
+              {t("completeProfile")}
+            </h2>
+            <p className="mt-1 font-lectura text-letra-suave">{t("completeProfileDesc")}</p>
+          </div>
+          <EnlaceBoton href="/profile/setup" variant="linea" size="sm" className="self-start sm:self-auto">
+            {t("setupProfile")}
+          </EnlaceBoton>
+        </section>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid sm:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-400">{t("freeReadingsLabel")}</p>
-                <p className="text-3xl font-bold text-emerald-400">
-                  {user?.freeReadingsLeft || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-emerald-400/30">&#10022;</div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* La retícula: los widgets en un pliego con filetes */}
+      <div data-reticula className={cn(RETICULA, "md:grid-cols-2 lg:grid-cols-12")}>
+        <div className={cn(CELDA, "lg:col-span-7")}>
+          <TodayEnergiesWidget userId={userId} />
+        </div>
+        <div className={cn(CELDA, "lg:col-span-5")}>
+          <BlueprintWidget userId={userId} />
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-400">{t("creditsLabel")}</p>
-                <p className="text-3xl font-bold text-amber-400">
-                  {user?.credits || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-amber-400/30">&#9733;</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-400">{t("totalReadingsLabel")}</p>
-                <p className="text-3xl font-bold text-purple-400">
-                  {totalReadings}
-                </p>
-              </div>
-              <div className="text-4xl text-purple-400/30">&#9788;</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Daily Oracle Promo */}
-      <Card className={`bg-gradient-to-r ${isSubscribed ? "from-emerald-900/30 to-teal-900/30 border-emerald-500/20" : "from-purple-900/30 to-amber-900/30 border-purple-500/20"}`}>
-        <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <span className="text-4xl">{isSubscribed ? "☀️" : "✨"}</span>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-slate-100">{t("dailyOracleTitle")}</h2>
-                {isSubscribed && (
-                  <Badge variant="success" className="text-xs">
-                    {tCommon("active")}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-sm text-slate-400">{t("dailyOracleDesc")}</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Link href="/daily" prefetch={true}>
-              <Button variant={isSubscribed ? "primary" : "secondary"} size="sm">
-                {isSubscribed ? t("todayCardDone") : t("viewDaily")}
-              </Button>
-            </Link>
-            {!isSubscribed && (
-              <Link href="/subscribe" prefetch={true}>
-                <Button size="sm">{t("subscribeCta")}</Button>
+        {/* Recent Readings */}
+        <section aria-labelledby="recientes-titulo" className={cn(CELDA, "md:col-span-2 lg:col-span-7 lg:row-span-2")}>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+            <h2 id="recientes-titulo" className={TITULO_CELDA}>
+              {t("recentReadings")}
+            </h2>
+            {totalReadings > LECTURAS_RECIENTES && (
+              <Link href="/history" className={ENLACE_DATO}>
+                {t("viewAll")} <span aria-hidden="true">→</span>
               </Link>
             )}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Referral Prompt */}
-      <Card className="bg-gradient-to-r from-emerald-900/20 to-teal-900/20 border-emerald-500/20">
-        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">&#127873;</span>
-            <div>
-              <p className="font-medium text-slate-100">{t("referralTitle")}</p>
-              <p className="text-sm text-slate-400">{t("referralDesc")}</p>
+          {recentReadings.length === 0 ? (
+            <div className="mt-5 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+              <span className="block aspect-[300/520] w-16 shrink-0 overflow-hidden rounded-[6px]">
+                <ReversoCarta />
+              </span>
+              <div>
+                <p className="font-lectura text-letra-suave">{t("noReadings")}</p>
+                <EnlaceBoton href="/reading/new" variant="linea" size="sm" className="mt-3">
+                  {t("firstReading")}
+                </EnlaceBoton>
+              </div>
             </div>
+          ) : (
+            <ol className="mt-4 divide-y divide-filete/15 border-t border-filete/15">
+              {recentReadings.map((reading) => {
+                const spreadName = locale === "en" ? reading.spreadType.name : reading.spreadType.nameEs;
+
+                return (
+                  <li key={reading.id}>
+                    <Link
+                      href={`/reading/${reading.id}`}
+                      className="group flex items-start gap-4 py-4 transition-colors hover:text-letra-acento"
+                    >
+                      <Abanico
+                        cartas={cartasDeLectura(reading.cards, nombres)}
+                        vacias={reading.spreadType.cardCount}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <Badge variant="primary" className="max-w-full whitespace-normal">
+                            {spreadName}
+                          </Badge>
+                          <span className="font-dato text-[0.6875rem] tracking-[0.06em] text-letra-suave">
+                            {new Date(reading.createdAt).toLocaleDateString(dateLocale, {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 line-clamp-2 font-lectura text-letra">{reading.intention}</p>
+                      </div>
+                      <span aria-hidden="true" className="self-center font-lectura text-xl text-letra-suave group-hover:text-letra-acento">
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </section>
+
+        {/* Racha */}
+        <section aria-labelledby="racha-titulo" className={cn(CELDA, "lg:col-span-5")}>
+          <h2 id="racha-titulo" className={cn(TITULO_CELDA, "mb-4")}>
+            {t("streak.title")}
+          </h2>
+          {streak > 0 ? (
+            <StreakDisplay currentStreak={streak} longestStreak={user?.longestStreak || 0} />
+          ) : (
+            <p className="font-lectura text-letra-suave">{t("streak.empty")}</p>
+          )}
+        </section>
+        <div className={cn(CELDA, "lg:col-span-5")}>
+          <LevelWidget userId={userId} />
+        </div>
+
+        <div className={cn(CELDA, "lg:col-span-4")}>
+          <ChallengesWidget userId={userId} />
+        </div>
+        <div className={cn(CELDA, "lg:col-span-4")}>
+          <InsightsWidget userId={userId} />
+        </div>
+        <div className={cn(CELDA, "md:col-span-2 lg:col-span-4")}>
+          <CollectionWidget userId={userId} />
+        </div>
+
+        <div className={cn(CELDA, "lg:col-span-5")}>
+          <AchievementsWidget userId={userId} />
+        </div>
+
+        {/* Daily Oracle */}
+        <section aria-labelledby="oraculo-titulo" className={cn(CELDA, "lg:col-span-7")}>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h2 id="oraculo-titulo" className={TITULO_CELDA}>
+              {t("dailyOracleTitle")}
+            </h2>
+            {isSubscribed && <Badge variant="success">{tCommon("active")}</Badge>}
           </div>
-          <Link href="/referral">
-            <Button variant="secondary" size="sm">{t("inviteFriends")}</Button>
-          </Link>
-        </CardContent>
-      </Card>
+          <p className="mt-2 max-w-[52ch] font-lectura text-letra-suave">{t("dailyOracleDesc")}</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <EnlaceBoton href="/daily" prefetch={true} variant={isSubscribed ? "primario" : "linea"} size="sm">
+              {isSubscribed ? t("todayCardDone") : t("viewDaily")}
+            </EnlaceBoton>
+            {!isSubscribed && (
+              <EnlaceBoton href="/subscribe" prefetch={true} size="sm">
+                {t("subscribeCta")}
+              </EnlaceBoton>
+            )}
+          </div>
+        </section>
+      </div>
 
       {/* Explore: the other ways of reading in Arcana */}
       <section aria-labelledby="dashboard-explore-title">
-        <h2 id="dashboard-explore-title" className="text-xl font-semibold text-slate-100">
-          {t("explore.title")}
-        </h2>
-        <p className="text-sm text-slate-400 mt-1 mb-4">{tPulse("moreThanTarot.subtitle")}</p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {explore.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="group block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-            >
-              <Card variant="interactive" className="h-full">
-                <CardContent className="p-5 h-full flex flex-col">
-                  <div aria-hidden="true" className="text-3xl mb-3 text-amber-400">
-                    {item.icon}
-                  </div>
-                  <h3 className="font-medium text-slate-100">
-                    {tPulse(`moreThanTarot.${item.key}.title`)}
-                  </h3>
-                  <p className="text-sm text-slate-400 mt-1 flex-1">
-                    {tPulse(`moreThanTarot.${item.key}.description`)}
-                  </p>
-                  <span className="mt-3 text-sm text-purple-300 transition-colors group-hover:text-amber-300">
-                    {tPulse("moreThanTarot.cta")} <span aria-hidden="true">&rarr;</span>
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <h2 id="dashboard-explore-title" className={TITULO_SECCION}>
+            {t("explore.title")}
+          </h2>
+          <Etiqueta>{tPulse("moreThanTarot.subtitle")}</Etiqueta>
         </div>
+        <ul className={cn(RETICULA, "sm:grid-cols-2 lg:grid-cols-4")}>
+          {explore.map((item, index) => (
+            <li key={item.href} className={cn("bg-suelo", index === explore.length - 1 && ultimaCelda(explore.length))}>
+              <Link
+                href={item.href}
+                className="group flex h-full flex-col gap-2.5 px-1 py-6 transition-colors hover:bg-papel-hondo sm:px-5"
+              >
+                <Glifo nombre={item.key} className="text-letra" />
+                <h3 className="font-titulo text-xl leading-tight text-letra">
+                  {tPulse(`moreThanTarot.${item.key}.title`)}
+                </h3>
+                <p className="flex-1 text-[0.9375rem] leading-snug text-letra-suave">
+                  {tPulse(`moreThanTarot.${item.key}.description`)}
+                </p>
+                <span className="mt-1 font-dato text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-letra-acento group-hover:underline group-hover:underline-offset-[0.35em]">
+                  {tPulse("moreThanTarot.cta")} <span aria-hidden="true">&rarr;</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Quick Actions - Spread Types */}
-      <section>
-        <h2 className="text-xl font-semibold text-slate-100 mb-4">
+      <section aria-labelledby="tiradas-titulo">
+        <h2 id="tiradas-titulo" className={cn(TITULO_SECCION, "mb-5")}>
           {t("startNewReading")}
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {spreadTypes.map((spread) => {
-            const canAfford =
-              (user?.freeReadingsLeft || 0) > 0 ||
-              (user?.credits || 0) >= spread.creditCost;
+        <ul className={cn(RETICULA, "sm:grid-cols-2 lg:grid-cols-4")}>
+          {spreadTypes.map((spread, index) => {
+            const canAfford = freeLeft > 0 || credits >= spread.creditCost;
 
             const spreadName = locale === "en" ? spread.name : spread.nameEs;
             const spreadDescription = locale === "en" ? spread.description : spread.descriptionEs;
 
             return (
-              <Link key={spread.id} href={`/reading/new?spread=${spread.id}`}>
-                <Card
-                  variant="interactive"
-                  className={!canAfford ? "opacity-50" : ""}
+              <li key={spread.id} className={cn("bg-suelo", index === spreadTypes.length - 1 && ultimaCelda(spreadTypes.length))}>
+                <Link
+                  href={`/reading/new?spread=${spread.id}`}
+                  className={cn(
+                    "flex h-full flex-col gap-2.5 px-1 py-5 transition-colors hover:bg-papel-hondo sm:px-5",
+                    !canAfford && "opacity-60"
+                  )}
                 >
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex gap-1">
-                        {Array.from({
-                          length: Math.min(spread.cardCount, 5),
-                        }).map((_, i) => (
-                          <div
-                            key={i}
-                            className="w-4 h-6 bg-gradient-to-b from-purple-700/50 to-purple-900/50 rounded-sm border border-purple-500/30"
-                          />
-                        ))}
-                        {spread.cardCount > 5 && (
-                          <span className="text-xs text-slate-500">
-                            +{spread.cardCount - 5}
-                          </span>
-                        )}
-                      </div>
-                      <Badge
-                        variant={
-                          (user?.freeReadingsLeft || 0) > 0
-                            ? "success"
-                            : "secondary"
-                        }
-                      >
-                        {(user?.freeReadingsLeft || 0) > 0
-                          ? t("free")
-                          : `${spread.creditCost} cr`}
-                      </Badge>
-                    </div>
-                    <h3 className="font-medium text-slate-100">
-                      {spreadName}
-                    </h3>
-                    <p className="text-sm text-slate-400 mt-1 line-clamp-2">
-                      {spreadDescription}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
+                  <div className="flex items-start justify-between gap-3">
+                    <span aria-hidden="true" className="flex items-end gap-1 pt-1">
+                      {Array.from({ length: Math.min(spread.cardCount, 5) }).map((_, i) => (
+                        <span key={i} className="block h-6 w-4 rounded-[2px] border border-filete/60" />
+                      ))}
+                      {spread.cardCount > 5 && (
+                        <span className="pl-0.5 font-dato text-[0.6875rem] text-letra-suave">+{spread.cardCount - 5}</span>
+                      )}
+                    </span>
+                    <Badge variant={freeLeft > 0 ? "success" : "default"}>
+                      {freeLeft > 0 ? t("free") : `${spread.creditCost} cr`}
+                    </Badge>
+                  </div>
+                  <h3 className="font-titulo text-lg leading-tight text-letra">{spreadName}</h3>
+                  <p className="line-clamp-2 text-[0.9375rem] leading-snug text-letra-suave">{spreadDescription}</p>
+                </Link>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </section>
 
-      {/* Recent Readings */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-slate-100">
-            {t("recentReadings")}
-          </h2>
-          {totalReadings > 3 && (
-            <Link href="/history">
-              <Button variant="ghost" size="sm">
-                {t("viewAll")}
-              </Button>
-            </Link>
-          )}
-        </div>
-
-        {recentReadings.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <div className="text-5xl text-slate-700 mb-4">&#9788;</div>
-              <p className="text-slate-400">
-                {t("noReadings")}
-              </p>
-              <Link href="/reading/new" className="inline-block mt-4">
-                <Button variant="secondary">{t("firstReading")}</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4">
-            {recentReadings.map((reading) => {
-              const spreadName = locale === "en" ? reading.spreadType.name : reading.spreadType.nameEs;
-
-              return (
-                <Link key={reading.id} href={`/reading/${reading.id}`}>
-                  <Card variant="interactive">
-                    <CardContent className="p-5">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="primary">
-                              {spreadName}
-                            </Badge>
-                            <span className="text-xs text-slate-500">
-                              {new Date(reading.createdAt).toLocaleDateString(
-                                locale === "en" ? "en-US" : "es-ES",
-                                {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                }
-                              )}
-                            </span>
-                          </div>
-                          <p className="text-slate-300 line-clamp-2">
-                            {reading.intention}
-                          </p>
-                        </div>
-                        <div className="text-slate-500">
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
+      {/* Referral Prompt */}
+      <section
+        aria-labelledby="referidos-titulo"
+        className="flex flex-col gap-4 border-y border-filete py-6 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div className="flex min-w-0 items-start gap-4">
+          <Glifo nombre="compatibility" className="mt-0.5 hidden text-letra sm:block" />
+          <div className="min-w-0">
+            <h2 id="referidos-titulo" className={TITULO_CELDA}>
+              {t("referralTitle")}
+            </h2>
+            <p className="mt-1 font-lectura text-letra-suave">{t("referralDesc")}</p>
           </div>
-        )}
+        </div>
+        <EnlaceBoton href="/referral" variant="linea" size="sm" className="self-start sm:shrink-0 sm:self-auto">
+          {t("inviteFriends")}
+        </EnlaceBoton>
       </section>
     </div>
   );
