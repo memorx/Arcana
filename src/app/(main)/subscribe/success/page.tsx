@@ -40,7 +40,20 @@ function SuccessContent() {
 
   useEffect(() => {
     if (conCreditos) {
-      setIsLoading(false);
+      // No hay sesión de Stripe que verificar: la bienvenida sólo si el servidor confirma la suscripción activa
+      // (la misma fuente que /subscribe y /daily). Quien abre esta URL desde el historial sin estar suscrito ve el error.
+      const verificarSuscripcion = async () => {
+        try {
+          const res = await fetch("/api/subscription");
+          const data = res.ok ? await res.json() : null;
+          if (data?.subscription?.status !== "active") setError(t("success.verifyError"));
+        } catch {
+          setError(t("success.verifyError"));
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      verificarSuscripcion();
       return;
     }
 
