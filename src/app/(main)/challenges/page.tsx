@@ -198,7 +198,7 @@ export default function ChallengesPage() {
                           </p>
                         </div>
                         <Badge variant={challenge.completed ? "primary" : "default"}>
-                          +{challenge.creditReward} {t("credits")}
+                          {t("reward", { count: challenge.creditReward })}
                         </Badge>
                       </div>
 

@@ -36,7 +36,7 @@ export function StreakDisplay({ currentStreak, longestStreak }: StreakDisplayPro
           <p className="flex flex-wrap items-baseline justify-between gap-x-3 text-[0.9375rem] leading-snug">
             <span className="text-letra">{tReward("nextMilestone", { days: nextMilestone.days })}</span>
             <span className="font-dato text-xs text-letra-acento">
-              +{nextMilestone.credits} {t("creditPlural")}
+              {t("streakReward", { count: nextMilestone.credits })}
             </span>
           </p>
           <Barra valor={progress} etiqueta={tReward("nextMilestone", { days: nextMilestone.days })} acento />

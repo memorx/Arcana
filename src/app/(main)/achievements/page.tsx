@@ -180,7 +180,7 @@ export default function AchievementsPage() {
                               </p>
                             </div>
                             <Badge variant={achievement.isUnlocked ? "primary" : "default"}>
-                              +{achievement.creditReward} {t("credits")}
+                              {t("reward", { count: achievement.creditReward })}
                             </Badge>
                           </div>
 
