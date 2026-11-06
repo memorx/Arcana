@@ -4,8 +4,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
-import { MEDIDAS_CARTA } from "@/lib/cartas";
-import { ContenidoArticulo, grabadoDelArticulo } from "../contenido";
+import { ContenidoArticulo, ImagenDelArticulo } from "../contenido";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -85,15 +84,15 @@ export default async function BlogPostPage({ params }: PageProps) {
             </p>
           )}
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element -- WebP autohospedada y ya optimizada (scripts/cartas.py) */}
-        <img
-          src={grabadoDelArticulo(post.slug)}
-          alt=""
-          width={MEDIDAS_CARTA.tinta.width}
-          height={MEDIDAS_CARTA.tinta.height}
-          decoding="async"
-          className="hidden h-auto w-[150px] rotate-[2deg] rounded-[4px] mix-blend-multiply md:block lg:w-[176px]"
-        />
+        {/* Portada del post si la tiene; si no, su grabado en tinta (decorativo). La misma regla que el índice. */}
+        <div className="hidden w-[150px] rotate-[2deg] md:block lg:w-[176px]">
+          <ImagenDelArticulo
+            slug={post.slug}
+            portada={post.coverImage}
+            sizes="176px"
+            claseGrabado="rounded-[4px] mix-blend-multiply"
+          />
+        </div>
       </header>
 
       {/* Cuerpo: Newsreader a ~66 caracteres; el «# » del Markdown baja a h2 */}

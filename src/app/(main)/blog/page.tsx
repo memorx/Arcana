@@ -1,10 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
-import { MEDIDAS_CARTA } from "@/lib/cartas";
-import { grabadoDelArticulo } from "./contenido";
+import { ImagenDelArticulo } from "./contenido";
 
 export const metadata = {
   title: "Blog - Tarot Insights & Guides",
@@ -80,24 +78,15 @@ export default async function BlogPage() {
                   </p>
                 </div>
 
-                {/* Portada del post si la tiene; si no, su grabado en tinta (decorativo) */}
+                {/* Portada del post si la tiene; si no, su grabado en tinta (decorativo). La misma regla que el artículo. */}
                 <div className="w-[72px] shrink-0 sm:w-[104px] md:w-[132px]">
-                  {post.coverImage ? (
-                    <div className="relative aspect-[7/12] w-full overflow-hidden border border-tinta/20">
-                      <Image src={post.coverImage} alt="" fill sizes="132px" className="object-cover" />
-                    </div>
-                  ) : (
-                    // eslint-disable-next-line @next/next/no-img-element -- WebP autohospedada y ya optimizada (scripts/cartas.py)
-                    <img
-                      src={grabadoDelArticulo(post.slug)}
-                      alt=""
-                      width={MEDIDAS_CARTA.tinta.width}
-                      height={MEDIDAS_CARTA.tinta.height}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-auto w-full rounded-[3px] mix-blend-multiply transition-transform duration-500 ease-tinta motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:-rotate-1"
-                    />
-                  )}
+                  <ImagenDelArticulo
+                    slug={post.slug}
+                    portada={post.coverImage}
+                    sizes="132px"
+                    perezosa
+                    claseGrabado="rounded-[3px] mix-blend-multiply transition-transform duration-500 ease-tinta motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:-rotate-1"
+                  />
                 </div>
               </li>
             );
