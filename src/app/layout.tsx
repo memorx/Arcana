@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Gloock, Martian_Mono, Newsreader, Water_Brush } from "next/font/google";
+import { Gloock, Martian_Mono, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -16,10 +17,14 @@ const gloock = Gloock({
   variable: "--fuente-gloock",
 });
 
+// Estática 400 + itálica 400 (22 + 24 KB) en vez de la variable opsz+wght (132 + 147 KB): el sitio sólo
+// la usa a 15–24 px y en peso 400, y Lantern cuenta cada byte de fuente en el FCP y el LCP simulados.
+// Sin negritas en Newsreader (saldrían sintéticas): el énfasis va en Gloock o en Martian Mono, y la red
+// responsiva (negritasSinteticas en e2e/helpers/responsivo.ts) avisa si algo pide Newsreader ≥ 600.
 const newsreader = Newsreader({
+  weight: "400",
   subsets: ["latin"],
   style: ["normal", "italic"],
-  axes: ["opsz"],
   display: "swap",
   variable: "--fuente-newsreader",
 });
@@ -31,12 +36,16 @@ const martianMono = Martian_Mono({
 });
 
 // Sólo para la palabra a pincel; sin fallback ajustado (su métrica no se parece a ninguna).
-// Sin precarga: pesa 65 KB y sólo la usan unas cuantas escenas; no debe competir con el LCP
-// (la tesis en Gloock) en todas las pantallas. La palabra es decorativa (aria-hidden) y su alto
-// lo fija el line-height, así que el cambio de fuente no mueve nada.
-const waterBrush = Water_Brush({
+// Sin precarga: sólo la usan unas cuantas escenas; no debe competir con el LCP (la tesis en Gloock)
+// en todas las pantallas. La palabra es decorativa (aria-hidden) y su alto lo fija el line-height,
+// así que el cambio de fuente no mueve nada.
+// Subset local (A–Z, a–z, acentos del español, ¿?¡!,. y el espacio): 35 KB en vez de los 65 KB
+// del latín completo que servía next/font/google. Lo regenera scripts/fuente-pincel.py (licencia en
+// fuentes/OFL.txt) y src/__tests__/app/fuente-pincel.test.ts cuida que cada palabra a pincel quepa en él.
+const waterBrush = localFont({
+  src: "./fuentes/water-brush-letras.woff2",
   weight: "400",
-  subsets: ["latin"],
+  style: "normal",
   display: "swap",
   adjustFontFallback: false,
   preload: false,

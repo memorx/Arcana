@@ -6,7 +6,8 @@
  * - maqueta: expected status, no horizontal scroll, nothing off screen (a scroller
  *   excuses it; a box with overflow hidden/clip only excuses decoration or opts in with
  *   data-recorta: see medirMaqueta in helpers/responsivo.ts), every rendered image
- *   loaded, no console errors.
+ *   loaded, no console errors, no text in Newsreader at weight >= 600 (only its 400 is
+ *   loaded: the bold would be synthetic; see negritasSinteticas).
  * - encabezados: exactly one h1 and every visible heading exposed in the accessibility tree.
  * - movimiento reducido: with prefers-reduced-motion nothing keeps animating and nothing
  *   with .revelar / [data-revelar] stays faded.
@@ -25,6 +26,7 @@ import {
   animacionesCorriendo,
   cargar,
   medirMaqueta,
+  negritasSinteticas,
   recorrer,
   revelarSinMostrar,
   textoInvisible,
@@ -174,6 +176,9 @@ async function revisarMaqueta(page: import("@playwright/test").Page, r: Ruta, te
   expect.soft(m.scrollHorizontal, "horizontal scroll (px)").toBe(0);
   expect.soft(m.fueraDePantalla, "elements off screen (no scroller, no data-recorta, not decorative)").toEqual([]);
   expect.soft(m.imagenesRotas, "images that did not load").toEqual([]);
+  expect
+    .soft(await negritasSinteticas(page), "text in Newsreader at weight >= 600 (synthetic bold: only the 400 is loaded)")
+    .toEqual([]);
   expect.soft(errores, "console errors").toEqual([]);
 }
 

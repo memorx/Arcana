@@ -345,6 +345,7 @@ export function GrabadoParticulas({ carta, texto, firma, alt = "", children, cla
               alt={alt}
               width={MEDIDAS_CARTA.tinta.width}
               height={MEDIDAS_CARTA.tinta.height}
+              loading="lazy"
               decoding="async"
             />
             <canvas ref={canvasRef} aria-hidden="true" />

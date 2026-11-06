@@ -163,7 +163,7 @@ function RegisterForm() {
 
       <p className="mt-6 border-t border-tinta/15 pt-5 text-center text-grafito">
         {t("hasAccount")}{" "}
-        <Link href="/login" className={`${ENLACE_PLIEGO} font-medium`}>
+        <Link href="/login" className={ENLACE_PLIEGO}>
           {t("loginButton")}
         </Link>
       </p>

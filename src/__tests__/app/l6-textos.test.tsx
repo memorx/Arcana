@@ -128,6 +128,9 @@ describe("/blog/[slug]", () => {
     expect(container.querySelectorAll("ul > li")).toHaveLength(2);
     expect(container.querySelectorAll("ol > li")).toHaveLength(2);
     expect(screen.getByText("Bastos").tagName).toBe("STRONG");
+    // Newsreader sólo se carga en 400: la negrita del blog es un rótulo en Gloock, sin peso sintético
+    expect(screen.getByText("Bastos")).toHaveClass("font-titulo", "font-normal");
+    expect(screen.getByText("Bastos")).not.toHaveClass("font-semibold");
     expect(container.innerHTML).not.toMatch(/\*\*/);
     expect(container.innerHTML).not.toMatch(SIN_PALETA_VIEJA);
   });

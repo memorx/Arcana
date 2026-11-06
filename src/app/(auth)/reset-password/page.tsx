@@ -127,7 +127,7 @@ function ResetPasswordForm() {
       </form>
 
       <p className="mt-8 border-t border-tinta/15 pt-5 text-center">
-        <Link href="/login" className={`${ENLACE_PLIEGO} font-medium`}>
+        <Link href="/login" className={ENLACE_PLIEGO}>
           {t("backToLogin")}
         </Link>
       </p>
