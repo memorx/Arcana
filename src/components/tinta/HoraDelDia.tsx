@@ -68,7 +68,8 @@ export function HoraDelDia({ variante = "larga", fecha, className }: HoraDelDiaP
       data-variante={variante}
       className={cn(
         "font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] uppercase",
-        variante === "corta" && "truncate",
+        // En 360 px la corta casi no cabe: menos tracking abajo de sm y puntos suspensivos si aún no alcanza.
+        variante === "corta" && "truncate tracking-[0.04em] sm:tracking-[0.08em]",
         className
       )}
     >
