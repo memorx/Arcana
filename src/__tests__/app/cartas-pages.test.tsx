@@ -10,6 +10,7 @@ import { CARTAS } from "@/lib/cartas";
 import { numeralDeCarta, numeroRomano } from "@/app/(main)/cards/indice";
 
 let mockLocale: "es" | "en" = "es";
+let mockUrl = "";
 const mockMensajes: Record<string, unknown> = {
   es: jest.requireActual("../../../messages/es.json"),
   en: jest.requireActual("../../../messages/en.json"),
@@ -41,7 +42,8 @@ jest.mock("next/navigation", () => ({
   }),
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), refresh: jest.fn(), prefetch: jest.fn() }),
   usePathname: () => "/cards",
-  useSearchParams: () => new URLSearchParams(),
+  // The URL the client sees (Next keeps it in sync with history.replaceState and navigations).
+  useSearchParams: () => new URLSearchParams(mockUrl),
 }));
 
 import { prisma } from "@/lib/prisma";
@@ -67,8 +69,10 @@ const BARAJA = CARTAS.map((c, i) => {
   };
 });
 
-const pagina = async (searchParams: Record<string, string> = {}) =>
-  render(await CardsPage({ searchParams: Promise.resolve(searchParams) }));
+const pagina = async (searchParams: Record<string, string> = {}) => {
+  mockUrl = new URLSearchParams(searchParams).toString();
+  return render(await CardsPage({ searchParams: Promise.resolve(searchParams) }));
+};
 
 describe("numeroRomano", () => {
   it("0 se queda 0 (El Loco); 17 → XVII; 14 → XIV; 21 → XXI", () => {
@@ -161,6 +165,39 @@ describe("/cards", () => {
     fireEvent.click(screen.getByRole("link", { name: "Limpiar filtros" }));
     expect(container.querySelectorAll("section li a")).toHaveLength(78);
     expect(window.history.replaceState).toHaveBeenLastCalledWith(null, "", "/cards");
+  });
+
+  it("los filtros siguen a la URL: tras «Copas» y una búsqueda, un enlace a /cards limpio vuelve a las 78", async () => {
+    const vista = await pagina();
+    const nav = screen.getByRole("navigation", { name: "Filtrar por palo" });
+    const otraVez = async () => vista.rerender(await CardsPage({ searchParams: Promise.resolve({}) }));
+
+    // «Copas» con JS: filtra y Next le pasa la URL nueva (replaceState) a useSearchParams.
+    fireEvent.click(within(nav).getByRole("link", { name: "Copas" }));
+    mockUrl = "palo=cups";
+    await otraVez();
+    expect(within(nav).getByRole("link", { name: "Copas" })).toHaveAttribute("aria-current", "page");
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(14);
+
+    fireEvent.change(screen.getByLabelText("Buscar una carta"), { target: { value: "two of" } });
+    fireEvent.submit(screen.getByRole("search"));
+    mockUrl = "palo=cups&q=two+of";
+    await otraVez();
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(1);
+
+    // El enlace «Cartas» del pie lleva a /cards: el servidor pinta lo mismo (misma key) y la URL ya no tiene filtros.
+    mockUrl = "";
+    await otraVez();
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(78);
+    expect(within(nav).getByRole("link", { name: "Todas" })).toHaveAttribute("aria-current", "page");
+    expect(within(nav).getByRole("link", { name: "Copas" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByLabelText("Buscar una carta")).toHaveValue("");
+
+    // «Atrás» a ?palo=swords: los filtros la siguen.
+    mockUrl = "palo=swords";
+    await otraVez();
+    expect(within(nav).getByRole("link", { name: "Espadas" })).toHaveAttribute("aria-current", "page");
+    expect(vista.container.querySelectorAll("section li a")).toHaveLength(14);
   });
 
   it("las cortes no llevan número romano: el Rey de Bastos no se lleva el XIV de La Templanza", async () => {

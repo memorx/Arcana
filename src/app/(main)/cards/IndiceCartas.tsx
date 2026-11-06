@@ -3,11 +3,12 @@
 import { useMemo, useState, type FormEvent, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Input, Button, buttonClasses } from "@/components/ui";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { cn } from "@/lib/utils";
-import { PALOS, agruparPorPalo, numeralDeCarta, paloDe, type Palo } from "./indice";
+import { PALOS, agruparPorPalo, esPalo, numeralDeCarta, paloDe, type Palo } from "./indice";
 
 export interface CartaDelIndice {
   id: string;
@@ -45,12 +46,27 @@ const esClicSimple = (e: MouseEvent) => e.button === 0 && !e.metaKey && !e.ctrlK
 /**
  * El índice de los 78 grabados con sus filtros. Lo pinta el servidor ya filtrado (`paloInicial`,
  * `busquedaInicial`): sin JS los filtros son enlaces y la búsqueda un GET. Con JS filtra en el momento y
- * deja la URL al día con `history.replaceState`.
+ * deja la URL al día con `history.replaceState`. Si la URL cambia por otro lado (un enlace a `/cards` limpio, «atrás»),
+ * los filtros la siguen: el estado nunca se queda pegado en un palo que la URL ya no dice.
  */
 export function IndiceCartas({ cartas, paloInicial, busquedaInicial, locale }: IndiceCartasProps) {
   const t = useTranslations("cards");
   const [palo, setPalo] = useState<Filtro>(paloInicial);
   const [busqueda, setBusqueda] = useState(busquedaInicial);
+
+  // La URL manda cuando cambia (Next sincroniza useSearchParams también con history.replaceState): mismo análisis
+  // que la página del servidor. Se ajusta durante el render, sin efecto, para no pintar un cuadro con el filtro viejo.
+  const parametros = useSearchParams();
+  const paloUrl = parametros?.get("palo");
+  const urlPalo: Filtro = esPalo(paloUrl) ? paloUrl : "all";
+  const urlBusqueda = (parametros?.get("q") ?? "").slice(0, 80);
+  const claveUrl = `${urlPalo}|${urlBusqueda}`;
+  const [claveVista, setClaveVista] = useState(claveUrl);
+  if (claveVista !== claveUrl) {
+    setClaveVista(claveUrl);
+    setPalo(urlPalo);
+    setBusqueda(urlBusqueda);
+  }
 
   const sincronizar = (p: Filtro, q: string) => {
     if (typeof window !== "undefined") window.history.replaceState(null, "", hrefDe(p, q));
