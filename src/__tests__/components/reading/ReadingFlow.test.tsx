@@ -160,6 +160,34 @@ describe("revelar la tirada sobre papel (L2)", () => {
     expect(screen.getByRole("link", { name: "reading.viewSaved" })).toHaveAttribute("href", "/reading/r1");
   });
 
+  it("con teclado, «voltear todas» no deja el foco en <body>: queda en el botón y llega a «ver interpretación»", async () => {
+    answerReadingWith(200, RESULT);
+    const user = await startReading();
+
+    const voltear = screen.getByRole("button", { name: "carta.voltearTodas" });
+    voltear.focus();
+    await user.keyboard("{Enter}");
+    // While the cards burn it is aria-disabled, not disabled (a disabled button loses the focus), and a second
+    // press does nothing.
+    expect(voltear).not.toBeDisabled();
+    expect(voltear).toHaveAttribute("aria-disabled", "true");
+    expect(voltear).toHaveFocus();
+    await user.keyboard("{Enter}");
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(1000);
+    });
+    expect(screen.getByText("reading.cardsRevealedCount(3|3)")).toBeInTheDocument();
+    const verInterpretacion = screen.getByRole("button", { name: "reading.viewInterpretation" });
+    expect(verInterpretacion).toBe(voltear); // the same <button>, so the focus never left it
+    expect(verInterpretacion).toHaveFocus();
+    expect(verInterpretacion).not.toHaveAttribute("aria-disabled", "true");
+    expect(document.activeElement).not.toBe(document.body);
+
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("heading", { level: 1, name: "reading.yourReading" })).toBeInTheDocument();
+  });
+
   it.each([
     [503, "reading.interpretationUnavailable"],
     [422, "reading.interpretationRefused"],

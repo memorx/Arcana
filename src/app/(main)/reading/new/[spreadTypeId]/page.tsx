@@ -621,12 +621,28 @@ export default function ReadingFlowPage({
           />
 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+            {/* One <button> (same key) that goes from «Voltear todas» to «Ver interpretación»: while the cards burn it
+                is aria-disabled, not disabled (a disabled button drops the keyboard focus to <body>), so the focus
+                stays on it and lands on «Ver interpretación» when the reading is complete. */}
             {allRevealed ? (
-              <Button onClick={() => setStep("interpretation")} size="lg" className="motion-safe:animate-entra">
+              <Button
+                key="accion-tirada"
+                onClick={() => setStep("interpretation")}
+                size="lg"
+                className="motion-safe:animate-entra"
+              >
                 {t("viewInterpretation")}
               </Button>
             ) : (
-              <Button variant="linea" onClick={() => setRevealAll(true)} disabled={revealAll}>
+              <Button
+                key="accion-tirada"
+                variant="linea"
+                aria-disabled={revealAll || undefined}
+                onClick={() => {
+                  if (!revealAll) setRevealAll(true);
+                }}
+                className="aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
                 {tCarta("voltearTodas")}
               </Button>
             )}
