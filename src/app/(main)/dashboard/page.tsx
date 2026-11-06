@@ -177,10 +177,10 @@ export default async function DashboardPage() {
 
       {/* La retícula: los widgets en un pliego con filetes */}
       <div data-reticula className={cn(RETICULA, "md:grid-cols-2 lg:grid-cols-12")}>
-        <div className={cn(CELDA, "lg:col-span-7")}>
+        <div className={cn(CELDA, "md:col-span-2 lg:col-span-7")}>
           <TodayEnergiesWidget userId={userId} />
         </div>
-        <div className={cn(CELDA, "lg:col-span-5")}>
+        <div className={cn(CELDA, "md:col-span-2 lg:col-span-5")}>
           <BlueprintWidget userId={userId} />
         </div>
 

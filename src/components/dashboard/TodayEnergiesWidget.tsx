@@ -39,23 +39,23 @@ export async function TodayEnergiesWidget({ userId }: TodayEnergiesWidgetProps) 
       </div>
 
       <ul className="grid grid-cols-3 gap-px bg-filete/20">
-        <li className="min-w-0 bg-suelo pr-2 sm:pr-4">
+        <li className="min-w-0 bg-suelo pr-2 sm:pr-3">
           <p className={ROTULO}>{t("tonalli")}</p>
-          <p className="mt-2 break-words font-titulo text-lg leading-tight sm:text-xl">
+          <p className="mt-2 break-words font-titulo text-lg leading-tight">
             {tonalli.number} {tonalli.sign.name[locale]}
           </p>
           <p className="mt-1 break-words font-dato text-[0.625rem] uppercase tracking-[0.08em] text-letra-suave">
             {tonalli.sign.nahuatl}
           </p>
         </li>
-        <li className="min-w-0 bg-suelo px-2 sm:px-4">
+        <li className="min-w-0 bg-suelo px-2 sm:px-3">
           <p className={ROTULO}>{t("moon")}</p>
           <p className="mt-2 flex flex-wrap items-center gap-2">
             <LunaGlifo luna={moon} className="size-6" />
-            <span className="break-words font-titulo text-lg leading-tight sm:text-xl">{moon.name[locale]}</span>
+            <span className="break-words font-titulo text-lg leading-tight">{moon.name[locale]}</span>
           </p>
         </li>
-        <li className="min-w-0 bg-suelo pl-2 sm:pl-4">
+        <li className="min-w-0 bg-suelo pl-2 sm:pl-3">
           <p className={ROTULO}>{t("personalDay")}</p>
           {personal ? (
             <p className="mt-2 flex flex-wrap items-center gap-2">
@@ -65,7 +65,7 @@ export async function TodayEnergiesWidget({ userId }: TodayEnergiesWidgetProps) 
               >
                 {personal.number}
               </span>
-              <span className="break-words font-titulo text-lg leading-tight sm:text-xl">
+              <span className="break-words font-titulo text-lg leading-tight">
                 <span className="sr-only">{personal.number} · </span>
                 {personal.name[locale]}
               </span>
