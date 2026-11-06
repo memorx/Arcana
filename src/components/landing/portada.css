@@ -64,7 +64,10 @@
   font-size: clamp(5.5rem, 3rem + 10vw, 12.5rem);
 }
 .portada-tesis {
-  max-width: 19ch;
+  /* En em y no en ch: `ch` cambia con la fuente de respaldo (Times ajustada da 279 px; Gloock, 320 px) y la tesis se
+     partía en un renglón más hasta que llegaba Gloock (CLS 0,03). 13.2em = 338 px a 25,6 px (teléfono), con cualquier
+     fuente: «Quien las lee hoy es una IA.» cabe con las dos (317 px en Gloock, 333 px con la de respaldo). */
+  max-width: 13.2em;
   font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.6rem);
   line-height: 1.12;
   color: var(--color-papel);
@@ -85,6 +88,22 @@
   font: 400 0.75rem/1.5 var(--p-dato);
   letter-spacing: 0.06em;
   color: var(--color-niebla);
+}
+/* En teléfono, la etiqueta y la nota cambian de renglones cuando llega Martian Mono (la de respaldo es más angosta):
+   se reserva su alto de dos renglones para que el héroe, anclado abajo, no salte (CLS 0,025). */
+@media (max-width: 479.98px) {
+  /* Bajo ~370 px la caja de la tesis es más angosta que 13.2em (a 360: 328 px) y el segundo renglón se partía sólo con
+     la fuente de respaldo. La letra se ajusta para que la caja siempre mida 13.2em (a 360: 24,85 px en vez de 25,6). */
+  .portada-tesis {
+    font-size: min(1.6rem, calc((100vw - 2 * var(--spacing-gutter, 16px)) / 13.2));
+  }
+  .portada-grabados__etiqueta {
+    min-height: 2.1rem;
+  }
+  .portada-nota {
+    flex-basis: 100%;
+    min-height: 2.25rem;
+  }
 }
 @media (max-width: 719.98px) {
   .portada-velo {

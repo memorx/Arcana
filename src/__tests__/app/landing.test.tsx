@@ -134,6 +134,38 @@ describe("Portada · escenas", () => {
   });
 });
 
+describe("Portada · el héroe no salta cuando llegan las fuentes (CLS)", () => {
+  const CSS = jest.requireActual<typeof import("node:fs")>("node:fs").readFileSync(
+    `${process.cwd()}/src/components/landing/portada.css`,
+    "utf8"
+  );
+  const regla = (selector: string, desde = 0) => {
+    const i = CSS.indexOf(`${selector} {`, desde);
+    return i < 0 ? "" : CSS.slice(i, CSS.indexOf("}", i));
+  };
+
+  it("la tesis mide en em, no en ch (ch cambia con la fuente de respaldo)", () => {
+    expect(regla(".portada-tesis")).toMatch(/max-width: 13\.2em;/);
+    expect(regla(".portada-tesis")).not.toMatch(/\dch\b/);
+  });
+
+  it("bajo 480 px la etiqueta y la nota reservan el alto de dos renglones", async () => {
+    const bloque = CSS.indexOf("@media (max-width: 479.98px) {");
+    expect(bloque).toBeGreaterThan(0);
+    expect(regla(".portada-grabados__etiqueta", bloque)).toMatch(/min-height: 2\.1rem;/);
+    expect(regla(".portada-nota", bloque)).toMatch(/flex-basis: 100%;[\s\S]*min-height: 2\.25rem;/);
+    // Bajo ~370 px la caja es más angosta que 13.2em: la letra baja para que siempre quepan 13.2em (a 360, 24,85 px).
+    expect(regla(".portada-tesis", bloque)).toMatch(
+      /font-size: min\(1\.6rem, calc\(\(100vw - 2 \* var\(--spacing-gutter, 16px\)\) \/ 13\.2\)\);/
+    );
+
+    const { container } = await pintar("es", null);
+    const etiqueta = container.querySelector(".portada-grabados__contenido > p");
+    expect(etiqueta).toHaveClass("portada-grabados__etiqueta");
+    expect(etiqueta).toHaveTextContent("Tarot con IA");
+  });
+});
+
 describe("Portada · llamados según la sesión", () => {
   it("sin sesión: «Haz tu lectura» va a /register, «Ver la carta de hoy» a #hoy y aparece la nota de 3 gratis", async () => {
     await pintar("es", null);
