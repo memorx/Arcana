@@ -6,8 +6,8 @@
    Concepto y tokens: docs/DISENO-2026-11-05.md · contratos: PLAN-2026-11-05 §2.1 y §5.
    ========================================================================== */
 
-/* Tokens fijos. `static`: se emiten siempre como variables CSS (los usan el
-   remapeo, los suelos y el JS de los momentos firma). */
+/* Tokens fijos. `static`: se emiten siempre como variables CSS (los usan los
+   suelos, tinta.css y el JS de los momentos firma). */
 @theme static {
   --color-tinta: #0e0d0c; /* negro de grabado: suelo oscuro y texto sobre papel */
   --color-papel: #eceae6; /* suelo claro, gris papel ligeramente frío */
@@ -262,6 +262,3 @@
 
 /* Componentes firma y carta dorada (dueño del contenido: F1-B). Se importa sólo aquí: ningún componente lo importa. */
 @import "../components/tinta/tinta.css";
-
-/* Remapeo temporal de la paleta vieja (§5.3). La Fase 3 lo quita borrando esta línea. */
-@import "./remapeo-paleta.css";
