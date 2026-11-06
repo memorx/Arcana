@@ -1,10 +1,10 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { Locale, locales } from "@/i18n/config";
 import { cn } from "@/lib/utils";
+import { recargarPagina } from "./recargar-pagina";
 
 const localeCodes: Record<Locale, string> = {
   es: "ES",
@@ -25,9 +25,8 @@ interface LanguageSelectorProps {
 
 export function LanguageSelector({ variant = "menu", className }: LanguageSelectorProps) {
   const locale = useLocale() as Locale;
-  const router = useRouter();
   const t = useTranslations("nav");
-  const [isPending, startTransition] = useTransition();
+  const [cambiando, setCambiando] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -45,20 +44,25 @@ export function LanguageSelector({ variant = "menu", className }: LanguageSelect
       return;
     }
 
+    setCambiando(true);
     try {
-      await fetch("/api/locale", {
+      const res = await fetch("/api/locale", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ locale: newLocale }),
       });
-
-      startTransition(() => {
-        router.refresh();
-      });
+      if (!res.ok) throw new Error(`POST /api/locale: ${res.status}`);
+      // Recarga completa, no router.refresh(): el idioma cambia todo el documento (lang, metadata, textos del
+      // servidor) y la recarga no depende de la respuesta RSC del refresh. En la portada Chrome a veces corta
+      // esa respuesta (net::ERR_ABORTED) y la transición del router se quedaba pendiente para siempre: la
+      // página no cambiaba y el selector quedaba deshabilitado (parte I2 de la Fase 3).
+      recargarPagina();
+      return;
     } catch (error) {
       console.error("Error changing locale:", error);
     }
 
+    setCambiando(false);
     setIsOpen(false);
   };
 
@@ -79,7 +83,7 @@ export function LanguageSelector({ variant = "menu", className }: LanguageSelect
             key={loc}
             type="button"
             onClick={() => handleLocaleChange(loc)}
-            disabled={isPending}
+            disabled={cambiando}
             aria-pressed={loc === locale}
             className={cn(
               "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-dato text-xs tracking-[0.1em] uppercase transition-colors disabled:opacity-50",
@@ -100,7 +104,7 @@ export function LanguageSelector({ variant = "menu", className }: LanguageSelect
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        disabled={isPending}
+        disabled={cambiando}
         className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 font-dato text-[0.6875rem] tracking-[0.1em] uppercase transition-colors hover:bg-current/10 disabled:opacity-50"
         aria-label="Change language"
         aria-haspopup="true"
