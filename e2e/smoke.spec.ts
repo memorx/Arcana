@@ -28,7 +28,7 @@ test.describe("Smoke Tests - Public Pages", () => {
 
     expect(response?.status()).toBe(200);
 
-    // Form elements (the Spanish label is written "Contrasena")
+    // Form elements (the Spanish label was "Contrasena" before the accents fix: accept both)
     await expect(page.getByLabel(/email|correo/i)).toBeVisible();
     await expect(page.getByLabel(/password|contrase[ñn]a/i)).toBeVisible();
     await expect(page.locator("form").getByRole("button", { name: /iniciar|sign in|login/i })).toBeVisible();
@@ -215,11 +215,11 @@ test.describe("Smoke Tests - Error States", () => {
     await page.getByLabel(/email|correo/i).fill("nonexistent@example.com");
     await page.getByLabel(/password|contrase[ñn]a/i).fill("wrongpassword123");
 
-    // The form's own button (the header also has an "Iniciar sesion" button-link)
+    // The form's own button (the header also has an "Iniciar sesión" button-link)
     await page.locator("form").getByRole("button", { name: /iniciar|sign in|login/i }).click();
 
     // Should show error (the credentials check goes to the database: allow for its latency)
-    await expect(page.locator("body")).toContainText(/invalid|inválido|error|incorrect/i, {
+    await expect(page.locator("body")).toContainText(/invalid|inv[aá]lid[oa]s?|error|incorrect/i, {
       timeout: 15000,
     });
   });

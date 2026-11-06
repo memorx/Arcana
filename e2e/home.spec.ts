@@ -20,7 +20,7 @@ test.describe("Home Page", () => {
     // Home is the logo link (there is no "Inicio" text link)
     await expect(page.getByRole("link", { name: "Arcana", exact: true })).toHaveAttribute("href", "/");
     await expect(
-      page.getByRole("link", { name: /iniciar sesion|log in/i })
+      page.getByRole("link", { name: /iniciar sesi[oó]n|log in/i })
     ).toBeVisible();
   });
 
@@ -33,7 +33,7 @@ test.describe("Home Page", () => {
   test("should display how it works section", async ({ page }) => {
     await expect(
       // level 2: an FAQ question (h3) also starts with "Como funciona"
-      page.getByRole("heading", { level: 2, name: /como funciona|how does it work/i })
+      page.getByRole("heading", { level: 2, name: /c[oó]mo funciona|how does it work/i })
     ).toBeVisible();
   });
 
@@ -58,7 +58,7 @@ test.describe("Home Page", () => {
   });
 
   test("should navigate to login page", async ({ page }) => {
-    await page.getByRole("link", { name: /iniciar sesion|log in/i }).click();
+    await page.getByRole("link", { name: /iniciar sesi[oó]n|log in/i }).click();
     await expect(page).toHaveURL(/\/login/);
     await expect(
       page.getByRole("heading", { name: /bienvenido|welcome/i })
@@ -114,7 +114,7 @@ test.describe("Responsive Design", () => {
       await mobileMenuButton.click();
       // Menu should open
       await expect(
-        page.getByRole("link", { name: /iniciar sesion|log in/i })
+        page.getByRole("link", { name: /iniciar sesi[oó]n|log in/i })
       ).toBeVisible();
     }
   });
