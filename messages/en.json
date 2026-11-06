@@ -596,6 +596,12 @@
       "career": "Career & Finances",
       "spirituality": "Spirituality & Growth",
       "health": "Health & Wellness"
+    },
+    "eyebrow": "Your profile",
+    "emailTimeUtc": "Times are in UTC. Mexico City is UTC-6.",
+    "meta": {
+      "title": "Your profile",
+      "description": "Complete your profile to personalize your tarot readings based on your zodiac sign and preferences."
     }
   },
   "daily": {
@@ -888,7 +894,8 @@
         "cooldown": "Your synthesis was updated a moment ago. You can create a new one in {minutes, plural, one {# minute} other {# minutes}}.",
         "profile": "We need your date of birth first. Complete your profile and come back.",
         "generic": "Something went wrong. Please try again."
-      }
+      },
+      "eyebrow": "Written by AI"
     },
     "share": {
       "title": "Share your map",
@@ -1281,7 +1288,8 @@
       "title": "Your readings for two",
       "empty": "Your readings for two will appear here.",
       "noName": "No name",
-      "bornOn": "Born {date}"
+      "bornOn": "Born {date}",
+      "count": "{count, plural, one {# reading} other {# readings}}"
     },
     "detail": {
       "back": "Readings for two",
@@ -1291,7 +1299,8 @@
       "cardsTitle": "Three cards for the bond",
       "readingTitle": "The reading",
       "newReading": "New reading for two",
-      "summaryUnavailable": "The system details for this reading aren't available."
+      "summaryUnavailable": "The system details for this reading aren't available.",
+      "readingEyebrow": "Written by AI"
     },
     "systems": {
       "western": "Western zodiac",
@@ -1311,7 +1320,8 @@
       "me": "You",
       "partner": "The other person",
       "bond": "The bond"
-    }
+    },
+    "eyebrow": "Two maps · three cards"
   },
   "hora": {
     "hoy": "Today",
