@@ -150,8 +150,8 @@ def icono(tam: int) -> Image.Image:
         a = -math.pi / 2 + i * math.tau / 20
         r = S * 0.34 - S * 0.045
         x, y = c + r * math.cos(a), c + r * math.sin(a)
-        p = S * 0.0075
-        d.ellipse([x - p, y - p, x + p, y + p], fill=PAPEL)
+        p = S * (0.012 if i == 0 else 0.0075)  # como en el reverso: el primer signo, rosa
+        d.ellipse([x - p, y - p, x + p, y + p], fill=ROSA if i == 0 else PAPEL)
     anillo(S * 0.2, S * 0.032, ROSA)
     p = S * 0.07
     d.ellipse([c - p, c - p, c + p, c + p], fill=ROSA)
