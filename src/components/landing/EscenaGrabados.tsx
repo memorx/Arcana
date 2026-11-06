@@ -1,8 +1,9 @@
+import Link from "next/link";
+import { buttonClasses } from "@/components/ui/button-classes";
 import { Escena } from "@/components/tinta/Escena";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { MesaDeGrabados } from "@/components/tinta/MesaDeGrabados";
 import { Pincel } from "@/components/tinta/Pincel";
-import { EnlaceBoton } from "./EnlaceBoton";
 import type { Traducir } from "./tipos";
 
 /** La mesa de la maqueta (design/maqueta/index.html), columna por columna: 8 × 5 grabados. */
@@ -41,20 +42,20 @@ export function EscenaGrabados({ t, autenticado }: EscenaGrabadosProps) {
           <span className="portada-tesis__tuya">{t("portada.grabados.tesis3")}</span>
         </h1>
         <div className="portada-acciones">
-          <EnlaceBoton href={autenticado ? "/reading/new" : "/register"}>
+          <Link href={autenticado ? "/reading/new" : "/register"} className={buttonClasses({ size: "lg" })}>
             {t("portada.grabados.cta")}
             <span aria-hidden="true" className="portada-flecha">
               →
             </span>
-          </EnlaceBoton>
+          </Link>
           {autenticado ? (
-            <EnlaceBoton href="/dashboard" variant="linea">
+            <Link href="/dashboard" className={buttonClasses({ variant: "linea", size: "lg" })}>
               {t("portada.grabados.irEspacio")}
-            </EnlaceBoton>
+            </Link>
           ) : (
-            <EnlaceBoton href="#hoy" variant="linea">
+            <Link href="#hoy" className={buttonClasses({ variant: "linea", size: "lg" })}>
               {t("portada.grabados.verHoy")}
-            </EnlaceBoton>
+            </Link>
           )}
           {!autenticado && <p className="portada-nota">{t("portada.grabados.nota")}</p>}
         </div>

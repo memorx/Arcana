@@ -13,7 +13,7 @@ import { BlueprintBadges } from "@/components/blueprint/BlueprintBadges";
 import { BlueprintConstellation } from "@/components/blueprint/BlueprintConstellation";
 import { SynthesisText } from "@/components/blueprint/SynthesisText";
 import { getBlueprintBadges, type BlueprintBadge } from "@/components/blueprint/view-model";
-import { enlaceBoton } from "@/components/blueprint/link-styles";
+import { buttonClasses } from "@/components/ui/button-classes";
 
 interface PageProps {
   params: Promise<{ shareId: string }>;
@@ -111,7 +111,7 @@ export default async function SharedBlueprintPage({ params }: PageProps) {
             Arcana
           </Link>
           <HoraDelDia variante="larga" className="hidden text-niebla lg:block" />
-          <Link href="/login" className={enlaceBoton({ variant: "linea", size: "sm", className: "ml-auto" })}>
+          <Link href="/login" className={buttonClasses({ variant: "linea", size: "sm", className: "ml-auto" })}>
             {t("login")}
           </Link>
         </div>
@@ -184,10 +184,10 @@ export default async function SharedBlueprintPage({ params }: PageProps) {
             <p className="max-w-[46ch] text-[1.0625rem] leading-[1.6] text-letra-suave">{t("ctaText")}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 md:justify-end">
-            <Link href="/register" className={enlaceBoton({ size: "lg", className: "w-full sm:w-auto" })}>
+            <Link href="/register" className={buttonClasses({ size: "lg", className: "w-full sm:w-auto" })}>
               {t("cta")}
             </Link>
-            <Link href="/login" className={enlaceBoton({ variant: "fantasma", size: "md" })}>
+            <Link href="/login" className={buttonClasses({ variant: "fantasma", size: "md" })}>
               {t("login")}
             </Link>
           </div>

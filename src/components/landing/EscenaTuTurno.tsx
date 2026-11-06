@@ -1,6 +1,7 @@
+import Link from "next/link";
+import { buttonClasses } from "@/components/ui/button-classes";
 import { Escena } from "@/components/tinta/Escena";
 import { Pincel } from "@/components/tinta/Pincel";
-import { EnlaceBoton } from "./EnlaceBoton";
 import type { Traducir } from "./tipos";
 
 interface EscenaTuTurnoProps {
@@ -23,12 +24,12 @@ export function EscenaTuTurno({ t, autenticado }: EscenaTuTurnoProps) {
           {t("portada.turno.texto")}
         </p>
         <div data-revelar>
-          <EnlaceBoton href={autenticado ? "/reading/new" : "/register"}>
+          <Link href={autenticado ? "/reading/new" : "/register"} className={buttonClasses({ size: "lg" })}>
             {t(autenticado ? "portada.turno.ctaSesion" : "portada.turno.cta")}
             <span aria-hidden="true" className="portada-flecha">
               →
             </span>
-          </EnlaceBoton>
+          </Link>
         </div>
       </div>
     </Escena>

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { COMPATIBILITY_COST, getStoredOverall, toIsoDay } from "@/lib/compatibility";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { Reveal } from "@/components/blueprint/Reveal";
-import { enlaceBoton } from "@/components/blueprint/link-styles";
+import { buttonClasses } from "@/components/ui/button-classes";
 import { CompatibilityForm } from "@/components/compatibility/CompatibilityForm";
 import { CompatibilityHistory } from "@/components/compatibility/CompatibilityHistory";
 
@@ -81,7 +81,7 @@ export default async function CompatibilityPage() {
             <p className="max-w-[52ch] text-[1.0625rem] leading-[1.6] text-letra-suave">
               {t("profileRequired.description")}
             </p>
-            <Link href="/profile/setup" className={enlaceBoton({ size: "lg", className: "mt-2" })}>
+            <Link href="/profile/setup" className={buttonClasses({ size: "lg", className: "mt-2" })}>
               {t("profileRequired.cta")}
             </Link>
           </section>

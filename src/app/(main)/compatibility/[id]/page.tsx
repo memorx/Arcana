@@ -8,7 +8,8 @@ import type { Locale } from "@/lib/systems";
 import { Badge } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { Reveal } from "@/components/blueprint/Reveal";
-import { ENLACE_DATO, enlaceBoton } from "@/components/blueprint/link-styles";
+import { ENLACE_DATO } from "@/components/blueprint/link-styles";
+import { buttonClasses } from "@/components/ui/button-classes";
 import { CompatibilityCards } from "@/components/compatibility/CompatibilityCards";
 import { CompatibilityMeters } from "@/components/compatibility/CompatibilityMeters";
 import { ReadingText } from "@/components/compatibility/ReadingText";
@@ -127,7 +128,7 @@ export default async function CompatibilityReadingPage({ params }: PageProps) {
 
       {/* Actions */}
       <div className="flex flex-wrap justify-center gap-3 border-t border-filete/25 pt-8">
-        <Link href="/compatibility" className={enlaceBoton({ size: "lg" })}>
+        <Link href="/compatibility" className={buttonClasses({ size: "lg" })}>
           {t("detail.newReading")}
         </Link>
       </div>

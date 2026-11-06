@@ -31,7 +31,8 @@ import {
   toRoman,
   traitList,
 } from "@/components/blueprint/view-model";
-import { ENLACE_DATO, enlaceBoton } from "@/components/blueprint/link-styles";
+import { ENLACE_DATO } from "@/components/blueprint/link-styles";
+import { buttonClasses } from "@/components/ui/button-classes";
 
 /** Columns of the birth-card row: one figure per role (1–3). */
 const CARD_GRID: Record<number, string> = {
@@ -78,7 +79,7 @@ export default async function BlueprintPage() {
             {t("noProfile.title")}
           </h1>
           <p className="max-w-[48ch] text-[1.125rem] leading-[1.65] text-letra-suave">{t("noProfile.description")}</p>
-          <Link href="/profile/setup" className={enlaceBoton({ size: "lg" })}>
+          <Link href="/profile/setup" className={buttonClasses({ size: "lg" })}>
             {t("noProfile.cta")}
           </Link>
         </div>
