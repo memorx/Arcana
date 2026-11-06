@@ -4,16 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Badge,
-} from "@/components/ui";
+import { Button, Badge, buttonClasses } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { SUBSCRIPTION_PLANS } from "@/lib/pricing";
-import { getZodiacEmoji, getZodiacSignEs } from "@/lib/zodiac";
+import { getZodiacSignEs } from "@/lib/zodiac";
 
 interface UserProfile {
   fullName: string;
@@ -29,6 +23,9 @@ interface Subscription {
   cancelAtPeriodEnd: boolean;
   paymentMethod?: string;
 }
+
+const ENLACE =
+  "inline-flex min-h-11 items-center text-rosa-texto underline decoration-rosa-texto/40 underline-offset-4 transition-colors hover:decoration-rosa-texto";
 
 export default function SubscribePage() {
   const router = useRouter();
@@ -138,13 +135,49 @@ export default function SubscribePage() {
 
   const features = locale === "en" ? plan.features : plan.featuresEs;
 
+  const encabezado = (titulo: string, bajada?: string) => (
+    <header className="grid max-w-[760px] gap-3.5">
+      <Etiqueta>{t("eyebrow")}</Etiqueta>
+      <h1 className="text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]">{titulo}</h1>
+      {bajada && <p className="max-w-[52ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] text-grafito">{bajada}</p>}
+    </header>
+  );
+
+  /** Lámina del plan: nombre, descripción, lo que incluye con filetes y el precio en mono. */
+  const laminaPlan = (
+    <section aria-labelledby="plan-titulo" className="grid gap-6 border-t border-tinta pt-6">
+      <h2 id="plan-titulo" className="text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1]">
+        {locale === "en" ? plan.name : plan.nameEs}
+      </h2>
+      <p className="max-w-[56ch] text-[1.0625rem] leading-relaxed">{t("description")}</p>
+
+      <div className="grid gap-3">
+        <Etiqueta>{t("included")}</Etiqueta>
+        <ul className="border-b border-tinta/15">
+          {features.map((feature, i) => (
+            <li key={i} className="flex items-baseline gap-3 border-t border-tinta/15 py-3">
+              <span aria-hidden="true" className="font-dato text-xs text-rosa-texto">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p className="font-dato text-[clamp(1.75rem,1.4rem+1.2vw,2.4rem)] leading-none tracking-[-0.02em]">
+        {plan.priceDisplay}
+      </p>
+    </section>
+  );
+
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto py-12">
-        <div className="animate-pulse space-y-8">
-          <div className="h-12 bg-slate-800 rounded w-1/2 mx-auto" />
-          <div className="h-6 bg-slate-800 rounded w-2/3 mx-auto" />
-          <div className="h-96 bg-slate-800 rounded mt-8" />
+      <div aria-busy="true" className="grid gap-[clamp(32px,6vh,56px)]">
+        {encabezado(t("title"), t("subtitle"))}
+        <div aria-hidden="true" className="grid gap-6 md:grid-cols-2">
+          <div className="h-96 bg-papel-hondo motion-safe:animate-pulse" />
+          <div className="h-96 bg-papel-hondo motion-safe:animate-pulse" />
         </div>
       </div>
     );
@@ -153,202 +186,132 @@ export default function SubscribePage() {
   // Already subscribed view
   if (subscription && subscription.status === "active") {
     return (
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="text-6xl mb-6">&#9788;</div>
-        <h1 className="text-3xl font-bold text-slate-100 mb-4">
-          {t("alreadySubscribed")}
-        </h1>
+      <div className="grid gap-[clamp(32px,6vh,56px)]">
+        {encabezado(t("alreadySubscribed"))}
 
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <Badge variant="success">Active</Badge>
-              {subscription.cancelAtPeriodEnd && (
-                <Badge variant="warning">Cancels at period end</Badge>
+        <div className="grid items-start gap-[clamp(40px,6vw,72px)] md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <div className="grid gap-8">
+            <section className="grid gap-4 border-y border-tinta py-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="success">{t("success.active")}</Badge>
+                {subscription.cancelAtPeriodEnd && <Badge variant="primary">{t("cancelsAtPeriodEnd")}</Badge>}
+              </div>
+
+              {subscription.currentPeriodEnd && (
+                <p className="text-[1.0625rem]">
+                  {t("activeUntil", {
+                    date: new Date(subscription.currentPeriodEnd).toLocaleDateString(
+                      locale === "en" ? "en-US" : "es-ES",
+                      { day: "numeric", month: "long", year: "numeric" }
+                    ),
+                  })}
+                </p>
               )}
+            </section>
+
+            <div className="flex flex-wrap gap-3">
+              <Link href="/daily" className={buttonClasses({ size: "lg" })}>
+                {t("success.goToDaily")}
+              </Link>
+              {/* Ruta de API que redirige al portal de Stripe: navegación completa, sin prefetch */}
+              <a href="/api/stripe/portal" className={buttonClasses({ variant: "linea", size: "lg" })}>
+                {t("manageSubscription")}
+              </a>
             </div>
+          </div>
 
-            {subscription.currentPeriodEnd && (
-              <p className="text-slate-400">
-                {t("activeUntil", {
-                  date: new Date(subscription.currentPeriodEnd).toLocaleDateString(
-                    locale === "en" ? "en-US" : "es-ES",
-                    { day: "numeric", month: "long", year: "numeric" }
-                  ),
-                })}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/daily">
-            <Button size="lg">{t("success.goToDaily")}</Button>
-          </Link>
-          <Link href="/api/stripe/portal">
-            <Button variant="secondary" size="lg">
-              {t("manageSubscription")}
-            </Button>
-          </Link>
+          {laminaPlan}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Hero Section */}
-      <div className="text-center mb-12">
-        <div className="text-6xl mb-6">&#9788;</div>
-        <h1 className="text-4xl font-bold text-slate-100 mb-4">{t("title")}</h1>
-        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-          {t("subtitle")}
-        </p>
-      </div>
+    <div className="grid gap-[clamp(32px,6vh,56px)]">
+      {encabezado(t("title"), t("subtitle"))}
 
-      <div className="grid md:grid-cols-2 gap-8 items-start">
-        {/* Features Card */}
-        <Card className="h-full">
-          <CardHeader>
-            <CardTitle className="text-2xl">
-              {locale === "en" ? plan.name : plan.nameEs}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <p className="text-slate-400">{t("description")}</p>
+      <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10">
+        {laminaPlan}
 
-            <ul className="space-y-3">
-              {features.map((feature, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-amber-400 mt-0.5">&#10003;</span>
-                  <span className="text-slate-300">{feature}</span>
-                </li>
-              ))}
-            </ul>
+        {/* Pliego para suscribirse */}
+        <section
+          aria-labelledby="suscribirse-titulo"
+          className="grid gap-6 border border-tinta/80 border-t-[3px] border-t-rosa bg-papel-hondo/50 p-[clamp(20px,4vw,32px)]"
+        >
+          <h2 id="suscribirse-titulo" className="text-[clamp(1.4rem,1.15rem+0.9vw,1.85rem)] leading-[1.15]">
+            {profile ? t("cta") : t("setupFirst")}
+          </h2>
 
-            <div className="pt-4 border-t border-slate-800">
-              <div className="text-center">
-                <span className="text-4xl font-bold text-amber-400">
-                  {plan.priceDisplay}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Profile/Subscribe Card */}
-        <Card variant="highlighted" className="h-full">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="text-amber-400">&#10022;</span>
-              {profile ? t("cta") : t("setupFirst")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {profile ? (
-              <>
-                {/* Profile Summary */}
-                <div className="p-4 bg-slate-800/50 rounded-lg space-y-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">
-                      {getZodiacEmoji(profile.zodiacSign)}
-                    </span>
-                    <div>
-                      <p className="font-medium text-slate-100">
-                        {profile.fullName}
-                      </p>
-                      <p className="text-sm text-slate-400">
-                        {locale === "en"
-                          ? profile.zodiacSign
-                          : getZodiacSignEs(profile.zodiacSign)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">
-                      {tProfile(`focusAreas.${profile.focusArea}`)}
-                    </Badge>
-                    <Badge variant="secondary">{profile.emailTime}</Badge>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleSubscribe}
-                  className="w-full"
-                  size="lg"
-                  isLoading={isProcessing}
-                >
-                  {t("cta")}
-                </Button>
-
-                {/* Divider */}
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-700" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-slate-900 px-2 text-slate-500">
-                      {t("orPayWithCredits")}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Credits option */}
-                <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-slate-300">{t("payWithCredits")}</span>
-                    <Badge variant="secondary">
-                      {plan.creditsCost} {t("creditsPerMonth")}
-                    </Badge>
-                  </div>
-                  <Button
-                    onClick={handleSubscribeWithCredits}
-                    variant="secondary"
-                    className="w-full"
-                    isLoading={isProcessingCredits}
-                    disabled={!profile || userCredits < plan.creditsCost}
-                  >
-                    {userCredits < plan.creditsCost
-                      ? t("needMoreCredits", { count: plan.creditsCost - userCredits })
-                      : t("subscribeWithCredits")}
-                  </Button>
-                  {userCredits < plan.creditsCost && (
-                    <Link
-                      href="/credits"
-                      className="block text-center text-sm text-purple-400 hover:text-purple-300 mt-2"
-                    >
-                      {t("buyCredits")}
-                    </Link>
-                  )}
-                  <p className="text-xs text-slate-500 text-center mt-2">
-                    {t("renewsAutomatically")}
+          {profile ? (
+            <>
+              {/* Resumen del perfil */}
+              <div className="grid gap-3 border-y border-tinta/15 py-4">
+                <div className="grid gap-1">
+                  <p className="font-titulo text-[1.25rem] leading-tight">{profile.fullName}</p>
+                  <p className="font-dato text-xs tracking-[0.1em] text-grafito uppercase">
+                    {locale === "en" ? profile.zodiacSign : getZodiacSignEs(profile.zodiacSign)}
                   </p>
                 </div>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary">{tProfile(`focusAreas.${profile.focusArea}`)}</Badge>
+                  <Badge variant="secondary">{profile.emailTime}</Badge>
+                </div>
+              </div>
 
-                <Link
-                  href="/profile/setup"
-                  className="block text-center text-sm text-purple-400 hover:text-purple-300"
+              <Button onClick={handleSubscribe} className="w-full" size="lg" isLoading={isProcessing}>
+                {t("cta")}
+              </Button>
+
+              {/* Separador */}
+              <div className="flex items-center gap-4">
+                <span aria-hidden="true" className="h-px flex-1 bg-tinta/20" />
+                <span className="font-dato text-[0.6875rem] tracking-[0.12em] text-grafito uppercase">
+                  {t("orPayWithCredits")}
+                </span>
+                <span aria-hidden="true" className="h-px flex-1 bg-tinta/20" />
+              </div>
+
+              {/* Pagar con créditos */}
+              <div className="grid gap-3 border border-tinta/25 bg-papel p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span>{t("payWithCredits")}</span>
+                  <Badge variant="primary">
+                    {plan.creditsCost} {t("creditsPerMonth")}
+                  </Badge>
+                </div>
+                <Button
+                  onClick={handleSubscribeWithCredits}
+                  variant="linea"
+                  className="w-full"
+                  isLoading={isProcessingCredits}
+                  disabled={!profile || userCredits < plan.creditsCost}
                 >
-                  Edit profile
-                </Link>
-              </>
-            ) : (
-              <>
-                <p className="text-slate-400 text-center">{t("setupFirst")}</p>
-                <Link href="/profile/setup">
-                  <Button className="w-full" size="lg">
-                    {tProfile("title")}
-                  </Button>
-                </Link>
-              </>
-            )}
+                  {userCredits < plan.creditsCost
+                    ? t("needMoreCredits", { count: plan.creditsCost - userCredits })
+                    : t("subscribeWithCredits")}
+                </Button>
+                {userCredits < plan.creditsCost && (
+                  <Link href="/credits" className={`${ENLACE} justify-self-center`}>
+                    {t("buyCredits")}
+                  </Link>
+                )}
+                <p className="text-center text-sm text-grafito">{t("renewsAutomatically")}</p>
+              </div>
 
-            <p className="text-xs text-slate-500 text-center">
-              Secure payments processed by Stripe
-            </p>
-          </CardContent>
-        </Card>
+              <Link href="/profile/setup" className={`${ENLACE} justify-self-center`}>
+                {t("editProfile")}
+              </Link>
+            </>
+          ) : (
+            <Link href="/profile/setup" className={buttonClasses({ size: "lg", className: "w-full" })}>
+              {tProfile("title")}
+            </Link>
+          )}
+
+          <p className="text-center font-dato text-[0.6875rem] tracking-[0.08em] text-grafito uppercase">
+            {t("securePayment")}
+          </p>
+        </section>
       </div>
     </div>
   );
