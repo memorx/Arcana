@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Input, Button, buttonClasses } from "@/components/ui";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { cn } from "@/lib/utils";
-import { PALOS, agruparPorPalo, numeroRomano, paloDe, type Palo } from "./indice";
+import { PALOS, agruparPorPalo, numeralDeCarta, paloDe, type Palo } from "./indice";
 
 export interface CartaDelIndice {
   id: string;
@@ -185,7 +185,8 @@ export function IndiceCartas({ cartas, paloInicial, busquedaInicial, locale }: I
                         aria-hidden="true"
                         className="mt-0.5 font-dato text-[0.625rem] leading-[1.4] tracking-[0.14em] text-grafito uppercase"
                       >
-                        {numeroRomano(carta.number)}
+                        {/* Las cortes no llevan número: un espacio duro guarda el renglón para que los nombres alineen. */}
+                        {numeralDeCarta(carta) ?? "\u00a0"}
                       </span>
                       <span className="font-titulo text-[0.9375rem] leading-[1.15] text-balance group-hover:text-rosa-texto">
                         {nombreDe(carta)}

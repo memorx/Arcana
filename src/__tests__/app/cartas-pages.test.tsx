@@ -7,7 +7,7 @@ import { render, screen, within, fireEvent } from "@testing-library/react";
 import CardsPage from "@/app/(main)/cards/page";
 import CardDetailPage, { generateMetadata } from "@/app/(main)/cards/[slug]/page";
 import { CARTAS } from "@/lib/cartas";
-import { numeroRomano } from "@/app/(main)/cards/indice";
+import { numeralDeCarta, numeroRomano } from "@/app/(main)/cards/indice";
 
 let mockLocale: "es" | "en" = "es";
 const mockMensajes: Record<string, unknown> = {
@@ -73,6 +73,16 @@ const pagina = async (searchParams: Record<string, string> = {}) =>
 describe("numeroRomano", () => {
   it("0 se queda 0 (El Loco); 17 → XVII; 14 → XIV; 21 → XXI", () => {
     expect([0, 1, 4, 9, 14, 17, 21].map(numeroRomano)).toEqual(["0", "I", "IV", "IX", "XIV", "XVII", "XXI"]);
+  });
+});
+
+describe("numeralDeCarta", () => {
+  it("Mayores y del As al Diez con su romano; las cortes (11–14 de los Menores) sin número", () => {
+    expect(numeralDeCarta({ arcana: "MAJOR", number: 14 })).toBe("XIV");
+    expect(numeralDeCarta({ arcana: "MAJOR", number: 0 })).toBe("0");
+    expect(numeralDeCarta({ arcana: "MINOR", number: 1 })).toBe("I");
+    expect(numeralDeCarta({ arcana: "MINOR", number: 10 })).toBe("X");
+    for (const n of [11, 12, 13, 14]) expect(numeralDeCarta({ arcana: "MINOR", number: n })).toBeNull();
   });
 });
 
@@ -153,6 +163,17 @@ describe("/cards", () => {
     expect(window.history.replaceState).toHaveBeenLastCalledWith(null, "", "/cards");
   });
 
+  it("las cortes no llevan número romano: el Rey de Bastos no se lleva el XIV de La Templanza", async () => {
+    await pagina();
+    const numeral = (nombre: string) =>
+      screen.getByRole("link", { name: nombre }).querySelector("span[aria-hidden='true'].font-dato")?.textContent;
+    expect(numeral("es Temperance")).toBe("XIV");
+    expect(numeral("es Ten of Wands")).toBe("X");
+    for (const corte of ["es Page of Wands", "es Knight of Cups", "es Queen of Swords", "es King of Wands"]) {
+      expect(numeral(corte)).toBe(" ");
+    }
+  });
+
   it("en inglés, los nombres en inglés", async () => {
     mockLocale = "en";
     await pagina({ palo: "major" });
@@ -220,6 +241,23 @@ describe("/cards/[slug]", () => {
     render(await CardDetailPage(params("the-star")));
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("The Star");
     expect(screen.getByText("Hope after the storm.")).toBeInTheDocument();
+  });
+
+  it("la ficha de una corte (Rey de Bastos, 14) no pinta número romano", async () => {
+    findUnique.mockResolvedValue({
+      ...ESTRELLA,
+      id: "c35",
+      name: "King of Wands",
+      nameEs: "Rey de Bastos",
+      slug: "king-of-wands",
+      arcana: "MINOR",
+      suit: "WANDS",
+      number: 14,
+    });
+    const { container } = render(await CardDetailPage(params("king-of-wands")));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Rey de Bastos");
+    expect(screen.queryByText("XIV")).toBeNull();
+    expect(container.querySelector("header p.text-rosa")).toBeNull();
   });
 
   it("una carta que no existe → notFound()", async () => {

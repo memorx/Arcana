@@ -106,6 +106,21 @@ describe("/collection", () => {
     for (const img of container.querySelectorAll("img")) expect(img.getAttribute("src")).toMatch(/^\/cartas\//);
   });
 
+  it("las cortes no llevan número romano, descubiertas o no (el Rey de Bastos no es XIV)", async () => {
+    responder({ ...HISTORIA, cards: coleccion(["King of Wands", "Temperance"], []) });
+    const { container } = render(<CollectionPage />);
+    await screen.findByRole("heading", { level: 2, name: "Arcanos Mayores" });
+
+    const numeral = (li: Element) => li.querySelector("span[aria-hidden='true'].font-dato, span.font-dato > span[aria-hidden='true']")?.textContent;
+    expect(numeral(screen.getByRole("link", { name: /es King of Wands/ }).closest("li")!)).toBe(" ");
+    expect(numeral(screen.getByRole("link", { name: /es Temperance/ }).closest("li")!)).toBe("XIV");
+    // Sin descubrir: las otras 15 cortes tampoco llevan número (ningún XIV queda: La Templanza está descubierta).
+    const porDescubrir = [...container.querySelectorAll("li[data-carta='por-descubrir']")].map(numeral);
+    expect(porDescubrir.filter((n) => n === "XIV")).toHaveLength(0);
+    expect(porDescubrir.filter((n) => n === " ")).toHaveLength(15);
+    expect(porDescubrir.filter((n) => n === "X")).toHaveLength(5); // la Rueda y los cuatro Dieces
+  });
+
   it("la dorada es la única con brasa rosa persistente", async () => {
     responder(HISTORIA);
     const { container } = render(<CollectionPage />);
