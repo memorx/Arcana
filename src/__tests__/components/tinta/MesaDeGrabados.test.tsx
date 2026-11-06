@@ -51,6 +51,47 @@ describe("MesaDeGrabados", () => {
     expect(img).toHaveAttribute("height", "342");
   });
 
+  it("sin `inmediatas`, los 40 grabados son perezosos y de baja prioridad", () => {
+    const { container } = render(<MesaDeGrabados slugs={SLUGS} />);
+    const imgs = [...container.querySelectorAll("img")];
+    expect(imgs).toHaveLength(40);
+    for (const img of imgs) {
+      expect(img).toHaveAttribute("loading", "lazy");
+      expect(img).toHaveAttribute("fetchpriority", "low");
+    }
+  });
+
+  it("con `inmediatas={3}`, las 3 primeras filas de las 4 columnas de móvil van sin loading ni fetchpriority (12) y el resto perezoso (28)", () => {
+    const { container } = render(<MesaDeGrabados slugs={SLUGS} inmediatas={3} />);
+    const columnas = [...container.querySelectorAll(".mdg-columna")];
+    const inmediatas: Element[] = [];
+    const perezosas: Element[] = [];
+    columnas.forEach((col, c) =>
+      col.querySelectorAll("img").forEach((img, f) => (c < 4 && f < 3 ? inmediatas : perezosas).push(img))
+    );
+    expect(inmediatas).toHaveLength(12);
+    expect(perezosas).toHaveLength(28);
+    for (const img of inmediatas) {
+      expect(img).not.toHaveAttribute("loading");
+      expect(img).not.toHaveAttribute("fetchpriority");
+      // Lo demás no cambia: decodificación asíncrona, medidas y decorativa.
+      expect(img).toHaveAttribute("decoding", "async");
+      expect(img).toHaveAttribute("width", "200");
+      expect(img).toHaveAttribute("height", "342");
+      expect(img).toHaveAttribute("alt", "");
+    }
+    for (const img of perezosas) {
+      expect(img).toHaveAttribute("loading", "lazy");
+      expect(img).toHaveAttribute("fetchpriority", "low");
+    }
+    // Las de las columnas anchas (ocultas en móvil) nunca se piden de inmediato.
+    columnas.slice(4).forEach((col) => col.querySelectorAll("img").forEach((img) => expect(img).toHaveAttribute("loading", "lazy")));
+    // En el orden del documento, las inmediatas son las filas 0–2 de cada una de las 4 primeras columnas.
+    const enOrden = [...container.querySelectorAll("img")].map((img) => !img.hasAttribute("loading"));
+    expect(enOrden.slice(0, 20)).toEqual([0, 1, 2, 3].flatMap(() => [true, true, true, false, false]));
+    expect(enOrden.slice(20).every((x) => !x)).toBe(true);
+  });
+
   it("sin filter: ni en estilos en línea ni en las reglas .mdg de tinta.css", () => {
     const { container } = render(<MesaDeGrabados slugs={SLUGS} />);
     container.querySelectorAll<HTMLElement>("*").forEach((el) => expect(el.style.filter).toBe(""));

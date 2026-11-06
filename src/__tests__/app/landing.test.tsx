@@ -128,6 +128,9 @@ describe("Portada · escenas", () => {
     expect(imgs).toHaveLength(40);
     expect(imgs[0]).toHaveAttribute("src", "/cartas/rws-tarot-00-fool-mesa.webp");
     expect(imgs.every((i) => /^\/cartas\/[a-z0-9-]+-mesa\.webp$/.test(i.getAttribute("src")!))).toBe(true);
+    // En celular el LCP es un grabado de arriba: las 3 primeras filas de las 4 columnas visibles se piden de inmediato.
+    expect(imgs.filter((i) => !i.hasAttribute("loading") && !i.hasAttribute("fetchpriority"))).toHaveLength(12);
+    expect(imgs.filter((i) => i.getAttribute("loading") === "lazy" && i.getAttribute("fetchpriority") === "low")).toHaveLength(28);
   });
 });
 

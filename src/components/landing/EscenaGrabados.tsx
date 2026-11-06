@@ -25,12 +25,14 @@ interface EscenaGrabadosProps {
 
 /**
  * Escena 1 · Los grabados (suelo tinta). La mesa girada de grabados detrás, la palabra a pincel y la tesis en
- * tres líneas como único h1. El LCP es la tesis (texto): nada de aquí se esconde ni espera a una animación.
+ * tres líneas como único h1. Nada de aquí se esconde ni espera a una animación.
+ * - En celular el LCP es un grabado de la mesa (es más grande que cualquier renglón): las 3 primeras filas de las
+ *   columnas visibles se piden de inmediato (`inmediatas={3}`, 12 grabados ≈ 165 KB); el resto, perezoso.
  */
 export function EscenaGrabados({ t, autenticado }: EscenaGrabadosProps) {
   return (
     <Escena suelo="tinta" aria-labelledby="portada-tesis" className="portada-grabados">
-      <MesaDeGrabados slugs={[...MESA_PORTADA]} columnas={8} filas={5} />
+      <MesaDeGrabados slugs={[...MESA_PORTADA]} columnas={8} filas={5} inmediatas={3} />
       <div aria-hidden="true" className="portada-velo" />
       <div className="portada-contenido portada-grabados__contenido">
         <Etiqueta>{t("portada.grabados.etiqueta")}</Etiqueta>

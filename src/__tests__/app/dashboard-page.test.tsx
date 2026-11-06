@@ -177,6 +177,9 @@ describe("Dashboard · the table of engravings (ink band)", () => {
     expect(srcs[0]).toBe("/cartas/rws-tarot-00-fool-mesa.webp");
     expect(srcs).not.toContain("/cartas/rws-tarot-17-star-mesa.webp"); // the 18th card is left out
     expect(srcs.every((src) => /^\/cartas\/[a-z0-9-]+-mesa\.webp$/.test(src ?? ""))).toBe(true);
+    // The band is not the page's LCP: every engraving stays lazy and low priority
+    const mesa = Array.from(container.querySelectorAll(".mdg img"));
+    expect(mesa.every((img) => img.getAttribute("loading") === "lazy" && img.getAttribute("fetchpriority") === "low")).toBe(true);
     // One query for the names, only for the cards of those readings
     expect(db.card.findMany).toHaveBeenCalledWith({
       where: { id: { in: ids } },
