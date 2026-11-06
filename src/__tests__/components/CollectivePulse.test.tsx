@@ -27,9 +27,9 @@ const pulse = {
   enough: true,
   date: "2026-11-04",
   cards: [
-    { name: "The Sun", nameEs: "El Sol", imageUrl: "/sun.jpg", percent: 40 },
-    { name: "The Moon", nameEs: "La Luna", imageUrl: "/moon.jpg", percent: 30 },
-    { name: "The Star", nameEs: "La Estrella", imageUrl: "/star.jpg", percent: 20 },
+    { name: "The Sun", nameEs: "El Sol", percent: 40 },
+    { name: "The Moon", nameEs: "La Luna", percent: 30 },
+    { name: "The Star", nameEs: "La Estrella", percent: 20 },
   ],
 };
 
@@ -58,11 +58,23 @@ describe("CollectivePulse", () => {
     render((await CollectivePulse())!);
 
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("El Sol");
-    expect(screen.getByAltText("El Sol")).toHaveAttribute("src", expect.stringContaining("/sun.jpg"));
+    // La imagen sale de las cartas autohospedadas (cartaImagen), nunca de la URL guardada en la base.
+    expect(screen.getByAltText("El Sol")).toHaveAttribute("src", "/cartas/rws-tarot-19-sun-color.webp");
     expect(screen.getByText("share(40)")).toBeInTheDocument();
     expect(screen.getByText("La Luna · 30%")).toBeInTheDocument();
     expect(screen.getByText("La Estrella · 20%")).toBeInTheDocument();
     expect(screen.getByText("anonymous")).toBeInTheDocument();
+  });
+
+  it("is a band on ink, named by its heading", async () => {
+    mockPulse.mockResolvedValue(pulse);
+
+    render((await CollectivePulse())!);
+
+    const banda = screen.getByRole("region", { name: "El Sol" });
+    expect(banda).toHaveClass("suelo-tinta");
+    expect(banda.querySelector("h2")).toHaveAttribute("id", "collective-pulse-title");
+    expect(banda.querySelector("ul")).toHaveClass("flex-wrap");
   });
 
   it("leaves the runners-up list out when only one card is known", async () => {
