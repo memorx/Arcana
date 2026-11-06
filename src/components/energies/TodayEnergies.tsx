@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Card, CardContent } from "@/components/ui";
 import { describeDayEnergies, getDayEnergies, getNumberMeaning } from "@/lib/systems";
+import { cn } from "@/lib/utils";
+import { LunaGlifo } from "./LunaGlifo";
 
 interface TodayEnergiesProps {
   /** The day, at 00:00 UTC (use `todayUtc()`). */
@@ -12,31 +13,20 @@ interface TodayEnergiesProps {
   className?: string;
 }
 
-function EnergyTile({
-  icon,
-  label,
-  children,
-}: {
-  icon: ReactNode;
-  label: string;
-  children: ReactNode;
-}) {
+const ROTULO = "font-dato text-[0.6875rem] uppercase leading-[1.4] tracking-[0.12em] text-letra-suave";
+
+function Dato({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <li className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/50 p-3 min-w-0">
-      <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center text-3xl leading-none">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs text-slate-500">{label}</p>
-        <div className="text-sm font-medium text-slate-100">{children}</div>
-      </div>
+    <li className="min-w-0 bg-suelo py-4 sm:px-5 sm:first:pl-0">
+      <p className={ROTULO}>{label}</p>
+      <div className="mt-2 font-titulo text-xl leading-tight text-letra sm:text-[1.375rem]">{children}</div>
     </li>
   );
 }
 
 /**
- * Today's tonalli, moon and personal day above the daily card, with the
- * same plain-text summary (`describeDayEnergies`) the AI receives.
+ * Today's tonalli, moon and personal day on /daily («El día de hoy» de la maqueta), with
+ * the same plain-text summary (`describeDayEnergies`) the AI receives for the daily card.
  */
 export function TodayEnergies({ date, birthDate = null, className }: TodayEnergiesProps) {
   const t = useTranslations("energies");
@@ -47,60 +37,52 @@ export function TodayEnergies({ date, birthDate = null, className }: TodayEnergi
   const lines = describeDayEnergies(energies, locale).split("\n");
 
   return (
-    <section aria-labelledby="today-energies-title" className={className}>
-      <Card className="border-purple-500/20 bg-gradient-to-r from-purple-900/20 via-slate-900/50 to-amber-900/10">
-        <CardContent className="p-4 sm:p-6">
-          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-            <h2
-              id="today-energies-title"
-              className="text-xs uppercase tracking-[0.2em] text-amber-400/80"
-            >
-              {t("title")}
-            </h2>
-            <Link
-              href="/calendar"
-              className="rounded text-sm text-purple-300 hover:text-amber-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-            >
-              {t("calendarLink")} <span aria-hidden="true">&rarr;</span>
-            </Link>
-          </div>
+    <section aria-labelledby="today-energies-title" className={cn("text-letra", className)}>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 border-b border-filete pb-2">
+        <h2 id="today-energies-title" className={cn(ROTULO, "font-dato")}>
+          <span
+            aria-hidden="true"
+            className="mr-[0.7em] inline-block size-[0.55em] rounded-full bg-rosa align-[0.05em]"
+          />
+          {t("title")}
+        </h2>
+        <Link
+          href="/calendar"
+          className="inline-flex min-h-11 items-center gap-1.5 font-dato text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-letra-acento underline-offset-[0.35em] hover:underline"
+        >
+          {t("calendarLink")} <span aria-hidden="true">&rarr;</span>
+        </Link>
+      </div>
 
-          <ul className="grid gap-3 sm:grid-cols-3">
-            <EnergyTile icon={tonalli.sign.glyph} label={t("tonalli")}>
-              {tonalli.label[locale]}
-            </EnergyTile>
-            <EnergyTile icon={moon.emoji} label={t("moon")}>
+      <ul className="grid gap-px border-b border-filete/20 bg-filete/20 sm:grid-cols-3">
+        <Dato label={t("tonalli")}>{tonalli.label[locale]}</Dato>
+        <Dato label={t("moon")}>
+          <span className="flex items-center gap-3">
+            <LunaGlifo luna={moon} className="size-7" />
+            <span>
               {moon.name[locale]} · {t("illumination", { percent: Math.round(moon.illumination * 100) })}
-            </EnergyTile>
-            <EnergyTile
-              icon={
-                personal ? (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-amber-500 text-base font-bold text-slate-950">
-                    {personal.number}
-                  </span>
-                ) : (
-                  "✦"
-                )
-              }
-              label={t("personalDay")}
+            </span>
+          </span>
+        </Dato>
+        <Dato label={t("personalDay")}>
+          {personal ? (
+            t("personalDayValue", { number: personal.number, name: personal.name[locale] })
+          ) : (
+            <Link
+              href="/profile/setup"
+              className="inline-flex min-h-11 items-center font-lectura text-base leading-snug text-letra-acento underline underline-offset-[0.2em] hover:no-underline"
             >
-              {personal ? (
-                t("personalDayValue", { number: personal.number, name: personal.name[locale] })
-              ) : (
-                <Link href="/profile/setup" className="text-purple-300 hover:text-amber-300 underline-offset-2 hover:underline">
-                  {t("addBirthDate")}
-                </Link>
-              )}
-            </EnergyTile>
-          </ul>
+              {t("addBirthDate")}
+            </Link>
+          )}
+        </Dato>
+      </ul>
 
-          <div className="mt-4 space-y-1 text-sm leading-relaxed text-slate-400">
-            {lines.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="mt-2 max-w-[68ch] space-y-1 pt-3 font-lectura text-base leading-relaxed text-letra-suave">
+        {lines.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
     </section>
   );
 }
