@@ -59,6 +59,8 @@ sólo con `npm run dev:e2e` / `e2e-db.mjs serve` contra `arcana_e2e_l2` en :3012
 | `npx playwright test e2e/flujos/lectura.spec.ts e2e/flujos/mazo-propio.spec.ts e2e/reading.spec.ts` (`ARCANA_E2E_REUSE=1` sobre ese build) | **15 ✓** (tirada de tres con quema real hasta la lectura guardada y el historial; mazo propio; selección de tiradas, costos con acento, 404 compartida, estructura de `/reading/[id]`) |
 | Unit tests nuevos | `disposicion.test.ts` (figuras, arco, Celta, romanos, interpretación sin perder texto) · `ReadingFlow.test.tsx` (revelar con **teclado**, **voltear todas** + progreso + «Ver interpretación», **503 y 422** con su aviso y la intención intacta, 403 → modal de créditos, `<Tirada>` por número de cartas con la posición encima, herradura en arco, modal de carta nueva con `cartaImagen`) |
 
+Después de la verificación, `rediseno/dos-tintas` recibió dos commits ajenos (`6eff62b` línea corta de la fecha en `tinta`, `23a0a55` pase sin JS del e2e) que no tocan archivos de L2; no los fusioné para que los resultados de arriba correspondan al commit verificado.
+
 ### Capturas
 
 `C:/Users/guill/AppData/Local/Temp/claude/C--Users-guill-dev-arcana/ba3d8826-c8e4-418f-8b14-19f131c84e14/scratchpad/fase2/L2/`
