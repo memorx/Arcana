@@ -6,6 +6,7 @@ import { sendDailyReadingEmail } from "@/lib/email";
 import { verifyCronRequest } from "@/lib/cron-auth";
 import { claimBirthdayGift, isBirthdayToday } from "@/lib/birthday";
 import { describeDayEnergies, getDayEnergies } from "@/lib/systems";
+import { cartaImagen } from "@/lib/cartas";
 
 /** AI budget per person: one slow answer must not eat the whole cron run (maxDuration 60 s). */
 const DAILY_AI_TIMEOUT_MS = 15_000;
@@ -184,7 +185,9 @@ async function sendDailyReading(
     userName: profile.fullName.split(" ")[0],
     cardName: selectedCard.name,
     cardNameEs: selectedCard.nameEs,
-    cardImage: selectedCard.imageUrl,
+    // Self-hosted card (/cartas/…-color.webp): the email proxies it through /_next/image, which only
+    // accepts local paths now (no remotePatterns), and serves JPEG to clients without WebP.
+    cardImage: cartaImagen(selectedCard.name),
     isReversed,
     interpretation,
     date: dateStr,
