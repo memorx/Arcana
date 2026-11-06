@@ -6,25 +6,83 @@
 
 ---
 
-## 📸 ESTADO AL 05/11/2026
+## 📸 ESTADO AL 06/11/2026
 
 *(Esta sección se reescribe completa en cada actualización.)*
 
 **Hecho y funcionando**
-- Mega actualización del 4-5 nov en producción (PR #2, merge `9ed9a25`, deploy `arcana-hwc155trk`). Verificado por HTTP el 5 nov 15:34 UTC: `/`, `/calendar`, `/api/pulse`, `/api/health`, `/sitemap.xml` → 200; `/share/blueprint/<inexistente>` → 404; `/blueprint`, `/compatibility`, `/history/insights`, `/reading/manual` → 307 al login. Landing y calendario vistos en Chrome sin errores de consola.
-- Funciones nuevas: Mapa Arcano (`/blueprint`, cinco sistemas + síntesis de IA + tarjeta pública opcional), Calendario Arcano (`/calendar`, tonalpohualli mexica + luna + día personal; energías del día en la carta diaria y el correo), Mi historia (`/history/insights`, memoria de lecturas en el prompt, analítica, recap mensual, resonancia días después), tirada con mazo propio (`/reading/manual`), lectura de dos (`/compatibility`, 2 créditos), preguntas de seguimiento (primera gratis, luego 1 crédito, máx. 5) y leer en voz alta en cada lectura, pulso colectivo en la landing, regalo de cumpleaños (3 créditos, cuentas de 30+ días).
-- Cimientos: modelos actuales; una lectura nunca se cobra si la IA falla; débitos condicionales (sin saldos negativos); crons que exigen `CRON_SECRET`; renovación por créditos idempotente; 0 vulnerabilidades críticas; ESLint funcionando; 88 suites / 1129 tests verdes.
-- Esquema: 4 tablas y 6 columnas nuevas aplicadas en producción por SQL aditivo (ver entrada del 5 nov).
-- Documentación de la ronda: `docs/PLAN-2026-11-04.md` (plan y catálogo de ideas), `docs/REVISION-2026-11-04.md` (inspección, decisiones, pendientes), `docs/partes/` (parte de cada lote).
+- **El rediseño «Dos tintas» está en producción** desde el 6 nov, 11:10 CDMX (PR #3, merge `af30337`, deploy `arcana-ep9xf5fft`). Las 46 rutas usan tinta, papel y rosa mexicano. Las cartas viven en `public/cartas/`: 234 archivos, tres variantes por carta.
+- **Verificado por HTTP en producción:**
+  - 15 rutas públicas responden 200; la carta inexistente y el blueprint compartido inexistente, 404.
+  - Las protegidas redirigen al login con 307.
+  - `/cartas/*` sale con 30 días de caché, y `sw.js` ya no precarga cartas.
+  - La imagen del correo diario sale en JPEG por `/_next/image`.
+- **Verificado en Chrome:** la portada carga sin errores de consola y sin imágenes rotas, y el cambio entre español e inglés funciona.
+- **Lighthouse móvil de `/` en producción:** puntaje 90–93, LCP 3.1–3.5 s y CLS 0.001–0.006. Con el diseño viejo daba 98–99.
+- **Pruebas:**
+  - Jest: 127 suites, 1,624 pruebas.
+  - E2E contra Postgres local (`npm run test:e2e`): 1,114 ✓ en Chromium a cinco anchos y en WebKit.
+  - Para ver la app con datos locales: `npm run dev:e2e`.
+- Concepto en `docs/DISENO-2026-11-05.md`, plan en `docs/PLAN-2026-11-05-rediseno.md`, partes en `docs/partes/rediseno-*.md`.
+- La mega actualización del 4-5 nov sigue igual (entrada del 05/11).
 
 **A medias**
-- Verificación con sesión en producción: sólo se probó lo público. Falta que Memo entre, vea el dashboard nuevo, genere su Mapa Arcano y haga una lectura con seguimiento. Si algo falla, `vercel rollback` al deploy anterior (`arcana-ob4zkrrc8`).
+- **Probar con sesión en producción.** Falta que Memo haga una lectura completa: elegir tirada, quemar las cartas e interpretación. También revisar la carta del día, el dashboard y la colección. Si algo falla, se regresa con `vercel rollback` al deploy `arcana-8e67hwd3k`.
+- **Rendimiento:** subir PageSpeed móvil a 95 o más. La deuda está en `docs/partes/rediseno-F4-C.md`:
+  - recortar los `messages` del HTML;
+  - sacar framer-motion del JS inicial de la portada;
+  - bajar los grabados `mesa` a calidad 40.
 
 **Bloqueado**
-- Nada bloqueado. Decisiones de Memo pendientes (lista completa en `docs/REVISION-2026-11-04.md` §Pendientes): precios provisionales, textos nuevos en es/en, tabla `products` ajena en la base, cron diario de Vercel Hobby (sólo 08:00 UTC recibe correo), "hoy" en UTC, privacidad de la tarjeta pública del Mapa Arcano.
+- **Decisiones de Memo, pendientes desde el 6 nov:**
+  - el «hoy» en hora de México: hoy cambia a las 18:00 CDMX;
+  - aplicar `docs/sql/2026-11-06-acentos-tiradas.sql` en producción (no se ha aplicado);
+  - el texto de la pregunta frecuente 2;
+  - testimonios, contador o precio en la portada;
+  - glifos propios para el zodiaco chino y el tonalli.
+  La lista completa está en `docs/partes/rediseno-I2.md` §6.
+- **Google Play:** espera la cuenta de desarrollador y la decisión sobre compras dentro de la app (Fase 5 del plan del 4 nov).
 
 **Siguiente paso**
-- Publicar en Google Play (Fase 5 del plan, §9): Memo abre la cuenta de desarrollador y decide qué hacer con las compras dentro de la app; después se genera el paquete TWA con Bubblewrap.
+- Que Memo pruebe con su cuenta en producción y conteste las cinco decisiones.
+
+---
+
+## 06/11/2026 — El rediseño «Dos tintas» llegó a producción con la suite e2e completa
+
+**Qué cambió**
+- **169 commits y 542 archivos**; casi la mitad son imágenes de cartas.
+- **Ciclo seguido:** maqueta aprobada, plan revisado por Fable y Fase 1 en tres lotes (tokens y primitivas, componentes de tinta, infraestructura e2e). Siguieron seis lotes de pantallas en worktrees, cada uno con su base `arcana_e2e_l<n>` y su puerto. Al final, integración, inspección de Fable, dos revisiones de código y tres lotes de correcciones.
+- **Paleta vieja:** 1,681 clases en 87 archivos bajaron a 0. Una prueba de Jest impide que vuelvan, y el remapeo provisional se borró.
+- **Pruebas:** Jest pasó de 1,129 a 1,624. Los e2e pasaron de 49 pruebas públicas sin base a 1,114 contra Postgres local.
+
+**Por qué**
+- Memo, 5 nov: «esta horrible el sitio». Eligió la referencia de 4C's ad. («este está poca madre») y aprobó la maqueta («me encanta»). Luego pidió que fuera «100% responsivo, con todos los tests».
+
+**Decisiones y descartes**
+- **Antes de cualquier e2e hubo guardas contra producción,** porque el `.env` local apunta a producción:
+  - la siembra sólo borra con una bandera y en un host local;
+  - la IA falsa sólo se enciende con `ARCANA_AI_FAKE=1` y fuera de Vercel;
+  - Jest corre contra una base inalcanzable.
+- **Velocidad:** tras las correcciones, Lighthouse local daba 70 contra 92 del diseño viejo. La causa eran 379 KB de fuentes web que Lantern cuenta antes del primer pintado. Fable eligió tres cambios:
+  - Newsreader estática 400;
+  - Water Brush recortada a 35 KB (OFL, se regenera con `scripts/fuente-pincel.py`);
+  - El Loco con carga perezosa.
+  Con eso dio 80–81 en local y 90–93 en producción. Se descartó cargar menos grabados en el héroe móvil, porque cambiaría el LCP real (1.2 s con Slow 4G). También se descartó quitar sólo la precarga, que no movía nada.
+- **Cambiar de idioma recarga la página.** Chrome cortaba la respuesta de `router.refresh()` en la portada y no se aisló la causa.
+- **Salieron de la portada** los testimonios inventados y el contador inflado.
+- **Firefox salió de la matriz e2e** porque no está instalado. WebKit de escritorio sí entró.
+
+**Lo que salió mal**
+- **`buttonClasses` vivía en un módulo `"use client"`** y tronaba al llamarlo desde un server component. Jest no lo veía; lo vieron dos lotes en el navegador. Se movió a `button-classes.ts`.
+- **El rediseño quitó el permiso de imágenes de Wikimedia,** y el correo diario se habría quedado sin imagen. Lo atrapó la revisión de código antes del merge: ahora usa las cartas locales.
+- **`next dev` reescribía `tsconfig.json`.** Se fijaron sus includes.
+- **`npm run build` lee la base de producción para el sitemap.** Sigue así; los lotes construyen con la base local.
+- **Bugs que ya estaban en `main` y se corrigieron:**
+  - las miniaturas de cartas recientes del dashboard daban 404;
+  - faltaba `dashboard.welcomeDefault`;
+  - las cartas de la corte mostraban números romanos.
+- **Error propio:** un `taskkill` por nombre de imagen (`python.exe`) en plena sesión. Se reportó; los demás procesos de Python sobrevivieron.
 
 ---
 
