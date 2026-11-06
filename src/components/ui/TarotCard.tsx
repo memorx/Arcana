@@ -13,8 +13,6 @@ interface TarotCardProps {
     arcana: "MAJOR" | "MINOR";
     suit: "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null;
     number: number;
-    /** Ya no se usa: la imagen sale de `cartaImagen(card)` (cartas autohospedadas). Se conserva por compatibilidad. */
-    imageUrl?: string | null;
   };
   isReversed?: boolean;
   isRevealed?: boolean;

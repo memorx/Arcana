@@ -30,9 +30,9 @@ describe("TarotCard", () => {
   });
 
   it("shows the engraving even when imageUrl is missing (The Lovers no longer 404s)", () => {
-    render(
-      <TarotCard card={{ ...mockCard, name: "The Lovers", nameEs: "Los Enamorados", number: 6, imageUrl: null }} />
-    );
+    // A database row still carries imageUrl (null for The Lovers); the card ignores it.
+    const enamorados = { ...mockCard, name: "The Lovers", nameEs: "Los Enamorados", number: 6, imageUrl: null };
+    render(<TarotCard card={enamorados} />);
     expect(screen.getByAltText("Los Enamorados")).toHaveAttribute("src", "/cartas/rws-tarot-06-lovers-color.webp");
   });
 

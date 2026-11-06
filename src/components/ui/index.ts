@@ -18,6 +18,5 @@ export { CardPlaceholder, CardBack } from "./CardPlaceholder";
 
 export { TarotCard, TarotCardStatic } from "./TarotCard";
 
-export { SavedReadingCard } from "./SavedReadingCard";
 
 export { ShareButton } from "./ShareButton";
