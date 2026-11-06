@@ -180,8 +180,9 @@ function psql(env, sql) {
   });
 }
 
-function pgIsReady(env) {
-  const result = spawnSync(pgExe("pg_isready"), ["-h", "127.0.0.1", "-p", String(PG_PORT), "-U", "postgres", "-q"], {
+/** Postgres on Windows starts a process per connection; on a busy machine that alone can take 10-20 s. */
+function pgIsReady(env, seconds = 60) {
+  const result = spawnSync(pgExe("pg_isready"), ["-h", "127.0.0.1", "-p", String(PG_PORT), "-U", "postgres", "-q", "-t", String(seconds)], {
     env,
     stdio: "ignore",
     windowsHide: true,
@@ -215,7 +216,7 @@ function start(env) {
       log(`cluster already running on 127.0.0.1:${PG_PORT}`);
       return;
     }
-  } else if (pgIsReady(env)) {
+  } else if (pgIsReady(env, 5)) {
     fail(`port ${PG_PORT} is answering but not from ${PGDATA}: another server is using it.`);
   }
 
@@ -223,7 +224,7 @@ function start(env) {
   run(
     `pg_ctl start (127.0.0.1:${PG_PORT}, log ${PG_LOG})`,
     pgExe("pg_ctl"),
-    ["start", "-D", PGDATA, "-l", PG_LOG, "-w", "-t", "60", "-o", `-p ${PG_PORT} -c listen_addresses=127.0.0.1`],
+    ["start", "-D", PGDATA, "-l", PG_LOG, "-w", "-t", "120", "-o", `-p ${PG_PORT} -c listen_addresses=127.0.0.1`],
     { env, stdio: "ignore" }
   );
   if (!pgIsReady(env)) fail(`the cluster did not come up; see ${PG_LOG}`);
@@ -315,7 +316,7 @@ function stop() {
 function status() {
   const env = { ...process.env };
   const running = clusterRunning(env);
-  log(`cluster ${PGDATA}: ${running ? "running" : "stopped"}; 127.0.0.1:${PG_PORT} ${pgIsReady(env) ? "answers" : "does not answer"}`);
+  log(`cluster ${PGDATA}: ${running ? "running" : "stopped"}; 127.0.0.1:${PG_PORT} ${pgIsReady(env, 10) ? "answers" : "does not answer"}`);
 }
 
 function check(args) {

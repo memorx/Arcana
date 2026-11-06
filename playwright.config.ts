@@ -44,8 +44,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: 4,
-  timeout: 60_000,
-  expect: { timeout: 10_000 },
+  // Generous: on Windows each new database connection is a new Postgres process, which a
+  // busy machine can take 10-20 s to start (see .env.e2e.example).
+  timeout: 120_000,
+  expect: { timeout: 20_000 },
   reporter: [["list"], ["html", { open: "never" }], ["json", { outputFile: "test-results/resultados.json" }]],
   // Logs in as the seeded e2e user before anything runs: proves :3000 is the e2e server.
   globalSetup: "./e2e/global-setup.ts",
@@ -56,22 +58,25 @@ export default defineConfig({
     timezoneId: "America/Mexico_City",
     // next-pwa caches /api/* in its service worker; tests must always hit the server.
     serviceWorkers: "block",
+    navigationTimeout: 60_000,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
 
+  // The English pass of responsivo.spec.ts (tag @en) runs at 390 only (§5.7).
   projects: [
-    { name: "chromium-1440", use: escritorio(1440, 900) },
-    { name: "chromium-1024", use: escritorio(1024, 768), testMatch: RESPONSIVO },
-    { name: "chromium-820", use: tactil(820, 1180), testMatch: RESPONSIVO },
+    { name: "chromium-1440", use: escritorio(1440, 900), grepInvert: /@en/ },
+    { name: "chromium-1024", use: escritorio(1024, 768), testMatch: RESPONSIVO, grepInvert: /@en/ },
+    { name: "chromium-820", use: tactil(820, 1180), testMatch: RESPONSIVO, grepInvert: /@en/ },
     { name: "chromium-390", use: tactil(390, 844), testMatch: RESPONSIVO },
-    { name: "chromium-360", use: tactil(360, 740), testMatch: RESPONSIVO },
+    { name: "chromium-360", use: tactil(360, 740), testMatch: RESPONSIVO, grepInvert: /@en/ },
     // Safari engine at phone width, public routes only (§5.2).
     {
       name: "webkit-390",
       use: { ...devices["iPhone 13"], viewport: { width: 390, height: 844 } },
       testMatch: RESPONSIVO,
       grep: /@publica/,
+      grepInvert: /@en/,
     },
   ],
 

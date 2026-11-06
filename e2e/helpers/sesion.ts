@@ -69,10 +69,9 @@ export const test = base.extend<OpcionesDePrueba, FixturesDeWorker>({
   cuenta: [null, { option: true }],
 
   sesiones: [
-    // eslint-disable-next-line no-empty-pattern
-    async ({}, use, workerInfo) => {
+    async ({}, usar, workerInfo) => {
       const cache = new Map<Cuenta, string>();
-      await use(async (cuenta) => {
+      await usar(async (cuenta) => {
         let archivo = cache.get(cuenta);
         if (!archivo) {
           const usuario = usuarioDe(cuenta, workerInfo.parallelIndex);
@@ -86,19 +85,19 @@ export const test = base.extend<OpcionesDePrueba, FixturesDeWorker>({
     { scope: "worker" },
   ],
 
-  storageState: async ({ cuenta, sesiones, storageState }, use) => {
-    await use(cuenta ? await sesiones(cuenta) : storageState);
+  storageState: async ({ cuenta, sesiones, storageState }, usar) => {
+    await usar(cuenta ? await sesiones(cuenta) : storageState);
   },
 
-  extraHTTPHeaders: async ({ extraHTTPHeaders }, use, testInfo) => {
+  extraHTTPHeaders: async ({ extraHTTPHeaders }, usar, testInfo) => {
     pruebasEnEsteWorker++;
     const n = pruebasEnEsteWorker;
     const ip = `10.${testInfo.workerIndex % 250}.${(n >> 8) & 255}.${n & 255}`;
-    await use({ ...extraHTTPHeaders, "x-forwarded-for": ip });
+    await usar({ ...extraHTTPHeaders, "x-forwarded-for": ip });
   },
 
   _red: [
-    async ({ context }, use, testInfo) => {
+    async ({ context }, usar, testInfo) => {
       await context.route(/^https:\/\/upload\.wikimedia\.org\//, (route) =>
         route.fulfill({ path: CARTA_PNG, contentType: "image/png" })
       );
@@ -110,7 +109,7 @@ export const test = base.extend<OpcionesDePrueba, FixturesDeWorker>({
         }
       });
 
-      await use();
+      await usar();
 
       if (externos.size) {
         testInfo.annotations.push({ type: "hosts externos", description: [...externos].sort().join(", ") });
