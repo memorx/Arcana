@@ -6,13 +6,14 @@
  *
  * - Lienzo fijo de 150 × 260 (90 × 156 en `chica`) sin importar el DPR; el resplandor va en otro lienzo a mitad de
  *   resolución escalado por CSS, sin `filter: blur` ni `mix-blend-mode`.
- * - Cola global (de módulo): como mucho 3 quemas a la vez. Una quema dura 1700 ms; en cuanto alguna carta tiene
- *   que esperar, las que corren y las que esperan pasan a 1100 ms («voltear todas» de 12 ≈ 4.4 s).
+ * - Cola global (de módulo): como mucho 3 quemas a la vez y a lo más una que arranca por cuadro. Una quema dura
+ *   1700 ms; en cuanto alguna carta tiene que esperar, las que corren y las que esperan pasan a 1100 ms
+ *   («voltear todas» de 12 ≈ 4.5 s).
  * - Sin `getContext`, con `getImageData` que lanza o con `prefers-reduced-motion`: se revela con un fundido corto.
  * - Sin JavaScript la carta se ve revelada (el reverso se oculta con `@media (scripting: none)`).
  * - El `requestAnimationFrame` vive sólo mientras se quema y se cancela al desmontar.
  */
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { useTranslations } from "next-intl";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { ReversoCarta, pintarReverso } from "./ReversoCarta";
@@ -72,21 +73,28 @@ interface Turno {
 const activas = new Set<Turno>();
 const espera: Turno[] = [];
 
+let arrancoEsteCuadro = false;
+
 function procesarCola() {
-  while (activas.size < MAX_QUEMAS && espera.length > 0) {
-    const turno = espera.shift()!;
-    activas.add(turno);
-    turno.iniciar();
-  }
-  // Si alguien se quedó esperando, todas las quemas en curso y en espera pasan al ritmo corto
+  // Si alguien se queda esperando, todas las quemas en curso y en espera pasan al ritmo corto
   // (la que ya corría ajusta su reloj sin saltos).
-  if (espera.length > 0) {
+  if (espera.length > MAX_QUEMAS - activas.size) {
     activas.forEach((t) => (t.conCola = true));
     espera.forEach((t) => (t.conCola = true));
   }
+  // Una quema nueva por cuadro: preparar una cuesta unos ms; tres en la misma tarea harían una tarea larga.
+  if (arrancoEsteCuadro || activas.size >= MAX_QUEMAS || espera.length === 0) return;
+  const turno = espera.shift()!;
+  activas.add(turno);
+  turno.iniciar();
+  arrancoEsteCuadro = true;
+  requestAnimationFrame(() => {
+    arrancoEsteCuadro = false;
+    procesarCola();
+  });
 }
 
-/** Pide lugar para quemar. Si hay lugar, `iniciar` corre ya; si no, cuando se libere uno. */
+/** Pide lugar para quemar. Si hay lugar y nadie arrancó en este cuadro, `iniciar` corre ya; si no, después. */
 function pedirTurno(iniciar: () => void): { turno: Turno; soltar: () => void } {
   const turno: Turno = { iniciar, conCola: false };
   espera.push(turno);
@@ -108,29 +116,60 @@ function pedirTurno(iniciar: () => void): { turno: Turno; soltar: () => void } {
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const suave = (t: number) => t * t * (3 - 2 * t);
 
-/** Ruido de valor en dos octavas, suavizado: da bordes de quemadura irregulares. */
-function ruido(w: number, h: number): Float32Array {
-  const capa = (gx: number, gy: number) => {
-    const g = new Float32Array((gx + 1) * (gy + 1));
-    for (let i = 0; i < g.length; i++) g[i] = Math.random();
-    const v = (i: number, j: number) => g[Math.min(j, gy) * (gx + 1) + Math.min(i, gx)];
-    return (x: number, y: number) => {
-      const fx = (x / w) * gx;
-      const fy = (y / h) * gy;
-      const x0 = Math.floor(fx);
-      const y0 = Math.floor(fy);
-      const tx = suave(fx - x0);
-      const ty = suave(fy - y0);
-      const a = v(x0, y0) + (v(x0 + 1, y0) - v(x0, y0)) * tx;
-      const b = v(x0, y0 + 1) + (v(x0 + 1, y0 + 1) - v(x0, y0 + 1)) * tx;
-      return a + (b - a) * ty;
-    };
-  };
-  const c1 = capa(6, 10);
-  const c2 = capa(18, 30);
-  const out = new Float32Array(w * h);
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) out[y * w + x] = c1(x, y) * 0.68 + c2(x, y) * 0.32;
-  return out;
+/**
+ * Suma a `v` una capa de ruido de valor (rejilla gx × gy, interpolación suave) con su peso.
+ * Los índices y pesos de cada columna se calculan una vez: el bucle interno sólo lee arreglos.
+ */
+function sumarRuido(v: Float32Array, w: number, h: number, gx: number, gy: number, peso: number) {
+  const g = new Float32Array((gx + 1) * (gy + 1));
+  for (let i = 0; i < g.length; i++) g[i] = Math.random();
+  const x0s = new Int32Array(w);
+  const x1s = new Int32Array(w);
+  const txs = new Float32Array(w);
+  for (let x = 0; x < w; x++) {
+    const f = (x / w) * gx;
+    const x0 = Math.floor(f);
+    x0s[x] = Math.min(x0, gx);
+    x1s[x] = Math.min(x0 + 1, gx);
+    txs[x] = suave(f - x0);
+  }
+  for (let y = 0; y < h; y++) {
+    const f = (y / h) * gy;
+    const y0 = Math.floor(f);
+    const ty = suave(f - y0);
+    const r0 = Math.min(y0, gy) * (gx + 1);
+    const r1 = Math.min(y0 + 1, gy) * (gx + 1);
+    const fila = y * w;
+    for (let x = 0; x < w; x++) {
+      const tx = txs[x];
+      const a = g[r0 + x0s[x]] + (g[r0 + x1s[x]] - g[r0 + x0s[x]]) * tx;
+      const b = g[r1 + x0s[x]] + (g[r1 + x1s[x]] - g[r1 + x0s[x]]) * tx;
+      v[fila + x] += (a + (b - a) * ty) * peso;
+    }
+  }
+}
+
+/**
+ * El momento en que se quema cada píxel: distancia al punto tocado (74 %) + ruido de valor en dos octavas (36 %),
+ * que da los bordes irregulares. 0 en el punto, ~1.1 en la esquina más lejana.
+ */
+function campoDeQuema(w: number, h: number, px: number, py: number): Float32Array {
+  const v = new Float32Array(w * h);
+  const maxD = Math.sqrt(
+    Math.max(px * px + py * py, (w - px) ** 2 + py * py, px * px + (h - py) ** 2, (w - px) ** 2 + (h - py) ** 2),
+  );
+  const k = 0.74 / maxD;
+  for (let y = 0; y < h; y++) {
+    const dy2 = (y - py) * (y - py);
+    const fila = y * w;
+    for (let x = 0; x < w; x++) {
+      const dx = x - px;
+      v[fila + x] = Math.sqrt(dx * dx + dy2) * k; // sqrt, no Math.hypot: varias veces más rápido en V8
+    }
+  }
+  sumarRuido(v, w, h, 6, 10, 0.68 * 0.36);
+  sumarRuido(v, w, h, 18, 30, 0.32 * 0.36);
+  return v;
 }
 
 interface Quema {
@@ -148,6 +187,21 @@ interface Quema {
 const BANDA = 0.085;
 const CHAMUSCO = 0.06;
 
+/**
+ * Los píxeles del reverso son iguales para todas las cartas de un tamaño: se pintan y se leen una vez por página.
+ * `getImageData` puede lanzar (lienzo bloqueado por el navegador): lo atrapa quien llama y no se guarda nada.
+ */
+const dorsos = new Map<string, Uint8ClampedArray>();
+function pixelesDelReverso(ctx: CanvasRenderingContext2D, w: number, h: number): Uint8ClampedArray {
+  const clave = `${w}x${h}`;
+  const guardado = dorsos.get(clave);
+  if (guardado) return guardado;
+  pintarReverso(ctx, w, h);
+  const datos = ctx.getImageData(0, 0, w, h).data;
+  dorsos.set(clave, datos);
+  return datos;
+}
+
 function prepararQuema(
   base: CanvasRenderingContext2D,
   resplandor: CanvasRenderingContext2D,
@@ -155,24 +209,13 @@ function prepararQuema(
   h: number,
   punto: { fx: number; fy: number },
 ): Quema {
-  pintarReverso(base, w, h);
-  const dorso = base.getImageData(0, 0, w, h); // puede lanzar (lienzo bloqueado por el navegador): lo atrapa quien llama
-  const n = ruido(w, h);
-  const px = punto.fx * w;
-  const py = punto.fy * h;
-  const maxD = Math.max(Math.hypot(px, py), Math.hypot(w - px, py), Math.hypot(px, h - py), Math.hypot(w - px, h - py));
-  const v = new Float32Array(w * h);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const i = y * w + x;
-      v[i] = (Math.hypot(x - px, y - py) / maxD) * 0.74 + n[i] * 0.36;
-    }
-  }
+  const dorso = pixelesDelReverso(base, w, h);
+  const v = campoDeQuema(w, h, punto.fx * w, punto.fy * h);
   return {
     w,
     h,
     v,
-    dorso: dorso.data,
+    dorso,
     img: base.createImageData(w, h),
     brillo: resplandor.createImageData(w >> 1, h >> 1),
     base,
@@ -201,7 +244,15 @@ function pintarCuadro(q: Quema, p: number) {
       a[j + 3] = 255 * (1 - k * 0.85);
       continue;
     }
-    const c = vi < t + CHAMUSCO ? 0.35 + 0.65 * ((vi - t) / CHAMUSCO) : 1; // borde chamuscado
+    if (vi >= t + CHAMUSCO) {
+      // Papel intacto: el reverso tal cual (sin el tinte cálido, para que no cambie de color al empezar).
+      a[j] = d[j];
+      a[j + 1] = d[j + 1];
+      a[j + 2] = d[j + 2];
+      a[j + 3] = 255;
+      continue;
+    }
+    const c = 0.35 + 0.65 * ((vi - t) / CHAMUSCO); // borde chamuscado, más cálido
     a[j] = d[j] * c;
     a[j + 1] = d[j + 1] * c * 0.92;
     a[j + 2] = d[j + 2] * c * 0.9;
@@ -212,7 +263,7 @@ function pintarCuadro(q: Quema, p: number) {
   const gh = q.h >> 1;
   const g = q.brillo.data;
   const centro = t - BANDA * 0.4;
-  const ancho = BANDA * 1.7;
+  const ancho = BANDA * 1.45;
   for (let y = 0; y < gh; y++) {
     for (let x = 0; x < gw; x++) {
       const o = (y * gw + x) * 4;
@@ -224,12 +275,15 @@ function pintarCuadro(q: Quema, p: number) {
       g[o] = 228;
       g[o + 1] = 0;
       g[o + 2] = 124;
-      g[o + 3] = 175 * k * k;
+      g[o + 3] = 135 * k * k;
     }
   }
   q.base.putImageData(q.img, 0, 0);
   q.resplandor.putImageData(q.brillo, 0, 0);
 }
+
+/** El reverso es igual para todas: un solo elemento que React no vuelve a reconciliar en cada cambio de estado. */
+const REVERSO = <ReversoCarta className="cq-reverso" />;
 
 function prefiereQuieto(): boolean {
   return typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
@@ -275,6 +329,7 @@ export function CartaQuemable({
   const onReveladaRef = useRef(onRevelada);
   const baseRef = useRef<HTMLCanvasElement>(null);
   const brilloRef = useRef<HTMLCanvasElement>(null);
+  const tapaRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     onReveladaRef.current = onRevelada;
@@ -319,26 +374,36 @@ export function CartaQuemable({
     [cambiar, terminar],
   );
 
-  // Los lienzos existen sólo en «quemando»: se preparan y se pinta el primer cuadro antes de que el navegador pinte,
-  // para que entre el reverso y el lienzo no se asome la carta.
-  useLayoutEffect(() => {
+  // Los lienzos existen sólo en «quemando» y nacen debajo del reverso (la «tapa»). La preparación (campo de quema,
+  // píxeles del reverso) corre en el primer cuadro de animación, fuera del commit de React, para que la tarea del
+  // toque quede corta; en ese mismo cuadro se pinta el lienzo y se esconde la tapa, así que la carta nunca se asoma.
+  useEffect(() => {
     if (estado !== "quemando") return;
     const [w, h] = LIENZO[tamano];
-    let quema: Quema;
-    try {
-      const base = baseRef.current?.getContext("2d") ?? null;
-      const resplandor = brilloRef.current?.getContext("2d") ?? null;
-      if (!base || !resplandor) throw new Error("sin canvas 2D");
-      quema = prepararQuema(base, resplandor, w, h, puntoRef.current);
-      pintarCuadro(quema, 0);
-    } catch {
-      terminar(true);
-      return;
-    }
     const duracionDe = () => (turnoRef.current?.conCola ? DURACION_CON_COLA : DURACION_SOLA);
-    let duracion = duracionDe();
-    let t0 = performance.now();
+    let quema: Quema | null = null;
+    let duracion = DURACION_SOLA;
+    let t0 = 0;
     const cuadro = (ahora: number) => {
+      if (!quema) {
+        try {
+          // Lienzos en memoria (willReadFrequently): la quema es trabajo de píxeles, un putImageData por cuadro.
+          const base = baseRef.current?.getContext("2d", { willReadFrequently: true }) ?? null;
+          const resplandor = brilloRef.current?.getContext("2d", { willReadFrequently: true }) ?? null;
+          if (!base || !resplandor) throw new Error("sin canvas 2D");
+          quema = prepararQuema(base, resplandor, w, h, puntoRef.current);
+          pintarCuadro(quema, 0);
+        } catch {
+          rafRef.current = 0;
+          terminar(true);
+          return;
+        }
+        tapaRef.current?.style.setProperty("visibility", "hidden");
+        duracion = duracionDe();
+        t0 = performance.now();
+        rafRef.current = requestAnimationFrame(cuadro);
+        return;
+      }
       const nueva = duracionDe();
       if (nueva !== duracion) {
         // Entró cola a media quema: mismo avance, ritmo nuevo.
@@ -354,9 +419,11 @@ export function CartaQuemable({
       }
     };
     rafRef.current = requestAnimationFrame(cuadro);
+    const tapa = tapaRef.current;
     return () => {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
+      tapa?.style.removeProperty("visibility"); // si vuelve boca abajo a media quema, la tapa reaparece
     };
   }, [estado, tamano, terminar]);
 
@@ -440,12 +507,16 @@ export function CartaQuemable({
           decoding="async"
           draggable={false}
         />
-        {(estado === "boca-abajo" || estado === "esperando") && <ReversoCarta className="cq-reverso" />}
         {estado === "quemando" && (
           <>
             <canvas ref={baseRef} className="cq-lienzo" width={w} height={h} aria-hidden="true" />
             <canvas ref={brilloRef} className="cq-brillo" width={w >> 1} height={h >> 1} aria-hidden="true" />
           </>
+        )}
+        {!estaRevelada && (
+          <span ref={tapaRef} className="cq-tapa">
+            {REVERSO}
+          </span>
         )}
         {estado === "boca-abajo" && textoPista ? (
           <span className="cq-pista" aria-hidden="true">

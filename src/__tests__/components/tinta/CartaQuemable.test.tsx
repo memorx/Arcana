@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { act, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import {
@@ -59,6 +59,9 @@ beforeEach(() => {
   conCanvas();
 });
 afterEach(() => {
+  // La cola es de módulo: se desmonta todo (suelta turnos) y corre el cuadro pendiente antes de volver a timers reales.
+  cleanup();
+  act(() => void jest.advanceTimersByTime(100));
   jest.useRealTimers();
 });
 
@@ -75,6 +78,24 @@ describe("CartaQuemable", () => {
     expect(lienzos(container)).toBe(0);
   });
 
+  // Va antes que cualquier otra quema del archivo: los píxeles del reverso se leen una vez por página (por tamaño)
+  // y quedan en caché, así que getImageData sólo puede fallar en la primera quema.
+  it("si getImageData lanza (lienzo bloqueado) también se revela con fundido", async () => {
+    getContext.mockImplementation((() => {
+      const ctx = contextoFalso();
+      (ctx as unknown as Record<string, unknown>).getImageData = () => {
+        throw new DOMException("bloqueado", "SecurityError");
+      };
+      return ctx;
+    }) as never);
+    const { container } = render(<CartaQuemable carta={ESTRELLA} etiqueta="Voltear" />);
+    act(() => screen.getByRole("button").click());
+    avanzar(20); // la preparación corre en el primer cuadro
+    expect(lienzos(container)).toBe(0);
+    expect(container.firstChild).toHaveAttribute("data-estado", "revelada");
+    expect(container.firstChild).toHaveClass("cq--fundido");
+  });
+
   it.each([["Enter", "{Enter}"], ["Espacio", " "]])("%s la quema y al terminar anuncia el nombre", async (_n, tecla) => {
     const onRevelada = jest.fn();
     const user = userEvent.setup({ delay: null });
@@ -87,7 +108,11 @@ describe("CartaQuemable", () => {
     expect(lienzos(container)).toBe(1);
     expect(container.querySelector(".cq-brillo")).toHaveAttribute("width", "75");
     expect(container.querySelector(".cq-lienzo")).toHaveAttribute("width", "150");
-    expect(container.querySelector(".cq-reverso")).not.toBeInTheDocument();
+    // El lienzo nace debajo del reverso; en el primer cuadro se prepara, se pinta y la tapa se esconde.
+    const tapa = container.querySelector<HTMLElement>(".cq-tapa")!;
+    expect(tapa.style.visibility).toBe("");
+    avanzar(20);
+    expect(tapa.style.visibility).toBe("hidden");
     expect(onRevelada).not.toHaveBeenCalled();
 
     avanzar(DURACION_SOLA + 50);
@@ -128,22 +153,6 @@ describe("CartaQuemable", () => {
     expect(onRevelada).toHaveBeenCalledTimes(1);
   });
 
-  it("si getImageData lanza (lienzo bloqueado) también se revela con fundido", async () => {
-    getContext.mockImplementation((() => {
-      const ctx = contextoFalso();
-      (ctx as unknown as Record<string, unknown>).getImageData = () => {
-        throw new DOMException("bloqueado", "SecurityError");
-      };
-      return ctx;
-    }) as never);
-    const { container } = render(<CartaQuemable carta={ESTRELLA} etiqueta="Voltear" />);
-    act(() => screen.getByRole("button").click());
-    await vaciarCola();
-    expect(lienzos(container)).toBe(0);
-    expect(container.firstChild).toHaveAttribute("data-estado", "revelada");
-    expect(container.firstChild).toHaveClass("cq--fundido");
-  });
-
   it("con prefers-reduced-motion se revela de inmediato, sin canvas", () => {
     movimientoReducido(true);
     const onRevelada = jest.fn();
@@ -178,6 +187,23 @@ describe("CartaQuemable", () => {
     expect(onRevelada).toHaveBeenCalledTimes(1);
   });
 
+  it("si `revelada` vuelve a false a media quema, se corta la quema y el reverso reaparece", () => {
+    const onRevelada = jest.fn();
+    const { container, rerender } = render(
+      <CartaQuemable carta={ESTRELLA} etiqueta="Voltear" revelada={false} onRevelada={onRevelada} />,
+    );
+    rerender(<CartaQuemable carta={ESTRELLA} etiqueta="Voltear" revelada onRevelada={onRevelada} />);
+    avanzar(300);
+    expect(container.firstChild).toHaveAttribute("data-estado", "quemando");
+    expect(container.querySelector<HTMLElement>(".cq-tapa")!.style.visibility).toBe("hidden");
+    rerender(<CartaQuemable carta={ESTRELLA} etiqueta="Voltear" revelada={false} onRevelada={onRevelada} />);
+    expect(container.firstChild).toHaveAttribute("data-estado", "boca-abajo");
+    expect(lienzos(container)).toBe(0);
+    expect(container.querySelector<HTMLElement>(".cq-tapa")!.style.visibility).toBe("");
+    avanzar(DURACION_SOLA * 2);
+    expect(onRevelada).not.toHaveBeenCalled();
+  });
+
   it("onRevelada se llama una sola vez aunque se toque varias veces durante la quema", async () => {
     const onRevelada = jest.fn();
     const user = userEvent.setup({ delay: null });
@@ -208,9 +234,12 @@ describe("CartaQuemable", () => {
     act(() => screen.getAllByRole("button").forEach((b) => b.click()));
     await vaciarCola();
     expect(MAX_QUEMAS).toBe(3);
+    // Arranca una por cuadro: en la misma tarea del toque sólo se prepara una quema.
+    expect(lienzos(container)).toBe(1);
+    expect(container.querySelectorAll('[aria-busy="true"]')).toHaveLength(5);
+    avanzar(50);
     expect(lienzos(container)).toBe(3);
     expect(container.querySelectorAll('[data-estado="esperando"]')).toHaveLength(2);
-    expect(container.querySelectorAll('[aria-busy="true"]')).toHaveLength(5);
 
     let maximo = 0;
     for (let ms = 0; ms < DURACION_CON_COLA * 3; ms += 16) {
@@ -234,6 +263,7 @@ describe("CartaQuemable", () => {
       Array.from({ length: n }, (_, i) => <CartaQuemable key={i} carta={ESTRELLA} etiqueta={`Voltear ${i}`} />);
     const { container, rerender } = render(<div>{cartas(4)}</div>);
     act(() => screen.getAllByRole("button").forEach((b) => b.click()));
+    avanzar(50);
     await vaciarCola();
     expect(lienzos(container)).toBe(3);
     // Se van dos que estaban quemando: la que esperaba entra, sin pasar de tres.
@@ -266,7 +296,8 @@ describe("CartaQuemable", () => {
     expect(html).toContain('src="/cartas/rws-tarot-17-star-color.webp"');
     expect(html).toContain('alt="La Estrella"');
     const css = fs.readFileSync(path.join(process.cwd(), "src/components/tinta/tinta.css"), "utf8");
-    expect(css).toMatch(/@media \(scripting: none\)\s*\{\s*\.cq-reverso, \.cq-pista \{ display: none; \}/);
+    expect(html).toContain('class="cq-tapa"');
+    expect(css).toMatch(/@media \(scripting: none\)\s*\{\s*\.cq-tapa, \.cq-pista \{ display: none; \}/);
   });
 
   it("el resplandor no usa filter ni mix-blend-mode", () => {

@@ -112,12 +112,15 @@ export function ReversoCarta({ titulo, className, ...resto }: ReversoCartaProps)
 export function pintarReverso(ctx: CanvasRenderingContext2D, ancho: number, alto: number): void {
   ctx.save();
   ctx.scale(ancho / REVERSO_ANCHO, alto / REVERSO_ALTO);
+  // En un lienzo chico (150 px) los filetes de 0.5–0.7 unidades quedarían en un tercio de píxel y se lavarían:
+  // ningún trazo baja de ~0.8 px del lienzo, para que el cambio del SVG al lienzo al empezar la quema no se note.
+  const grosor = (w: number) => Math.max(w, (0.8 * REVERSO_ANCHO) / ancho);
   ctx.fillStyle = TINTA;
   ctx.fillRect(0, 0, REVERSO_ANCHO, REVERSO_ALTO);
 
-  const marco = (x: number, y: number, w: number, h: number, r: number, grosor: number, alfa: number) => {
+  const marco = (x: number, y: number, w: number, h: number, r: number, trazo: number, alfa: number) => {
     ctx.globalAlpha = alfa;
-    ctx.lineWidth = grosor;
+    ctx.lineWidth = grosor(trazo);
     ctx.strokeStyle = PAPEL;
     ctx.beginPath();
     if (typeof ctx.roundRect === "function") ctx.roundRect(x, y, w, h, r);
@@ -128,23 +131,34 @@ export function pintarReverso(ctx: CanvasRenderingContext2D, ancho: number, alto
   marco(12, 12, 276, 496, 8, 1.2, 1);
   marco(18, 18, 264, 484, 5, 0.5, 0.6);
 
+  // Trazos agrupados por grosor y puntos por color: pocas llamadas a stroke()/fill() en lugar de una por trazo.
   ctx.strokeStyle = PAPEL;
+  const porGrosor = new Map<number, Trazo[]>();
   for (const m of [...MARCAS, ...GUIONES]) {
-    ctx.lineWidth = m.w;
+    const g = grosor(m.w);
+    porGrosor.set(g, [...(porGrosor.get(g) ?? []), m]);
+  }
+  for (const [g, trazos] of porGrosor) {
+    ctx.lineWidth = g;
     ctx.beginPath();
-    ctx.moveTo(m.x1, m.y1);
-    ctx.lineTo(m.x2, m.y2);
+    for (const m of trazos) {
+      ctx.moveTo(m.x1, m.y1);
+      ctx.lineTo(m.x2, m.y2);
+    }
     ctx.stroke();
   }
-  for (const p of PUNTOS) {
-    ctx.fillStyle = p.rosa ? ROSA : PAPEL;
+  for (const rosa of [false, true]) {
+    ctx.fillStyle = rosa ? ROSA : PAPEL;
     ctx.beginPath();
-    ctx.arc(p.cx, p.cy, p.r, 0, Math.PI * 2);
+    for (const p of PUNTOS.filter((q) => q.rosa === rosa)) {
+      ctx.moveTo(p.cx + p.r, p.cy);
+      ctx.arc(p.cx, p.cy, p.r, 0, Math.PI * 2);
+    }
     ctx.fill();
   }
-  const anillo = (r: number, grosor: number, color: string) => {
+  const anillo = (r: number, trazo: number, color: string) => {
     ctx.strokeStyle = color;
-    ctx.lineWidth = grosor;
+    ctx.lineWidth = grosor(trazo);
     ctx.beginPath();
     ctx.arc(CX, CY, r, 0, Math.PI * 2);
     ctx.stroke();

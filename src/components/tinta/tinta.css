@@ -4,6 +4,7 @@
  * orden en que Next junte los CSS. Para que una página ajuste un componente se exponen variables:
  *   --cq-ancho        ancho de <CartaQuemable> (por omisión lo pone `tamano`)
  *   --mdg-opacidad    opacidad de la mesa de grabados
+ *   --gp-suelo        suelo del lienzo fijo de <GrabadoParticulas> (por omisión, papel)
  * Los colores leen los tokens de globals.css (@theme) con su valor de respaldo.
  * Movimiento: sólo transform, opacity y clip-path; nada de filter ni mix-blend-mode en lo que se anima.
  */
@@ -35,15 +36,16 @@
   .cq[data-estado="boca-abajo"] .cq-boton:hover { transform: translateY(-4px) rotate(-.6deg); }
 }
 
-.cq-cara, .cq-reverso, .cq-lienzo, .cq-brillo {
+.cq-cara, .cq-tapa, .cq-lienzo, .cq-brillo {
   position: absolute; inset: 0; width: 100%; height: 100%;
 }
+.cq-tapa { display: block; }
 .cq-cara { object-fit: cover; user-select: none; }
 .cq--invertida .cq-cara { transform: rotate(180deg); }
 .cq-brillo { pointer-events: none; }
 
 .cq-pista {
-  position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); white-space: nowrap;
+  position: absolute; left: 50%; bottom: 12.5%; transform: translateX(-50%); white-space: nowrap; /* encima de «ARCANA» */
   font: 400 .625rem/1 var(--font-dato, ui-monospace, monospace); letter-spacing: .18em; text-transform: uppercase;
   color: var(--color-papel, #ECEAE6);
   padding: 8px 12px; border-radius: 999px; background: rgb(14 13 12 / .72); border: 1px solid rgb(236 234 230 / .25);
@@ -56,7 +58,7 @@
 
 /* Sin JavaScript la carta se ve revelada: el reverso y la pista sólo existen para quien puede voltearla. */
 @media (scripting: none) {
-  .cq-reverso, .cq-pista { display: none; }
+  .cq-tapa, .cq-pista { display: none; }
 }
 
 /* ======================================================================
@@ -126,7 +128,8 @@
 }
 /* Activa (con JS, > 820 px y con movimiento): escena alta con el lienzo fijo; el canvas dibuja la transición. */
 .gp--activa { height: 320svh; }
-.gp--activa .gp-fijo { position: sticky; top: 0; height: 100svh; padding-block: 0; }
+/* sticky crea su propio contexto de apilado: sin suelo propio, el multiply del grabado no tendría papel detrás. */
+.gp--activa .gp-fijo { position: sticky; top: 0; height: 100svh; padding-block: 0; background: var(--gp-suelo, var(--color-papel, #ECEAE6)); }
 .gp--activa .gp-progreso { display: block; }
 .gp--activa .gp-grabado { clip-path: inset(calc(var(--p-corte, 0) * 100%) 0 0 0); }
 .gp--activa .gp-lectura { opacity: var(--p-texto, 0); transform: translateY(calc((1 - var(--p-texto, 0)) * 10px)); }
