@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./helpers/sesion";
 
 // The app picks the language from the locale cookie, then Accept-Language (default es).
 // These checks were written for the Spanish default, so the browser asks for Spanish.

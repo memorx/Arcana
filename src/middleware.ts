@@ -5,13 +5,21 @@ import { getToken } from 'next-auth/jwt'
 const protectedRoutes = ['/dashboard', '/reading', '/history', '/credits', '/daily', '/subscribe', '/profile', '/referral', '/blueprint', '/compatibility', '/history/insights', '/reading/manual']
 const authRoutes = ['/login', '/register']
 
+/**
+ * Auth.js names its session cookie after the request's protocol: `__Secure-` only
+ * over https. Reading it by NODE_ENV broke `next start` on http (local e2e): the
+ * cookie was looked up under the https name and every private page sent you to
+ * /login. On Vercel the protocol is always https, so production is unchanged.
+ */
+export function sessionCookieName(protocol: string): string {
+  return protocol === 'https:' ? '__Secure-authjs.session-token' : 'authjs.session-token'
+}
+
 export async function middleware(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
-    cookieName: process.env.NODE_ENV === 'production'
-      ? '__Secure-authjs.session-token'
-      : 'authjs.session-token'
+    cookieName: sessionCookieName(request.nextUrl.protocol)
   })
 
   const { pathname } = request.nextUrl

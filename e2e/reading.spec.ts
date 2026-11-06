@@ -1,10 +1,7 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./helpers/sesion";
+import { IDS, LECTURA_PRINCIPAL } from "./fixtures/usuarios";
 
-// Note: These tests assume an authenticated user.
-// In a real scenario, you would:
-// 1. Create a test user in a test database
-// 2. Use a fixture to authenticate before each test
-// 3. Clean up after tests
+// Signed-in tests use the users of the local e2e database (e2e/fixtures/usuarios.ts).
 
 test.describe("Reading Flow - Unauthenticated", () => {
   test("clicking start reading redirects to login", async ({ page }) => {
@@ -20,31 +17,37 @@ test.describe("Reading Flow - Unauthenticated", () => {
 });
 
 test.describe("Spread Selection Page", () => {
-  // These tests will work once authenticated
-  test.skip("should display all spread types", async ({ page }) => {
+  // Signed in as this worker's e2e user (1000 credits, no free readings left)
+  test.use({ cuenta: "worker" });
+
+  test("should display all spread types", async ({ page }) => {
     await page.goto("/reading/new");
 
-    // Should show 4 spread types
-    await expect(page.getByText(/tres cartas|three cards/i)).toBeVisible();
-    await expect(page.getByText(/cruz simple|simple cross/i)).toBeVisible();
-    await expect(page.getByText(/herradura|horseshoe/i)).toBeVisible();
-    await expect(page.getByText(/cruz celta|celtic cross/i)).toBeVisible();
+    // Should show the 4 classic spread types
+    await expect(page.getByText(/tres cartas|three cards/i).first()).toBeVisible();
+    await expect(page.getByText(/cruz simple|simple cross/i).first()).toBeVisible();
+    await expect(page.getByText(/herradura|horseshoe/i).first()).toBeVisible();
+    await expect(page.getByText(/cruz celta|celtic cross/i).first()).toBeVisible();
   });
 
-  test.skip("should show credit costs for each spread", async ({ page }) => {
+  test("should show credit costs for each spread", async ({ page }) => {
     await page.goto("/reading/new");
 
     // Each spread should show its cost
-    await expect(page.getByText(/1 credito|1 credit/i)).toBeVisible();
-    await expect(page.getByText(/2 creditos|2 credits/i)).toBeVisible();
-    await expect(page.getByText(/3 creditos|3 credits/i)).toBeVisible();
+    await expect(page.getByText(/^1 credito|^1 credit/i).first()).toBeVisible();
+    await expect(page.getByText(/^2 creditos|^2 credits/i).first()).toBeVisible();
+    await expect(page.getByText(/^3 creditos|^3 credits/i).first()).toBeVisible();
   });
 
-  test.skip("should show free reading indicator for new users", async ({ page }) => {
-    await page.goto("/reading/new");
+  test.describe("new account", () => {
+    test.use({ cuenta: "nuevo" });
 
-    // Should indicate free readings available
-    await expect(page.getByText(/gratis|free/i)).toBeVisible();
+    test("should show free reading indicator for new users", async ({ page }) => {
+      await page.goto("/reading/new");
+
+      // Should indicate free readings available
+      await expect(page.getByText(/gratis|free/i).first()).toBeVisible();
+    });
   });
 });
 
@@ -52,8 +55,8 @@ test.describe("Shared Readings", () => {
   test("should show 404 for non-existent shared reading", async ({ page }) => {
     await page.goto("/share/non-existent-id");
 
-    // Should show not found
-    await expect(page.locator("body")).toContainText(/not found|no encontrado/i);
+    // Should show not found (today's 404 reads "404 · Esta página no existe en el mazo")
+    await expect(page.locator("body")).toContainText(/not found|no encontrad|no existe|404/i);
   });
 
   test("public shared reading page should be accessible", async ({ page }) => {
@@ -67,9 +70,11 @@ test.describe("Shared Readings", () => {
 });
 
 test.describe("Reading Page Structure", () => {
-  test.skip("reading page shows all expected sections", async ({ page }) => {
-    // This would require an actual reading ID
-    await page.goto("/reading/test-reading-id");
+  test.use({ cuenta: "historia" });
+
+  test("reading page shows all expected sections", async ({ page }) => {
+    // A reading of the e2e "con historia" account
+    await page.goto(`/reading/${IDS.lectura(LECTURA_PRINCIPAL)}`);
 
     // Intention section
     await expect(
@@ -78,7 +83,7 @@ test.describe("Reading Page Structure", () => {
 
     // Cards section
     await expect(
-      page.getByRole("heading", { name: /cartas|cards/i })
+      page.getByRole("heading", { name: /cartas|cards/i }).first()
     ).toBeVisible();
 
     // Interpretation section
@@ -97,7 +102,7 @@ test.describe("Accessibility", () => {
     await expect(emailInput).toBeVisible();
     await expect(emailInput).toHaveAttribute("type", "email");
 
-    const passwordInput = page.getByLabel(/password|contraseña/i);
+    const passwordInput = page.getByLabel(/password|contrase[ñn]a/i);
     await expect(passwordInput).toBeVisible();
     await expect(passwordInput).toHaveAttribute("type", "password");
   });
@@ -121,13 +126,15 @@ test.describe("Accessibility", () => {
   test("buttons should be keyboard accessible", async ({ page }) => {
     await page.goto("/login");
 
-    // Tab through the form
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
+    // Tab through the page until the submit button takes the focus (skip link, logo and
+    // fields come first; the exact count changes with the layout)
+    const submitButton = page.locator("form").getByRole("button", { name: /iniciar|sign in/i });
+    for (let i = 0; i < 15; i++) {
+      await page.keyboard.press("Tab");
+      if (await submitButton.evaluate((el) => el === document.activeElement)) break;
+    }
 
     // Submit button should be focusable
-    const submitButton = page.getByRole("button", { name: /iniciar|sign in/i });
     await expect(submitButton).toBeFocused();
   });
 });

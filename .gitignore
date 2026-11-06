@@ -55,3 +55,11 @@ design/maqueta/_qa/
 design/maqueta/_artifact/
 design/cartas/descarga.log
 design/maqueta/img/cartas/
+
+# Local e2e (PLAN 2026-11-05 §5.2): the real env file, the e2e build and Playwright output
+.env.e2e
+/.next-e2e/
+/test-results/
+/playwright-report/
+/e2e/.auth/
+/e2e/.generado/
