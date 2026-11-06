@@ -108,12 +108,14 @@ describe("HoraDelDia", () => {
     const raiz = document.createElement("div");
     raiz.innerHTML = html;
     document.body.appendChild(raiz);
+    let hidratada: ReturnType<typeof hydrateRoot> | undefined;
     await act(async () => {
-      hydrateRoot(raiz, elemento, { onRecoverableError: errores });
+      hidratada = hydrateRoot(raiz, elemento, { onRecoverableError: errores });
     });
     expect(errores).not.toHaveBeenCalled();
     expect(consola).not.toHaveBeenCalled();
     expect(textoDe(raiz)).toBe(textoDe(cliente));
+    act(() => hidratada?.unmount());
     consola.mockRestore();
     raiz.remove();
   });
