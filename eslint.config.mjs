@@ -22,6 +22,7 @@ const eslintConfig = [
       "test-results/**",
       "public/sw.js",
       "public/workbox-*.js",
+      "public/worker-*.js",
       "next-env.d.ts",
       "_referencias/**",
       "design/**",
