@@ -1,25 +1,43 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Locale, locales } from "@/i18n/config";
+import { cn } from "@/lib/utils";
 
-const localeNames: Record<Locale, string> = {
+const localeCodes: Record<Locale, string> = {
   es: "ES",
   en: "EN",
 };
 
-const localeFlags: Record<Locale, string> = {
-  es: "🇪🇸",
-  en: "🇺🇸",
+// Cada idioma se nombra en sí mismo (con su `lang`).
+const localeNames: Record<Locale, string> = {
+  es: "Español",
+  en: "English",
 };
 
-export function LanguageSelector() {
+interface LanguageSelectorProps {
+  /** `menu` (por omisión): botón que abre la lista. `inline`: los dos idiomas a la vista (menú móvil). */
+  variant?: "menu" | "inline";
+  className?: string;
+}
+
+export function LanguageSelector({ variant = "menu", className }: LanguageSelectorProps) {
   const locale = useLocale() as Locale;
   const router = useRouter();
+  const t = useTranslations("nav");
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const alTeclear = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", alTeclear);
+    return () => document.removeEventListener("keydown", alTeclear);
+  }, [isOpen]);
 
   const handleLocaleChange = async (newLocale: Locale) => {
     if (newLocale === locale) {
@@ -44,63 +62,81 @@ export function LanguageSelector() {
     setIsOpen(false);
   };
 
+  const opcion = (loc: Locale, extra?: string) => (
+    <>
+      <span lang={loc} className={cn("font-lectura text-[0.9375rem] tracking-normal normal-case", extra)}>
+        {localeNames[loc]}
+      </span>{" "}
+      <span>{localeCodes[loc]}</span>
+    </>
+  );
+
+  if (variant === "inline") {
+    return (
+      <div role="group" aria-label={t("language")} className={cn("flex flex-wrap gap-2", className)}>
+        {locales.map((loc) => (
+          <button
+            key={loc}
+            type="button"
+            onClick={() => handleLocaleChange(loc)}
+            disabled={isPending}
+            aria-pressed={loc === locale}
+            className={cn(
+              "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-dato text-xs tracking-[0.1em] uppercase transition-colors disabled:opacity-50",
+              loc === locale
+                ? "border-rosa-luz bg-rosa-luz text-tinta"
+                : "border-current/40 hover:border-current"
+            )}
+          >
+            {opcion(loc)}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
-        className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 rounded-lg transition-colors disabled:opacity-50"
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 font-dato text-[0.6875rem] tracking-[0.1em] uppercase transition-colors hover:bg-current/10 disabled:opacity-50"
         aria-label="Change language"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
       >
-        <span>{localeFlags[locale]}</span>
-        <span className="hidden sm:inline">{localeNames[locale]}</span>
+        <span aria-hidden="true">{localeCodes[locale]}</span>
         <svg
-          className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          aria-hidden="true"
+          className={cn("h-3 w-3 transition-transform", isOpen && "rotate-180")}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-32 bg-slate-900 border border-slate-800 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+          <div className="fixed inset-0 z-10" aria-hidden="true" onClick={() => setIsOpen(false)} />
+          <div className="suelo-tinta absolute right-0 z-20 mt-2 w-44 rounded-sm border border-filete/20 py-1">
             {locales.map((loc) => (
               <button
                 key={loc}
+                type="button"
                 onClick={() => handleLocaleChange(loc)}
-                className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
-                  loc === locale
-                    ? "bg-purple-500/20 text-purple-400"
-                    : "text-slate-300 hover:bg-slate-800/50"
-                }`}
+                aria-current={loc === locale ? "true" : undefined}
+                className={cn(
+                  "flex min-h-11 w-full items-center gap-2 px-4 text-left font-dato text-xs tracking-[0.1em] uppercase transition-colors hover:bg-filete/10",
+                  loc === locale ? "text-letra-acento" : "text-letra"
+                )}
               >
-                <span>{localeFlags[loc]}</span>
-                <span>{localeNames[loc]}</span>
+                {opcion(loc, "flex-1")}
                 {loc === locale && (
-                  <svg
-                    className="w-4 h-4 ml-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
+                  <svg aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </button>

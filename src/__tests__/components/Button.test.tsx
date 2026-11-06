@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 
 describe("Button", () => {
   it("renders with default props", () => {
@@ -8,40 +8,63 @@ describe("Button", () => {
     expect(button).toBeInTheDocument();
   });
 
-  it("renders with primary variant by default", () => {
+  it("renders with primary variant by default: rosa-luz with tinta letters", () => {
     render(<Button>Primary</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bg-gradient-to-r");
-    expect(button).toHaveClass("from-amber-500");
+    expect(button).toHaveClass("bg-rosa-luz", "text-tinta");
   });
 
-  it("renders with secondary variant", () => {
+  it("is set in mono uppercase with tracking, as a pill", () => {
+    render(<Button>Mono</Button>);
+    expect(screen.getByRole("button")).toHaveClass("font-dato", "uppercase", "tracking-[0.1em]", "rounded-full");
+  });
+
+  it("renders with secondary variant (alias of linea): a rule in the letter color of its ground", () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bg-slate-800");
+    expect(button).toHaveClass("bg-transparent", "border-current");
   });
 
-  it("renders with ghost variant", () => {
+  it("renders with ghost variant (alias of fantasma)", () => {
     render(<Button variant="ghost">Ghost</Button>);
     const button = screen.getByRole("button");
     expect(button).toHaveClass("bg-transparent");
+    expect(button).not.toHaveClass("border-current");
   });
 
-  it("renders with danger variant", () => {
+  it("renders with danger variant (alias of peligro)", () => {
     render(<Button variant="danger">Danger</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bg-red-600");
+    expect(button).toHaveClass("bg-error", "text-papel");
   });
 
-  it("renders with different sizes", () => {
+  it("old variant names and the new ones give the same classes", () => {
+    for (const [viejo, nuevo] of [
+      ["primary", "primario"],
+      ["secondary", "linea"],
+      ["ghost", "fantasma"],
+      ["danger", "peligro"],
+    ] as const) {
+      expect(buttonClasses({ variant: viejo })).toBe(buttonClasses({ variant: nuevo }));
+    }
+  });
+
+  it("renders with different sizes, all at least 44 px tall", () => {
     const { rerender } = render(<Button size="sm">Small</Button>);
-    expect(screen.getByRole("button")).toHaveClass("px-3", "py-1.5");
+    expect(screen.getByRole("button")).toHaveClass("min-h-11", "px-4");
 
     rerender(<Button size="md">Medium</Button>);
-    expect(screen.getByRole("button")).toHaveClass("px-4", "py-2");
+    expect(screen.getByRole("button")).toHaveClass("min-h-12", "px-6");
 
     rerender(<Button size="lg">Large</Button>);
-    expect(screen.getByRole("button")).toHaveClass("px-6", "py-3");
+    expect(screen.getByRole("button")).toHaveClass("min-h-14", "px-8");
+  });
+
+  it("buttonClasses lets a link look like a button", () => {
+    const clases = buttonClasses({ variant: "linea", size: "lg", className: "w-full" });
+    expect(clases).toContain("border-current");
+    expect(clases).toContain("min-h-14");
+    expect(clases).toContain("w-full");
   });
 
   it("shows loading state", () => {

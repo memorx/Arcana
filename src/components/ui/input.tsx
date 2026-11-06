@@ -9,6 +9,11 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
 }
 
+/**
+ * Campo de pliego: sin caja, un filete inferior y la letra en Newsreader.
+ * Al enfocarse el filete se vuelve rosa y más grueso; con error, el filete y
+ * el mensaje van en el semántico de error del suelo (#B3261E / #FF8A80).
+ */
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, hint, type = "text", id, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
@@ -21,7 +26,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-slate-300 mb-1.5"
+            className="mb-1.5 block font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase"
           >
             {label}
           </label>
@@ -33,22 +38,24 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
-            "w-full px-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg",
-            "text-slate-100 placeholder:text-slate-500",
-            "focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500",
-            "transition-all duration-200",
-            error && "border-red-500 focus:ring-red-500/50 focus:border-red-500",
+            "w-full rounded-none border-0 border-b border-filete/50 bg-transparent px-0 py-2.5",
+            "font-lectura text-[1.0625rem] text-letra placeholder:text-letra-suave",
+            "transition-[border-color,box-shadow] duration-200",
+            "focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none focus-visible:outline-none",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            error &&
+              "border-letra-error focus:border-letra-error focus:shadow-[0_1px_0_0_var(--letra-error)]",
             className
           )}
           {...props}
         />
         {hint && !error && (
-          <p id={hintId} className="mt-1.5 text-sm text-slate-500">
+          <p id={hintId} className="mt-1.5 text-sm text-letra-suave">
             {hint}
           </p>
         )}
         {error && (
-          <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-400">
+          <p id={errorId} role="alert" className="mt-1.5 text-sm text-letra-error">
             {error}
           </p>
         )}

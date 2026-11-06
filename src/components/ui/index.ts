@@ -1,5 +1,5 @@
-export { Button } from "./button";
-export type { ButtonProps } from "./button";
+export { Button, buttonClasses } from "./button";
+export type { ButtonProps, ButtonVariant, ButtonSize } from "./button";
 
 export { Input } from "./input";
 export type { InputProps } from "./input";
@@ -8,7 +8,8 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 
 export { Badge } from "./badge";
 
-export { Modal, ModalHeader, ModalBody, ModalFooter } from "./modal";
+export { Modal, ModalHeader, ModalBody, ModalFooter, useFocusTrap } from "./modal";
+export type { FocusTrapOptions } from "./modal";
 
 export { LanguageSelector } from "./LanguageSelector";
 
