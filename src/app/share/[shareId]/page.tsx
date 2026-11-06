@@ -114,7 +114,9 @@ export default async function SharedReadingPage({ params }: PageProps) {
               </span>
             </div>
             <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-              <h1 className="font-titulo text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]">{t("yourReading")}</h1>
+              <h1 className="min-w-0 font-titulo text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05] break-words">
+                {reading.user.name ? t("sharedTitle", { name: reading.user.name }) : t("sharedTitleAnonymous")}
+              </h1>
               <Link href="/register" className={buttonClasses({ variant: "linea" })}>
                 {t("anotherReading")}
               </Link>
