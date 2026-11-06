@@ -94,7 +94,7 @@ describe("/achievements", () => {
     expect(barra).toHaveAttribute("aria-valuenow", "3");
     expect(barra).toHaveAttribute("aria-valuemax", "10");
     expect(barra).toHaveAttribute("aria-valuetext", "3 de 10");
-    expect(within(enCurso).getByText("+2 creditos")).toBeInTheDocument();
+    expect(within(enCurso).getByText("+2 créditos")).toBeInTheDocument();
 
     const bloqueado = fila("Constante");
     expect(bloqueado).toHaveAttribute("data-estado", "bloqueado");
@@ -198,6 +198,6 @@ describe("/challenges", () => {
   it("sin desafíos: el aviso en lugar de la lista", async () => {
     responder({ weekly: [], monthly: [], stats: null, resets: null });
     render(<ChallengesPage />);
-    expect(await screen.findByText("No hay desafios disponibles")).toBeInTheDocument();
+    expect(await screen.findByText("No hay desafíos disponibles")).toBeInTheDocument();
   });
 });

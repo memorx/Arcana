@@ -65,7 +65,7 @@ describe("/collection", () => {
     const { container } = render(<CollectionPage />);
     await screen.findByRole("heading", { level: 2, name: "Arcanos Mayores" });
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tu Coleccion");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tu Colección");
     expect(container.querySelector("[data-contador]")?.textContent?.replace(/\s+/g, " ").trim()).toBe("3 de 78");
 
     const barra = screen.getByRole("progressbar", { name: "3 de 78 cartas descubiertas" });

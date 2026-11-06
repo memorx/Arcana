@@ -54,12 +54,12 @@ describe("AchievementUnlockedModal", () => {
   it("h2, cada logro con su sello y el total de créditos; Continuar cierra", () => {
     const onClose = jest.fn();
     render(<AchievementUnlockedModal isOpen onClose={onClose} achievements={logros} />);
-    dialogoNombradoPor("Logro Desbloqueado!");
+    dialogoNombradoPor("¡Logro Desbloqueado!");
 
     expect(screen.getByRole("heading", { level: 3, name: "Primera Lectura" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Madrugador" })).toBeInTheDocument();
     expect(document.querySelectorAll("[data-estado='logrado'][aria-hidden='true']")).toHaveLength(2);
-    expect(screen.getByText("Has ganado 3 creditos")).toBeInTheDocument();
+    expect(screen.getByText("Has ganado 3 créditos")).toBeInTheDocument();
     expect(screen.getByText("+3")).toBeInTheDocument();
     // La palabra a pincel es un sello decorativo: no es encabezado ni nombre del diálogo.
     expect(screen.getByText("Logro")).toHaveAttribute("aria-hidden", "true");
@@ -85,13 +85,13 @@ describe("ChallengeCompletedModal", () => {
         challenges={[{ id: "c1", key: "weekly_explorer", name: "Weekly Explorer", nameEs: "Explorador Semanal", icon: "🔍", creditReward: 3 }]}
       />
     );
-    dialogoNombradoPor("Desafio Completado!");
+    dialogoNombradoPor("¡Desafío Completado!");
 
     const chispas = document.querySelector("[data-chispas]")!;
     expect(chispas).toHaveAttribute("aria-hidden", "true");
     expect(chispas.children).toHaveLength(10);
     expect(screen.getByRole("heading", { level: 3, name: "Explorador Semanal" })).toBeInTheDocument();
-    expect(screen.getByText("Has ganado 3 creditos de desafios")).toBeInTheDocument();
+    expect(screen.getByText("Has ganado 3 créditos de desafíos")).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: "Escape" });
     expect(onClose).toHaveBeenCalled();
@@ -103,12 +103,12 @@ describe("LevelUpModal", () => {
     render(
       <LevelUpModal isOpen onClose={jest.fn()} newLevel={3} levelName="Adept" levelNameEs="Adepto" levelIcon="🔮" creditsAwarded={5} />
     );
-    dialogoNombradoPor("Subiste de Nivel!");
+    dialogoNombradoPor("¡Subiste de Nivel!");
 
     expect(screen.getByText("III")).toBeInTheDocument();
-    expect(screen.getByText("Ahora eres Adepto!")).toBeInTheDocument();
+    expect(screen.getByText("¡Ahora eres Adepto!")).toBeInTheDocument();
     expect(screen.getByText("+5")).toBeInTheDocument();
-    expect(screen.getByText("Sigue asi! Tu viaje continua.")).toBeInTheDocument();
+    expect(screen.getByText("¡Sigue así! Tu viaje continúa.")).toBeInTheDocument();
     expect(screen.queryByText("🔮")).toBeNull();
   });
 
@@ -131,7 +131,7 @@ describe("GoldenCardModal", () => {
   it("una dorada: h2, la carta a color propia con la única brasa rosa, «Nueva» y créditos", () => {
     const onClose = jest.fn();
     render(<GoldenCardModal isOpen onClose={onClose} cards={[estrella]} />);
-    const dialogo = dialogoNombradoPor("CARTA DORADA!");
+    const dialogo = dialogoNombradoPor("¡CARTA DORADA!");
 
     const img = screen.getByRole("img", { name: "La Estrella" });
     expect(img.getAttribute("src")).toMatch(/\/cartas\/rws-tarot-17-star-color\.webp$/);
@@ -141,7 +141,7 @@ describe("GoldenCardModal", () => {
     expect(img.closest(".golden-card-glow")).not.toBeNull();
     expect(screen.getByText("Nueva")).toBeInTheDocument();
     expect(screen.getByText(`+${GOLDEN_CARD_CREDITS_REWARD}`)).toBeInTheDocument();
-    expect(screen.getByText("Agregada a tu coleccion dorada!")).toBeInTheDocument();
+    expect(screen.getByText("¡Agregada a tu colección dorada!")).toBeInTheDocument();
 
     // El botón ya no es texto oscuro sobre ámbar: es el primario de Dos tintas (rosa-luz con letra tinta).
     const continuar = screen.getByRole("button", { name: "Continuar" });
@@ -163,7 +163,7 @@ describe("GoldenCardModal", () => {
         ]}
       />
     );
-    const dialogo = dialogoNombradoPor("3 CARTAS DORADAS!");
+    const dialogo = dialogoNombradoPor("¡3 CARTAS DORADAS!");
     expect(dialogo.querySelectorAll(".golden-card-glow")).toHaveLength(3);
     expect(screen.getByRole("img", { name: "Los Enamorados" }).getAttribute("src")).toMatch(/\/cartas\/rws-tarot-06-lovers-color\.webp$/);
     expect(screen.getByText(`+${3 * GOLDEN_CARD_CREDITS_REWARD}`)).toBeInTheDocument();
