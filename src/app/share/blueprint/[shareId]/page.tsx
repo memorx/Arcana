@@ -4,14 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent } from "@/components/ui";
 import { getArcanaBlueprint } from "@/lib/systems";
 import { blueprintInputsHash, getFirstName, toBlueprintLocale } from "@/lib/ai/blueprint-synthesis";
+import { Footer } from "@/components/layout/footer";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { HoraDelDia } from "@/components/tinta/HoraDelDia";
 import { BlueprintBadges } from "@/components/blueprint/BlueprintBadges";
 import { BlueprintConstellation } from "@/components/blueprint/BlueprintConstellation";
 import { SynthesisText } from "@/components/blueprint/SynthesisText";
 import { getBlueprintBadges, type BlueprintBadge } from "@/components/blueprint/view-model";
-import { linkButtonClass } from "@/components/blueprint/link-styles";
+import { buttonClasses } from "@/components/ui/button-classes";
 
 interface PageProps {
   params: Promise<{ shareId: string }>;
@@ -79,6 +81,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/**
+ * The public Arcana Map, in two inks and complete without JavaScript (no
+ * entrance animation, no client state): ink band with the brand and the hour
+ * of the day, the hero with the first name and the five stamps, the synthesis
+ * as a printed sheet and the call to make your own.
+ */
 export default async function SharedBlueprintPage({ params }: PageProps) {
   const { shareId } = await params;
   const data = await loadSharedBlueprint(shareId);
@@ -93,89 +101,100 @@ export default async function SharedBlueprintPage({ params }: PageProps) {
   const initial = Array.from(data.firstName)[0]?.toLocaleUpperCase(locale) ?? "✦";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950">
-      <header className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-5">
-        <Link
-          href="/"
-          className="rounded text-lg font-semibold text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-        >
-          <span aria-hidden="true" className="text-amber-400">
-            ✦{" "}
-          </span>
-          Arcana
-        </Link>
-        <Link href="/login" className={linkButtonClass("ghost", "sm")}>
-          {t("login")}
-        </Link>
+    <div className="flex min-h-screen flex-col">
+      <header className="suelo-tinta border-b border-papel/12 pt-[env(safe-area-inset-top,0px)]">
+        <div className="mx-auto flex max-w-escena flex-wrap items-center gap-x-6 gap-y-2 px-gutter py-2">
+          <Link
+            href="/"
+            className="inline-flex min-h-11 shrink-0 items-center font-titulo text-[1.45rem] leading-none tracking-[0.01em] text-papel"
+          >
+            Arcana
+          </Link>
+          <HoraDelDia variante="larga" className="hidden text-niebla lg:block" />
+          <Link href="/login" className={buttonClasses({ variant: "linea", size: "sm", className: "ml-auto" })}>
+            {t("login")}
+          </Link>
+        </div>
+        <div className="border-t border-papel/10 lg:hidden">
+          <div className="mx-auto max-w-escena px-gutter py-1.5 text-niebla">
+            <HoraDelDia variante="corta" className="text-[0.625rem] md:text-center" />
+          </div>
+        </div>
       </header>
 
-      <main id="main-content" className="mx-auto max-w-3xl space-y-8 px-4 pb-16">
+      <main
+        id="main-content"
+        className="mx-auto grid w-full max-w-pliego flex-1 gap-14 px-gutter py-[clamp(32px,6vh,64px)] sm:gap-16"
+      >
         <section
           aria-labelledby="shared-blueprint-title"
-          className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-purple-950/70 via-slate-950 to-amber-950/30 px-5 py-8 text-center sm:px-10 sm:py-12"
+          className="grid items-center gap-10 border-b border-filete pb-10 sm:pb-12 md:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]"
         >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-purple-600/20 blur-3xl"
-          />
-          <div className="relative flex flex-col items-center">
-            <BlueprintConstellation badges={badges} center={initial} />
-            <p className="mt-6 text-xs font-medium uppercase tracking-[0.25em] text-amber-400">{t("eyebrow")}</p>
-            <h1 id="shared-blueprint-title" className="mt-2 text-3xl font-bold text-slate-100 text-balance sm:text-4xl">
+          <div className="grid min-w-0 justify-items-start gap-5">
+            <Etiqueta>{t("eyebrow")}</Etiqueta>
+            <h1 id="shared-blueprint-title" className="text-[clamp(2.2rem,1.4rem+2.8vw,3.75rem)] leading-[1.02]">
               {data.firstName ? t("title", { name: data.firstName }) : t("titleNoName")}
             </h1>
-            <BlueprintBadges
-              badges={badges}
-              label={tBlueprint("badgesLabel")}
-              className="mt-5 justify-center"
-            />
-            <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-300">{t("intro")}</p>
+            <BlueprintBadges badges={badges} label={tBlueprint("badgesLabel")} />
+            <p className="max-w-[56ch] text-[1.0625rem] leading-[1.65] text-letra-suave">{t("intro")}</p>
+          </div>
+          <BlueprintConstellation
+            badges={badges}
+            center={initial}
+            className="justify-self-center md:justify-self-end lg:w-72"
+          />
+        </section>
+
+        <section
+          aria-labelledby="shared-synthesis-title"
+          className="grid gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14"
+        >
+          <header className="grid content-start gap-3">
+            <Etiqueta>{tBlueprint("synthesis.eyebrow")}</Etiqueta>
+            <h2 id="shared-synthesis-title" className="text-[clamp(1.9rem,1.4rem+1.6vw,2.6rem)] leading-[1.05]">
+              {t("synthesisTitle")}
+            </h2>
+          </header>
+          <div className="min-w-0">
+            {data.synthesis ? (
+              <SynthesisText
+                text={data.synthesis}
+                lang={data.synthesisLocale}
+                questionsTitle={tBlueprint("synthesis.questionsTitle")}
+              />
+            ) : (
+              <p className="border-l-2 border-rosa pl-4 text-[1.0625rem] leading-[1.6] text-letra-suave">
+                {t("noSynthesis")}
+              </p>
+            )}
+            <p className="mt-8 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+              {tBlueprint("synthesis.disclaimer")}
+            </p>
           </div>
         </section>
 
-        <Card variant="highlighted" role="region" aria-labelledby="shared-synthesis-title">
-          <CardContent className="p-5 pt-6 sm:p-8">
-            <div className="flex items-center gap-2">
-              <span aria-hidden="true" className="text-amber-400">
-                ✦
-              </span>
-              <h2 id="shared-synthesis-title" className="text-2xl font-semibold text-slate-100">
-                {t("synthesisTitle")}
-              </h2>
-            </div>
-            <div className="mt-6">
-              {data.synthesis ? (
-                <SynthesisText
-                  text={data.synthesis}
-                  lang={data.synthesisLocale}
-                  questionsTitle={tBlueprint("synthesis.questionsTitle")}
-                />
-              ) : (
-                <p className="text-slate-400">{t("noSynthesis")}</p>
-              )}
-            </div>
-            <p className="mt-6 text-xs text-slate-500">{tBlueprint("synthesis.disclaimer")}</p>
-          </CardContent>
-        </Card>
-
         <section
           aria-labelledby="shared-blueprint-cta"
-          className="rounded-2xl border border-slate-800 bg-gradient-to-r from-purple-900/30 to-amber-900/20 p-6 text-center sm:p-8"
+          className="grid gap-5 border-y border-filete py-10 sm:py-12 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:items-end"
         >
-          <h2 id="shared-blueprint-cta" className="text-xl font-semibold text-slate-100">
-            {t("ctaTitle")}
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-slate-400">{t("ctaText")}</p>
-          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/register" className={linkButtonClass("primary", "lg", "w-full sm:w-auto")}>
+          <div className="grid gap-3">
+            <h2 id="shared-blueprint-cta" className="text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1]">
+              {t("ctaTitle")}
+            </h2>
+            <p className="max-w-[46ch] text-[1.0625rem] leading-[1.6] text-letra-suave">{t("ctaText")}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 md:justify-end">
+            <Link href="/register" className={buttonClasses({ size: "lg", className: "w-full sm:w-auto" })}>
               {t("cta")}
             </Link>
-            <Link href="/login" className={linkButtonClass("ghost", "md")}>
+            <Link href="/login" className={buttonClasses({ variant: "fantasma", size: "md" })}>
               {t("login")}
             </Link>
           </div>
         </section>
       </main>
+
+      <Footer />
     </div>
   );
 }

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arcana · Dos tintas</title>
+<meta name="description" content="Maqueta de la portada de Arcana: grabados de 1909, una lectura escrita por IA y la carta del día.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Martian+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Water+Brush&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<!-- Pincel seco: vetas horizontales que comen el trazo, como brocha con poca tinta -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <filter id="pincel-seco" x="-5%" y="-10%" width="110%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.42" numOctaves="2" seed="11" result="vetas"/>
+    <feColorMatrix in="vetas" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3.2 2.25" result="huecos"/>
+    <feComposite in="SourceGraphic" in2="huecos" operator="in" result="seco"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="1" seed="4" result="grano"/>
+    <feDisplacementMap in="seco" in2="grano" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<header class="cabecera">
+  <a class="marca" href="#inicio">Arcana</a>
+  <p class="hora" data-hora>jue 5 nov 2026 · 1 Mázatl (Venado) · Señor de la noche: Tláloc · Luna creciente</p>
+  <a class="entrar" href="lectura.html">Entrar</a>
+</header>
+
+<main id="inicio">
+
+  <!-- 1 · Los grabados -->
+  <section class="escena suelo-tinta e1" aria-labelledby="e1-t">
+    <div class="mesa" aria-hidden="true">
+      <div class="columna"><img src="img/cartas/rws-tarot-00-fool-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/cups01-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-13-death-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/swords03-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-21-world-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+      <div class="columna"><img src="img/cartas/rws-tarot-01-magician-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/wands10-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-18-moon-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/pents01-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-06-lovers-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+      <div class="columna"><img src="img/cartas/rws-tarot-02-high-priestess-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/swords01-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-19-sun-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/cups10-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-12-hanged-man-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+      <div class="columna"><img src="img/cartas/rws-tarot-16-tower-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/pents10-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-03-empress-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/wands01-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-11-justice-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+      <div class="columna"><img src="img/cartas/rws-tarot-17-star-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/cups02-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-07-chariot-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/swords10-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-04-emperor-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+      <div class="columna"><img src="img/cartas/rws-tarot-09-hermit-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/wands02-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-20-judgement-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/cups06-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-15-devil-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+      <div class="columna"><img src="img/cartas/rws-tarot-10-wheel-of-fortune-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/pents02-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-08-strength-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/swords06-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/rws-tarot-05-hierophant-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+      <div class="columna"><img src="img/cartas/rws-tarot-14-temperance-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/cups03-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/wands06-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/pents05-mesa.webp" alt="" width="240" height="411" decoding="async"><img src="img/cartas/swords02-mesa.webp" alt="" width="240" height="411" decoding="async"></div>
+    </div>
+    <div class="contenido">
+      <p class="etiqueta"><span class="punto"></span>Tarot con IA · 78 grabados de 1909</p>
+      <p class="pincel" aria-hidden="true">Pregunta</p>
+      <h1 class="tesis" id="e1-t"><span>Las cartas son de 1909.</span> <span>Quien las lee hoy es una IA.</span> <span>La pregunta sigue siendo tuya.</span></h1>
+      <div class="acciones">
+        <a class="boton boton--rosa" href="lectura.html">Haz tu lectura <span class="flecha" aria-hidden="true">→</span></a>
+        <a class="boton boton--linea" href="#hoy">Ver la carta de hoy</a>
+        <p class="nota">3 lecturas gratis al registrarte · sin tarjeta</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · Del grabado a la IA -->
+  <section class="escena suelo-papel e2" aria-labelledby="e2-t">
+    <div class="fijo">
+      <div class="contenido">
+        <div class="texto">
+          <p class="etiqueta"><span class="punto"></span>Del grabado a la IA</p>
+          <h2 id="e2-t">Un grabado de 1909 se vuelve una lectura escrita para ti.</h2>
+          <p class="bajada">Pamela Colman Smith dibujó las 78 cartas en 1909. Arcana las baraja, tú escribes tu pregunta y la IA lee cómo dialogan entre sí y con tu momento. Un espejo, no una bola de cristal.</p>
+        </div>
+        <div class="lienzo">
+          <img class="grabado" src="img/cartas/rws-tarot-00-fool-tinta.webp" alt="El Loco, grabado de Pamela Colman Smith, 1909" width="480" height="822">
+          <canvas aria-hidden="true"></canvas>
+          <div class="lectura-muestra">
+            <p>El Loco abre tu lectura con un paso al vacío que no es descuido: es confianza. Tu pregunta habla de empezar algo sin tener el mapa completo.</p>
+            <p>Esta carta no te promete que saldrá bien; te pregunta qué cargas en ese hatillo que ya no necesitas llevar.</p>
+            <p class="firma">Lectura de ejemplo · Arcana</p>
+          </div>
+        </div>
+      </div>
+      <p class="progreso-e2" aria-hidden="true">Desliza ↓</p>
+    </div>
+  </section>
+
+  <!-- 3 · La carta del día -->
+  <section class="escena suelo-tinta e3" id="hoy" aria-labelledby="e3-t">
+    <div class="contenido">
+      <div class="lado-texto">
+        <p class="etiqueta"><span class="punto"></span>La carta de hoy · <span data-tonalli-corto>1 Mázatl</span></p>
+        <h2 id="e3-t">Una carta al día, para empezar con una pregunta.</h2>
+        <p class="estado">Tu carta de hoy está boca abajo. Tócala para voltearla.</p>
+        <div class="mensaje" aria-live="polite">
+          <p class="pos">Carta del día · <span data-fecha>5 de noviembre de 2026</span></p>
+          <h3>La Estrella</h3>
+          <p>Después de la tormenta viene una calma que no es olvido. Hoy toca cuidar algo pequeño que te devuelve la esperanza: una conversación, una caminata, un rato sin pantalla. ¿Qué parte de ti necesita descanso para volver a confiar?</p>
+          <p><a class="boton boton--linea" href="lectura.html">Recíbela cada mañana</a></p>
+        </div>
+      </div>
+      <div class="carta-wrap">
+        <button class="carta" type="button" aria-label="Voltear la carta de hoy" data-revelada="La Estrella, carta del día">
+          <img src="img/cartas/rws-tarot-17-star-color.webp" alt="La Estrella: una mujer desnuda vierte agua de dos jarras bajo ocho estrellas" width="480" height="822">
+          <img class="reverso" src="img/reverso.svg" alt="" width="300" height="520">
+          <span class="pista" aria-hidden="true">Toca para voltear</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · Más que tarot -->
+  <section class="escena suelo-papel e4" aria-labelledby="e4-t">
+    <div class="contenido">
+      <div class="cabeza revelar">
+        <h2 id="e4-t">Más que tarot</h2>
+        <p class="etiqueta"><span class="punto"></span>Cinco formas de leerte</p>
+      </div>
+      <ul class="tira">
+        <li>
+          <svg class="glifo" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="4" fill="#E4007C"/><g fill="none" stroke="#0E0D0C" stroke-width="1.2"><circle cx="22" cy="5" r="3"/><circle cx="38" cy="17" r="3"/><circle cx="32" cy="37" r="3"/><circle cx="12" cy="37" r="3"/><circle cx="6" cy="17" r="3"/><path d="M22 18V8M25.6 20.8 35.3 18M24.4 25.4l5.8 9.2M19.6 25.4l-5.8 9.2M18.4 20.8 8.7 18"/></g></svg>
+          <h3>Mapa Arcano</h3>
+          <p>Tu carta natal, tu signo, tu animal chino, tu tonalli y tu número, cruzados en una sola lectura.</p>
+          <a href="lectura.html">Arma el tuyo</a>
+        </li>
+        <li>
+          <svg class="glifo" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="#0E0D0C" stroke-width="1.2"/><g stroke="#0E0D0C" stroke-width="1.2"><path d="M22 3v5M22 36v5M3 22h5M36 22h5M8.6 8.6l3.5 3.5M31.9 31.9l3.5 3.5M8.6 35.4l3.5-3.5M31.9 12.1l3.5-3.5"/></g><circle cx="22" cy="22" r="5" fill="#E4007C"/></svg>
+          <h3>Calendario Arcano</h3>
+          <p>Cada día con su signo mexica, su luna y tu día personal.</p>
+          <a href="#e5-t">Ver hoy</a>
+        </li>
+        <li>
+          <svg class="glifo" viewBox="0 0 44 44" aria-hidden="true"><circle cx="16" cy="22" r="11" fill="none" stroke="#0E0D0C" stroke-width="1.2"/><circle cx="28" cy="22" r="11" fill="none" stroke="#0E0D0C" stroke-width="1.2"/><path d="M22 12.8a11 11 0 0 1 0 18.4a11 11 0 0 1 0-18.4z" fill="#E4007C"/></svg>
+          <h3>Lectura de dos</h3>
+          <p>Cómo se encuentran dos personas en cuatro sistemas, con tres cartas para el vínculo.</p>
+          <a href="lectura.html">Leer el vínculo</a>
+        </li>
+        <li>
+          <svg class="glifo" viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="#0E0D0C" stroke-width="1.2"><rect x="8" y="9" width="18" height="28" rx="2" transform="rotate(-10 17 23)"/><rect x="16" y="7" width="18" height="28" rx="2" transform="rotate(6 25 21)"/></g><circle cx="25" cy="21" r="3" fill="#E4007C"/></svg>
+          <h3>Tu propio mazo</h3>
+          <p>¿Tiras con cartas físicas? Dinos cuáles salieron y Arcana las lee.</p>
+          <a href="lectura.html">Usar mi mazo</a>
+        </li>
+        <li>
+          <svg class="glifo" viewBox="0 0 44 44" aria-hidden="true"><path d="M22 22m-3 0a3 3 0 1 1 6 0a7 7 0 1 1-14 0a11 11 0 1 1 22 0a15 15 0 1 1-30 0" fill="none" stroke="#0E0D0C" stroke-width="1.2"/><circle cx="22" cy="22" r="2.4" fill="#E4007C"/></svg>
+          <h3>Mi historia</h3>
+          <p>Arcana recuerda tus lecturas: las cartas que se repiten y tu mes en cartas.</p>
+          <a href="lectura.html">Ver ejemplo</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 · El día de hoy -->
+  <section class="escena suelo-papel e5" aria-labelledby="e5-t">
+    <div class="contenido">
+      <div class="revelar">
+        <p class="etiqueta"><span class="punto"></span>El día de hoy en el tonalpohualli</p>
+        <h2 id="e5-t">Hoy es <span data-tonalli>1 Mázatl, Venado</span>.</h2>
+      </div>
+      <dl class="detalle revelar">
+        <div><dt>Trecena</dt><dd data-trecena>Ce Mázatl</dd></div>
+        <div><dt>Señor de la noche</dt><dd data-senor>Tláloc</dd></div>
+        <div><dt>Luna</dt><dd data-luna>Creciente</dd></div>
+        <div><dt>Tu día personal</dt><dd>Al registrarte</dd></div>
+      </dl>
+    </div>
+    <div class="marquesina" aria-label="Los veinte signos del tonalpohualli">
+      <div class="pista-m">
+        <ul>
+          <li data-i="0">Cipactli <small>Lagarto</small></li><li data-i="1">Ehécatl <small>Viento</small></li><li data-i="2">Calli <small>Casa</small></li><li data-i="3">Cuetzpalin <small>Lagartija</small></li><li data-i="4">Cóatl <small>Serpiente</small></li><li data-i="5">Miquiztli <small>Muerte</small></li><li data-i="6" class="hoy">Mázatl <small>Venado</small></li><li data-i="7">Tochtli <small>Conejo</small></li><li data-i="8">Atl <small>Agua</small></li><li data-i="9">Itzcuintli <small>Perro</small></li><li data-i="10">Ozomatli <small>Mono</small></li><li data-i="11">Malinalli <small>Hierba</small></li><li data-i="12">Ácatl <small>Caña</small></li><li data-i="13">Océlotl <small>Jaguar</small></li><li data-i="14">Cuauhtli <small>Águila</small></li><li data-i="15">Cozcacuauhtli <small>Zopilote</small></li><li data-i="16">Ollin <small>Movimiento</small></li><li data-i="17">Técpatl <small>Pedernal</small></li><li data-i="18">Quiáhuitl <small>Lluvia</small></li><li data-i="19">Xóchitl <small>Flor</small></li>
+        </ul>
+        <ul aria-hidden="true">
+          <li data-i="0">Cipactli <small>Lagarto</small></li><li data-i="1">Ehécatl <small>Viento</small></li><li data-i="2">Calli <small>Casa</small></li><li data-i="3">Cuetzpalin <small>Lagartija</small></li><li data-i="4">Cóatl <small>Serpiente</small></li><li data-i="5">Miquiztli <small>Muerte</small></li><li data-i="6" class="hoy">Mázatl <small>Venado</small></li><li data-i="7">Tochtli <small>Conejo</small></li><li data-i="8">Atl <small>Agua</small></li><li data-i="9">Itzcuintli <small>Perro</small></li><li data-i="10">Ozomatli <small>Mono</small></li><li data-i="11">Malinalli <small>Hierba</small></li><li data-i="12">Ácatl <small>Caña</small></li><li data-i="13">Océlotl <small>Jaguar</small></li><li data-i="14">Cuauhtli <small>Águila</small></li><li data-i="15">Cozcacuauhtli <small>Zopilote</small></li><li data-i="16">Ollin <small>Movimiento</small></li><li data-i="17">Técpatl <small>Pedernal</small></li><li data-i="18">Quiáhuitl <small>Lluvia</small></li><li data-i="19">Xóchitl <small>Flor</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · Tu turno -->
+  <section class="escena suelo-tinta e6" aria-labelledby="e6-t">
+    <div class="contenido">
+      <p class="pincel" aria-hidden="true">Tu turno</p>
+      <h2 class="sr" id="e6-t">Tu turno</h2>
+      <p class="grande revelar">Escribe tu pregunta. Las cartas ya están barajadas.</p>
+      <a class="boton boton--rosa revelar" href="lectura.html">Haz tu lectura · 3 gratis <span class="flecha" aria-hidden="true">→</span></a>
+      <footer class="pie">
+        <span>Arcana · readarcana.com</span>
+        <span>Cartas: Pamela Colman Smith, 1909 · dominio público</span>
+        <span><a href="#">Privacidad</a> · <a href="#">Términos</a></span>
+        <span>Maqueta · noviembre 2026</span>
+      </footer>
+    </div>
+  </section>
+
+</main>
+
+<script src="tinta.js"></script>
+</body>
+</html>

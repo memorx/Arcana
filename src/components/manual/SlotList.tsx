@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { cn } from "@/lib/utils";
-import { THUMB_WIDTH, thumbUrl, type DeckCard, type SlotChoice } from "./manual-cards";
+import type { DeckCard, SlotChoice } from "./manual-cards";
 
 export interface ManualSpreadPosition {
   position: number;
@@ -52,7 +52,7 @@ export function SlotList({
   const t = useTranslations("manual");
 
   return (
-    <ol className="space-y-2">
+    <ol className="grid gap-2">
       {slots.map((slot, index) => {
         const label = positionLabel(positions, index, locale, t("positionLabel", { number: index + 1 }));
         const card = slot.cardId ? cardsById[slot.cardId] : undefined;
@@ -63,9 +63,9 @@ export function SlotList({
           <li
             key={index}
             className={cn(
-              "flex items-center gap-2 rounded-lg border p-2",
+              "flex items-center gap-1.5 rounded-[6px] border p-1.5",
               "motion-safe:transition-colors",
-              isActive ? "border-amber-400/60 bg-amber-500/5" : "border-slate-800 bg-slate-900/40"
+              isActive ? "border-rosa bg-papel-hondo" : "border-filete/20"
             )}
           >
             <button
@@ -73,32 +73,36 @@ export function SlotList({
               onClick={() => onSelect(index)}
               aria-current={isActive ? "step" : undefined}
               aria-label={t("choosePosition", { position: label, number: index + 1 })}
-              className="flex min-w-0 flex-1 items-center gap-3 rounded-md text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-[4px] text-left"
             >
               <span
                 className={cn(
-                  "relative flex h-12 w-8 shrink-0 items-center justify-center overflow-hidden rounded border text-xs font-bold",
-                  card ? "border-amber-500/30" : "border-dashed border-slate-600 text-slate-500"
+                  "relative flex h-[55px] w-8 shrink-0 items-center justify-center overflow-hidden rounded-[4px] font-dato text-xs",
+                  card ? "bg-tinta" : "border border-dashed border-filete/40 text-letra-suave"
                 )}
               >
-                {card?.imageUrl ? (
-                  <Image
-                    src={thumbUrl(card.imageUrl, THUMB_WIDTH)}
+                {card ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- WebP autohospedada (scripts/cartas.py)
+                  <img
+                    src={cartaImagen(card.name)}
                     alt=""
-                    fill
-                    sizes="32px"
-                    className={cn("object-cover motion-safe:transition-transform motion-safe:duration-300", slot.isReversed && "rotate-180")}
-                    unoptimized
+                    width={MEDIDAS_CARTA.color.width}
+                    height={MEDIDAS_CARTA.color.height}
+                    decoding="async"
+                    className={cn(
+                      "absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-300",
+                      slot.isReversed && "rotate-180"
+                    )}
                   />
                 ) : (
                   index + 1
                 )}
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-xs text-slate-400">
+                <span className="block truncate font-dato text-[0.625rem] tracking-[0.1em] text-letra-suave uppercase">
                   {index + 1}. {label}
                 </span>
-                <span className={cn("block truncate text-sm", card ? "font-medium text-slate-100" : "italic text-slate-500")}>
+                <span className={cn("block truncate", card ? "font-titulo text-[1.0625rem] leading-tight" : "font-lectura text-[0.9375rem] text-letra-suave italic")}>
                   {cardName ?? t("emptySlot")}
                 </span>
               </span>
@@ -110,13 +114,13 @@ export function SlotList({
               aria-pressed={slot.isReversed}
               aria-label={t("reversedToggle", { position: label })}
               className={cn(
-                "shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+                "inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full border px-2.5 font-dato text-[0.625rem] tracking-[0.08em] uppercase",
                 slot.isReversed
-                  ? "border-orange-400/50 bg-orange-500/20 text-orange-200"
-                  : "border-slate-700 text-slate-400 hover:text-slate-200"
+                  ? "border-rosa-luz bg-rosa-luz text-tinta"
+                  : "border-filete/25 text-letra-suave hover:border-filete hover:text-letra"
               )}
             >
-              <span aria-hidden="true">&#8645; </span>
+              <span aria-hidden="true">&#8645;</span>
               {t("reversed")}
             </button>
 
@@ -125,9 +129,9 @@ export function SlotList({
                 type="button"
                 onClick={() => onClear(index)}
                 aria-label={t("clearSlot", { card: cardName ?? "", position: label })}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                className="flex size-11 shrink-0 items-center justify-center rounded-full text-letra-suave hover:bg-papel hover:text-letra"
               >
-                <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true" className="text-lg leading-none">&times;</span>
               </button>
             )}
           </li>

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./helpers/sesion";
 
 test.describe("Legal Pages", () => {
   test.describe("About Page", () => {
@@ -14,13 +14,13 @@ test.describe("Legal Pages", () => {
 
     test("should display mission section", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { name: /mision|mission/i })
+        page.getByRole("heading", { name: /misi[oó]n|mission/i })
       ).toBeVisible();
     });
 
     test("should display how it works section", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { name: /como funciona|how it works/i })
+        page.getByRole("heading", { name: /c[oó]mo funciona|how it works/i })
       ).toBeVisible();
     });
 
@@ -32,7 +32,7 @@ test.describe("Legal Pages", () => {
 
     test("should have back link", async ({ page }) => {
       await expect(
-        page.getByRole("link", { name: /back/i })
+        page.getByRole("link", { name: /volver|back/i })
       ).toBeVisible();
     });
   });
@@ -44,19 +44,19 @@ test.describe("Legal Pages", () => {
 
     test("should display terms of service", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { level: 3, name: /terminos de servicio|terms of service/i })
+        page.getByRole("heading", { level: 1, name: /t[eé]rminos de servicio|terms of service/i })
       ).toBeVisible();
     });
 
     test("should display acceptance section", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { name: /aceptacion|acceptance/i })
+        page.getByRole("heading", { name: /aceptaci[oó]n|acceptance/i })
       ).toBeVisible();
     });
 
     test("should display service description", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { name: /descripcion|description/i })
+        page.getByRole("heading", { name: /descripci[oó]n|description/i })
       ).toBeVisible();
     });
 
@@ -68,7 +68,7 @@ test.describe("Legal Pages", () => {
 
     test("should display credits section", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { name: /creditos|credits/i })
+        page.getByRole("heading", { name: /cr[eé]ditos|credits/i })
       ).toBeVisible();
     });
   });
@@ -86,7 +86,7 @@ test.describe("Legal Pages", () => {
 
     test("should display information collection section", async ({ page }) => {
       await expect(
-        page.getByRole("heading", { name: /informacion|information/i }).first()
+        page.getByRole("heading", { name: /informaci[oó]n|information/i }).first()
       ).toBeVisible();
     });
 
@@ -127,7 +127,7 @@ test.describe("Legal Pages", () => {
 
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
-      const termsLink = page.getByRole("link", { name: /terminos|terms/i }).last();
+      const termsLink = page.getByRole("link", { name: /t[eé]rminos|terms/i }).last();
       await termsLink.click();
 
       await expect(page).toHaveURL(/\/terms/);

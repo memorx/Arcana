@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { Modal, ModalBody, Button } from "@/components/ui";
+import { Modal, ModalBody, Button, Badge } from "@/components/ui";
 import { CardPlaceholder } from "@/components/ui/CardPlaceholder";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { cartaImagen, CARTA_REVERSO, MEDIDAS_CARTA } from "@/lib/cartas";
+import { cn } from "@/lib/utils";
 
 interface DiscoveredCard {
   id: string;
   name: string;
   nameEs: string;
-  imageUrl: string;
   arcana: string;
   suit: string | null;
   keywords: string[];
@@ -27,6 +28,10 @@ interface NewCardDiscoveredModalProps {
   cards: DiscoveredCard[];
 }
 
+/**
+ * Cartas nuevas para la colección, sobre tinta (el modal de «Dos tintas»): la carta a color, su nombre en Gloock,
+ * las palabras clave en mono y el significado. Tercer modal de la cadena del revelado.
+ */
 export function NewCardDiscoveredModal({
   isOpen,
   onClose,
@@ -35,16 +40,10 @@ export function NewCardDiscoveredModal({
   const t = useTranslations("collection");
   const tReading = useTranslations("reading");
   const locale = useLocale();
-  const [showShimmer, setShowShimmer] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (isOpen) {
-      setShowShimmer(true);
-      setImageErrors({});
-      const timer = setTimeout(() => setShowShimmer(false), 2000);
-      return () => clearTimeout(timer);
-    }
+    if (isOpen) setImageErrors({});
   }, [isOpen]);
 
   const handleImageError = (cardId: string) => {
@@ -69,39 +68,60 @@ export function NewCardDiscoveredModal({
   };
 
   const getKeywordsDisplay = (card: DiscoveredCard) => {
-    return card.keywords.slice(0, 3).join(" • ");
+    return card.keywords.slice(0, 3).join(" · ");
   };
 
   const isSingle = cards.length === 1;
 
+  /** La carta a color; si no es una de las 78 o la imagen falla, el marcador de F1-B. */
+  const cardImage = (card: DiscoveredCard, ancho: string) => {
+    const src = cartaImagen(card);
+    if (imageErrors[card.id] || src === CARTA_REVERSO) {
+      return (
+        <CardPlaceholder
+          cardName={getCardName(card)}
+          arcana={card.arcana as "MAJOR" | "MINOR"}
+          suit={card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null}
+          number={0}
+          className={cn(ancho, "aspect-[300/520] h-auto")}
+        />
+      );
+    }
+    return (
+      <span className={cn("relative block aspect-[300/520] overflow-hidden rounded-[8px] shadow-[0_0_0_1px_rgb(236_234_230/0.25),0_20px_40px_-24px_rgb(0_0_0/0.9)]", ancho)}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- WebP autohospedada y ya optimizada (scripts/cartas.py) */}
+        <img
+          src={src}
+          alt={getCardName(card)}
+          width={MEDIDAS_CARTA.color.width}
+          height={MEDIDAS_CARTA.color.height}
+          decoding="async"
+          onError={() => handleImageError(card.id)}
+          className={cn("absolute inset-0 h-full w-full object-cover", card.isReversed && "rotate-180")}
+        />
+      </span>
+    );
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="overflow-visible">
-      <ModalBody className="text-center py-8 relative">
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalBody className="relative grid justify-items-center gap-6 py-8 text-center">
         {/* Close button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-2 right-2 p-2 rounded-full hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200"
-          aria-label="Close"
+          className="absolute top-2 right-2 flex size-11 items-center justify-center rounded-full text-letra-suave transition-colors hover:bg-papel/10 hover:text-letra"
+          aria-label={tReading("close")}
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
+          <svg aria-hidden="true" className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
         {/* Header */}
-        <div className="mb-6">
-          <span className="text-5xl mb-4 block">&#10024;</span>
-          <h2 className="text-2xl font-bold text-slate-100">
+        <div className="grid justify-items-center gap-3 px-8">
+          <Etiqueta>{t("title")}</Etiqueta>
+          <h2 className="font-titulo text-[clamp(1.6rem,1.3rem+1vw,2.1rem)] leading-[1.1] text-letra">
             {isSingle ? t("newCard") : t("newCards", { count: cards.length })}
           </h2>
         </div>
@@ -109,172 +129,59 @@ export function NewCardDiscoveredModal({
         {/* Cards Display */}
         {isSingle ? (
           /* Single card - larger display with description */
-          <div className="mb-6">
-            <div className="flex flex-col items-center">
-              {/* Card Image */}
-              <div
-                className={`relative w-32 h-48 rounded-lg overflow-hidden ring-2 ring-amber-500 shadow-lg shadow-amber-500/30 ${
-                  showShimmer ? "animate-pulse" : ""
-                }`}
-              >
-                {imageErrors[cards[0].id] ? (
-                  <CardPlaceholder
-                    cardName={getCardName(cards[0])}
-                    arcana={cards[0].arcana as "MAJOR" | "MINOR"}
-                    suit={cards[0].suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null}
-                    number={0}
-                    className="w-32 h-48"
-                  />
-                ) : (
-                  <Image
-                    src={cards[0].imageUrl}
-                    alt={getCardName(cards[0])}
-                    fill
-                    className="object-cover"
-                    sizes="128px"
-                    onError={() => handleImageError(cards[0].id)}
-                    unoptimized
-                  />
-                )}
+          <div className="grid justify-items-center gap-3 motion-safe:animate-entra">
+            {cardImage(cards[0], "w-36")}
 
-                {/* Shimmer overlay */}
-                {showShimmer && !imageErrors[cards[0].id] && (
-                  <div className="absolute inset-0 overflow-hidden">
-                    <div
-                      className="absolute inset-0 -translate-x-full animate-shimmer"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Card Name with Reversed Badge */}
-              <div className="mt-3 flex items-center gap-2">
-                <p className="text-lg text-slate-200 font-semibold">
-                  {getCardName(cards[0])}
-                </p>
-                {cards[0].isReversed && (
-                  <span className="px-2 py-0.5 bg-orange-500/90 text-white text-xs font-medium rounded-full">
-                    {tReading("reversed")}
-                  </span>
-                )}
-              </div>
-
-              {/* Keywords */}
-              <p className="mt-1 text-sm text-amber-400/80 italic">
-                {getKeywordsDisplay(cards[0])}
-              </p>
-
-              {/* Card Meaning */}
-              <p className="mt-3 text-sm text-slate-400 max-w-sm leading-relaxed">
-                {getCardMeaning(cards[0])}
-              </p>
+            {/* Card Name with Reversed Badge */}
+            <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+              <p className="font-titulo text-xl leading-tight text-letra">{getCardName(cards[0])}</p>
+              {cards[0].isReversed && <Badge variant="warning">{tReading("reversed")}</Badge>}
             </div>
+
+            {/* Keywords */}
+            <p className="font-dato text-[0.6875rem] tracking-[0.1em] text-letra-acento uppercase">
+              {getKeywordsDisplay(cards[0])}
+            </p>
+
+            {/* Card Meaning */}
+            <p className="max-w-sm font-lectura text-[0.9375rem] leading-relaxed text-letra-suave">
+              {getCardMeaning(cards[0])}
+            </p>
           </div>
         ) : (
           /* Multiple cards - compact display */
-          <div className={`flex justify-center gap-4 mb-6 ${cards.length > 3 ? "flex-wrap" : ""}`}>
+          <ul className="flex flex-wrap justify-center gap-4">
             {cards.map((card, index) => (
-              <div
+              <li
                 key={card.id}
-                className="relative flex flex-col items-center"
-                style={{
-                  animationDelay: `${index * 0.15}s`,
-                }}
+                className="flex w-24 flex-col items-center gap-1.5 motion-safe:animate-entra"
+                style={{ animationDelay: `${index * 0.12}s` }}
               >
-                {/* Card Container with Shimmer */}
-                <div
-                  className={`relative w-24 h-36 rounded-lg overflow-hidden ring-2 ring-amber-500 shadow-lg shadow-amber-500/30 ${
-                    showShimmer ? "animate-pulse" : ""
-                  }`}
-                >
-                  {imageErrors[card.id] ? (
-                    <CardPlaceholder
-                      cardName={getCardName(card)}
-                      arcana={card.arcana as "MAJOR" | "MINOR"}
-                      suit={card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null}
-                      number={0}
-                      className="w-24 h-36"
-                    />
-                  ) : (
-                    <Image
-                      src={card.imageUrl}
-                      alt={getCardName(card)}
-                      fill
-                      className="object-cover"
-                      sizes="96px"
-                      onError={() => handleImageError(card.id)}
-                      unoptimized
-                    />
-                  )}
-
-                  {/* Shimmer overlay */}
-                  {showShimmer && !imageErrors[card.id] && (
-                    <div className="absolute inset-0 overflow-hidden">
-                      <div
-                        className="absolute inset-0 -translate-x-full animate-shimmer"
-                        style={{
-                          background:
-                            "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
-                          animationDelay: `${index * 0.15}s`,
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {/* Reversed badge on card */}
-                  {card.isReversed && (
-                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                      <span className="px-1.5 py-0.5 bg-orange-500/90 text-white text-[9px] font-medium rounded-full">
-                        {tReading("reversed")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Card Name */}
-                <p className="mt-2 text-sm text-slate-300 font-medium max-w-24 text-center leading-tight">
-                  {getCardName(card)}
-                </p>
-
-                {/* Keywords (truncated) */}
-                <p className="mt-0.5 text-[10px] text-amber-400/70 italic max-w-24 text-center truncate">
+                {cardImage(card, "w-24")}
+                <p className="mt-1 font-titulo text-[0.9375rem] leading-tight text-letra">{getCardName(card)}</p>
+                {card.isReversed && (
+                  <span className="font-dato text-[0.5625rem] tracking-[0.1em] text-letra-acento uppercase">
+                    {tReading("reversed")}
+                  </span>
+                )}
+                <p className="w-full truncate font-dato text-[0.5625rem] tracking-[0.08em] text-letra-suave uppercase">
                   {card.keywords[0]}
                 </p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {/* Encouragement */}
-        <p className="text-slate-400 text-sm mb-6">
+        <p className="font-dato text-xs tracking-[0.06em] text-letra-suave">
           {t("addedToCollection")}
         </p>
 
         {/* Actions */}
-        <div className="flex gap-3 justify-center">
-          <Button onClick={onClose} size="lg">
-            {t("continue")}
-          </Button>
-        </div>
+        <Button onClick={onClose} size="lg">
+          {t("continue")}
+        </Button>
       </ModalBody>
-
-      <style jsx global>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(200%);
-          }
-        }
-        .animate-shimmer {
-          animation: shimmer 1.5s infinite;
-        }
-      `}</style>
     </Modal>
   );
 }

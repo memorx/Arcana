@@ -3,7 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, Button, Badge } from "@/components/ui";
+import { Card, Badge, buttonClasses } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
+import { numeralDeCarta } from "../indice";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -25,9 +28,12 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
+/** Ficha de una carta como lámina: el grabado a color grande, su número romano, nombre, palabras clave en mono
+ *  y los dos significados en Newsreader. Página pública: se pinta completa en el servidor. */
 export default async function CardDetailPage({ params }: Props) {
   const { slug } = await params;
   const t = await getTranslations("cardDetail");
+  const tComun = await getTranslations("common");
   const locale = await getLocale();
 
   const card = await prisma.card.findUnique({
@@ -39,6 +45,7 @@ export default async function CardDetailPage({ params }: Props) {
   }
 
   const displayName = locale === "es" ? card.nameEs : card.name;
+  const otherName = locale === "es" ? card.name : card.nameEs;
   const suitNames: Record<string, { en: string; es: string }> = {
     WANDS: { en: "Wands", es: "Bastos" },
     CUPS: { en: "Cups", es: "Copas" },
@@ -84,171 +91,141 @@ export default async function CardDetailPage({ params }: Props) {
     focusAreas.push(t("focusAreas.general"));
   }
 
+  const uprightText = locale === "en" && card.meaningUprightEn ? card.meaningUprightEn : card.meaningUpright;
+  const reversedText = locale === "en" && card.meaningReversedEn ? card.meaningReversedEn : card.meaningReversed;
+  const numeral = numeralDeCarta(card);
+
   return (
-    <div className="container mx-auto px-4">
-      {/* Breadcrumb */}
-          <div className="mb-8">
-            <Link
-              href="/cards"
-              className="text-purple-400 hover:text-purple-300 flex items-center gap-2"
+    <div className="grid gap-[clamp(36px,7vh,72px)]">
+      {/* Migas: de vuelta al índice */}
+      <Link
+        href="/cards"
+        className="inline-flex min-h-11 w-fit items-center gap-2 font-dato text-xs tracking-[0.12em] text-letra-suave uppercase no-underline hover:text-rosa-texto"
+      >
+        <span aria-hidden="true" className="font-lectura text-base tracking-normal">
+          ←
+        </span>
+        {t("backToCards")}
+      </Link>
+
+      {/* La lámina: en móvil el título va primero; desde md el grabado queda fijo a la izquierda */}
+      <article className="grid gap-x-[clamp(32px,6vw,96px)] gap-y-9 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <header className="grid min-w-0 content-start gap-3 md:col-start-2 md:row-start-1">
+          <Etiqueta>{arcanaLabel}</Etiqueta>
+          {numeral && (
+            <p
+              aria-hidden="true"
+              className="font-dato text-[clamp(2.75rem,2rem+3vw,4.5rem)] leading-none tracking-[-0.02em] text-rosa"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              {t("backToCards")}
-            </Link>
-          </div>
+              {numeral}
+            </p>
+          )}
+          <h1 className="text-[clamp(2.2rem,1.5rem+2.4vw,3.6rem)] leading-[1.02]">{displayName}</h1>
+          <p className="font-lectura text-[1.1875rem] italic text-letra-suave">{otherName}</p>
+        </header>
 
-          <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            {/* Card Image */}
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-amber-500/20 blur-3xl" />
-                <div className="relative w-72 md:w-80 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/20 border border-purple-500/30">
-                  <Image
-                    src={card.imageUrl}
-                    alt={displayName}
-                    fill
-                    className="object-cover"
-                    priority
-                    unoptimized
-                  />
-                </div>
+        <figure className="grid w-full max-w-[min(340px,78vw)] gap-3 justify-self-center md:sticky md:top-[calc(var(--alto-cabecera)+24px)] md:col-start-1 md:row-span-2 md:row-start-1 md:max-w-[420px] md:self-start md:justify-self-stretch">
+          <div className="overflow-hidden rounded-[14px] border border-tinta/20 shadow-[0_30px_60px_-34px_rgb(14_13_12/0.55)]">
+            <Image
+              src={cartaImagen(card)}
+              alt={displayName}
+              width={MEDIDAS_CARTA.color.width}
+              height={MEDIDAS_CARTA.color.height}
+              className="h-auto w-full"
+              priority
+              unoptimized
+            />
+          </div>
+          <figcaption className="font-dato text-[0.625rem] leading-[1.5] tracking-[0.1em] text-letra-suave uppercase">
+            {tComun("cardsCredit")}
+          </figcaption>
+        </figure>
+
+        <div className="grid min-w-0 content-start gap-9 md:col-start-2">
+          {/* Palabras clave */}
+          <section aria-labelledby="palabras-clave" className="grid gap-3 border-t border-filete pt-4">
+            <h2
+              id="palabras-clave"
+              className="font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase"
+            >
+              {t("keywords")}
+            </h2>
+            <ul className="flex flex-wrap gap-x-2 gap-y-2.5">
+              {card.keywords.map((keyword, i) => (
+                <li
+                  key={i}
+                  className="rounded-full border border-filete/40 px-3 py-1 font-dato text-[0.75rem] leading-[1.4] tracking-[0.06em] text-letra"
+                >
+                  {keyword}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* Aparece en */}
+          <section aria-labelledby="aparece-en" className="grid gap-3 border-t border-filete/25 pt-4">
+            <h2
+              id="aparece-en"
+              className="font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase"
+            >
+              {t("appearsIn")}
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {focusAreas.map((area, i) => (
+                <li key={i}>
+                  <Badge variant="primary">{area}</Badge>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* Significados: al derecho e invertido, en Newsreader */}
+          <section aria-labelledby="al-derecho" className="grid content-start gap-4 border-t-2 border-tinta pt-5">
+            <div className="flex items-start gap-4">
+              <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full border border-tinta">
+                <span className="block h-4 w-2.5 rounded-[2px] border border-t-[3px] border-tinta" />
+              </span>
+              <div className="grid gap-1">
+                <h2 id="al-derecho" className="text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-[1.1]">
+                  {t("upright")}
+                </h2>
+                <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-suave uppercase">
+                  {t("uprightSubtitle")}
+                </p>
               </div>
             </div>
+            <p className="max-w-[66ch] text-[1.125rem] leading-[1.7]">{uprightText}</p>
+          </section>
 
-            {/* Card Info */}
-            <div>
-              <Badge variant="secondary" className="mb-4">
-                {arcanaLabel}
-              </Badge>
-
-              <h1 className="text-4xl md:text-5xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-purple-400 to-amber-400 bg-clip-text text-transparent">
-                  {displayName}
-                </span>
-              </h1>
-
-              {locale !== "es" && (
-                <p className="text-slate-400 text-lg mb-6">{card.nameEs}</p>
-              )}
-              {locale === "es" && (
-                <p className="text-slate-400 text-lg mb-6">{card.name}</p>
-              )}
-
-              {/* Keywords */}
-              <div className="mb-8">
-                <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
-                  {t("keywords")}
+          <section aria-labelledby="invertido" className="grid content-start gap-4 border-t-2 border-rosa pt-5">
+            <div className="flex items-start gap-4">
+              <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full border border-rosa">
+                <span className="block h-4 w-2.5 rotate-180 rounded-[2px] border border-t-[3px] border-rosa" />
+              </span>
+              <div className="grid gap-1">
+                <h2 id="invertido" className="text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-[1.1]">
+                  {t("reversed")}
                 </h2>
-                <div className="flex flex-wrap gap-2">
-                  {card.keywords.map((keyword, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 bg-purple-900/30 text-purple-300 rounded-full text-sm"
-                    >
-                      {keyword}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Focus Areas */}
-              <div className="mb-8">
-                <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
-                  {t("appearsIn")}
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {focusAreas.map((area, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 bg-amber-900/30 text-amber-300 rounded-full text-sm"
-                    >
-                      {area}
-                    </span>
-                  ))}
-                </div>
+                <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-suave uppercase">
+                  {t("reversedSubtitle")}
+                </p>
               </div>
             </div>
-          </div>
-
-          {/* Meanings */}
-          <div className="max-w-4xl mx-auto mt-12 space-y-8">
-            {/* Upright */}
-            <Card className="overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-900/50 to-purple-800/30 px-6 py-4 border-b border-purple-500/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-purple-600/30 flex items-center justify-center">
-                    <span className="text-2xl">&#9650;</span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-slate-100">
-                      {t("upright")}
-                    </h2>
-                    <p className="text-sm text-slate-400">
-                      {t("uprightSubtitle")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-slate-300 leading-relaxed">
-                  {locale === "en" && card.meaningUprightEn
-                    ? card.meaningUprightEn
-                    : card.meaningUpright}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Reversed */}
-            <Card className="overflow-hidden">
-              <div className="bg-gradient-to-r from-red-900/30 to-red-800/20 px-6 py-4 border-b border-red-500/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-red-600/30 flex items-center justify-center">
-                    <span className="text-2xl rotate-180">&#9650;</span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-slate-100">
-                      {t("reversed")}
-                    </h2>
-                    <p className="text-sm text-slate-400">
-                      {t("reversedSubtitle")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-slate-300 leading-relaxed">
-                  {locale === "en" && card.meaningReversedEn
-                    ? card.meaningReversedEn
-                    : card.meaningReversed}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* CTA */}
-          <div className="max-w-2xl mx-auto mt-16">
-            <Card variant="highlighted" className="p-8 text-center">
-              <h2 className="text-2xl font-bold text-slate-100 mb-4">
-                {t("cta.title", { card: displayName })}
-              </h2>
-              <p className="text-slate-400 mb-6">{t("cta.subtitle")}</p>
-              <Link href="/reading/new">
-              <Button size="lg">{t("cta.button")}</Button>
-            </Link>
-          </Card>
+            <p className="max-w-[66ch] text-[1.125rem] leading-[1.7]">{reversedText}</p>
+          </section>
         </div>
-      </div>
+      </article>
+
+      {/* CTA */}
+      <Card variant="highlighted" className="grid justify-items-start gap-4 p-[clamp(20px,4vw,40px)]">
+        <h2 className="text-[clamp(1.5rem,1.2rem+1vw,2.1rem)] leading-[1.1]">
+          {t("cta.title", { card: displayName })}
+        </h2>
+        <p className="max-w-[52ch] text-letra-suave">{t("cta.subtitle")}</p>
+        <Link href="/reading/new" className={buttonClasses({ size: "lg" })}>
+          {t("cta.button")}
+        </Link>
+      </Card>
+    </div>
   );
 }

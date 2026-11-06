@@ -2,14 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { cn } from "@/lib/utils";
 import { BlueprintShare } from "./BlueprintShare";
 import { SynthesisText } from "./SynthesisText";
 
 type ErrorKind = "unavailable" | "refused" | "rateLimited" | "cooldown" | "profile" | "generic";
 
 const LOADING_STEPS = ["western", "chinese", "tonalli", "numerology", "cards", "writing"] as const;
-const LOADING_GLYPHS = ["☉", "☯", "◈", "✧", "✦"];
 
 export interface SynthesisPanelProps {
   /** Cached synthesis for the current profile, or null. */
@@ -31,10 +32,15 @@ function errorKind(status: number): ErrorKind {
   return "generic";
 }
 
+/** A notice with the pink rule of the reading's intention (lectura.html). */
+const AVISO = "border-l-2 border-rosa pl-4 text-[1.0625rem] leading-[1.6]";
+
 /**
  * The AI synthesis of the Arcana Map: generate it (free, POST
- * /api/blueprint/synthesis), wait with a calm loading state, read it in
- * paragraphs with the closing questions apart, and share the map.
+ * /api/blueprint/synthesis), wait with a calm loading state, read it as a
+ * printed sheet with the closing questions apart, and share the map.
+ * States: none yet, stale (profile changed), generating, error (incl. the
+ * 429 cooldown) and written.
  */
 export function SynthesisPanel({
   initialSynthesis,
@@ -94,29 +100,30 @@ export function SynthesisPanel({
     }
   };
 
+  const estado = synthesis ? "escrita" : loading ? "generando" : error ? "error" : stale ? "vieja" : "pendiente";
+
   return (
-    <Card
-      variant="highlighted"
+    <section
       id="synthesis"
       role="region"
       aria-labelledby="blueprint-synthesis-title"
-      className="scroll-mt-24"
+      data-estado={estado}
+      className="grid scroll-mt-(--alto-cabecera) gap-8 border-t border-filete pt-8 sm:pt-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14"
     >
-      <CardContent className="p-5 sm:p-8">
-        <div className="flex items-center gap-2">
-          <span aria-hidden="true" className="text-amber-400">
-            ✦
-          </span>
-          <h2
-            id="blueprint-synthesis-title"
-            ref={titleRef}
-            tabIndex={-1}
-            className="text-2xl font-semibold text-slate-100 focus:outline-none"
-          >
-            {t("title")}
-          </h2>
-        </div>
-        <p className="mt-1 text-sm text-slate-400">{t("subtitle")}</p>
+      <header className="grid content-start gap-3">
+        <Etiqueta>{t("eyebrow")}</Etiqueta>
+        <h2
+          id="blueprint-synthesis-title"
+          ref={titleRef}
+          tabIndex={-1}
+          className="text-[clamp(1.9rem,1.4rem+1.6vw,2.6rem)] leading-[1.05] focus:outline-none"
+        >
+          {t("title")}
+        </h2>
+        <p className="max-w-[42ch] text-letra-suave">{t("subtitle")}</p>
+      </header>
+
+      <div className="min-w-0">
         {/* Always in the DOM so screen readers announce the text when loading starts */}
         <p role="status" className="sr-only">
           {loading ? t("loadingSr") : ""}
@@ -124,72 +131,67 @@ export function SynthesisPanel({
 
         {synthesis ? (
           <>
-            <div className="mt-6">
-              <SynthesisText text={synthesis} lang={synthesisLocale} questionsTitle={t("questionsTitle")} />
+            <SynthesisText text={synthesis} lang={synthesisLocale} questionsTitle={t("questionsTitle")} />
+            <div className="mt-8 grid gap-1.5 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+              {synthesisLocale !== uiLocale && (
+                <p>{t("languageNote", { language: t(`languages.${synthesisLocale}`) })}</p>
+              )}
+              <p>{t("disclaimer")}</p>
             </div>
-            {synthesisLocale !== uiLocale && (
-              <p className="mt-4 text-xs text-slate-500">
-                {t("languageNote", { language: t(`languages.${synthesisLocale}`) })}
-              </p>
-            )}
-            <p className="mt-4 text-xs text-slate-500">{t("disclaimer")}</p>
           </>
         ) : loading ? (
-          <div className="mt-6 flex flex-col items-center py-8 text-center">
-            <div aria-hidden="true" className="relative h-28 w-28">
-              <div className="absolute inset-0 rounded-full border border-slate-700/80" />
-              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-400/80 motion-safe:animate-spin" />
-              {LOADING_GLYPHS.map((glyph, i) => {
-                const angle = ((-90 + 72 * i) * Math.PI) / 180;
-                return (
-                  <span
-                    key={glyph}
-                    className="absolute flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-slate-900 text-sm text-purple-200 motion-safe:animate-pulse"
-                    style={{
-                      left: `${50 + 50 * Math.cos(angle)}%`,
-                      top: `${50 + 50 * Math.sin(angle)}%`,
-                      animationDelay: `${i * 300}ms`,
-                    }}
-                  >
-                    {glyph}
-                  </span>
-                );
-              })}
-              <span className="absolute inset-0 flex items-center justify-center text-2xl text-amber-300">✦</span>
-            </div>
-            <p aria-hidden="true" className="mt-8 font-medium text-slate-200">
+          <div className="grid gap-6">
+            <ol aria-hidden="true" className="grid max-w-[22rem] grid-cols-6 gap-1.5">
+              {LOADING_STEPS.map((key, i) => (
+                <li
+                  key={key}
+                  className={cn(
+                    "h-1.5 rounded-full",
+                    i < step ? "bg-tinta" : i === step ? "bg-rosa motion-safe:animate-pulse" : "bg-filete/15"
+                  )}
+                />
+              ))}
+            </ol>
+            <p aria-hidden="true" className="text-[clamp(1.25rem,1.1rem+0.5vw,1.45rem)] leading-[1.45] italic">
               {t(`loading.${LOADING_STEPS[step]}`)}
             </p>
-            <p className="mt-1 text-xs text-slate-500">{t("loadingHint")}</p>
+            <div aria-hidden="true" className="grid max-w-[66ch] gap-3">
+              {["w-full", "w-11/12", "w-full", "w-2/3"].map((ancho, i) => (
+                <span key={i} className={cn("h-3 rounded-sm bg-papel-hondo motion-safe:animate-pulse", ancho)} />
+              ))}
+            </div>
+            <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+              {t("loadingHint")}
+            </p>
           </div>
         ) : (
-          <div className="mt-6 space-y-4">
+          <div className="grid gap-5">
             {stale ? (
-              <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-100">
-                {t("stale")}
-              </p>
+              <p className={AVISO}>{t("stale")}</p>
             ) : (
-              <p className="leading-relaxed text-slate-300">{t("intro")}</p>
+              <p className="max-w-[60ch] text-[1.125rem] leading-[1.7]">{t("intro")}</p>
             )}
             {error && (
-              <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+              <p role="alert" className={cn(AVISO, "border-letra-error text-letra-error")}>
                 {error === "cooldown"
                   ? t("errors.cooldown", { minutes: cooldownMinutes })
                   : t(`errors.${error}`)}
               </p>
             )}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
               <Button size="lg" onClick={generate} className="w-full sm:w-auto">
                 {error ? t("retry") : stale ? t("regenerate") : t("generate")}
               </Button>
-              <span className="text-center text-xs text-slate-500 sm:text-left">{t("free")}</span>
+              <span className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+                {t("free")}
+              </span>
             </div>
           </div>
         )}
 
         {/* Outside the synthesis branch: an existing link can be revoked even if the synthesis is out of date */}
         {(synthesis || shareId) && <BlueprintShare initialShareId={shareId} canCreate={Boolean(synthesis)} />}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

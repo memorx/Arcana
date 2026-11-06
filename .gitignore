@@ -44,3 +44,26 @@ public/sw.js
 public/sw.js.map
 public/workbox-*.js
 public/workbox-*.js.map
+# next-pwa compiles worker/index.js into this
+public/worker-*.js
+public/worker-*.js.map
+
+# Referencias de diseño (capturas de sitios ajenos y tablero de direcciones): sólo en local, el repo es público.
+# El tablero publicado vive en https://claude.ai/artifact/JaE4Pu1PAc6qfJ4zhT8oRK
+_referencias/
+
+# Originales de los grabados (se regeneran con design/maqueta/scripts/cartas.py)
+design/cartas/original/
+design/maqueta/_qa/
+design/maqueta/_artifact/
+design/cartas/descarga.log
+design/maqueta/img/cartas/
+
+# Local e2e (PLAN 2026-11-05 §5.2): the real env file, the e2e build and Playwright output
+.env.e2e
+/.next-e2e/
+/test-results/
+/playwright-report/
+/e2e/.auth/
+/e2e/.generado/
+/.next-dev-e2e/

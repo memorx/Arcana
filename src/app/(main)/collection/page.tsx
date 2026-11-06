@@ -4,14 +4,18 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { Card, CardContent, Button } from "@/components/ui";
+import { Card, buttonClasses } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { BarraProgreso } from "@/components/achievements/BarraProgreso";
+import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
+import { cn } from "@/lib/utils";
+import { numeralDeCarta } from "../cards/indice";
 
 interface CollectionCard {
   id: string;
   name: string;
   nameEs: string;
   slug: string | null;
-  imageUrl: string;
   arcana: string;
   suit: string | null;
   number: number;
@@ -34,6 +38,8 @@ interface GoldenStats {
 
 type FilterType = "all" | "golden" | "major" | "wands" | "cups" | "swords" | "pentacles";
 
+const REJILLA = "grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8";
+
 export default function CollectionPage() {
   const t = useTranslations("collection");
   const tGolden = useTranslations("goldenCards");
@@ -43,21 +49,20 @@ export default function CollectionPage() {
   const [goldenStats, setGoldenStats] = useState<GoldenStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
-  const [showTooltip, setShowTooltip] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/collection")
       .then((res) => res.json())
       .then((data) => {
-        setCards(data.cards);
-        setStats(data.stats);
-        setGoldenStats(data.goldenStats);
+        setCards(data.cards ?? []);
+        setStats(data.stats ?? null);
+        setGoldenStats(data.goldenStats ?? null);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
-  const filters: { id: FilterType; label: string; isGolden?: boolean }[] = useMemo(() => {
+  const filters: { id: FilterType; label: string; count?: string; isGolden?: boolean }[] = useMemo(() => {
     const majorCount = cards.filter((c) => c.arcana === "MAJOR").length;
     const majorDiscovered = cards.filter((c) => c.arcana === "MAJOR" && c.isDiscovered).length;
     const goldenCount = cards.filter((c) => c.isGolden).length;
@@ -65,17 +70,17 @@ export default function CollectionPage() {
     const suitCounts = (suit: string) => {
       const total = cards.filter((c) => c.suit === suit).length;
       const discovered = cards.filter((c) => c.suit === suit && c.isDiscovered).length;
-      return { total, discovered };
+      return `${discovered}/${total}`;
     };
 
     return [
       { id: "all" as FilterType, label: t("filters.all") },
-      { id: "golden" as FilterType, label: `${tGolden("goldenCardsShort")} (${goldenCount}/${cards.length})`, isGolden: true },
-      { id: "major" as FilterType, label: `${t("majorArcana")} (${majorDiscovered}/${majorCount})` },
-      { id: "wands" as FilterType, label: `${t("wands")} (${suitCounts("WANDS").discovered}/${suitCounts("WANDS").total})` },
-      { id: "cups" as FilterType, label: `${t("cups")} (${suitCounts("CUPS").discovered}/${suitCounts("CUPS").total})` },
-      { id: "swords" as FilterType, label: `${t("swords")} (${suitCounts("SWORDS").discovered}/${suitCounts("SWORDS").total})` },
-      { id: "pentacles" as FilterType, label: `${t("pentacles")} (${suitCounts("PENTACLES").discovered}/${suitCounts("PENTACLES").total})` },
+      { id: "golden" as FilterType, label: tGolden("goldenCardsShort"), count: `${goldenCount}/${cards.length}`, isGolden: true },
+      { id: "major" as FilterType, label: t("majorArcana"), count: `${majorDiscovered}/${majorCount}` },
+      { id: "wands" as FilterType, label: t("wands"), count: suitCounts("WANDS") },
+      { id: "cups" as FilterType, label: t("cups"), count: suitCounts("CUPS") },
+      { id: "swords" as FilterType, label: t("swords"), count: suitCounts("SWORDS") },
+      { id: "pentacles" as FilterType, label: t("pentacles"), count: suitCounts("PENTACLES") },
     ];
   }, [cards, t, tGolden]);
 
@@ -122,55 +127,59 @@ export default function CollectionPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Header with Progress */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-purple-400 via-amber-400 to-purple-400 bg-clip-text text-transparent">
-            {t("title")}
-          </span>
-        </h1>
+    <div className="grid gap-[clamp(32px,6vh,56px)]">
+      {/* Encabezado: el índice y su contador */}
+      <header className="grid gap-x-[clamp(24px,5vw,80px)] gap-y-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end">
+        <div className="grid gap-3.5">
+          <Etiqueta>{t("kicker")}</Etiqueta>
+          <h1 className="text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]">{t("title")}</h1>
+          <p className="max-w-[46ch] text-letra-suave">{t("legend")}</p>
+        </div>
 
         {stats && (
-          <div className="max-w-2xl mx-auto">
-            {/* Regular Collection Progress */}
-            <div className="mb-6">
-              <p className="text-slate-400 mb-3">
-                {t("progress", { count: stats.discovered, total: stats.total })}
+          <div className="grid gap-5">
+            <div className="grid gap-3 border-t border-filete pt-4">
+              <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 font-dato" data-contador>
+                <span className="text-[clamp(2.75rem,2rem+3vw,4.25rem)] leading-none tracking-[-0.04em] tabular-nums">
+                  {stats.discovered}
+                </span>{" "}
+                <span className="text-sm tracking-[0.12em] text-letra-suave uppercase">
+                  {t("counterOf", { total: stats.total })}
+                </span>
               </p>
-              <div className="h-4 bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-amber-500 transition-all duration-500"
-                  style={{ width: `${stats.percentage}%` }}
-                />
-              </div>
-              <p className="text-2xl font-bold text-amber-400 mt-2">
-                {stats.percentage}%
+              <BarraProgreso
+                valor={stats.discovered}
+                max={stats.total}
+                etiqueta={t("progress", { count: stats.discovered, total: stats.total })}
+                texto={`${stats.discovered} ${t("counterOf", { total: stats.total })}`}
+              />
+              <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-suave uppercase">
+                {t("progress", { count: stats.discovered, total: stats.total })} · {stats.percentage}%
               </p>
             </div>
 
-            {/* Golden Collection Progress */}
+            {/* Cartas doradas: la segunda tinta */}
             {goldenStats && (
-              <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-amber-900/20 via-yellow-900/20 to-amber-900/20 border border-amber-500/30">
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <span className="text-xl">&#10024;</span>
-                  <span className="text-amber-400 font-semibold">{tGolden("goldenCardsShort")}</span>
-                  <span className="text-xl">&#10024;</span>
-                </div>
-                <p className="text-amber-200/70 text-sm mb-2">
-                  {tGolden("collectionProgress", { count: goldenStats.discovered, total: goldenStats.total })}
+              <div className="grid gap-2">
+                <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] uppercase">
+                  <span className="inline-flex items-center gap-2 text-letra-acento">
+                    <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-rosa" />
+                    {tGolden("goldenCardsShort")}
+                  </span>
+                  <span className="text-letra-suave">
+                    {tGolden("collectionProgress", { count: goldenStats.discovered, total: goldenStats.total })} ·{" "}
+                    {goldenStats.percentage}%
+                  </span>
                 </p>
-                <div className="h-3 bg-slate-800/50 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500"
-                    style={{ width: `${goldenStats.percentage}%` }}
-                  />
-                </div>
-                <p className="text-lg font-bold text-amber-300 mt-2">
-                  {goldenStats.percentage}%
-                </p>
+                <BarraProgreso
+                  valor={goldenStats.discovered}
+                  max={goldenStats.total}
+                  etiqueta={tGolden("collectionProgress", { count: goldenStats.discovered, total: goldenStats.total })}
+                  logrado
+                  grosor="fina"
+                />
                 {goldenStats.totalGoldenCardsFound > 0 && (
-                  <p className="text-amber-200/50 text-xs mt-1">
+                  <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.06em] text-letra-suave">
                     {tGolden("totalFound", { count: goldenStats.totalGoldenCardsFound })}
                   </p>
                 )}
@@ -178,205 +187,178 @@ export default function CollectionPage() {
             )}
           </div>
         )}
+      </header>
+
+      {/* Filtros: botones de alternar, con su cuenta */}
+      <div role="group" aria-label={t("filters.label")} className="flex flex-wrap gap-2">
+        {filters.map((f) => {
+          const activo = filter === f.id;
+          return (
+            <button
+              key={f.id}
+              type="button"
+              aria-pressed={activo}
+              onClick={() => setFilter(f.id)}
+              className={cn(
+                "inline-flex min-h-11 cursor-pointer flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full border px-4 py-1.5 text-left font-dato text-[0.6875rem] leading-[1.3] tracking-[0.1em] uppercase transition-colors duration-200",
+                activo
+                  ? "border-tinta bg-tinta text-papel"
+                  : "border-tinta/30 text-tinta hover:border-tinta"
+              )}
+            >
+              {f.isGolden && <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-rosa" />}
+              <span>{f.label}</span>
+              {f.count && (
+                <span className={cn("tabular-nums", activo ? "text-niebla" : "text-grafito")}>{f.count}</span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-        {filters.map((f) => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              filter === f.id
-                ? f.isGolden
-                  ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-900"
-                  : "bg-purple-600 text-white"
-                : f.isGolden
-                  ? "bg-slate-800 text-amber-400 hover:bg-slate-700 border border-amber-500/30"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-            }`}
-          >
-            {f.isGolden && <span className="mr-1">&#10024;</span>}
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Loading State */}
+      {/* Cargando: esqueleto en papel hondo, quieto con reduced-motion */}
       {loading && (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+        <div className={REJILLA} aria-hidden="true">
           {Array.from({ length: 24 }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-[2/3] bg-slate-800/50 rounded-lg animate-pulse"
-            />
+            <div key={i} className="aspect-[300/514] rounded-[6px] bg-papel-hondo motion-safe:animate-pulse" />
           ))}
         </div>
       )}
 
-      {/* Cards Grid */}
-      {!loading && (
-        <div className="space-y-10">
-          {(Object.entries(groupedCards) as [string, CollectionCard[]][]).map(([key, sectionCards]) => (
-            <section key={key}>
-              {filter === "all" && (
-                <h2 className="text-xl font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                  {getSectionTitle(key)}
-                  <span className="text-sm font-normal text-slate-500">
-                    ({sectionCards.filter((c) => c.isDiscovered).length}/{sectionCards.length})
-                  </span>
-                </h2>
-              )}
+      {/* El índice, por palo */}
+      {!loading && cards.length > 0 && (
+        <div className="grid gap-[clamp(32px,5vh,48px)]">
+          {(Object.entries(groupedCards) as [string, CollectionCard[]][]).map(([key, sectionCards]) => {
+            const descubiertas = sectionCards.filter((c) => c.isDiscovered).length;
+            return (
+              <section key={key} aria-labelledby={`palo-${key}`} className="grid gap-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-filete pt-3">
+                  <h2 id={`palo-${key}`} className="text-[clamp(1.4rem,1.1rem+1vw,1.9rem)] leading-[1.1]">
+                    {getSectionTitle(key)}
+                  </h2>
+                  <p className="font-dato text-xs tracking-[0.12em] text-letra-suave uppercase tabular-nums">
+                    {key === "golden"
+                      ? sectionCards.length
+                      : `${descubiertas} ${t("counterOf", { total: sectionCards.length })}`}
+                  </p>
+                </div>
 
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-                {sectionCards.map((card) => (
-                  <div
-                    key={card.id}
-                    className="relative"
-                    onMouseEnter={() => !card.isDiscovered && !card.isGolden && setShowTooltip(card.id)}
-                    onMouseLeave={() => setShowTooltip(null)}
-                  >
-                    {card.isDiscovered || card.isGolden ? (
-                      <Link href={`/cards/${card.slug}`}>
-                        <Card
-                          variant="interactive"
-                          className={`overflow-hidden ${
-                            card.isGolden
-                              ? "ring-2 ring-amber-400 golden-card-collection"
-                              : "ring-2 ring-amber-500/50 hover:ring-amber-400"
-                          }`}
-                        >
-                          <div className="aspect-[2/3] relative">
-                            <Image
-                              src={card.imageUrl}
-                              alt={getCardName(card)}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 12vw"
-                              unoptimized
-                            />
-                            {/* Golden shimmer overlay */}
-                            {card.isGolden && (
-                              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                                <div className="absolute inset-0 golden-shimmer-collection" />
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity">
-                              <div className="absolute bottom-0 left-0 right-0 p-2">
-                                <p className="text-white text-xs font-medium text-center truncate">
-                                  {getCardName(card)}
-                                </p>
-                              </div>
-                            </div>
-                            {/* Golden badge */}
-                            {card.isGolden && (
-                              <div className="absolute top-1 right-1 z-10">
-                                <span className="inline-flex items-center px-1 py-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-900 text-[8px] font-bold rounded-full">
-                                  &#10024;
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </Card>
-                      </Link>
-                    ) : filter === "golden" ? (
-                      // In golden filter, show locked cards with golden theme
-                      <Card className="overflow-hidden bg-amber-950/20 border-amber-700/30">
-                        <div className="aspect-[2/3] relative flex items-center justify-center bg-gradient-to-br from-amber-900/20 to-slate-900/80">
-                          <div className="text-3xl text-amber-700/50">&#10024;</div>
-                          <div className="absolute inset-0 opacity-5">
-                            <Image
-                              src={card.imageUrl}
-                              alt=""
-                              fill
-                              className="object-cover filter grayscale"
-                              sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 12vw"
-                              unoptimized
-                            />
-                          </div>
-                        </div>
-                      </Card>
-                    ) : (
-                      <Card className="overflow-hidden bg-slate-900/80 border-slate-700/50">
-                        <div className="aspect-[2/3] relative flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                          <div className="text-4xl text-slate-700">&#128274;</div>
-                          {/* Silhouette effect */}
-                          <div className="absolute inset-0 opacity-10">
-                            <Image
-                              src={card.imageUrl}
-                              alt=""
-                              fill
-                              className="object-cover filter grayscale blur-sm"
-                              sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 12vw"
-                              unoptimized
-                            />
-                          </div>
-                        </div>
-
-                        {/* Tooltip */}
-                        {showTooltip === card.id && (
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg whitespace-nowrap z-10 border border-slate-700">
-                            {t("locked")}
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
-                          </div>
-                        )}
-                      </Card>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
+                {sectionCards.length === 0 ? (
+                  <p className="font-dato text-xs tracking-[0.08em] text-letra-suave">{tGolden("chance")}</p>
+                ) : (
+                  <ul className={REJILLA}>
+                    {sectionCards.map((card) => (
+                      <CartaDelIndice
+                        key={card.id}
+                        card={card}
+                        nombre={getCardName(card)}
+                        porDescubrir={t("undiscovered")}
+                        dorada={tGolden("golden")}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </section>
+            );
+          })}
         </div>
       )}
 
       {/* CTA */}
-      <div className="mt-16 text-center">
-        <Card variant="highlighted" className="inline-block p-8">
-          <h2 className="text-2xl font-bold text-slate-100 mb-4">
-            {t("cta.title")}
-          </h2>
-          <p className="text-slate-400 mb-6">{t("cta.subtitle")}</p>
-          <Link href="/reading/new">
-            <Button size="lg">{t("cta.button")}</Button>
-          </Link>
-        </Card>
-      </div>
-
-      {/* Golden card styles */}
-      <style jsx global>{`
-        .golden-card-collection {
-          animation: golden-glow-collection 2s ease-in-out infinite;
-        }
-        @keyframes golden-glow-collection {
-          0%, 100% {
-            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
-          }
-          50% {
-            box-shadow: 0 0 16px rgba(251, 191, 36, 0.7);
-          }
-        }
-        .golden-shimmer-collection {
-          background: linear-gradient(
-            105deg,
-            transparent 40%,
-            rgba(251, 191, 36, 0.2) 45%,
-            rgba(253, 224, 71, 0.3) 50%,
-            rgba(251, 191, 36, 0.2) 55%,
-            transparent 60%
-          );
-          background-size: 200% 100%;
-          animation: golden-shimmer-sweep-collection 4s ease-in-out infinite;
-        }
-        @keyframes golden-shimmer-sweep-collection {
-          0% {
-            background-position: 200% 0;
-          }
-          100% {
-            background-position: -200% 0;
-          }
-        }
-      `}</style>
+      <Card variant="highlighted" className="grid justify-items-start gap-4 p-[clamp(20px,4vw,40px)]">
+        <h2 className="text-[clamp(1.5rem,1.2rem+1vw,2.1rem)] leading-[1.1]">{t("cta.title")}</h2>
+        <p className="max-w-[52ch] text-letra-suave">{t("cta.subtitle")}</p>
+        <Link href="/reading/new" className={buttonClasses({ size: "lg" })}>
+          {t("cta.button")}
+        </Link>
+      </Card>
     </div>
+  );
+}
+
+/**
+ * Una carta del índice. Descubierta: el grabado a color, con su número y su nombre, enlazado a su ficha.
+ * Por descubrir: el grabado en tinta tenue, sin enlace. La dorada es la única con brasa rosa persistente.
+ */
+function CartaDelIndice({
+  card,
+  nombre,
+  porDescubrir,
+  dorada,
+}: {
+  card: CollectionCard;
+  nombre: string;
+  porDescubrir: string;
+  dorada: string;
+}) {
+  // Las cortes no llevan número: un espacio duro guarda el renglón para que los nombres alineen.
+  const numero = numeralDeCarta(card) ?? "\u00a0";
+
+  if (!card.isDiscovered && !card.isGolden) {
+    return (
+      <li className="grid content-start gap-1.5" data-carta="por-descubrir">
+        <span className="block aspect-[7/12] overflow-hidden rounded-[6px] border border-dashed border-tinta/25">
+          <Image
+            src={cartaImagen(card.name, "tinta")}
+            alt=""
+            width={MEDIDAS_CARTA.tinta.width}
+            height={MEDIDAS_CARTA.tinta.height}
+            sizes="(max-width: 640px) 30vw, (max-width: 1024px) 16vw, 140px"
+            className="h-full w-full object-cover opacity-[0.22]"
+            unoptimized
+          />
+        </span>
+        <span className="font-dato text-[0.625rem] leading-[1.4] tracking-[0.14em] text-grafito uppercase">
+          <span aria-hidden="true">{numero}</span>
+          <span className="sr-only">{porDescubrir}</span>
+        </span>
+      </li>
+    );
+  }
+
+  return (
+    <li className="grid content-start" data-carta={card.isGolden ? "dorada" : "descubierta"}>
+      <Link
+        href={`/cards/${card.slug}`}
+        className="group grid content-start gap-1.5 rounded-[6px] focus-visible:outline-offset-4"
+      >
+        <span className={cn("relative block rounded-[6px]", card.isGolden && "golden-card-glow")}>
+          <span
+            className={cn(
+              "relative block aspect-[7/12] overflow-hidden rounded-[6px] border transition-[translate,border-color] duration-300 ease-tinta group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0",
+              card.isGolden ? "golden-card-border border-2" : "border-tinta/20 group-hover:border-rosa"
+            )}
+          >
+            <Image
+              src={cartaImagen(card.name)}
+              alt=""
+              width={MEDIDAS_CARTA.color.width}
+              height={MEDIDAS_CARTA.color.height}
+              sizes="(max-width: 640px) 30vw, (max-width: 1024px) 16vw, 140px"
+              className="h-full w-full object-cover"
+              unoptimized
+            />
+            {card.isGolden && (
+              <span aria-hidden="true" className="golden-shimmer-effect pointer-events-none absolute inset-0" />
+            )}
+          </span>
+        </span>
+        <span
+          aria-hidden="true"
+          className="font-dato text-[0.625rem] leading-[1.4] tracking-[0.14em] text-grafito uppercase"
+        >
+          {numero}
+        </span>
+        <span className="font-titulo text-[0.9375rem] leading-[1.15] text-balance group-hover:text-rosa-texto">
+          {nombre}
+        </span>
+        {card.isGolden && (
+          <span className="inline-flex items-center gap-1.5 font-dato text-[0.625rem] leading-[1.4] tracking-[0.12em] text-rosa-texto uppercase">
+            <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-rosa" />
+            {dorada}
+          </span>
+        )}
+      </Link>
+    </li>
   );
 }

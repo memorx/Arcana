@@ -1,19 +1,19 @@
 import Link from "next/link";
+import { buttonClasses } from "@/components/ui";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent } from "@/components/ui";
 import { getArcanaBlueprint } from "@/lib/systems";
 import { blueprintInputsHash, toBlueprintLocale } from "@/lib/ai/blueprint-synthesis";
 import { BlueprintBadges } from "@/components/blueprint/BlueprintBadges";
 import { getBlueprintBadges } from "@/components/blueprint/view-model";
-import { linkButtonClass } from "@/components/blueprint/link-styles";
+import { ENLACE_DATO, ROTULO, TITULO_CELDA } from "./estilos";
 
 interface BlueprintWidgetProps {
   userId: string;
 }
 
 /**
- * Dashboard card for the Arcana Map. Without a profile: a call to complete
+ * Dashboard cell for the Arcana Map. Without a profile: a call to complete
  * it. With one: the five badges, whether the synthesis is ready, and a link
  * to /blueprint.
  */
@@ -42,22 +42,13 @@ export async function BlueprintWidget({ userId }: BlueprintWidgetProps) {
 
   if (!profile) {
     return (
-      <Card className="h-full border-purple-500/20 bg-gradient-to-br from-purple-900/20 to-slate-900/50">
-        <CardContent className="flex h-full flex-col gap-4 p-5">
-          <div className="flex items-start gap-3">
-            <span aria-hidden="true" className="text-2xl text-amber-300">
-              ✦
-            </span>
-            <div>
-              <h3 className="font-semibold text-slate-100">{t("widget.setupTitle")}</h3>
-              <p className="mt-1 text-sm text-slate-400">{t("widget.setupText")}</p>
-            </div>
-          </div>
-          <Link href="/profile/setup" className={linkButtonClass("primary", "sm", "mt-auto self-start")}>
-            {t("widget.setupCta")}
-          </Link>
-        </CardContent>
-      </Card>
+      <div className="flex h-full flex-col gap-3">
+        <h2 className={TITULO_CELDA}>{t("widget.setupTitle")}</h2>
+        <p className="font-lectura text-[0.9375rem] leading-snug text-letra-suave">{t("widget.setupText")}</p>
+        <Link href="/profile/setup" className={buttonClasses({ variant: "primario", size: "sm", className: "mt-auto self-start" })}>
+          {t("widget.setupCta")}
+        </Link>
+      </div>
     );
   }
 
@@ -74,24 +65,17 @@ export async function BlueprintWidget({ userId }: BlueprintWidgetProps) {
     blueprintInputsHash(profile.birthDate, profile.fullName, toBlueprintLocale(profile.locale));
 
   return (
-    <Card className="h-full border-purple-500/20 bg-gradient-to-br from-purple-900/20 via-slate-900/50 to-amber-900/10">
-      <CardContent className="flex h-full flex-col gap-4 p-5">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="flex items-center gap-2 font-semibold text-slate-100">
-            <span aria-hidden="true" className="text-amber-400">
-              ✦
-            </span>
-            {t("widget.title")}
-          </h3>
-          <Link href="/blueprint" className={linkButtonClass("secondary", "sm", "shrink-0")}>
-            {t("widget.cta")}
-          </Link>
-        </div>
-        <BlueprintBadges badges={badges} label={t("badgesLabel")} size="sm" />
-        <p className="mt-auto text-xs text-slate-400">
-          {hasSynthesis ? t("widget.synthesisReady") : t("widget.synthesisPending")}
-        </p>
-      </CardContent>
-    </Card>
+    <div className="flex h-full flex-col gap-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+        <h2 className={TITULO_CELDA}>{t("widget.title")}</h2>
+        <Link href="/blueprint" className={ENLACE_DATO}>
+          {t("widget.cta")} <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+      <BlueprintBadges badges={badges} label={t("badgesLabel")} size="sm" />
+      <p className={`${ROTULO} mt-auto`}>
+        {hasSynthesis ? t("widget.synthesisReady") : t("widget.synthesisPending")}
+      </p>
+    </div>
   );
 }

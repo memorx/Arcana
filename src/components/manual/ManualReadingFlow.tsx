@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MotionConfig } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, TarotCardStatic } from "@/components/ui";
+import { Badge, Button } from "@/components/ui";
 import { FadeIn } from "@/components/animations";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { CartaFija, FiguraTirada, Tirada } from "@/components/reading/Tirada";
 import { cn } from "@/lib/utils";
 import { CardPicker } from "./CardPicker";
 import { SlotList, positionLabel, type ManualSpreadPosition } from "./SlotList";
@@ -42,6 +44,9 @@ export interface ManualReadingFlowProps {
 type Step = "spread" | "cards" | "intention";
 const STEPS: Step[] = ["spread", "cards", "intention"];
 const MIN_INTENTION = 10;
+
+const ENLACE =
+  "inline-flex min-h-11 items-center font-dato text-xs font-medium tracking-[0.1em] text-letra-acento uppercase underline-offset-[0.3em] hover:underline";
 
 type DeckState = { status: "loading" } | { status: "error" } | { status: "ready"; cards: DeckCard[] };
 type SubmitError = "unavailable" | "refused" | "credits" | "generic" | null;
@@ -184,53 +189,46 @@ export function ManualReadingFlow({ spreadTypes, freeReadingsLeft, credits, loca
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="mx-auto max-w-5xl">
+      <div className="grid gap-8">
         {/* Header */}
-        <div className="mb-6 text-center">
+        <header className="grid max-w-[760px] gap-4">
           <Link
             href="/reading/new"
-            className="mb-3 inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-300"
+            className="inline-flex min-h-11 items-center gap-2 justify-self-start font-dato text-xs tracking-[0.1em] text-letra-suave uppercase hover:text-letra"
           >
-            <svg aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <span aria-hidden="true">←</span>
             {t("backToSpreads")}
           </Link>
-          <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">{t("title")}</h1>
-          <p className="mx-auto mt-2 max-w-xl text-slate-400">{t("subtitle")}</p>
+          <h1 className="font-titulo text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]">{t("title")}</h1>
+          <p className="max-w-[56ch] text-letra-suave">{t("subtitle")}</p>
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            {freeReadingsLeft > 0 && (
-              <Badge variant="success" className="px-3 py-1 text-sm">
-                {t("balanceFree", { count: freeReadingsLeft })}
-              </Badge>
-            )}
-            <Badge variant="secondary" className="px-3 py-1 text-sm">
-              {t("balanceCredits", { count: credits })}
-            </Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            {freeReadingsLeft > 0 && <Badge variant="success">{t("balanceFree", { count: freeReadingsLeft })}</Badge>}
+            <Badge variant="secondary">{t("balanceCredits", { count: credits })}</Badge>
           </div>
-        </div>
+        </header>
 
         {/* Step indicator */}
-        <nav aria-label={t("stepsLabel")} className="mb-6">
-          <ol className="flex items-center justify-center gap-2 text-xs sm:text-sm">
+        <nav aria-label={t("stepsLabel")}>
+          <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 border-y border-filete/20 py-3 font-dato text-[0.6875rem] tracking-[0.1em] uppercase">
             {STEPS.map((s, i) => (
-              <li key={s} className="flex items-center gap-2">
+              <li key={s} className="flex items-center gap-3">
                 <span
                   aria-current={s === step ? "step" : undefined}
-                  className={cn(
-                    "flex items-center gap-1.5 rounded-full border px-3 py-1",
-                    s === step
-                      ? "border-amber-400/60 bg-amber-500/10 text-amber-200"
-                      : i < stepIndex
-                        ? "border-purple-500/40 text-purple-300"
-                        : "border-slate-800 text-slate-500"
-                  )}
+                  className={cn("flex items-center gap-2", s === step || i < stepIndex ? "text-letra" : "text-letra-suave")}
                 >
-                  <span className="font-semibold">{i + 1}</span>
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "flex size-6 items-center justify-center rounded-full border text-[0.625rem]",
+                      s === step ? "border-rosa-luz bg-rosa-luz text-tinta" : i < stepIndex ? "border-filete" : "border-filete/30"
+                    )}
+                  >
+                    {i + 1}
+                  </span>
                   <span>{t(`steps.${s}`)}</span>
                 </span>
-                {i < STEPS.length - 1 && <span aria-hidden="true" className="h-px w-4 bg-slate-700 sm:w-8" />}
+                {i < STEPS.length - 1 && <span aria-hidden="true" className="h-px w-5 bg-filete/30 sm:w-10" />}
               </li>
             ))}
           </ol>
@@ -238,69 +236,62 @@ export function ManualReadingFlow({ spreadTypes, freeReadingsLeft, credits, loca
 
         {/* Step 1: spread */}
         {step === "spread" && (
-          <FadeIn key="spread" className="space-y-4">
-            <div className="text-center">
-              <h2 ref={headingRef} tabIndex={-1} className="text-xl font-semibold text-slate-100 focus:outline-none">
+          <FadeIn key="spread" className="grid gap-5">
+            <div className="grid gap-1.5">
+              <h2
+                ref={headingRef}
+                tabIndex={-1}
+                className="font-titulo text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-[1.1] focus:outline-none"
+              >
                 {t("chooseSpread")}
               </h2>
-              <p className="mt-1 text-sm text-slate-400">{t("chooseSpreadHint")}</p>
+              <p className="text-letra-suave">{t("chooseSpreadHint")}</p>
             </div>
 
-            <ul className="grid gap-4 md:grid-cols-2">
+            <ul className="grid grid-cols-1 border-t border-l border-filete/25 sm:grid-cols-2 lg:grid-cols-3">
               {spreadTypes.map((s) => {
                 const canAfford = usesFreeReading || credits >= s.creditCost;
-                const isThemed = s.category === "themed";
                 const sorted = [...s.positions].sort((a, b) => Number(a.position) - Number(b.position));
                 return (
-                  <li key={s.id}>
+                  <li key={s.id} className="border-r border-b border-filete/25">
                     <button
                       type="button"
                       onClick={() => canAfford && chooseSpread(s)}
                       aria-disabled={!canAfford || undefined}
                       className={cn(
-                        "relative h-full w-full overflow-hidden rounded-xl border bg-slate-900/50 p-5 text-left backdrop-blur-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400",
-                        "motion-safe:transition-all motion-safe:duration-300",
-                        canAfford
-                          ? "border-slate-800 hover:border-purple-500/50 hover:bg-slate-900/80"
-                          : "cursor-not-allowed border-slate-800 opacity-50",
-                        spread?.id === s.id && "border-amber-400/60"
+                        "flex h-full w-full flex-col gap-4 p-5 text-left outline-offset-[-3px]",
+                        "motion-safe:transition-colors motion-safe:duration-300",
+                        canAfford ? "hover:bg-papel-hondo" : "cursor-not-allowed text-letra-suave",
+                        spread?.id === s.id && "bg-papel-hondo"
                       )}
                     >
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "absolute right-0 top-0 h-32 w-32 rounded-full bg-gradient-to-br to-transparent blur-2xl",
-                          isThemed ? "from-amber-500/10" : "from-purple-500/10"
-                        )}
-                      />
-                      <span className="relative flex items-start justify-between gap-3">
-                        <span>
-                          <span className="block text-lg font-semibold text-slate-100">{localized(s)}</span>
-                          <span className="mt-0.5 block text-sm text-slate-400">
+                      <span className="flex items-end justify-between gap-3">
+                        <span className="grid gap-1">
+                          <span className="font-titulo text-[1.35rem] leading-[1.1]">{localized(s)}</span>
+                          <span className="font-dato text-[0.6875rem] tracking-[0.1em] text-letra-suave uppercase">
                             {tReading("cards", { count: s.cardCount })}
                           </span>
                         </span>
-                        <Badge variant={usesFreeReading ? "success" : "secondary"} className="shrink-0 text-sm">
-                          {usesFreeReading ? tReading("free") : t("cost", { count: s.creditCost })}
-                        </Badge>
+                        <span className="flex h-16 shrink-0 items-end">
+                          <FiguraTirada total={s.cardCount} nombreTirada={s.name} />
+                        </span>
                       </span>
-                      <span className="relative mt-3 flex flex-wrap gap-1.5">
-                        {sorted.slice(0, 5).map((pos) => (
-                          <span key={pos.position} className="rounded bg-slate-800/50 px-2 py-1 text-xs text-slate-400">
-                            {localized(pos)}
-                          </span>
-                        ))}
+                      <span className="font-dato text-[0.6875rem] leading-[1.7] tracking-[0.04em] break-words">
+                        {sorted.slice(0, 5).map((pos) => localized(pos)).join(" · ")}
                         {sorted.length > 5 && (
-                          <span className="px-1 py-1 text-xs text-slate-500">
-                            {tReading("more", { count: sorted.length - 5 })}
+                          <span className="text-letra-suave"> · {tReading("more", { count: sorted.length - 5 })}</span>
+                        )}
+                      </span>
+                      <span className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-filete/15 pt-3">
+                        <span className="font-dato text-xs font-medium tracking-[0.1em] text-letra-acento uppercase">
+                          {usesFreeReading ? tReading("free") : t("cost", { count: s.creditCost })}
+                        </span>
+                        {!canAfford && (
+                          <span className="font-dato text-[0.6875rem] tracking-[0.06em] text-letra-suave">
+                            {t("cantAfford", { count: s.creditCost - credits })}
                           </span>
                         )}
                       </span>
-                      {!canAfford && (
-                        <span className="relative mt-3 block text-sm text-amber-400/80">
-                          {t("cantAfford", { count: s.creditCost - credits })}
-                        </span>
-                      )}
                     </button>
                   </li>
                 );
@@ -308,8 +299,8 @@ export function ManualReadingFlow({ spreadTypes, freeReadingsLeft, credits, loca
             </ul>
 
             {!usesFreeReading && spreadTypes.every((s) => credits < s.creditCost) && (
-              <p className="text-center text-sm text-slate-400">
-                <Link href="/credits" className="font-medium text-amber-400 hover:text-amber-300">
+              <p>
+                <Link href="/credits" className={ENLACE}>
                   {t("buyCredits")} &rarr;
                 </Link>
               </p>
@@ -319,83 +310,81 @@ export function ManualReadingFlow({ spreadTypes, freeReadingsLeft, credits, loca
 
         {/* Step 2: which cards came out */}
         {step === "cards" && spread && (
-          <FadeIn key="cards" className="space-y-4">
-            <div className="text-center">
-              <h2 ref={headingRef} tabIndex={-1} className="text-xl font-semibold text-slate-100 focus:outline-none">
+          <FadeIn key="cards" className="grid gap-5">
+            <div className="grid gap-1.5">
+              <h2
+                ref={headingRef}
+                tabIndex={-1}
+                className="font-titulo text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-[1.1] focus:outline-none"
+              >
                 {t("pickCardsTitle")}
               </h2>
-              <p className="mx-auto mt-1 max-w-xl text-sm text-slate-400">{t("pickCardsHint")}</p>
+              <p className="max-w-[60ch] text-letra-suave">{t("pickCardsHint")}</p>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-              <Card>
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="flex items-center justify-between gap-2 text-base">
-                    <span>{localized(spread)}</span>
-                    <span className="text-xs font-normal text-slate-400">
-                      {t("progress", { done: filledCount, total: slots.length })}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <SlotList
-                    positions={positions}
-                    slots={slots}
-                    activeIndex={activeIndex}
-                    cardsById={cardsById}
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-10">
+              <section aria-labelledby="manual-tirada-titulo" className="grid content-start gap-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-filete/20 pb-2">
+                  <Etiqueta as="h3" id="manual-tirada-titulo">
+                    {localized(spread)}
+                  </Etiqueta>
+                  <span className="font-dato text-[0.6875rem] tracking-[0.06em] text-letra-suave">
+                    {t("progress", { done: filledCount, total: slots.length })}
+                  </span>
+                </div>
+                <SlotList
+                  positions={positions}
+                  slots={slots}
+                  activeIndex={activeIndex}
+                  cardsById={cardsById}
+                  locale={locale}
+                  onSelect={setActiveIndex}
+                  onToggleReversed={toggleReversed}
+                  onClear={clearSlot}
+                />
+              </section>
+
+              <div className="grid content-start gap-3">
+                <p className="border-b border-filete/20 pb-2 font-lectura text-[1.0625rem] italic" aria-live="polite">
+                  {t("choosingFor", { number: activeIndex + 1, position: labelFor(activeIndex) })}
+                </p>
+                {deck.status === "loading" && (
+                  <div role="status" className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6">
+                    <span className="sr-only">{t("loadingCards")}</span>
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <span
+                        key={i}
+                        aria-hidden="true"
+                        className="aspect-[300/520] rounded-[5px] bg-papel-hondo motion-safe:animate-pulse"
+                      />
+                    ))}
+                  </div>
+                )}
+                {deck.status === "error" && (
+                  <div role="alert" className="grid justify-items-start gap-3 border-l-2 border-rosa bg-papel-hondo px-4 py-4">
+                    <p className="text-[0.9375rem]">{t("cardsLoadError")}</p>
+                    <Button variant="secondary" size="sm" onClick={loadDeck}>
+                      {t("retryLoad")}
+                    </Button>
+                  </div>
+                )}
+                {deck.status === "ready" && (
+                  <CardPicker
+                    cards={deck.cards}
+                    takenAt={takenAt}
+                    activeCardId={slots[activeIndex]?.cardId ?? null}
+                    onPick={pickCard}
                     locale={locale}
-                    onSelect={setActiveIndex}
-                    onToggleReversed={toggleReversed}
-                    onClear={clearSlot}
                   />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="p-4 pb-2">
-                  <p className="text-sm text-slate-300" aria-live="polite">
-                    {t("choosingFor", { number: activeIndex + 1, position: labelFor(activeIndex) })}
-                  </p>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  {deck.status === "loading" && (
-                    <div role="status" className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6">
-                      <span className="sr-only">{t("loadingCards")}</span>
-                      {Array.from({ length: 12 }).map((_, i) => (
-                        <span
-                          key={i}
-                          aria-hidden="true"
-                          className="aspect-[2/3] rounded-md bg-slate-800 motion-safe:animate-pulse"
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {deck.status === "error" && (
-                    <div role="alert" className="space-y-3 py-6 text-center">
-                      <p className="text-sm text-slate-300">{t("cardsLoadError")}</p>
-                      <Button variant="secondary" size="sm" onClick={loadDeck}>
-                        {t("retryLoad")}
-                      </Button>
-                    </div>
-                  )}
-                  {deck.status === "ready" && (
-                    <CardPicker
-                      cards={deck.cards}
-                      takenAt={takenAt}
-                      activeCardId={slots[activeIndex]?.cardId ?? null}
-                      onPick={pickCard}
-                      locale={locale}
-                    />
-                  )}
-                </CardContent>
-              </Card>
+                )}
+              </div>
             </div>
 
-            <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-between gap-3 border-t border-slate-800 bg-slate-950/90 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-xl sm:border">
+            <div className="sticky bottom-0 z-10 flex items-center justify-between gap-3 border-t border-filete/30 bg-papel py-3">
               <Button variant="ghost" onClick={() => goTo("spread")}>
                 {t("back")}
               </Button>
-              <span className="text-xs text-slate-400 sm:text-sm">
+              <span className="hidden font-dato text-xs tracking-[0.06em] text-letra-suave sm:inline">
                 {t("progress", { done: filledCount, total: slots.length })}
               </span>
               <Button onClick={() => goTo("intention")} disabled={!isComplete(slots)}>
@@ -407,107 +396,110 @@ export function ManualReadingFlow({ spreadTypes, freeReadingsLeft, credits, loca
 
         {/* Step 3: intention and confirm */}
         {step === "intention" && spread && (
-          <FadeIn key="intention" className="space-y-6">
-            <div className="text-center">
-              <h2 ref={headingRef} tabIndex={-1} className="text-xl font-semibold text-slate-100 focus:outline-none">
+          <FadeIn key="intention" className="grid gap-8">
+            <div className="grid gap-1.5">
+              <h2
+                ref={headingRef}
+                tabIndex={-1}
+                className="font-titulo text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-[1.1] focus:outline-none"
+              >
                 {t("summaryTitle")}
               </h2>
-              <p className="mt-1 text-sm text-slate-400">{localized(spread)}</p>
+              <Etiqueta>{localized(spread)}</Etiqueta>
             </div>
 
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-              {slots.map((slot, index) => {
-                const card = slot.cardId ? cardsById[slot.cardId] : undefined;
+            <Tirada
+              compacta
+              posiciones={slots.map((_, index) => ({ numero: index + 1, nombre: labelFor(index) }))}
+              nombreTirada={spread.name}
+              etiqueta={t("summaryTitle")}
+              carta={(_, index) => {
+                const cardId = slots[index].cardId;
+                const card = cardId ? cardsById[cardId] : undefined;
+                return card ? <CartaFija carta={card} alt={localized(card)} invertida={slots[index].isReversed} /> : null;
+              }}
+              pie={(_, index) => {
+                const cardId = slots[index].cardId;
+                const card = cardId ? cardsById[cardId] : undefined;
                 if (!card) return null;
                 return (
-                  <li
-                    key={index}
-                    className="flex flex-col items-center rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-center"
-                  >
-                    <span className="mb-2 line-clamp-1 text-xs text-slate-400">
-                      {index + 1}. {labelFor(index)}
-                    </span>
-                    <TarotCardStatic
-                      card={card}
-                      isReversed={slot.isReversed}
-                      showReversedBadge={false}
-                      size="sm"
-                      locale={locale}
-                    />
-                    <span className="mt-2 text-sm font-medium text-slate-100">{localized(card)}</span>
-                    {slot.isReversed && <span className="text-xs text-orange-400">{tReading("reversed")}</span>}
-                  </li>
-                );
-              })}
-            </ul>
-
-            <Card variant="highlighted">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span aria-hidden="true" className="text-amber-400">&#10022;</span>
-                  {t("intentionTitle")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <label htmlFor="manual-intention" className="mb-3 block text-sm text-slate-400">
-                  {t("intentionHint")}
-                </label>
-                <textarea
-                  id="manual-intention"
-                  value={intention}
-                  onChange={(e) => setIntention(e.target.value)}
-                  placeholder={tReading("intentionPlaceholder")}
-                  disabled={isSubmitting}
-                  className="h-32 w-full resize-none rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-                />
-                <p className="mt-2 text-xs text-slate-500">
-                  {tReading("intentionHint", { count: intention.trim().length })}
-                </p>
-
-                <p className="mt-4 rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-3 text-sm text-slate-300">
-                  {usesFreeReading
-                    ? t("costFree", { count: freeReadingsLeft })
-                    : t("costCredits", { count: spread.creditCost, balance: credits })}
-                </p>
-
-                {submitError && (
-                  <div role="alert" className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-                    <p className="text-sm text-amber-200">
-                      {submitError === "unavailable" && tReading("interpretationUnavailable")}
-                      {submitError === "refused" && tReading("interpretationRefused")}
-                      {submitError === "credits" && t("needCredits")}
-                      {submitError === "generic" && t("createError")}
-                    </p>
-                    {submitError === "credits" && (
-                      <Link href="/credits" className="mt-2 inline-block text-sm font-medium text-amber-400 hover:text-amber-300">
-                        {t("buyCredits")} &rarr;
-                      </Link>
+                  <p className="font-titulo text-[clamp(1rem,0.9rem+0.5vw,1.3rem)] leading-[1.15]">
+                    {localized(card)}
+                    {slots[index].isReversed && (
+                      <span className="mt-1 block font-dato text-[0.625rem] tracking-[0.12em] text-letra-acento uppercase">
+                        {tReading("reversed")}
+                      </span>
                     )}
-                  </div>
-                )}
-
-                {isSubmitting && (
-                  <p role="status" className="mt-4 flex items-center justify-center gap-2 text-sm text-purple-300">
-                    <span aria-hidden="true" className="motion-safe:animate-pulse">&#10022;</span>
-                    {t("interpreting")}
                   </p>
-                )}
+                );
+              }}
+            />
 
-                <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-                  <Button variant="ghost" onClick={() => goTo("cards")} disabled={isSubmitting}>
-                    {t("back")}
-                  </Button>
-                  <Button
-                    size="lg"
-                    onClick={handleSubmit}
-                    isLoading={isSubmitting}
-                    disabled={intention.trim().length < MIN_INTENTION || submitError === "credits"}
-                  >
-                    {submitError === "unavailable" ? tReading("retry") : t("submit")}
-                  </Button>
+            <section
+              aria-labelledby="manual-intencion-titulo"
+              className="grid max-w-[760px] gap-4 border-t-[3px] border-rosa pt-6"
+            >
+              <h3 id="manual-intencion-titulo" className="font-titulo text-[clamp(1.4rem,1.15rem+0.8vw,1.8rem)] leading-[1.1]">
+                {t("intentionTitle")}
+              </h3>
+              <label htmlFor="manual-intention" className="text-letra-suave">
+                {t("intentionHint")}
+              </label>
+              <textarea
+                id="manual-intention"
+                value={intention}
+                onChange={(e) => setIntention(e.target.value)}
+                placeholder={tReading("intentionPlaceholder")}
+                disabled={isSubmitting}
+                className="block min-h-36 w-full resize-y rounded-none border-0 border-y border-filete/40 bg-transparent px-0 py-4 font-lectura text-[1.15rem] leading-[1.55] text-letra italic placeholder:text-letra-suave placeholder:not-italic focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none disabled:opacity-60 sm:text-[1.25rem]"
+              />
+              <p className="font-dato text-[0.6875rem] tracking-[0.06em] text-letra-suave">
+                {tReading("intentionHint", { count: intention.trim().length })}
+              </p>
+
+              <p className="font-dato text-xs leading-[1.6] tracking-[0.04em]">
+                {usesFreeReading
+                  ? t("costFree", { count: freeReadingsLeft })
+                  : t("costCredits", { count: spread.creditCost, balance: credits })}
+              </p>
+
+              {submitError && (
+                <div role="alert" className="border-l-2 border-rosa bg-papel-hondo px-4 py-3">
+                  <p className="text-[0.9375rem] leading-[1.5]">
+                    {submitError === "unavailable" && tReading("interpretationUnavailable")}
+                    {submitError === "refused" && tReading("interpretationRefused")}
+                    {submitError === "credits" && t("needCredits")}
+                    {submitError === "generic" && t("createError")}
+                  </p>
+                  {submitError === "credits" && (
+                    <Link href="/credits" className={cn(ENLACE, "mt-1")}>
+                      {t("buyCredits")} &rarr;
+                    </Link>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+              )}
+
+              {isSubmitting && (
+                <p role="status" className="flex items-center gap-2 font-lectura italic">
+                  <span aria-hidden="true" className="size-1.5 rounded-full bg-rosa motion-safe:animate-pulse" />
+                  {t("interpreting")}
+                </p>
+              )}
+
+              <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+                <Button variant="ghost" onClick={() => goTo("cards")} disabled={isSubmitting}>
+                  {t("back")}
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={handleSubmit}
+                  isLoading={isSubmitting}
+                  disabled={intention.trim().length < MIN_INTENTION || submitError === "credits"}
+                >
+                  {submitError === "unavailable" ? tReading("retry") : t("submit")}
+                </Button>
+              </div>
+            </section>
           </FadeIn>
         )}
       </div>

@@ -7,21 +7,26 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "interactive" | "highlighted";
 }
 
+/**
+ * Lámina: el suelo de donde esté (papel o tinta) con un filete de su letra.
+ * Sin sombras ni esquinas redondas de tarjeta genérica.
+ * - interactive: sube 2 px y el filete se vuelve rosa al pasar.
+ * - highlighted: un filete rosa grueso arriba, como sello.
+ */
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", children, ...props }, ref) => {
     const variants = {
-      default: "bg-slate-900/50 border-slate-800",
+      default: "",
       interactive:
-        "bg-slate-900/50 border-slate-800 hover:border-purple-500/50 hover:bg-slate-900/80 cursor-pointer transition-all duration-300",
-      highlighted:
-        "bg-gradient-to-br from-purple-900/20 to-amber-900/20 border-amber-500/30",
+        "cursor-pointer transition-[translate,border-color] duration-300 ease-tinta hover:-translate-y-0.5 hover:border-rosa motion-reduce:hover:translate-y-0",
+      highlighted: "border-t-[3px] border-t-rosa",
     };
 
     return (
       <div
         ref={ref}
         className={cn(
-          "rounded-xl border backdrop-blur-sm",
+          "rounded-sm border border-filete bg-suelo text-letra",
           variants[variant],
           className
         )}
@@ -47,7 +52,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingEleme
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn("text-xl font-semibold text-slate-100", className)}
+      className={cn("font-titulo text-xl leading-tight text-letra", className)}
       {...props}
     />
   )
@@ -59,7 +64,7 @@ const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLPara
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn("text-sm text-slate-400 mt-1", className)}
+      className={cn("mt-1 text-sm text-letra-suave", className)}
       {...props}
     />
   )

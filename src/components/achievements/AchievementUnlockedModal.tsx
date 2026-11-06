@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Modal, ModalBody, Button } from "@/components/ui";
+import { Pincel } from "@/components/tinta/Pincel";
+import { cn } from "@/lib/utils";
+import { ESTAMPA } from "./Celebracion";
+import { Sello } from "./Sello";
 
 interface UnlockedAchievement {
   id: string;
@@ -22,6 +25,7 @@ interface AchievementUnlockedModalProps {
   achievements: UnlockedAchievement[];
 }
 
+/** Logro desbloqueado, sobre tinta: la palabra a pincel se estampa, el título en Gloock y los sellos en mono. */
 export function AchievementUnlockedModal({
   isOpen,
   onClose,
@@ -29,15 +33,6 @@ export function AchievementUnlockedModal({
 }: AchievementUnlockedModalProps) {
   const t = useTranslations("achievements");
   const locale = useLocale();
-  const [showGlow, setShowGlow] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShowGlow(true);
-      const timer = setTimeout(() => setShowGlow(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
 
   if (achievements.length === 0) return null;
 
@@ -50,69 +45,53 @@ export function AchievementUnlockedModal({
   };
 
   const totalCredits = achievements.reduce((sum, a) => sum + a.creditReward, 0);
-  const isSingle = achievements.length === 1;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="overflow-visible">
-      <ModalBody className="text-center py-8">
-        {/* Trophy Icon */}
-        <div className="relative inline-block mb-6">
-          <div
-            className={`w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center text-5xl ${
-              showGlow ? "animate-pulse shadow-lg shadow-amber-500/50" : ""
-            }`}
-          >
-            🏆
-          </div>
-          {showGlow && (
-            <div className="absolute inset-0 rounded-full bg-amber-500/30 animate-ping" />
-          )}
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-md">
+      <ModalBody className="grid gap-6 px-[clamp(20px,6vw,36px)] pb-8 pt-9 text-center">
+        <div className="grid justify-items-center gap-2">
+          <Pincel aria-hidden="true" className={cn("text-[clamp(3.4rem,2.6rem+4vw,4.75rem)]", ESTAMPA)}>
+            {t("unlockModal.pincel")}
+          </Pincel>
+          <h2 className="text-[clamp(1.6rem,1.3rem+1.4vw,2.1rem)] leading-[1.1] text-letra">
+            {t("unlockModal.title")}
+          </h2>
         </div>
 
-        {/* Title */}
-        <h2 className="text-2xl font-bold text-slate-100 mb-2">
-          {t("unlockModal.title")}
-        </h2>
-
-        {/* Achievements List */}
-        <div className="space-y-3 mb-6">
-          {achievements.map((achievement, index) => (
-            <div
+        {/* Los logros de esta lectura */}
+        <ul className="grid border-t border-filete/20 text-left">
+          {achievements.map((achievement) => (
+            <li
               key={achievement.id}
-              className="bg-slate-800/50 rounded-xl p-4 border border-amber-500/30"
-              style={{
-                animationDelay: `${index * 0.1}s`,
-              }}
+              className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 border-b border-filete/20 py-4"
             >
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">{achievement.icon}</span>
-                <div className="text-left flex-1">
-                  <h3 className="font-semibold text-amber-400">
-                    {getLocalizedName(achievement)}
-                  </h3>
-                  <p className="text-sm text-slate-400">
-                    {getLocalizedDescription(achievement)}
-                  </p>
-                </div>
-                <span className="text-emerald-400 font-medium">
-                  +{achievement.creditReward}
-                </span>
+              <Sello estado="logrado">
+                <span className="font-lectura text-lg">✓</span>
+              </Sello>
+              <div className="grid min-w-0 gap-1">
+                <h3 className="text-[1.15rem] leading-[1.15] text-letra">{getLocalizedName(achievement)}</h3>
+                <p className="text-[0.9375rem] leading-[1.45] text-letra-suave">
+                  {getLocalizedDescription(achievement)}
+                </p>
+                <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-acento uppercase tabular-nums">
+                  {t("reward", { count: achievement.creditReward })}
+                </p>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
-        {/* Total Credits */}
-        <div className="bg-emerald-900/30 rounded-xl p-4 mb-6 border border-emerald-500/30">
-          <p className="text-slate-400 text-sm mb-1">
+        {/* Créditos ganados */}
+        <div className="grid gap-1">
+          <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.12em] text-letra-suave uppercase">
             {t("unlockModal.earned", { credits: totalCredits })}
           </p>
-          <p className="text-3xl font-bold text-emerald-400">
-            +{totalCredits} <span className="text-lg">{t("credits")}</span>
+          <p className="flex flex-wrap items-baseline justify-center gap-x-2.5 font-dato text-[2.5rem] leading-none tracking-[-0.03em] text-letra-acento tabular-nums">
+            <span>+{totalCredits}</span>
+            <span className="text-sm tracking-[0.12em] text-letra-suave uppercase">{t("credits")}</span>
           </p>
         </div>
 
-        {/* Close Button */}
         <Button onClick={onClose} size="lg" className="w-full">
           {t("continue")}
         </Button>

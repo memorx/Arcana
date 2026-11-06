@@ -4,39 +4,34 @@ interface ResonanceSummaryProps {
   resonance: { count: number; average: number | null };
 }
 
-/** Average resonance (1–5) of the readings the person rated. */
+/** Average resonance (1–5) of the readings the person rated: the figure in Martian Mono (data) and a bar in two inks. */
 export async function ResonanceSummary({ resonance }: ResonanceSummaryProps) {
   const t = await getTranslations("insights.resonance");
   const locale = await getLocale();
 
   if (resonance.count === 0 || resonance.average === null) {
-    return <p className="text-slate-400">{t("empty")}</p>;
+    return <p className="max-w-[60ch] font-lectura text-letra-suave">{t("empty")}</p>;
   }
 
-  const average = new Intl.NumberFormat(locale === "en" ? "en-US" : "es-ES", {
+  const average = new Intl.NumberFormat(locale === "en" ? "en-US" : "es-MX", {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   }).format(resonance.average);
   const percent = Math.min(100, Math.max(0, (resonance.average / 5) * 100));
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-      <p className="text-4xl font-bold text-amber-300 tabular-nums">
+    <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-10">
+      <p className="font-dato text-[3.5rem] leading-none tracking-[-0.04em] text-letra tabular-nums">
         {average}
-        <span className="text-lg font-medium text-slate-400">/5</span>
+        <span className="ml-1 font-dato text-base text-letra-suave">/5</span>
       </p>
-      <div className="flex-1">
-        <div
-          role="img"
-          aria-label={t("chartLabel", { average })}
-          className="h-3 rounded-full bg-slate-800 overflow-hidden"
-        >
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-purple-500 to-amber-400"
-            style={{ width: `${percent}%` }}
-          />
+      <div className="min-w-0 flex-1">
+        <div role="img" aria-label={t("chartLabel", { average })} className="h-2 bg-letra/10">
+          <div className="h-full bg-rosa" style={{ width: `${percent}%` }} />
         </div>
-        <p className="text-sm text-slate-400 mt-2">{t("basedOn", { count: resonance.count })}</p>
+        <p className="mt-2 font-dato text-[0.6875rem] uppercase tracking-[0.1em] text-letra-suave">
+          {t("basedOn", { count: resonance.count })}
+        </p>
       </div>
     </div>
   );

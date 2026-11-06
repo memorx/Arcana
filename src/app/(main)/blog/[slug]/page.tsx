@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, Badge, Button } from "@/components/ui";
+import { buttonClasses } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { ContenidoArticulo, ImagenDelArticulo } from "../contenido";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -43,124 +45,74 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   const title = locale === "en" ? post.title : post.titleEs;
+  const excerpt = locale === "en" ? post.excerpt : post.excerptEs;
   const content = locale === "en" ? post.content : post.contentEs;
 
-  // Simple markdown-like rendering (headers and paragraphs)
-  const renderContent = (text: string) => {
-    return text.split("\n").map((line, i) => {
-      if (line.startsWith("# ")) {
-        return (
-          <h1 key={i} className="text-3xl font-bold text-slate-100 mb-6 mt-8 first:mt-0">
-            {line.slice(2)}
-          </h1>
-        );
-      }
-      if (line.startsWith("## ")) {
-        return (
-          <h2 key={i} className="text-2xl font-semibold text-slate-100 mb-4 mt-8">
-            {line.slice(3)}
-          </h2>
-        );
-      }
-      if (line.startsWith("### ")) {
-        return (
-          <h3 key={i} className="text-xl font-medium text-slate-200 mb-3 mt-6">
-            {line.slice(4)}
-          </h3>
-        );
-      }
-      if (line.startsWith("- **")) {
-        const match = line.match(/- \*\*(.+?)\*\*: (.+)/);
-        if (match) {
-          return (
-            <li key={i} className="text-slate-300 mb-2 ml-4 list-disc">
-              <strong className="text-slate-200">{match[1]}</strong>: {match[2]}
-            </li>
-          );
-        }
-      }
-      if (line.startsWith("- ")) {
-        return (
-          <li key={i} className="text-slate-300 mb-2 ml-4 list-disc">
-            {line.slice(2)}
-          </li>
-        );
-      }
-      if (line.startsWith("**") && line.endsWith("**")) {
-        return (
-          <p key={i} className="text-slate-200 font-medium mb-2">
-            {line.slice(2, -2)}
-          </p>
-        );
-      }
-      if (line.match(/^\d+\. /)) {
-        return (
-          <li key={i} className="text-slate-300 mb-2 ml-4 list-decimal">
-            {line.replace(/^\d+\. /, "")}
-          </li>
-        );
-      }
-      if (line.trim() === "") {
-        return <div key={i} className="h-4" />;
-      }
-      return (
-        <p key={i} className="text-slate-300 mb-4 leading-relaxed">
-          {line}
-        </p>
-      );
-    });
-  };
-
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Back link */}
+    <article className="grid gap-[clamp(32px,6vh,56px)]">
+      {/* Volver */}
       <Link
         href="/blog"
-        className="text-slate-400 hover:text-slate-300 text-sm mb-6 inline-flex items-center gap-1"
+        className="inline-flex min-h-11 items-center gap-2 justify-self-start font-dato text-[0.6875rem] tracking-[0.12em] text-grafito uppercase transition-colors hover:text-tinta"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
+        <span aria-hidden="true">←</span>
         {t("backToBlog")}
       </Link>
 
-      {/* Article Header */}
-      <header className="mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <Badge variant="primary">{t("article")}</Badge>
-          {post.publishedAt && (
-            <span className="text-sm text-slate-500">
-              {new Date(post.publishedAt).toLocaleDateString(
-                locale === "en" ? "en-US" : "es-ES",
-                { month: "long", day: "numeric", year: "numeric" }
-              )}
-            </span>
+      {/* Cabecera del artículo */}
+      <header className="grid items-end gap-x-12 gap-y-8 border-b border-tinta pb-[clamp(28px,5vh,48px)] md:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="grid max-w-[760px] gap-4">
+          <Etiqueta>
+            {t("article")}
+            {post.publishedAt && (
+              <>
+                {" · "}
+                <time dateTime={post.publishedAt.toISOString()}>
+                  {new Date(post.publishedAt).toLocaleDateString(locale === "en" ? "en-US" : "es-ES", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </time>
+              </>
+            )}
+          </Etiqueta>
+          <h1 className="text-[clamp(2.2rem,1.5rem+2.4vw,3.6rem)] leading-[1.04]">{title}</h1>
+          {excerpt && (
+            <p className="max-w-[46ch] border-l-2 border-rosa pl-[18px] text-[clamp(1.15rem,1rem+0.5vw,1.4rem)] leading-[1.45] italic">
+              {excerpt}
+            </p>
           )}
         </div>
-        <h1 className="text-4xl font-bold text-slate-100 mb-4">{title}</h1>
+        {/* Portada del post si la tiene; si no, su grabado en tinta (decorativo). La misma regla que el índice. */}
+        <div className="hidden w-[150px] rotate-[2deg] md:block lg:w-[176px]">
+          <ImagenDelArticulo
+            slug={post.slug}
+            portada={post.coverImage}
+            sizes="176px"
+            claseGrabado="rounded-[4px] mix-blend-multiply"
+          />
+        </div>
       </header>
 
-      {/* Article Content */}
-      <Card>
-        <CardContent className="p-8">
-          <article className="prose prose-invert prose-slate max-w-none">
-            {renderContent(content)}
-          </article>
-        </CardContent>
-      </Card>
+      {/* Cuerpo: Newsreader a ~66 caracteres; el «# » del Markdown baja a h2 */}
+      <ContenidoArticulo texto={content} titulo={title} />
 
-      {/* CTA */}
-      <Card variant="highlighted" className="mt-8 text-center p-8">
-        <h3 className="text-xl font-semibold text-slate-100 mb-2">
+      {/* Llamado final */}
+      <section
+        aria-labelledby="blog-cta-titulo"
+        className="grid max-w-[66ch] gap-4 border border-tinta/80 border-t-[3px] border-t-rosa bg-papel-hondo/50 p-[clamp(20px,4vw,36px)]"
+      >
+        <h2 id="blog-cta-titulo" className="text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-[1.12]">
           {t("ctaTitle")}
-        </h3>
-        <p className="text-slate-400 mb-4">
-          {t("ctaDescription")}
-        </p>
-        <Link href="/register">
-          <Button size="lg">{t("ctaButton")}</Button>
-        </Link>
-      </Card>
-    </div>
+        </h2>
+        <p className="text-grafito">{t("ctaDescription")}</p>
+        <div>
+          <Link href="/register" className={buttonClasses({ size: "lg" })}>
+            {t("ctaButton")}
+          </Link>
+        </div>
+      </section>
+    </article>
   );
 }

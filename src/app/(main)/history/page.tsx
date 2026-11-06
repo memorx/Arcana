@@ -3,12 +3,12 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  Button,
-  Card,
-  CardContent,
-  Badge,
-} from "@/components/ui";
+import { Badge, buttonClasses } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { ReversoCarta } from "@/components/tinta/ReversoCarta";
+import { Abanico } from "@/components/dashboard/Abanico";
+import { Glifo } from "@/components/dashboard/Glifos";
+import { cartasDeLectura, nombresDeCartas } from "@/components/dashboard/mesa";
 
 export default async function HistoryPage() {
   const session = await auth();
@@ -21,6 +21,7 @@ export default async function HistoryPage() {
   const tInsights = await getTranslations("insights");
   const tResonance = await getTranslations("resonance");
   const locale = await getLocale();
+  const dateLocale = locale === "en" ? "en-US" : "es-ES";
 
   const readings = await prisma.reading.findMany({
     where: { userId: session.user.id },
@@ -28,12 +29,15 @@ export default async function HistoryPage() {
     orderBy: { createdAt: "desc" },
   });
 
+  // English names of the cards, for the small engravings of each reading
+  const nombres = await nombresDeCartas(readings);
+
   // Group readings by month
   const groupedReadings = readings.reduce(
     (acc, reading) => {
       const date = new Date(reading.createdAt);
       const key = `${date.getFullYear()}-${date.getMonth()}`;
-      const label = date.toLocaleDateString(locale === "en" ? "en-US" : "es-ES", {
+      const label = date.toLocaleDateString(dateLocale, {
         month: "long",
         year: "numeric",
       });
@@ -51,137 +55,109 @@ export default async function HistoryPage() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-100">
-            {t("title")}
-          </h1>
-          <p className="text-slate-400 mt-1">
-            {readings.length} {readings.length === 1
-              ? t("readingTotal")
-              : t("readingsTotal")}
+      <header className="mb-10 grid gap-6 border-b border-filete pb-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div className="grid gap-3">
+          <Etiqueta>{t("etiqueta")}</Etiqueta>
+          <h1 className="font-titulo text-[clamp(2.2rem,1.4rem+2.6vw,3.6rem)] leading-[1.05] text-letra">{t("title")}</h1>
+          <p className="font-dato text-xs uppercase tracking-[0.1em] text-letra-suave">
+            {readings.length} {readings.length === 1 ? t("readingTotal") : t("readingsTotal")}
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/history/insights">
-            <Button variant="secondary">
-              <span aria-hidden="true" className="mr-1.5 text-amber-400">&#10022;</span>
-              {tInsights("myStory")}
-            </Button>
+          <Link href="/history/insights" className={buttonClasses({ variant: "linea" })}>
+            <Glifo nombre="history" className="-my-2 size-7" />
+            {tInsights("myStory")}
           </Link>
-          <Link href="/reading/new">
-            <Button>{t("newReading")}</Button>
-          </Link>
+          <Link href="/reading/new" className={buttonClasses()}>{t("newReading")}</Link>
         </div>
-      </div>
+      </header>
 
       {/* Readings List */}
       {readings.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <div className="text-6xl text-slate-700 mb-4">&#9788;</div>
-            <h2 className="text-xl font-semibold text-slate-300 mb-2">
+        <section
+          aria-labelledby="historial-vacio"
+          className="grid justify-items-start gap-6 border-b border-filete pb-10 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-10"
+        >
+          <span className="block aspect-[300/520] w-24 overflow-hidden rounded-[8px] shadow-[0_18px_36px_-24px_rgb(0_0_0/.6)]">
+            <ReversoCarta />
+          </span>
+          <div>
+            <h2 id="historial-vacio" className="font-titulo text-2xl leading-tight text-letra sm:text-3xl">
               {t("emptyTitle")}
             </h2>
-            <p className="text-slate-400 mb-6">
-              {t("emptySubtitle")}
-            </p>
-            <Link href="/reading/new">
-              <Button>{t("startReading")}</Button>
+            <p className="mt-2 max-w-[48ch] font-lectura text-lg text-letra-suave">{t("emptySubtitle")}</p>
+            <Link href="/reading/new" className={buttonClasses({ className: "mt-6" })}>
+              {t("startReading")}
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-12">
           {Object.entries(groupedReadings).map(([key, group]) => (
-            <section key={key}>
-              <h2 className="text-lg font-medium text-slate-400 mb-4 capitalize">
-                {group.label}
-              </h2>
-              <div className="space-y-3">
+            <section key={key} aria-labelledby={`historial-${key}`}>
+              <div className="flex items-baseline justify-between gap-4 border-b border-filete pb-2">
+                <h2 id={`historial-${key}`} className="font-titulo text-2xl leading-tight text-letra first-letter:uppercase">
+                  {group.label}
+                </h2>
+                <p aria-hidden="true" className="font-dato text-[0.6875rem] uppercase tracking-[0.12em] text-letra-suave">
+                  {group.readings.length}
+                </p>
+              </div>
+              <ol className="divide-y divide-filete/15">
                 {group.readings.map((reading) => {
-                  const cards = reading.cards as Array<{
-                    position: number;
-                    cardId: string;
-                    isReversed: boolean;
-                  }>;
-
                   const spreadName = locale === "en" ? reading.spreadType.name : reading.spreadType.nameEs;
+                  const created = new Date(reading.createdAt);
 
                   return (
-                    <Link key={reading.id} href={`/reading/${reading.id}`}>
-                      <Card variant="interactive">
-                        <CardContent className="p-5">
-                          <div className="flex items-start gap-4">
-                            {/* Card stack icon */}
-                            <div className="hidden sm:flex items-end gap-0.5 pt-1">
-                              {Array.from({
-                                length: Math.min(cards.length, 4),
-                              }).map((_, i) => (
-                                <div
-                                  key={i}
-                                  className="w-4 h-6 bg-gradient-to-b from-purple-800/50 to-purple-900/50 rounded-sm border border-purple-500/30"
-                                  style={{
-                                    transform: `rotate(${(i - 1.5) * 5}deg)`,
-                                    marginLeft: i > 0 ? "-6px" : "0",
-                                  }}
-                                />
-                              ))}
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex flex-wrap items-center gap-2 mb-2">
-                                <Badge variant="primary">
-                                  {spreadName}
-                                </Badge>
-                                {reading.resonance !== null && (
-                                  <Badge variant="secondary">
-                                    <span aria-hidden="true" className="mr-1">&#9733;</span>
-                                    {tResonance("badge", { score: reading.resonance })}
-                                  </Badge>
-                                )}
-                                <span className="text-xs text-slate-500">
-                                  {new Date(
-                                    reading.createdAt
-                                  ).toLocaleDateString(locale === "en" ? "en-US" : "es-ES", {
-                                    day: "numeric",
-                                    month: "short",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-                              </div>
-                              <p className="text-slate-300 line-clamp-2">
-                                {reading.intention}
-                              </p>
-                            </div>
-
-                            {/* Arrow */}
-                            <div className="text-slate-500 self-center">
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                            </div>
+                    <li key={reading.id}>
+                      <Link
+                        href={`/reading/${reading.id}`}
+                        className="group -mx-2 grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-x-4 px-2 py-4 transition-colors hover:bg-papel-hondo sm:gap-x-6"
+                      >
+                        <Abanico
+                          cartas={cartasDeLectura(reading.cards, nombres)}
+                          vacias={reading.spreadType.cardCount}
+                        />
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                            <Badge variant="primary" className="max-w-full whitespace-normal">
+                              {spreadName}
+                            </Badge>
+                            {reading.resonance !== null && (
+                              <Badge>
+                                <span aria-hidden="true" className="inline-block size-[0.55em] rounded-full bg-rosa" />
+                                {tResonance("badge", { score: reading.resonance })}
+                              </Badge>
+                            )}
+                            <time
+                              dateTime={created.toISOString()}
+                              className="font-dato text-[0.6875rem] tracking-[0.06em] text-letra-suave"
+                            >
+                              {created.toLocaleDateString(dateLocale, {
+                                day: "numeric",
+                                month: "short",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </time>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                          <p className="mt-2 line-clamp-2 font-lectura text-[1.0625rem] leading-snug text-letra">
+                            {reading.intention}
+                          </p>
+                        </div>
+                        <span
+                          aria-hidden="true"
+                          className="self-center font-lectura text-xl text-letra-suave transition-colors group-hover:text-letra-acento"
+                        >
+                          →
+                        </span>
+                      </Link>
+                    </li>
                   );
                 })}
-              </div>
+              </ol>
             </section>
           ))}
         </div>

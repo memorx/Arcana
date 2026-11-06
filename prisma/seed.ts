@@ -1,5 +1,32 @@
 import { PrismaClient, Arcana, Suit, TransactionType } from "@prisma/client";
 
+/**
+ * Wipe guard (PLAN 2026-11-05 §5.1). This seed starts by deleting readings,
+ * credit transactions, cards and spread types, and the root `.env` points to
+ * PRODUCTION. It only runs with ARCANA_SEED_ALLOW_WIPE=1 AND a DATABASE_URL
+ * (and DIRECT_URL, if set) on localhost/127.0.0.1. Returns why it refuses, or
+ * null when the wipe is allowed. Pure: reads only the env it is given.
+ */
+export function seedWipeRefusal(env: Record<string, string | undefined>): string | null {
+  if (env.ARCANA_SEED_ALLOW_WIPE !== "1") {
+    return "ARCANA_SEED_ALLOW_WIPE=1 is not set. This seed deletes readings, transactions, cards and spreads; it only runs against the local e2e database (npm run e2e:db -- reset).";
+  }
+  for (const name of ["DATABASE_URL", "DIRECT_URL"] as const) {
+    const value = env[name];
+    if (value === undefined && name === "DIRECT_URL") continue;
+    let host = "";
+    try {
+      host = new URL(value ?? "").hostname;
+    } catch {
+      return `${name} is missing or is not a valid URL.`;
+    }
+    if (host !== "localhost" && host !== "127.0.0.1") {
+      return `${name} does not point to localhost/127.0.0.1 (host: ${host || "none"}). The seed refuses to wipe a remote database.`;
+    }
+  }
+  return null;
+}
+
 const prisma = new PrismaClient();
 
 // Helper function to generate slugs from card names
@@ -92,7 +119,7 @@ const majorArcana = [
       "Amor, armonía y relaciones significativas. Representa una conexión profunda, ya sea romántica o de valores. También indica una decisión importante que debe tomarse desde el corazón.",
     meaningReversed:
       "Desequilibrio, desalineación de valores, malas decisiones. Puede indicar conflictos en relaciones o falta de armonía interior.",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_06_Lovers.jpg",
   },
   {
     name: "The Chariot",
@@ -1117,6 +1144,9 @@ const spreadTypes = [
 async function main() {
   console.log("Starting seed process...\n");
 
+  const refusal = seedWipeRefusal(process.env);
+  if (refusal) throw new Error(`Refusing to clear data: ${refusal}`);
+
   // Clear existing data
   console.log("Clearing existing data...");
   await prisma.creditTransaction.deleteMany();
@@ -1214,12 +1244,22 @@ async function main() {
   console.log("═══════════════════════════════════════\n");
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error("Seed failed:", e);
-    await prisma.$disconnect();
+// Only when run directly (tsx prisma/seed.ts), never on import (the guard's test).
+// The guard runs before main(), so a refusal never opens a connection.
+if (require.main === module) {
+  const refusal = seedWipeRefusal(process.env);
+  if (refusal) {
+    console.error(`Seed aborted before connecting: ${refusal}`);
     process.exit(1);
-  });
+  }
+
+  main()
+    .then(async () => {
+      await prisma.$disconnect();
+    })
+    .catch(async (e) => {
+      console.error("Seed failed:", e);
+      await prisma.$disconnect();
+      process.exit(1);
+    });
+}

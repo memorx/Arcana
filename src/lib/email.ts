@@ -92,7 +92,9 @@ function renderBirthdayHeader(
           </tr>`;
 }
 
-// Use Next.js image optimization as a proxy to avoid email clients blocking external images
+// Use Next.js image optimization as a proxy to avoid email clients blocking external images.
+// Pass a site path (e.g. cartaImagen(): "/cartas/rws-tarot-06-lovers-color.webp"): next.config has no
+// remotePatterns, so /_next/image answers 400 to any other host. 384 is one of the default imageSizes.
 function getProxiedImageUrl(originalUrl: string): string {
   const baseUrl = "https://www.readarcana.com";
   const encodedUrl = encodeURIComponent(originalUrl);

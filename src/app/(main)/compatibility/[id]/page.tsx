@@ -5,9 +5,14 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseCompatibilitySummary } from "@/lib/compatibility";
 import type { Locale } from "@/lib/systems";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
-import { FadeIn } from "@/components/animations";
-import { CompatibilityCards, CompatibilityMeters, MotionSafe, ReadingText } from "@/components/compatibility";
+import { Badge } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { Reveal } from "@/components/blueprint/Reveal";
+import { ENLACE_DATO } from "@/components/blueprint/link-styles";
+import { buttonClasses } from "@/components/ui/button-classes";
+import { CompatibilityCards } from "@/components/compatibility/CompatibilityCards";
+import { CompatibilityMeters } from "@/components/compatibility/CompatibilityMeters";
+import { ReadingText } from "@/components/compatibility/ReadingText";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -15,8 +20,8 @@ interface PageProps {
 
 const firstWord = (s: string | null | undefined) => s?.trim().split(/\s+/)[0] || null;
 
-const linkButton =
-  "inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-base font-medium text-slate-950 shadow-lg shadow-amber-500/20 transition-all hover:from-amber-400 hover:to-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
+/** Section title of the sheet (h2). */
+const TITULO = "text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1]";
 
 export default async function CompatibilityReadingPage({ params }: PageProps) {
   const { id } = await params;
@@ -50,83 +55,83 @@ export default async function CompatibilityReadingPage({ params }: PageProps) {
   });
 
   return (
-    <MotionSafe>
-      <div className="mx-auto max-w-4xl">
-        {/* Header */}
-        <FadeIn>
-          <header className="mb-8">
-            <Link
-              href="/compatibility"
-              className="mb-4 inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-300"
-            >
-              <svg aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              {t("detail.back")}
-            </Link>
-            <div className="mt-2 flex flex-wrap items-center gap-3">
-              <Badge variant="primary">{t("title")}</Badge>
-              <span className="text-sm text-slate-500">{t("detail.createdOn", { date: createdOn })}</span>
-            </div>
-            <h1 className="mt-3 break-words text-3xl font-bold text-slate-100">
-              {t("detail.title", { me: myName, partner: partnerName })}
-            </h1>
-            {summary && (
-              <p className="mt-2 text-amber-200/90">{summary.systems.overallLabel[locale]}</p>
-            )}
-          </header>
-        </FadeIn>
-
-        {summary ? (
-          <>
-            {/* Five meters */}
-            <FadeIn delay={0.1}>
-              <section className="mb-10" aria-labelledby="meters-title">
-                <h2 id="meters-title" className="mb-4 text-xl font-semibold text-slate-100">
-                  {t("detail.metersTitle")}
-                </h2>
-                <CompatibilityMeters systems={summary.systems} locale={locale} />
-              </section>
-            </FadeIn>
-
-            {/* Three cards */}
-            <FadeIn delay={0.2}>
-              <section className="mb-10" aria-labelledby="cards-title">
-                <h2 id="cards-title" className="mb-6 text-xl font-semibold text-slate-100">
-                  {t("detail.cardsTitle")}
-                </h2>
-                <CompatibilityCards cards={summary.cards} partnerName={reading.partnerName} locale={locale} />
-              </section>
-            </FadeIn>
-          </>
-        ) : (
-          <p className="mb-8 text-sm text-slate-500">{t("detail.summaryUnavailable")}</p>
-        )}
-
-        {/* The reading */}
-        <FadeIn delay={0.3}>
-          <Card variant="highlighted">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span aria-hidden="true" className="text-amber-400">
-                  &#9788;
-                </span>
-                {t("detail.readingTitle")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ReadingText content={reading.content} />
-            </CardContent>
-          </Card>
-        </FadeIn>
-
-        {/* Actions */}
-        <div className="mt-8 flex justify-center">
-          <Link href="/compatibility" className={linkButton}>
-            {t("detail.newReading")}
+    <div className="grid gap-12 sm:gap-14">
+      {/* Header */}
+      <Reveal>
+        <header className="grid justify-items-start gap-4 border-b border-filete pb-8">
+          <Link href="/compatibility" className={ENLACE_DATO}>
+            <span aria-hidden="true" className="font-lectura text-base tracking-normal">
+              ←
+            </span>
+            {t("detail.back")}
           </Link>
-        </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <Badge variant="primary">{t("title")}</Badge>
+            <span className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+              {t("detail.createdOn", { date: createdOn })}
+            </span>
+          </div>
+          <h1 className="max-w-full text-[clamp(2.2rem,1.4rem+2.8vw,3.75rem)] leading-[1.02] break-words">
+            {t("detail.title", { me: myName, partner: partnerName })}
+          </h1>
+          {summary && (
+            <p className="max-w-[52ch] text-[clamp(1.15rem,1rem+0.5vw,1.4rem)] leading-[1.45] italic">
+              {summary.systems.overallLabel[locale]}
+            </p>
+          )}
+        </header>
+      </Reveal>
+
+      {summary ? (
+        <>
+          {/* Five meters */}
+          <Reveal delay={80}>
+            <section aria-labelledby="meters-title">
+              <h2 id="meters-title" className={`mb-5 ${TITULO}`}>
+                {t("detail.metersTitle")}
+              </h2>
+              <CompatibilityMeters systems={summary.systems} locale={locale} />
+            </section>
+          </Reveal>
+
+          {/* Three cards */}
+          <Reveal delay={160}>
+            <section aria-labelledby="cards-title">
+              <h2 id="cards-title" className={`mb-6 ${TITULO}`}>
+                {t("detail.cardsTitle")}
+              </h2>
+              <CompatibilityCards cards={summary.cards} partnerName={reading.partnerName} locale={locale} />
+            </section>
+          </Reveal>
+        </>
+      ) : (
+        <p className="border-l-2 border-rosa pl-4 text-[1.0625rem] leading-[1.6] text-letra-suave">
+          {t("detail.summaryUnavailable")}
+        </p>
+      )}
+
+      {/* The reading, as a printed sheet */}
+      <Reveal delay={240}>
+        <section
+          aria-labelledby="reading-title"
+          className="grid gap-8 border-t border-filete pt-8 sm:pt-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14"
+        >
+          <header className="grid content-start gap-3">
+            <Etiqueta>{t("detail.readingEyebrow")}</Etiqueta>
+            <h2 id="reading-title" className={TITULO}>
+              {t("detail.readingTitle")}
+            </h2>
+          </header>
+          <ReadingText content={reading.content} />
+        </section>
+      </Reveal>
+
+      {/* Actions */}
+      <div className="flex flex-wrap justify-center gap-3 border-t border-filete/25 pt-8">
+        <Link href="/compatibility" className={buttonClasses({ size: "lg" })}>
+          {t("detail.newReading")}
+        </Link>
       </div>
-    </MotionSafe>
+    </div>
   );
 }

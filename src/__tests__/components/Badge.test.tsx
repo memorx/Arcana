@@ -10,7 +10,7 @@ describe("Badge", () => {
   it("renders with default variant by default", () => {
     render(<Badge data-testid="badge">Default</Badge>);
     const badge = screen.getByTestId("badge");
-    expect(badge).toHaveClass("bg-slate-800", "text-slate-300");
+    expect(badge).toHaveClass("border-filete/30", "text-letra-suave");
   });
 
   it("renders with primary variant", () => {
@@ -20,7 +20,7 @@ describe("Badge", () => {
       </Badge>
     );
     const badge = screen.getByTestId("badge");
-    expect(badge).toHaveClass("bg-purple-500/20", "text-purple-300");
+    expect(badge).toHaveClass("text-letra-acento");
   });
 
   it("renders with secondary variant", () => {
@@ -30,7 +30,7 @@ describe("Badge", () => {
       </Badge>
     );
     const badge = screen.getByTestId("badge");
-    expect(badge).toHaveClass("bg-amber-500/20", "text-amber-300");
+    expect(badge).toHaveClass("bg-filete", "text-suelo");
   });
 
   it("renders with success variant", () => {
@@ -40,7 +40,7 @@ describe("Badge", () => {
       </Badge>
     );
     const badge = screen.getByTestId("badge");
-    expect(badge).toHaveClass("bg-emerald-500/20", "text-emerald-300");
+    expect(badge).toHaveClass("text-letra-exito");
   });
 
   it("renders with warning variant", () => {
@@ -50,7 +50,7 @@ describe("Badge", () => {
       </Badge>
     );
     const badge = screen.getByTestId("badge");
-    expect(badge).toHaveClass("bg-orange-500/20", "text-orange-300");
+    expect(badge).toHaveClass("bg-rosa-luz", "text-tinta");
   });
 
   it("applies custom className", () => {
@@ -65,6 +65,6 @@ describe("Badge", () => {
   it("has proper base styles", () => {
     render(<Badge data-testid="badge">Styled</Badge>);
     const badge = screen.getByTestId("badge");
-    expect(badge).toHaveClass("inline-flex", "rounded-full", "text-xs");
+    expect(badge).toHaveClass("inline-flex", "rounded-full", "font-dato", "uppercase", "text-[0.6875rem]");
   });
 });

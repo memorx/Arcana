@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./helpers/sesion";
 
 // The app picks the language from the locale cookie, then Accept-Language (default es).
 // These checks were written for the Spanish default, so the browser asks for Spanish.
@@ -10,9 +10,9 @@ test.describe("Home Page", () => {
   });
 
   test("should display the hero section", async ({ page }) => {
-    // Check for hero title (in Spanish by default)
+    // The thesis is the only h1 (in Spanish by default)
     await expect(
-      page.getByRole("heading", { name: /descubre tu destino/i })
+      page.getByRole("heading", { level: 1, name: /las cartas son de 1909/i })
     ).toBeVisible();
   });
 
@@ -20,27 +20,30 @@ test.describe("Home Page", () => {
     // Home is the logo link (there is no "Inicio" text link)
     await expect(page.getByRole("link", { name: "Arcana", exact: true })).toHaveAttribute("href", "/");
     await expect(
-      page.getByRole("link", { name: /iniciar sesion|log in/i })
+      page.getByRole("link", { name: /iniciar sesi[oó]n|log in/i })
     ).toBeVisible();
   });
 
   test("should display CTA buttons", async ({ page }) => {
-    await expect(
-      page.getByRole("link", { name: /comenzar lectura|start reading/i })
-    ).toBeVisible();
+    // Guests: "Haz tu lectura" goes to sign-up; "Ver la carta de hoy" jumps to the card of the day
+    const cta = page.getByRole("link", { name: /^haz tu lectura|^get your reading/i }).first();
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveAttribute("href", "/register");
+    await expect(page.getByRole("link", { name: /ver la carta de hoy|see today's card/i })).toHaveAttribute("href", "#hoy");
   });
 
   test("should display how it works section", async ({ page }) => {
+    // «Del grabado a la IA» explains the product: a 1909 engraving becomes a reading
     await expect(
-      // level 2: an FAQ question (h3) also starts with "Como funciona"
-      page.getByRole("heading", { level: 2, name: /como funciona|how does it work/i })
+      page.getByRole("heading", { level: 2, name: /un grabado de 1909|a 1909 engraving/i })
     ).toBeVisible();
   });
 
   test("should display features section", async ({ page }) => {
     await expect(
-      page.getByText(/78 cartas|78 complete cards/i)
+      page.getByText(/78 grabados de 1909|78 engravings from 1909/i)
     ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: /más que tarot|more than tarot/i })).toBeVisible();
   });
 
   test("should display FAQ section", async ({ page }) => {
@@ -58,7 +61,7 @@ test.describe("Home Page", () => {
   });
 
   test("should navigate to login page", async ({ page }) => {
-    await page.getByRole("link", { name: /iniciar sesion|log in/i }).click();
+    await page.getByRole("link", { name: /iniciar sesi[oó]n|log in/i }).click();
     await expect(page).toHaveURL(/\/login/);
     await expect(
       page.getByRole("heading", { name: /bienvenido|welcome/i })
@@ -80,11 +83,11 @@ test.describe("Language Switching", () => {
     await page.goto("/");
 
     // Open the language selector and pick English (options read "🇪🇸 ES" / "🇺🇸 EN")
-    await page.getByRole("button", { name: "Change language" }).click();
+    await page.getByRole("button", { name: /^(idioma|language)$/i }).click();
     await page.getByRole("button", { name: /\bEN$/ }).click();
 
     // The locale cookie is set and the page re-renders in English
-    await expect(page.getByRole("heading", { name: /discover your destiny/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /who reads them today is an ai/i })).toBeVisible();
   });
 });
 
@@ -100,7 +103,7 @@ test.describe("Responsive Design", () => {
 
     // CTA button should be visible
     await expect(
-      page.getByRole("link", { name: /comenzar|start/i }).first()
+      page.getByRole("link", { name: /haz tu lectura|get your reading/i }).first()
     ).toBeVisible();
   });
 
@@ -108,14 +111,18 @@ test.describe("Responsive Design", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
 
-    // Look for hamburger menu or mobile nav
-    const mobileMenuButton = page.locator('[aria-label*="menu"]');
-    if (await mobileMenuButton.isVisible()) {
-      await mobileMenuButton.click();
-      // Menu should open
-      await expect(
-        page.getByRole("link", { name: /iniciar sesion|log in/i })
-      ).toBeVisible();
-    }
+    // The header's hamburger must be there (no "if visible": a missing button must fail)
+    const mobileMenuButton = page.locator('header button[aria-controls="menu-movil"]');
+    await expect(mobileMenuButton).toBeVisible();
+
+    // It opens the full-screen menu (retry the click until hydration wires it up)
+    const menu = page.locator("#menu-movil");
+    await expect(async () => {
+      if (!(await menu.isVisible())) await mobileMenuButton.click();
+      await expect(menu).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
+
+    // and the menu itself offers the log in link
+    await expect(menu.getByRole("link", { name: /iniciar sesi[oó]n|log in/i })).toBeVisible();
   });
 });

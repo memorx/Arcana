@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Card, CardContent } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { BarraProgreso } from "@/components/achievements/BarraProgreso";
+import { Sello, type EstadoSello } from "@/components/achievements/Sello";
+import { cn } from "@/lib/utils";
 
 interface Achievement {
   id: string;
@@ -26,7 +30,8 @@ interface AchievementStats {
   percentage: number;
 }
 
-const CATEGORY_ORDER = ["readings", "collection", "streak", "time", "subscription"];
+// Las cartas doradas también son logros (las cuenta `stats`): su archivo va al final.
+const CATEGORY_ORDER = ["readings", "collection", "streak", "time", "subscription", "golden"];
 
 export default function AchievementsPage() {
   const t = useTranslations("achievements");
@@ -39,8 +44,8 @@ export default function AchievementsPage() {
     fetch("/api/achievements")
       .then((res) => res.json())
       .then((data) => {
-        setAchievements(data.achievements);
-        setStats(data.stats);
+        setAchievements(data.achievements ?? []);
+        setStats(data.stats ?? null);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -53,18 +58,8 @@ export default function AchievementsPage() {
       case "streak": return t("categories.streak");
       case "time": return t("categories.time");
       case "subscription": return t("categories.subscription");
+      case "golden": return t("categories.golden");
       default: return category;
-    }
-  };
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "readings": return "📖";
-      case "collection": return "🃏";
-      case "streak": return "🔥";
-      case "time": return "⏰";
-      case "subscription": return "☀️";
-      default: return "🏆";
     }
   };
 
@@ -83,6 +78,12 @@ export default function AchievementsPage() {
     );
   };
 
+  const estadoDe = (achievement: Achievement): EstadoSello =>
+    achievement.isUnlocked ? "logrado" : achievement.progress > 0 ? "en-curso" : "bloqueado";
+
+  const etiquetaDeEstado = (estado: EstadoSello) =>
+    estado === "logrado" ? t("unlocked") : estado === "en-curso" ? t("inProgress") : t("locked");
+
   // Group achievements by category
   const groupedAchievements = CATEGORY_ORDER.reduce((acc, category) => {
     const categoryAchievements = achievements.filter((a) => a.category === category);
@@ -93,133 +94,129 @@ export default function AchievementsPage() {
   }, {} as Record<string, Achievement[]>);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 bg-clip-text text-transparent">
-            {t("title")}
-          </span>
-        </h1>
+    <div className="grid gap-[clamp(32px,6vh,56px)]">
+      {/* Encabezado */}
+      <header className="grid gap-x-[clamp(24px,5vw,80px)] gap-y-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end">
+        <div className="grid gap-3.5">
+          <Etiqueta>{t("kicker")}</Etiqueta>
+          <h1 className="text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]">{t("title")}</h1>
+        </div>
 
         {stats && (
-          <div className="max-w-sm mx-auto">
-            <p className="text-slate-400 mb-3">
-              {t("progress", { unlocked: stats.unlocked, total: stats.total })}
+          <div className="grid gap-3 border-t border-filete pt-4">
+            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 font-dato" data-contador>
+              <span className="text-[clamp(2.75rem,2rem+3vw,4.25rem)] leading-none tracking-[-0.04em] tabular-nums">
+                {stats.unlocked}
+              </span>{" "}
+              <span className="text-sm tracking-[0.12em] text-letra-suave uppercase">
+                {t("counterOf", { total: stats.total })}
+              </span>
             </p>
-            <div className="h-4 bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-amber-500 to-yellow-500 transition-all duration-500"
-                style={{ width: `${stats.percentage}%` }}
-              />
-            </div>
-            <p className="text-2xl font-bold text-amber-400 mt-2">
+            <BarraProgreso
+              valor={stats.unlocked}
+              max={stats.total}
+              etiqueta={t("title")}
+              texto={t("progress", { unlocked: stats.unlocked, total: stats.total })}
+              logrado={stats.total > 0 && stats.unlocked >= stats.total}
+            />
+            <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-suave uppercase">
               {stats.percentage}%
             </p>
           </div>
         )}
-      </div>
+      </header>
 
-      {/* Loading State */}
+      {/* Cargando */}
       {loading && (
-        <div className="space-y-4">
+        <div className="grid gap-3" aria-hidden="true">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-slate-800/50 rounded-xl animate-pulse" />
+            <div key={i} className="h-28 rounded-sm bg-papel-hondo motion-safe:animate-pulse" />
           ))}
         </div>
       )}
 
-      {/* Achievements by Category */}
+      {/* El archivo, por categoría */}
       {!loading && (
-        <div className="space-y-8">
-          {Object.entries(groupedAchievements).map(([category, categoryAchievements]) => (
-            <section key={category}>
-              <h2 className="text-xl font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                <span>{getCategoryIcon(category)}</span>
-                {getCategoryLabel(category)}
-              </h2>
+        <div className="grid gap-[clamp(32px,5vh,48px)]">
+          {Object.entries(groupedAchievements).map(([category, categoryAchievements]) => {
+            const logrados = categoryAchievements.filter((a) => a.isUnlocked).length;
+            return (
+              <section key={category} aria-labelledby={`categoria-${category}`} className="grid gap-1">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-filete pt-3">
+                  <h2 id={`categoria-${category}`} className="text-[clamp(1.4rem,1.1rem+1vw,1.9rem)] leading-[1.1]">
+                    {getCategoryLabel(category)}
+                  </h2>
+                  <p className="font-dato text-xs tracking-[0.12em] text-letra-suave uppercase tabular-nums">
+                    {t("of", { count: logrados, total: categoryAchievements.length })}
+                  </p>
+                </div>
 
-              <div className="grid gap-4">
-                {categoryAchievements.map((achievement) => (
-                  <Card
-                    key={achievement.id}
-                    className={`transition-all ${
-                      achievement.isUnlocked
-                        ? "ring-2 ring-amber-500/50 bg-gradient-to-r from-amber-900/20 to-yellow-900/10"
-                        : "opacity-60"
-                    }`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-4">
-                        {/* Icon */}
-                        <div
-                          className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center text-2xl ${
-                            achievement.isUnlocked
-                              ? "bg-gradient-to-br from-amber-500 to-yellow-600"
-                              : "bg-slate-800 grayscale"
-                          }`}
-                        >
-                          {achievement.icon}
-                        </div>
+                <ul className="grid">
+                  {categoryAchievements.map((achievement) => {
+                    const estado = estadoDe(achievement);
+                    const nombre = getLocalizedName(achievement);
+                    const avance = Math.min(achievement.progress, achievement.requirement);
+                    return (
+                      <li
+                        key={achievement.id}
+                        data-estado={estado}
+                        className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-3 border-b border-filete/15 py-5 sm:gap-x-5"
+                      >
+                        <Sello estado={estado}>{achievement.requirement}</Sello>
 
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <h3 className={`font-semibold ${
-                                achievement.isUnlocked ? "text-slate-100" : "text-slate-400"
-                              }`}>
-                                {getLocalizedName(achievement)}
+                        <div className="grid min-w-0 gap-2.5">
+                          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                            <div className="grid min-w-0 gap-1">
+                              <h3
+                                className={cn(
+                                  "text-[1.25rem] leading-[1.15]",
+                                  estado === "bloqueado" ? "text-letra-suave" : "text-letra"
+                                )}
+                              >
+                                {nombre}
                               </h3>
-                              <p className="text-sm text-slate-500">
+                              <p className="text-[0.9375rem] leading-[1.45] text-letra-suave">
                                 {getLocalizedDescription(achievement)}
                               </p>
                             </div>
-
-                            {/* Reward Badge */}
-                            <span className={`flex-shrink-0 px-2 py-1 rounded-full text-xs font-medium ${
-                              achievement.isUnlocked
-                                ? "bg-amber-500/20 text-amber-400"
-                                : "bg-slate-800 text-slate-500"
-                            }`}>
-                              +{achievement.creditReward} {t("credits")}
-                            </span>
+                            <Badge variant={achievement.isUnlocked ? "primary" : "default"}>
+                              {t("reward", { count: achievement.creditReward })}
+                            </Badge>
                           </div>
 
-                          {/* Progress or Unlock Date */}
-                          <div className="mt-2">
-                            {achievement.isUnlocked ? (
-                              <p className="text-xs text-emerald-400 flex items-center gap-1">
-                                <span>&#10003;</span>
-                                {t("unlocked")} {achievement.unlockedAt && `- ${formatDate(achievement.unlockedAt)}`}
+                          {achievement.isUnlocked ? (
+                            <p className="flex flex-wrap items-center gap-x-2 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-acento uppercase">
+                              <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-rosa" />
+                              {t("unlocked")}
+                              {achievement.unlockedAt && (
+                                <span className="text-letra-suave">· {formatDate(achievement.unlockedAt)}</span>
+                              )}
+                            </p>
+                          ) : (
+                            <div className="grid gap-1.5">
+                              <p className="flex flex-wrap justify-between gap-x-3 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] text-letra-suave uppercase">
+                                <span>{etiquetaDeEstado(estado)}</span>
+                                <span className="tabular-nums">
+                                  {avance}/{achievement.requirement}
+                                </span>
                               </p>
-                            ) : (
-                              <div className="space-y-1">
-                                <div className="flex justify-between text-xs text-slate-500">
-                                  <span>{t("locked")}</span>
-                                  <span>
-                                    {achievement.progress}/{achievement.requirement}
-                                  </span>
-                                </div>
-                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-slate-600 transition-all"
-                                    style={{
-                                      width: `${Math.min((achievement.progress / achievement.requirement) * 100, 100)}%`,
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                              <BarraProgreso
+                                valor={avance}
+                                max={achievement.requirement}
+                                etiqueta={nombre}
+                                texto={t("of", { count: avance, total: achievement.requirement })}
+                                grosor="fina"
+                              />
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          ))}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            );
+          })}
         </div>
       )}
     </div>

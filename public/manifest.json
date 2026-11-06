@@ -5,8 +5,8 @@
   "start_url": "/dashboard",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f0a19",
-  "theme_color": "#7c3aed",
+  "background_color": "#ECEAE6",
+  "theme_color": "#0E0D0C",
   "categories": ["lifestyle", "entertainment"],
   "icons": [
     {
@@ -36,16 +36,18 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshots/home.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow"
+      "src": "/screenshots/portada-ancha.webp",
+      "sizes": "1440x900",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Arcana home page: 1909 tarot engravings read by AI"
     },
     {
-      "src": "/screenshots/reading.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow"
+      "src": "/screenshots/portada-angosta.webp",
+      "sizes": "780x1688",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "Arcana home page on a phone"
     }
   ],
   "shortcuts": [

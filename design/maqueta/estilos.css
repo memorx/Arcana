@@ -1,0 +1,300 @@
+/* Arcana · «Dos tintas». Un pliego impreso en negro de grabado + tinta directa rosa mexicano.
+   Escenas a pantalla que alternan suelo tinta / papel; el tamaño lo ponen los grabados y el pincel, no la tipografía.
+   Un solo mundo visual a propósito: no cambia con el tema del sistema (colores explícitos en todo). */
+:root {
+  --tinta: #0E0D0C;
+  --papel: #ECEAE6;
+  --papel-hondo: #E2DFD9;
+  --grafito: #55524D;
+  --niebla: #A8A49D;
+  --rosa: #E4007C;
+  --rosa-texto: #B10061;   /* rosa para texto chico sobre papel: 5.75:1 */
+  --rosa-luz: #F43D97;     /* rosa para texto chico y botones sobre tinta: 5.51:1 */
+  --brasa: #FF6BB5;
+
+  --f-titulo: "Gloock", "Bodoni Moda", "Didot", Georgia, serif;
+  --f-lectura: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-dato: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --f-pincel: "Water Brush", "Brush Script MT", cursive;
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 400 1.0625rem/1.6 var(--f-lectura);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg, canvas { display: block; max-width: 100%; }
+h1, h2, h3, p, ol, ul, figure { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+h1, h2, h3 { font-family: var(--f-titulo); font-weight: 400; line-height: 1.05; text-wrap: balance; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--rosa); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ---------- Cabecera: la hora del día (diferencia: se lee sobre tinta y sobre papel) ---------- */
+.cabecera {
+  position: fixed; inset: 0 0 auto 0; z-index: 30;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) var(--gutter) 14px;
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px;
+  background: var(--tinta); color: var(--papel);
+  border-bottom: 1px solid rgb(236 234 230 / .12);
+}
+.marca { font-family: var(--f-titulo); font-size: 1.45rem; letter-spacing: .01em; text-decoration: none; }
+.hora {
+  justify-self: center; text-align: center;
+  font: 400 .6875rem/1.5 var(--f-dato); letter-spacing: .08em; text-transform: uppercase;
+}
+.hora b { font-weight: 400; }
+.hora .corta { display: none; }
+.entrar {
+  font: 500 .75rem/1 var(--f-dato); letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
+  padding: 10px 14px; border: 1px solid currentColor; border-radius: 999px;
+}
+@media (max-width: 720px) {
+  .cabecera { grid-template-columns: 1fr auto; row-gap: 8px; padding-bottom: 10px; }
+  .hora { grid-column: 1 / -1; grid-row: 2; justify-self: stretch; text-align: left; font-size: .625rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--niebla); }
+  .hora .larga { display: none; }
+  .hora .corta { display: inline; }
+}
+
+/* ---------- Suelos ---------- */
+.escena { position: relative; overflow: clip; }
+.suelo-tinta { background: var(--tinta); color: var(--papel); }
+.suelo-papel { background: var(--papel); color: var(--tinta); }
+.contenido { position: relative; padding-inline: var(--gutter); max-width: 1440px; margin-inline: auto; }
+
+/* Etiqueta de escena: datos en mono, con su número de pliego */
+.etiqueta { font: 400 .75rem/1.4 var(--f-dato); letter-spacing: .12em; text-transform: uppercase; }
+.suelo-tinta .etiqueta { color: var(--niebla); }
+.suelo-papel .etiqueta { color: var(--grafito); }
+.etiqueta .punto { display: inline-block; width: .55em; height: .55em; border-radius: 50%; background: var(--rosa); margin-right: .7em; vertical-align: .05em; }
+
+/* ---------- Pincel (palabra sello) ---------- */
+.pincel {
+  font-family: var(--f-pincel); font-weight: 400; line-height: .9;
+  color: var(--rosa); filter: url(#pincel-seco);
+  letter-spacing: -.01em;
+}
+
+/* ---------- Botones ---------- */
+.boton {
+  display: inline-flex; align-items: center; gap: .9em;
+  font: 500 .8125rem/1 var(--f-dato); letter-spacing: .1em; text-transform: uppercase; text-decoration: none;
+  padding: 18px 26px; border-radius: 999px; border: 1px solid transparent; cursor: pointer;
+  transition: transform .5s var(--ease), background-color .3s, color .3s;
+}
+.boton:hover { transform: translateY(-2px); }
+.boton--rosa { background: var(--rosa-luz); color: var(--tinta); }
+.boton--rosa:hover { background: var(--brasa); }
+.boton--linea { background: transparent; color: inherit; border-color: currentColor; }
+.boton .flecha { font-family: var(--f-lectura); font-size: 1.1em; letter-spacing: 0; }
+
+/* ======================================================================
+   Escena 1 · Los grabados
+   ====================================================================== */
+.e1 { min-height: max(680px, 100svh); display: grid; align-items: end; }
+.mesa {
+  position: absolute; inset: -30% -20%; display: grid; grid-template-columns: repeat(8, 1fr); gap: 22px;
+  transform: rotate(-14deg); opacity: .62;
+}
+.mesa .columna { display: grid; gap: 22px; align-content: start; }
+.mesa .columna:nth-child(even) { margin-top: -140px; }
+.mesa img { width: 100%; height: auto; border-radius: 6px; filter: grayscale(1) contrast(1.05); }
+@media (prefers-reduced-motion: no-preference) {
+  .mesa .columna { animation: deriva 70s linear infinite alternate; }
+  .mesa .columna:nth-child(even) { animation-direction: alternate-reverse; animation-duration: 84s; }
+}
+@keyframes deriva { from { transform: translateY(-6%); } to { transform: translateY(6%); } }
+.e1::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(14 13 12 / .96) 0%, rgb(14 13 12 / .86) 38%, rgb(14 13 12 / .25) 72%, rgb(14 13 12 / .45) 100%),
+    linear-gradient(0deg, rgb(14 13 12 / .9) 0%, transparent 40%);
+}
+@media (max-width: 720px) {
+  .e1::after { background: linear-gradient(180deg, rgb(14 13 12 / .15) 0%, rgb(14 13 12 / .55) 30%, rgb(14 13 12 / .94) 55%, rgb(14 13 12 / .98) 100%); }
+  .mesa { inset: -10% -60% 20% -60%; opacity: .8; }
+}
+.e1 .contenido { z-index: 2; width: 100%; padding-block: 140px clamp(48px, 9vh, 96px); display: grid; gap: 28px; }
+.e1 .pincel { font-size: clamp(5.5rem, 3rem + 10vw, 12.5rem); margin-left: -.06em; }
+.tesis { font-family: var(--f-titulo); font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.6rem); line-height: 1.12; max-width: 19ch; }
+.tesis span { display: block; }
+.tesis span:last-child { color: var(--rosa); }
+.e1 .acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 24px; }
+.e1 .nota { font: 400 .75rem/1.5 var(--f-dato); letter-spacing: .06em; color: var(--niebla); }
+
+/* ======================================================================
+   Escena 2 · Del grabado a la IA (partículas ligadas al scroll)
+   ====================================================================== */
+.e2 { height: 320svh; }
+.e2 .fijo { position: sticky; top: 0; height: 100svh; display: grid; align-items: center; }
+.e2 .contenido { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 5vw, 80px); align-items: center; width: 100%; }
+.e2 .texto { display: grid; gap: 20px; align-content: center; }
+.e2 h2 { font-size: clamp(2rem, 1.3rem + 2.4vw, 3.4rem); max-width: 14ch; }
+.e2 .bajada { max-width: 42ch; color: var(--grafito); }
+.lienzo { position: relative; aspect-ratio: 7 / 6; width: 100%; }
+.lienzo canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lienzo .grabado { position: absolute; left: 4%; top: 6%; height: 88%; width: auto; border-radius: 8px; box-shadow: 0 1px 0 rgb(14 13 12 / .08); mix-blend-mode: multiply; }
+.lienzo .lectura-muestra {
+  position: absolute; right: 0; top: 12%; width: 54%;
+  font: 400 clamp(1.05rem, .78rem + .82vw, 1.5rem)/1.48 var(--f-lectura); font-style: italic; color: var(--tinta);
+}
+.lienzo .lectura-muestra p + p { margin-top: .7em; }
+.lienzo .firma { margin-top: 1.1em; font: 400 .6875rem/1.4 var(--f-dato); font-style: normal; letter-spacing: .1em; text-transform: uppercase; color: var(--rosa-texto); }
+/* Con JS el canvas dibuja la transición; el texto real aparece al final y el grabado se apaga al empezar. */
+/* El grabado se corta de arriba abajo al mismo ritmo en que salen sus partículas. */
+.js .e2 .grabado { clip-path: inset(calc(var(--p-corte, 0) * 100%) 0 0 0); }
+.js .e2 .lectura-muestra { opacity: var(--p-texto, 0); transform: translateY(calc((1 - var(--p-texto, 0)) * 10px)); }
+.progreso-e2 { position: absolute; left: var(--gutter); bottom: 28px; font: 400 .6875rem/1 var(--f-dato); letter-spacing: .12em; color: var(--grafito); text-transform: uppercase; }
+@media (max-width: 820px) {
+  .e2 { height: auto; }
+  .e2 .fijo { position: relative; height: auto; padding-block: 120px 80px; }
+  .e2 .contenido { grid-template-columns: 1fr; }
+  .lienzo { aspect-ratio: 6 / 7; }
+  .lienzo .grabado { height: 56%; left: 50%; transform: translateX(-50%); top: 0; }
+  .lienzo .lectura-muestra { left: 0; right: 0; top: 60%; width: 100%; }
+}
+
+/* ======================================================================
+   Escena 3 · La carta del día (el papel se quema)
+   ====================================================================== */
+.e3 { padding-block: clamp(96px, 14vh, 160px); }
+.e3 .contenido { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
+.e3 .lado-texto { display: grid; gap: 22px; }
+.e3 h2 { font-size: clamp(2rem, 1.3rem + 2.4vw, 3.4rem); }
+.e3 .estado { color: var(--niebla); max-width: 40ch; }
+.e3 .mensaje { display: grid; gap: 12px; max-width: 44ch; }
+.e3 .mensaje h3 { font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.4rem); }
+.e3 .mensaje .pos { font: 400 .75rem/1.4 var(--f-dato); letter-spacing: .12em; text-transform: uppercase; color: var(--rosa-luz); }
+.e3 .mensaje p { color: var(--papel); }
+.js .e3 .mensaje { opacity: 0; transform: translateY(14px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.js .e3.revelada .mensaje { opacity: 1; transform: none; }
+.js .e3.revelada .estado { display: none; }
+.e3 .carta-wrap { justify-self: center; width: min(360px, 78vw); }
+
+/* La carta que se revela (se usa en la portada y en la lectura) */
+.carta {
+  position: relative; display: block; width: 100%; aspect-ratio: 300 / 520; border-radius: 14px; overflow: hidden;
+  background: var(--tinta); padding: 0; border: 0; cursor: pointer; color: inherit;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / .65);
+  transition: transform .6s var(--ease);
+}
+.carta:hover { transform: translateY(-4px) rotate(-.6deg); }
+.carta > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.carta canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.carta .resplandor { filter: blur(6px); mix-blend-mode: screen; }
+.carta .reverso { display: none; }
+.js .carta:not(.abierta) .reverso { display: block; }
+.js .carta.quemando .reverso { display: none; }
+.carta.abierta { cursor: default; }
+.carta.abierta:hover { transform: none; }
+.carta .pista {
+  position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); white-space: nowrap;
+  font: 400 .625rem/1 var(--f-dato); letter-spacing: .18em; text-transform: uppercase; color: var(--papel);
+  padding: 8px 12px; border-radius: 999px; background: rgb(14 13 12 / .7); border: 1px solid rgb(236 234 230 / .25);
+}
+.carta .pista { display: none; }
+.js .carta:not(.abierta):not(.quemando) .pista { display: block; }
+.carta.invertida > img { transform: rotate(180deg); }
+@media (max-width: 820px) { .e3 .contenido { grid-template-columns: 1fr; } .e3 .carta-wrap { grid-row: 1; } }
+
+/* ======================================================================
+   Escena 4 · Más que tarot (tira densa)
+   ====================================================================== */
+.e4 { padding-block: 72px 80px; border-top: 1px solid rgb(14 13 12 / .12); }
+.e4 .cabeza { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 28px; }
+.e4 h2 { font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.2rem); }
+.tira { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--tinta); border-bottom: 1px solid var(--tinta); }
+.tira li { padding: 22px 18px 24px; display: grid; gap: 10px; align-content: start; }
+.tira li + li { border-left: 1px solid rgb(14 13 12 / .25); }
+.tira .glifo { width: 44px; height: 44px; }
+.tira h3 { font-size: 1.25rem; }
+.tira p { font-size: .9375rem; line-height: 1.45; color: var(--grafito); }
+.tira a { font: 500 .6875rem/1 var(--f-dato); letter-spacing: .12em; text-transform: uppercase; color: var(--rosa-texto); text-decoration: none; margin-top: 4px; }
+.tira a:hover { text-decoration: underline; text-underline-offset: .3em; }
+@media (max-width: 1020px) { .tira { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tira li + li { border-left: 0; } .tira li { border-bottom: 1px solid rgb(14 13 12 / .2); } .tira li:last-child { grid-column: 1 / -1; border-bottom: 0; } }
+@media (max-width: 480px) { .tira { grid-template-columns: 1fr; } }
+
+/* ======================================================================
+   Escena 5 · El día de hoy (marquesina de los 20 signos)
+   ====================================================================== */
+.e5 { padding-block: 72px 0; }
+.e5 .contenido { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 5vw, 80px); align-items: end; padding-bottom: 48px; }
+.e5 h2 { font-size: clamp(2rem, 1.3rem + 2.4vw, 3.4rem); }
+.e5 .detalle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
+.e5 .detalle dt { font: 400 .6875rem/1.4 var(--f-dato); letter-spacing: .12em; text-transform: uppercase; color: var(--grafito); }
+.e5 .detalle dd { margin: 4px 0 0; font-family: var(--f-titulo); font-size: 1.35rem; line-height: 1.15; }
+.marquesina { overflow: hidden; border-block: 1px solid var(--tinta); background: var(--tinta); color: var(--papel); }
+.marquesina .pista-m { display: flex; width: max-content; }
+.marquesina ul { display: flex; }
+.marquesina li { display: flex; align-items: baseline; gap: .55em; padding: 22px 28px; font-family: var(--f-titulo); font-size: clamp(1.4rem, 1rem + 1.2vw, 2rem); white-space: nowrap; border-right: 1px solid rgb(236 234 230 / .15); }
+.marquesina li small { font: 400 .6875rem/1 var(--f-dato); letter-spacing: .1em; text-transform: uppercase; color: var(--niebla); }
+.marquesina li.hoy { color: var(--rosa-luz); }
+.marquesina li.hoy small { color: var(--rosa-luz); }
+@media (prefers-reduced-motion: no-preference) {
+  .marquesina .pista-m { animation: correr 90s linear infinite; }
+  .marquesina:hover .pista-m, .marquesina:focus-within .pista-m { animation-play-state: paused; }
+}
+@keyframes correr { to { transform: translateX(-50%); } }
+@media (max-width: 820px) { .e5 .contenido { grid-template-columns: 1fr; } }
+
+/* ======================================================================
+   Escena 6 · Tu turno
+   ====================================================================== */
+.e6 { padding-block: clamp(96px, 16vh, 180px) 40px; }
+.e6 .contenido { display: grid; gap: 30px; justify-items: start; }
+.e6 .pincel { font-size: clamp(5rem, 2.6rem + 9vw, 11rem); }
+.e6 p.grande { font-family: var(--f-titulo); font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem); max-width: 26ch; line-height: 1.2; }
+.pie { margin-top: clamp(80px, 12vh, 140px); padding-top: 24px; border-top: 1px solid rgb(236 234 230 / .18); display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; font: 400 .6875rem/1.6 var(--f-dato); letter-spacing: .08em; color: var(--niebla); text-transform: uppercase; }
+.pie a { text-decoration: none; }
+.pie a:hover { color: var(--papel); }
+
+/* Revelado editorial con máscara (sólo bloques cortos) */
+.js .revelar { opacity: 0; transform: translateY(18px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.js .revelar.visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js .revelar { opacity: 1; transform: none; transition: none; } }
+
+/* ======================================================================
+   Pantalla de la app: tu lectura
+   ====================================================================== */
+.app { min-height: 100svh; padding: calc(env(safe-area-inset-top, 0px) + 120px) var(--gutter) 80px; max-width: 1240px; margin-inline: auto; }
+.app .encabezado { display: grid; gap: 14px; max-width: 760px; }
+.app h1 { font-size: clamp(2rem, 1.4rem + 2vw, 3.2rem); }
+.app .intencion { font-style: italic; font-size: clamp(1.15rem, 1rem + .5vw, 1.4rem); line-height: 1.45; max-width: 46ch; color: var(--tinta); border-left: 2px solid var(--rosa); padding-left: 18px; }
+.app .meta { font: 400 .6875rem/1.5 var(--f-dato); letter-spacing: .1em; text-transform: uppercase; color: var(--grafito); }
+.tirada { margin-top: clamp(36px, 6vh, 64px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 3vw, 44px); max-width: 980px; }
+.tirada .pos { display: grid; gap: 14px; }
+.tirada .pos-nombre { font: 400 .6875rem/1.3 var(--f-dato); letter-spacing: .14em; text-transform: uppercase; color: var(--grafito); }
+.tirada .pos-nombre b { color: var(--rosa-texto); font-weight: 500; }
+.tirada .nombre-carta { font-family: var(--f-titulo); font-size: clamp(1.05rem, .9rem + .7vw, 1.5rem); line-height: 1.15; min-height: 2.3em; }
+.js .tirada .nombre-carta { opacity: 0; transition: opacity .8s var(--ease) .2s; }
+.js .tirada .pos.lista .nombre-carta { opacity: 1; }
+.controles { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.controles .ayuda { font: 400 .75rem/1.4 var(--f-dato); letter-spacing: .06em; color: var(--grafito); }
+.interpretacion { margin-top: clamp(40px, 7vh, 72px); max-width: 66ch; display: grid; gap: 1.1em; font-size: 1.125rem; line-height: 1.7; }
+.interpretacion h2 { font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.2rem); margin-bottom: .2em; }
+.interpretacion .preguntas { font-style: italic; border-top: 1px solid rgb(14 13 12 / .2); padding-top: 1em; }
+.js .interpretacion { opacity: 0; transform: translateY(16px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+.js .interpretacion.visible { opacity: 1; transform: none; }
+.app .acciones-lectura { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; }
+.app .acciones-lectura .boton { padding: 14px 20px; }
+.app .boton--linea { color: var(--tinta); }
+@media (max-width: 560px) { .tirada { gap: 10px; } .tirada .pos-nombre { white-space: nowrap; letter-spacing: .04em; font-size: .5625rem; } .carta .pista { font-size: .5rem; padding: 6px 8px; letter-spacing: .12em; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .boton:hover, .carta:hover { transform: none; }
+  .js .interpretacion, .js .e3 .mensaje, .js .tirada .nombre-carta { transition: none; }
+}
+
+/* Los saltos por ancla no quedan debajo de la cabecera fija */
+.escena, .interpretacion { scroll-margin-top: 92px; }

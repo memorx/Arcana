@@ -1,25 +1,23 @@
-import { cn } from "@/lib/utils";
+import { buttonClasses, type ButtonSize } from "@/components/ui/button-classes";
 
 /**
- * Classes that make a <Link> look like the ui Button (primary/secondary/ghost)
- * without nesting a <button> inside an <a>.
+ * Link styles for the Arcana Map pages, safe in Server Components.
+ * Buttons-as-links use the shared `buttonClasses()` (a module without "use client").
+ */
+export { buttonClasses };
+
+/**
+ * Old signature, kept for its callers (the dashboard widget):
+ * primary → primario, secondary → línea, ghost → fantasma.
  */
 export function linkButtonClass(
   variant: "primary" | "secondary" | "ghost" = "primary",
-  size: "sm" | "md" | "lg" = "md",
+  size: ButtonSize = "md",
   className?: string
 ): string {
-  return cn(
-    "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
-    variant === "primary" &&
-      "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-amber-500 focus-visible:ring-amber-500",
-    variant === "secondary" &&
-      "border border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700 focus-visible:ring-purple-500",
-    variant === "ghost" &&
-      "bg-transparent text-slate-300 hover:bg-slate-800/50 hover:text-slate-100 focus-visible:ring-slate-500",
-    size === "sm" && "px-3 py-1.5 text-sm",
-    size === "md" && "px-4 py-2 text-sm",
-    size === "lg" && "px-6 py-3 text-base",
-    className
-  );
+  return buttonClasses({ variant, size, className });
 }
+
+/** Text link in mono capitals with a ≥ 44 px touch target (back links, «Ir a tu síntesis»). */
+export const ENLACE_DATO =
+  "inline-flex min-h-11 items-center gap-2 font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] uppercase text-letra-acento underline-offset-[0.3em] hover:underline";

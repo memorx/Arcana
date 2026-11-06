@@ -1,10 +1,11 @@
 "use client";
 
 import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { Input } from "@/components/ui";
+import { MEDIDAS_CARTA } from "@/lib/cartas";
 import { cn } from "@/lib/utils";
-import { DECK_FILTERS, THUMB_WIDTH, filterDeck, thumbUrl, type DeckCard, type DeckFilter } from "./manual-cards";
+import { DECK_FILTERS, filterDeck, thumbnailOf, type DeckCard, type DeckFilter } from "./manual-cards";
 
 export interface CardPickerProps {
   cards: DeckCard[];
@@ -31,7 +32,8 @@ const NAV_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Ho
  * Grid of the 78 cards with search (English and Spanish names) and a suit filter.
  * Cards already placed in another position are marked and can't be picked again.
  * Only one card is in the Tab order (roving tabindex); arrow keys, Home and End move
- * between cards and Enter or Space picks one. Thumbnails are Wikimedia's 120 px copies.
+ * between cards and Enter or Space picks one. The grid is an index of engravings: the grey `mesa`
+ * variant of each card, inked (`tinta`) once it is placed in the spread.
  */
 export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: CardPickerProps) {
   const t = useTranslations("manual");
@@ -39,8 +41,9 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
   const gridRef = useRef<HTMLUListElement>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<DeckFilter>("all");
-  // Images that failed: 1 = the thumbnail failed (use the original), 2 = both failed (show the name).
-  const [failedImages, setFailedImages] = useState<Record<string, number>>({});
+  // Images that failed to load, by card AND variant (`${id}-mesa`, `${id}-tinta`): the card shows its name instead,
+  // and a failed grey `mesa` does not stop the inked `tinta` (another URL) from loading once the card is placed.
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   // Roving tabindex: only one card is in the Tab order; arrows move between cards.
   const [focusId, setFocusId] = useState<string | null>(null);
 
@@ -55,17 +58,8 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
       ? activeCardId
       : (visible[0]?.id ?? null);
 
-  const imageFor = (card: DeckCard): string | null => {
-    const failed = failedImages[card.id] ?? 0;
-    if (!card.imageUrl || failed >= 2) return null;
-    const thumb = thumbUrl(card.imageUrl, THUMB_WIDTH);
-    if (failed === 0) return thumb;
-    // The thumbnail failed: try the original once (if it's a different URL).
-    return thumb === card.imageUrl ? null : card.imageUrl;
-  };
-
-  const markImageFailed = (card: DeckCard) =>
-    setFailedImages((prev) => ({ ...prev, [card.id]: (prev[card.id] ?? 0) + 1 }));
+  const imageKey = (card: DeckCard, placed: boolean) => `${card.id}-${placed ? "tinta" : "mesa"}`;
+  const markImageFailed = (key: string) => setFailedImages((prev) => ({ ...prev, [key]: true }));
 
   // Left/right step by one, up/down by a row, Home/End to the ends.
   const handleGridKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
@@ -94,32 +88,16 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
   };
 
   return (
-    <div className="space-y-3">
-      <div>
-        <label htmlFor={searchId} className="sr-only">
-          {t("searchLabel")}
-        </label>
-        <div className="relative">
-          <svg
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
-          </svg>
-          <input
-            id={searchId}
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("searchPlaceholder")}
-            autoComplete="off"
-            className="w-full rounded-lg border border-slate-700 bg-slate-900/60 py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-          />
-        </div>
-      </div>
+    <div className="grid gap-4">
+      <Input
+        id={searchId}
+        type="search"
+        label={t("searchLabel")}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={t("searchPlaceholder")}
+        autoComplete="off"
+      />
 
       <div role="group" aria-label={t("filterLabel")} className="flex flex-wrap gap-1.5">
         {DECK_FILTERS.map((value) => (
@@ -129,11 +107,11 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
             aria-pressed={filter === value}
             onClick={() => setFilter(value)}
             className={cn(
-              "rounded-full border px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+              "inline-flex min-h-11 items-center rounded-full border px-3.5 font-dato text-[0.6875rem] tracking-[0.1em] uppercase",
               "motion-safe:transition-colors",
               filter === value
-                ? "border-purple-400/60 bg-purple-500/20 text-purple-200"
-                : "border-slate-700 bg-slate-900/40 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                ? "border-filete bg-filete text-suelo"
+                : "border-filete/25 text-letra-suave hover:border-filete hover:text-letra"
             )}
           >
             {t(FILTER_KEYS[value])}
@@ -146,7 +124,7 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
       </p>
 
       {visible.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-700 px-4 py-8 text-center text-sm text-slate-400">
+        <p className="border-y border-dashed border-filete/30 px-4 py-8 text-center text-[0.9375rem] text-letra-suave">
           {t("noResults", { query: query.trim() })}
         </p>
       ) : (
@@ -154,14 +132,15 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
           ref={gridRef}
           onKeyDown={handleGridKeyDown}
           aria-label={t("deckLabel")}
-          className="grid max-h-[26rem] grid-cols-4 gap-2 overflow-y-auto overscroll-contain p-1 sm:max-h-[32rem] sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6"
+          className="grid max-h-[26rem] grid-cols-4 gap-x-2 gap-y-3 overflow-y-auto overscroll-contain p-2 sm:max-h-[32rem] sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6"
         >
           {visible.map((card) => {
             const name = nameOf(card);
             const placedAt = takenAt[card.id];
             const isActive = activeCardId === card.id;
             const isTaken = placedAt !== undefined && !isActive;
-            const image = imageFor(card);
+            const variantKey = imageKey(card, placedAt !== undefined);
+            const showImage = !failedImages[variantKey];
 
             return (
               <li key={card.id}>
@@ -177,32 +156,39 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
                     if (!isTaken) onPick(card.id);
                   }}
                   className={cn(
-                    "group flex w-full flex-col items-center gap-1 rounded-lg p-1 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400",
-                    isTaken ? "cursor-not-allowed opacity-40" : "hover:bg-slate-800/60",
-                    isActive && "bg-amber-500/10 ring-2 ring-amber-400/80"
+                    "group flex w-full flex-col items-center gap-1.5 rounded-[6px] p-1 text-center",
+                    isTaken ? "cursor-not-allowed opacity-45" : "hover:bg-papel-hondo",
+                    isActive && "bg-papel-hondo"
                   )}
                 >
-                  <span className="relative block aspect-[2/3] w-full overflow-hidden rounded-md border border-amber-500/20 bg-slate-800">
-                    {image ? (
-                      <Image
-                        key={image}
-                        src={image}
+                  <span
+                    className={cn(
+                      "relative block aspect-[300/520] w-full overflow-hidden rounded-[5px] bg-papel-hondo",
+                      isActive ? "ring-2 ring-rosa ring-offset-2 ring-offset-papel" : "ring-1 ring-filete/15"
+                    )}
+                  >
+                    {showImage ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- WebP autohospedada de 200/360 px (scripts/cartas.py)
+                      <img
+                        key={placedAt !== undefined ? "tinta" : "mesa"}
+                        src={thumbnailOf(card, placedAt !== undefined)}
                         alt=""
-                        fill
-                        sizes="(max-width: 640px) 22vw, 96px"
-                        className="object-cover motion-safe:transition-transform motion-safe:duration-200 group-hover:motion-safe:scale-105"
-                        onError={() => markImageFailed(card)}
-                        unoptimized
+                        width={MEDIDAS_CARTA.mesa.width}
+                        height={MEDIDAS_CARTA.mesa.height}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-200 group-hover:motion-safe:scale-105"
+                        onError={() => markImageFailed(variantKey)}
                       />
                     ) : (
-                      <span className="absolute inset-0 flex items-center justify-center p-1 text-[10px] leading-tight text-slate-400">
+                      <span className="absolute inset-0 flex items-center justify-center p-1 font-lectura text-[0.625rem] leading-tight text-letra-suave">
                         {name}
                       </span>
                     )}
                     {isTaken && (
                       <span
                         aria-hidden="true"
-                        className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-950/90 px-1 text-[10px] font-bold text-amber-300"
+                        className="absolute top-1 right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-tinta px-1 font-dato text-[0.625rem] text-papel"
                       >
                         {placedAt}
                       </span>
@@ -210,13 +196,13 @@ export function CardPicker({ cards, takenAt, activeCardId, onPick, locale }: Car
                     {isActive && (
                       <span
                         aria-hidden="true"
-                        className="absolute inset-x-0 bottom-0 bg-amber-500/90 py-0.5 text-[10px] font-semibold text-slate-950"
+                        className="absolute inset-x-0 bottom-0 bg-rosa-luz py-0.5 font-dato text-[0.625rem] text-tinta"
                       >
                         &#10003;
                       </span>
                     )}
                   </span>
-                  <span aria-hidden="true" className="line-clamp-2 text-[11px] leading-tight text-slate-300">
+                  <span aria-hidden="true" className="line-clamp-2 font-lectura text-[0.75rem] leading-tight text-letra">
                     {name}
                   </span>
                 </button>

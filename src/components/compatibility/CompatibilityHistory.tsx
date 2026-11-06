@@ -28,30 +28,44 @@ function formatBirthDate(isoDay: string, locale: string) {
   });
 }
 
-/** Previous readings for two: name, birth date, date of the reading and overall score. */
+/**
+ * Previous readings for two as an archive: one ruled row each, the name in
+ * Gloock, the dates in mono and the overall score as five small segments.
+ */
 export function CompatibilityHistory({ readings, locale }: CompatibilityHistoryProps) {
   const t = useTranslations("compatibility");
 
   if (readings.length === 0) {
-    return <p className="text-sm text-slate-500">{t("previous.empty")}</p>;
+    return (
+      <p className="border-y border-filete/25 py-6 text-[1.0625rem] leading-[1.6] text-letra-suave italic">
+        {t("previous.empty")}
+      </p>
+    );
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="divide-y divide-filete/25 border-y border-filete">
       {readings.map((reading) => {
         const name = reading.partnerName || t("previous.noName");
         return (
           <li key={reading.id}>
             <Link
               href={`/compatibility/${reading.id}`}
-              className="flex items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition-colors hover:border-purple-500/50 hover:bg-slate-900/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+              className="group grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 py-4 transition-colors hover:bg-papel-hondo/70 sm:px-3"
             >
               <div className="min-w-0">
-                <p className={cn("truncate font-medium", reading.partnerName ? "text-slate-100" : "text-slate-400")}>
+                <p
+                  className={cn(
+                    "truncate font-titulo text-[1.3rem] leading-[1.2] decoration-rosa underline-offset-4 group-hover:underline",
+                    !reading.partnerName && "text-letra-suave italic"
+                  )}
+                >
                   {name}
                 </p>
-                <p className="mt-0.5 text-xs text-slate-500">
-                  {t("previous.bornOn", { date: formatBirthDate(reading.partnerBirthDate, locale) })} ·{" "}
+                <p className="mt-1 font-dato text-[0.625rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+                  {t("previous.bornOn", { date: formatBirthDate(reading.partnerBirthDate, locale) })}
+                  <span aria-hidden="true"> · </span>
+                  <br className="min-[420px]:hidden" />
                   {new Date(reading.createdAt).toLocaleDateString(dateLocale(locale), {
                     day: "numeric",
                     month: "short",
@@ -61,7 +75,7 @@ export function CompatibilityHistory({ readings, locale }: CompatibilityHistoryP
               </div>
 
               {reading.overall !== null && (
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2.5">
                   <div
                     role="meter"
                     aria-label={t("meterAria", { system: t("systems.overall"), score: reading.overall })}
@@ -74,14 +88,15 @@ export function CompatibilityHistory({ readings, locale }: CompatibilityHistoryP
                       <span
                         key={n}
                         aria-hidden="true"
+                        data-filled={n <= (reading.overall ?? 0)}
                         className={cn(
-                          "h-1.5 w-3 rounded-full sm:w-4",
-                          n <= (reading.overall ?? 0) ? "bg-gradient-to-r from-purple-500 to-amber-400" : "bg-slate-800"
+                          "h-2 w-2.5 rounded-[1px] sm:w-3.5",
+                          n <= (reading.overall ?? 0) ? "bg-rosa" : "border border-filete/45"
                         )}
                       />
                     ))}
                   </div>
-                  <span aria-hidden="true" className="text-sm font-semibold tabular-nums text-amber-300">
+                  <span aria-hidden="true" className="font-dato text-[0.8125rem] tabular-nums">
                     {t("scoreOutOf", { score: reading.overall })}
                   </span>
                 </div>

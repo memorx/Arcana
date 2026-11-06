@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Modal, ModalBody, Button } from "@/components/ui";
+import { Pincel } from "@/components/tinta/Pincel";
+import { Chispas, ESTAMPA } from "@/components/achievements/Celebracion";
+import { Sello } from "@/components/achievements/Sello";
+import { numeroRomano } from "@/app/(main)/cards/indice";
+import { cn } from "@/lib/utils";
 
 interface LevelUpModalProps {
   isOpen: boolean;
@@ -10,121 +14,65 @@ interface LevelUpModalProps {
   newLevel: number;
   levelName: string;
   levelNameEs: string;
+  /** Se conserva por compatibilidad: en «Dos tintas» el sello lleva el número romano del nivel, no el emoji. */
   levelIcon: string;
   creditsAwarded: number;
 }
 
-// Level-specific gradient colors for epic effect
-const LEVEL_COLORS: Record<number, { from: string; to: string; glow: string }> = {
-  2: { from: "from-blue-500", to: "to-cyan-500", glow: "shadow-blue-500/50" },
-  3: { from: "from-purple-500", to: "to-pink-500", glow: "shadow-purple-500/50" },
-  4: { from: "from-amber-500", to: "to-orange-500", glow: "shadow-amber-500/50" },
-  5: { from: "from-yellow-400", to: "to-amber-300", glow: "shadow-yellow-400/60" },
-};
-
+/** Subir de nivel, sobre tinta: el sello con el número romano se estampa entre chispas en dos tintas. */
 export function LevelUpModal({
   isOpen,
   onClose,
   newLevel,
   levelName,
   levelNameEs,
-  levelIcon,
   creditsAwarded,
 }: LevelUpModalProps) {
   const t = useTranslations("levels");
   const locale = useLocale();
-  const [showGlow, setShowGlow] = useState(false);
-  const [showParticles, setShowParticles] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShowGlow(true);
-      setShowParticles(true);
-      const glowTimer = setTimeout(() => setShowGlow(false), 2500);
-      const particleTimer = setTimeout(() => setShowParticles(false), 3000);
-      return () => {
-        clearTimeout(glowTimer);
-        clearTimeout(particleTimer);
-      };
-    }
-  }, [isOpen]);
 
   const displayName = locale === "en" ? levelName : levelNameEs;
-  const colors = LEVEL_COLORS[newLevel] || LEVEL_COLORS[2];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="overflow-visible">
-      <ModalBody className="text-center py-8 relative">
-        {/* Particle effects */}
-        {showParticles && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(12)].map((_, i) => (
-              <div
-                key={i}
-                className={`absolute w-2 h-2 rounded-full bg-gradient-to-r ${colors.from} ${colors.to} animate-ping`}
-                style={{
-                  left: `${10 + Math.random() * 80}%`,
-                  top: `${10 + Math.random() * 80}%`,
-                  animationDelay: `${i * 0.15}s`,
-                  animationDuration: "1.5s",
-                }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Level Up Badge */}
-        <div className="relative inline-block mb-6">
-          <div
-            className={`w-28 h-28 rounded-full bg-gradient-to-br ${colors.from} ${colors.to} flex items-center justify-center text-5xl transition-all duration-500 ${
-              showGlow ? `animate-pulse shadow-2xl ${colors.glow}` : ""
-            }`}
-          >
-            {levelIcon}
-          </div>
-          {showGlow && (
-            <>
-              <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${colors.from} ${colors.to} opacity-30 animate-ping`} />
-              <div className={`absolute -inset-2 rounded-full bg-gradient-to-br ${colors.from} ${colors.to} opacity-20 blur-xl animate-pulse`} />
-            </>
-          )}
-          {/* Level number badge */}
-          <div className={`absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-gradient-to-br ${colors.from} ${colors.to} flex items-center justify-center text-white font-bold text-lg border-4 border-slate-900`}>
-            {newLevel}
-          </div>
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-md">
+      <ModalBody className="grid gap-6 px-[clamp(20px,6vw,36px)] pb-8 pt-9 text-center">
+        <div className="relative grid justify-items-center gap-3">
+          <Chispas />
+          <Sello estado="logrado" tamano="grande" className={cn("relative", ESTAMPA)}>
+            {numeroRomano(newLevel)}
+          </Sello>
+          <Pincel aria-hidden="true" className="relative text-[clamp(3rem,2.4rem+3vw,4.25rem)]">
+            {t("level")}
+          </Pincel>
+          <h2 className="relative text-[clamp(1.6rem,1.3rem+1.4vw,2.1rem)] leading-[1.1] text-letra">
+            {t("levelUp")}
+          </h2>
+          <p className="relative font-lectura text-[1.1875rem] italic text-letra">
+            {t("newLevel", { level: displayName })}
+          </p>
         </div>
 
-        {/* Title */}
-        <h2 className={`text-3xl font-bold bg-gradient-to-r ${colors.from} ${colors.to} bg-clip-text text-transparent mb-2`}>
-          {t("levelUp")}
-        </h2>
-
-        {/* New Level */}
-        <p className="text-xl text-slate-200 mb-6">
-          {t("newLevel", { level: displayName })}
-        </p>
-
-        {/* Credits Reward */}
+        {/* Recompensa */}
         {creditsAwarded > 0 && (
-          <div className={`bg-gradient-to-r ${colors.from}/20 ${colors.to}/20 rounded-xl p-4 mb-6 border border-emerald-500/30`}>
-            <p className="text-slate-400 text-sm mb-1">
+          <div className="grid gap-1 border-y border-filete/20 py-4">
+            <p className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.12em] text-letra-suave uppercase">
               {t("reward")}
             </p>
-            <p className="text-3xl font-bold text-emerald-400">
-              +{creditsAwarded} <span className="text-lg">{t("credits")}</span>
+            <p className="flex flex-wrap items-baseline justify-center gap-x-2.5 font-dato text-[2.5rem] leading-none tracking-[-0.03em] text-letra-acento tabular-nums">
+              <span>+{creditsAwarded}</span>
+              <span className="text-sm tracking-[0.12em] text-letra-suave uppercase">{t("credits")}</span>
             </p>
           </div>
         )}
 
-        {/* Motivational message based on level */}
-        <p className="text-slate-400 text-sm mb-6">
+        {/* Mensaje según el nivel */}
+        <p className="text-[0.9375rem] leading-[1.5] text-letra-suave">
           {newLevel === 5
             ? t("maxLevelMessage")
             : t("keepGoing")}
         </p>
 
-        {/* Continue Button */}
-        <Button onClick={onClose} size="lg" className={`w-full bg-gradient-to-r ${colors.from} ${colors.to} hover:opacity-90`}>
+        <Button onClick={onClose} size="lg" className="w-full">
           {t("continue")}
         </Button>
       </ModalBody>

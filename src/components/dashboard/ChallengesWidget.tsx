@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
-import { Card, CardContent, Button } from "@/components/ui";
 import {
   getClosestChallenges,
   getChallengeStats,
   getTimeUntilReset,
 } from "@/lib/challenges";
+import { Barra } from "./Barra";
+import { CIFRA, ENLACE_DATO, ROTULO, TITULO_CELDA } from "./estilos";
 
 interface ChallengesWidgetProps {
   userId: string;
@@ -41,74 +42,44 @@ export async function ChallengesWidget({ userId }: ChallengesWidgetProps) {
   };
 
   return (
-    <Card className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border-purple-500/20">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🎯</span>
-            <div>
-              <h3 className="font-medium text-slate-100">{t("title")}</h3>
-              <p className="text-sm text-slate-400">
-                {totalCompleted}/{totalChallenges} ({percentage}%)
-              </p>
-            </div>
-          </div>
-          <Link href="/challenges">
-            <Button variant="secondary" size="sm">{t("viewAll")}</Button>
-          </Link>
-        </div>
+    <div className="flex h-full flex-col gap-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+        <h2 className={TITULO_CELDA}>{t("title")}</h2>
+        <Link href="/challenges" className={ENLACE_DATO}>
+          {t("viewAll")} <span aria-hidden="true">→</span>
+        </Link>
+      </div>
 
-        {/* Progress Bar */}
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-3">
-          <div
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
+      <p className="flex flex-wrap items-baseline gap-x-3">
+        <span className={CIFRA}>
+          {totalCompleted}/{totalChallenges}
+        </span>
+        <span className={ROTULO}>{t("resetsIn", { time: formatResetTime(weeklyReset) })}</span>
+      </p>
+      <Barra valor={percentage} etiqueta={`${t("title")}: ${percentage}%`} />
 
-        {/* Reset Timer */}
-        <div className="text-xs text-slate-500 mb-3">
-          {t("resetsIn", { time: formatResetTime(weeklyReset) })}
-        </div>
+      {closest.length > 0 ? (
+        <ul className="divide-y divide-filete/15">
+          {closest.map((challenge) => {
+            const progressPercent = Math.min((challenge.progress / challenge.target) * 100, 100);
+            const name = getLocalizedName(challenge);
 
-        <div className="space-y-2">
-          {/* Closest Challenges */}
-          {closest.length > 0 ? (
-            closest.map((challenge) => {
-              const progressPercent = Math.min(
-                (challenge.progress / challenge.target) * 100,
-                100
-              );
-
-              return (
-                <div key={challenge.id} className="flex items-center gap-2">
-                  <span className="text-lg">{challenge.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-300 truncate">
-                        {getLocalizedName(challenge)}
-                      </span>
-                      <span className="text-xs text-slate-500 flex-shrink-0 ml-2">
-                        {challenge.progress}/{challenge.target}
-                      </span>
-                    </div>
-                    <div className="h-1 bg-slate-800 rounded-full overflow-hidden mt-1">
-                      <div
-                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                        style={{ width: `${progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
+            return (
+              <li key={challenge.id} className="py-2.5 first:pt-0">
+                <div className="mb-1.5 flex items-baseline justify-between gap-3">
+                  <span className="min-w-0 text-[0.9375rem] leading-snug text-letra">{name}</span>
+                  <span className="shrink-0 font-dato text-xs tabular-nums text-letra-suave">
+                    {challenge.progress}/{challenge.target}
+                  </span>
                 </div>
-              );
-            })
-          ) : (
-            <p className="text-purple-400 text-sm text-center">
-              {t("allCompleted")}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+                <Barra valor={progressPercent} etiqueta={`${name}: ${challenge.progress}/${challenge.target}`} acento />
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="font-lectura text-letra-acento">{t("allCompleted")}</p>
+      )}
+    </div>
   );
 }

@@ -135,4 +135,50 @@ describe("ArcanaCalendar", () => {
     expect(screen.getByRole("heading", { level: 2, name: "noviembre de 2026" })).toBeInTheDocument();
     expect(day(/^4 de noviembre,/)).toHaveAttribute("tabindex", "0");
   });
+
+  it("marks today in the second ink and the selected day in ink", async () => {
+    mockCalendarApi({ authenticated: false, birthDate: null });
+    const user = userEvent.setup();
+
+    render(<ArcanaCalendar today={TODAY} />);
+
+    // Only one day is today; it carries the pink rule on top, selected or not
+    const grid = screen.getByRole("grid");
+    expect(grid.querySelectorAll('[aria-current="date"]')).toHaveLength(1);
+    const hoy = day(/^4 de noviembre,/);
+    expect(hoy.className).toContain("shadow-[inset_0_3px_0_var(--color-rosa)]");
+    expect(hoy).toHaveClass("bg-tinta"); // selected at first
+    expect(hoy.querySelector(".text-rosa-luz")).toHaveTextContent("4");
+
+    await user.click(day(/^12 de noviembre,/));
+    expect(day(/^12 de noviembre,/)).toHaveClass("bg-tinta");
+    expect(day(/^12 de noviembre,/).className).not.toContain("--color-rosa");
+    expect(hoy).not.toHaveClass("bg-tinta");
+    expect(hoy.className).toContain("shadow-[inset_0_3px_0_var(--color-rosa)]");
+    expect(hoy.querySelector(".text-rosa-texto")).toHaveTextContent("4");
+    // No emoji glyphs: the moon is drawn in two inks, and it is decorative (the label says it)
+    expect(grid.textContent).not.toMatch(/\p{Extended_Pictographic}/u);
+    expect(hoy.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("changes month and year with PageUp/PageDown (Shift for the year), keeping the focus on the day", async () => {
+    mockCalendarApi({ authenticated: false, birthDate: null });
+    const user = userEvent.setup();
+
+    render(<ArcanaCalendar today={TODAY} />);
+    day(/^4 de noviembre,/).focus();
+
+    await user.keyboard("{PageUp}");
+    expect(screen.getByRole("heading", { level: 2, name: "octubre de 2026" })).toBeInTheDocument();
+    expect(day(/^4 de octubre,/)).toHaveFocus();
+
+    await user.keyboard("{Shift>}{PageDown}{/Shift}");
+    expect(screen.getByRole("heading", { level: 2, name: "octubre de 2027" })).toBeInTheDocument();
+    expect(day(/^4 de octubre,/)).toHaveFocus();
+
+    await user.keyboard("{Shift>}{PageUp}{/Shift}{PageDown}");
+    expect(screen.getByRole("heading", { level: 2, name: "noviembre de 2026" })).toBeInTheDocument();
+    expect(day(/^4 de noviembre,/)).toHaveFocus();
+    expect(day(/^4 de noviembre,/)).toHaveAttribute("aria-current", "date");
+  });
 });

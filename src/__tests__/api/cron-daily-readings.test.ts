@@ -72,7 +72,8 @@ const theSun = {
   id: "card-sun",
   name: "The Sun",
   nameEs: "El Sol",
-  imageUrl: "/cards/sun.jpg",
+  // The database still holds the old Wikimedia URL; the email must not use it.
+  imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg",
   keywords: ["joy", "success"],
 };
 
@@ -157,7 +158,7 @@ describe("GET /api/cron/daily-readings", () => {
         userName: "Ana",
         cardName: "The Sun",
         cardNameEs: "El Sol",
-        cardImage: "/cards/sun.jpg",
+        cardImage: "/cartas/rws-tarot-19-sun-color.webp", // self-hosted, not the DB imageUrl
         interpretation: "Buenos días, Ana. El Sol te acompaña hoy.",
         locale: "es",
         zodiacSign: "Leo",

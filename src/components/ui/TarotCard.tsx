@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
+import { cartaImagen, slugCarta } from "@/lib/cartas";
 import { CardPlaceholder, CardBack } from "./CardPlaceholder";
 
 interface TarotCardProps {
@@ -12,7 +13,6 @@ interface TarotCardProps {
     arcana: "MAJOR" | "MINOR";
     suit: "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null;
     number: number;
-    imageUrl?: string | null;
   };
   isReversed?: boolean;
   isRevealed?: boolean;
@@ -24,19 +24,90 @@ interface TarotCardProps {
   className?: string;
 }
 
+// Mismos anchos de siempre; el alto sigue la proporción de los grabados (≈ 7:12) para no cortarles el título.
 const SIZES = {
-  sm: { width: 64, height: 96, className: "w-16 h-24" },
-  md: { width: 80, height: 120, className: "w-20 h-[120px]" },
-  lg: { width: 120, height: 180, className: "w-[120px] h-[180px]" },
+  sm: { sizes: "64px", className: "w-16 h-[110px]" },
+  md: { sizes: "80px", className: "w-20 h-[137px]" },
+  lg: { sizes: "120px", className: "w-[120px] h-[206px]" },
 };
 
-function CardSkeleton({ className }: { className: string }) {
+const MARCO = "relative w-full h-full overflow-hidden rounded-[6px] bg-papel-hondo";
+
+function CardSkeleton() {
+  return <div className="absolute inset-0 bg-papel-hondo motion-safe:animate-pulse" aria-hidden="true" />;
+}
+
+function GoldenBadge({ label }: { label: string }) {
   return (
-    <div className={`relative ${className} rounded-lg overflow-hidden border-2 border-amber-500/30 bg-slate-800`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 to-slate-900/50 animate-pulse" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-      </div>
+    <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-20">
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-tinta px-2 py-0.5 font-dato text-[10px] uppercase tracking-[0.12em] text-rosa-luz">
+        <span className="h-1.5 w-1.5 rounded-full bg-rosa" aria-hidden="true" />
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function ReversedBadge({ label }: { label: string }) {
+  return (
+    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 z-10">
+      <span className="inline-block whitespace-nowrap rounded-full border border-tinta/25 bg-papel px-2 py-0.5 font-dato text-[10px] uppercase tracking-[0.12em] text-tinta">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+/** La cara de la carta: el grabado a color autohospedado, o el marcador si no es una de las 78 o no carga. */
+function CardFace({
+  card,
+  displayName,
+  isGolden,
+  sizes,
+  className,
+}: {
+  card: TarotCardProps["card"];
+  displayName: string;
+  isGolden: boolean;
+  sizes: string;
+  className: string;
+}) {
+  const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const hasImage = slugCarta(card.name) !== "" && !imageError;
+
+  if (!hasImage) {
+    return (
+      <CardPlaceholder
+        cardName={displayName}
+        arcana={card.arcana}
+        suit={card.suit}
+        number={card.number}
+        className={className}
+      />
+    );
+  }
+  return (
+    <div className={`${MARCO} ${isGolden ? "border-2 golden-card-border" : "border border-tinta/20"}`}>
+      {isLoading && <CardSkeleton />}
+      <Image
+        src={cartaImagen(card)}
+        alt={displayName}
+        fill
+        sizes={sizes}
+        className={`object-cover transition-opacity duration-300 motion-reduce:transition-none ${isLoading ? "opacity-0" : "opacity-100"}`}
+        onLoad={() => setIsLoading(false)}
+        onError={() => {
+          setImageError(true);
+          setIsLoading(false);
+        }}
+        unoptimized
+      />
+      {isGolden && !isLoading && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+          <div className="absolute inset-0 golden-shimmer-effect" />
+        </div>
+      )}
     </div>
   );
 }
@@ -56,32 +127,19 @@ export function TarotCard({
   const tGolden = useTranslations("goldenCards");
   const currentLocale = useLocale();
   const locale = localeProp || currentLocale;
-  const [imageError, setImageError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const sizeConfig = SIZES[size];
   const displayName = locale === "en" ? card.name : card.nameEs;
 
-  // Check if we should show the actual image
-  const hasImage = card.imageUrl && !imageError;
-
-  // Golden card styling
-  const goldenBorderClass = isGolden
-    ? "border-2 border-transparent golden-card-border"
-    : "border-2 border-amber-500/30";
-
-  const goldenGlowClass = isGolden ? "golden-card-glow" : "";
-
   return (
     <div className={`relative ${className}`}>
-      {/* Card container with flip animation */}
+      {/* Volteo: la cara y el reverso de tinta, con la cara invertida girada 180° */}
       <div
-        className={`relative ${sizeConfig.className} transition-transform duration-500 transform-gpu ${goldenGlowClass}`}
+        className={`relative ${sizeConfig.className} rounded-[6px] transition-transform duration-500 motion-reduce:transition-none transform-gpu ${isGolden ? "golden-card-glow" : ""}`}
         style={{
           transformStyle: "preserve-3d",
           transform: isRevealed ? "rotateY(0deg)" : "rotateY(180deg)",
         }}
       >
-        {/* Front of card */}
         <div
           className="absolute inset-0"
           style={{
@@ -89,42 +147,16 @@ export function TarotCard({
             transform: isReversed ? "rotate(180deg)" : "rotate(0deg)",
           }}
         >
-          {hasImage ? (
-            <div className={`relative w-full h-full rounded-lg overflow-hidden ${goldenBorderClass}`}>
-              {isLoading && (
-                <CardSkeleton className={sizeConfig.className} />
-              )}
-              <Image
-                src={card.imageUrl!}
-                alt={displayName}
-                fill
-                className={`object-cover transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
-                onLoad={() => setIsLoading(false)}
-                onError={() => {
-                  setImageError(true);
-                  setIsLoading(false);
-                }}
-                unoptimized
-              />
-              {/* Golden shimmer overlay */}
-              {isGolden && !isLoading && (
-                <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-                  <div className="absolute inset-0 golden-shimmer-effect" />
-                </div>
-              )}
-            </div>
-          ) : (
-            <CardPlaceholder
-              cardName={displayName}
-              arcana={card.arcana}
-              suit={card.suit}
-              number={card.number}
-              className={sizeConfig.className}
-            />
-          )}
+          <CardFace
+            key={card.name}
+            card={card}
+            displayName={displayName}
+            isGolden={isGolden}
+            sizes={sizeConfig.sizes}
+            className={sizeConfig.className}
+          />
         </div>
 
-        {/* Back of card */}
         <div
           className="absolute inset-0"
           style={{
@@ -136,75 +168,13 @@ export function TarotCard({
         </div>
       </div>
 
-      {/* Golden badge */}
-      {isRevealed && isGolden && showGoldenBadge && (
-        <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-20">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-900 text-[10px] font-bold rounded-full shadow-lg">
-            <span>&#10024;</span>
-            {tGolden("golden")}
-          </span>
-        </div>
-      )}
-
-      {/* Reversed badge */}
-      {isRevealed && isReversed && showReversedBadge && (
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 z-10">
-          <span className="inline-block px-2 py-0.5 bg-orange-500/90 text-white text-[10px] font-medium rounded-full shadow-lg">
-            {t("reversed")}
-          </span>
-        </div>
-      )}
-
-      {/* Golden card CSS */}
-      {isGolden && (
-        <style jsx global>{`
-          .golden-card-border {
-            background: linear-gradient(135deg, #fbbf24, #fde047, #fbbf24);
-            -webkit-mask:
-              linear-gradient(#fff 0 0) content-box,
-              linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            padding: 2px;
-          }
-          .golden-card-glow {
-            animation: golden-card-pulse 2s ease-in-out infinite;
-          }
-          @keyframes golden-card-pulse {
-            0%, 100% {
-              filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
-            }
-            50% {
-              filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.9));
-            }
-          }
-          .golden-shimmer-effect {
-            background: linear-gradient(
-              105deg,
-              transparent 40%,
-              rgba(251, 191, 36, 0.3) 45%,
-              rgba(253, 224, 71, 0.4) 50%,
-              rgba(251, 191, 36, 0.3) 55%,
-              transparent 60%
-            );
-            background-size: 200% 100%;
-            animation: golden-shimmer-sweep 3s ease-in-out infinite;
-          }
-          @keyframes golden-shimmer-sweep {
-            0% {
-              background-position: 200% 0;
-            }
-            100% {
-              background-position: -200% 0;
-            }
-          }
-        `}</style>
-      )}
+      {isRevealed && isGolden && showGoldenBadge && <GoldenBadge label={tGolden("golden")} />}
+      {isRevealed && isReversed && showReversedBadge && <ReversedBadge label={t("reversed")} />}
     </div>
   );
 }
 
-// Simple static card display (no animation)
+// Carta quieta (sin volteo)
 export function TarotCardStatic({
   card,
   isReversed = false,
@@ -219,125 +189,29 @@ export function TarotCardStatic({
   const tGolden = useTranslations("goldenCards");
   const currentLocale = useLocale();
   const locale = localeProp || currentLocale;
-  const [imageError, setImageError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const sizeConfig = SIZES[size];
   const displayName = locale === "en" ? card.name : card.nameEs;
-  const hasImage = card.imageUrl && !imageError;
-
-  // Golden card styling
-  const goldenBorderClass = isGolden
-    ? "border-2 border-transparent golden-card-border"
-    : "border-2 border-amber-500/30";
-
-  const goldenGlowClass = isGolden ? "golden-card-glow" : "";
 
   return (
     <div className={`relative ${className}`}>
       <div
-        className={`${sizeConfig.className} ${goldenGlowClass}`}
+        className={`${sizeConfig.className} rounded-[6px] ${isGolden ? "golden-card-glow" : ""}`}
         style={{
           transform: isReversed ? "rotate(180deg)" : "rotate(0deg)",
         }}
       >
-        {hasImage ? (
-          <div className={`relative w-full h-full rounded-lg overflow-hidden ${goldenBorderClass}`}>
-            {isLoading && (
-              <CardSkeleton className={sizeConfig.className} />
-            )}
-            <Image
-              src={card.imageUrl!}
-              alt={displayName}
-              fill
-              className={`object-cover transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
-              onLoad={() => setIsLoading(false)}
-              onError={() => {
-                setImageError(true);
-                setIsLoading(false);
-              }}
-              unoptimized
-            />
-            {/* Golden shimmer overlay */}
-            {isGolden && !isLoading && (
-              <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-                <div className="absolute inset-0 golden-shimmer-effect" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <CardPlaceholder
-            cardName={displayName}
-            arcana={card.arcana}
-            suit={card.suit}
-            number={card.number}
-          />
-        )}
+        <CardFace
+          key={card.name}
+          card={card}
+          displayName={displayName}
+          isGolden={isGolden}
+          sizes={sizeConfig.sizes}
+          className={sizeConfig.className}
+        />
       </div>
 
-      {/* Golden badge */}
-      {isGolden && showGoldenBadge && (
-        <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-20">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-900 text-[10px] font-bold rounded-full shadow-lg">
-            <span>&#10024;</span>
-            {tGolden("golden")}
-          </span>
-        </div>
-      )}
-
-      {/* Reversed badge */}
-      {isReversed && showReversedBadge && (
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 z-10">
-          <span className="inline-block px-2 py-0.5 bg-orange-500/90 text-white text-[10px] font-medium rounded-full shadow-lg">
-            {t("reversed")}
-          </span>
-        </div>
-      )}
-
-      {/* Golden card CSS */}
-      {isGolden && (
-        <style jsx global>{`
-          .golden-card-border {
-            background: linear-gradient(135deg, #fbbf24, #fde047, #fbbf24);
-            -webkit-mask:
-              linear-gradient(#fff 0 0) content-box,
-              linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            padding: 2px;
-          }
-          .golden-card-glow {
-            animation: golden-card-pulse 2s ease-in-out infinite;
-          }
-          @keyframes golden-card-pulse {
-            0%, 100% {
-              filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
-            }
-            50% {
-              filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.9));
-            }
-          }
-          .golden-shimmer-effect {
-            background: linear-gradient(
-              105deg,
-              transparent 40%,
-              rgba(251, 191, 36, 0.3) 45%,
-              rgba(253, 224, 71, 0.4) 50%,
-              rgba(251, 191, 36, 0.3) 55%,
-              transparent 60%
-            );
-            background-size: 200% 100%;
-            animation: golden-shimmer-sweep 3s ease-in-out infinite;
-          }
-          @keyframes golden-shimmer-sweep {
-            0% {
-              background-position: 200% 0;
-            }
-            100% {
-              background-position: -200% 0;
-            }
-          }
-        `}</style>
-      )}
+      {isGolden && showGoldenBadge && <GoldenBadge label={tGolden("golden")} />}
+      {isReversed && showReversedBadge && <ReversedBadge label={t("reversed")} />}
     </div>
   );
 }

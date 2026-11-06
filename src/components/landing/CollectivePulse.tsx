@@ -1,12 +1,16 @@
-import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Badge, Card } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
+import { Escena } from "@/components/tinta/Escena";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { getCollectivePulse, type CollectivePulse as Pulse } from "@/lib/pulse";
 
 /**
  * "Today in Arcana, X came up the most": the most drawn card of the day,
  * anonymous. Renders nothing when there are too few readings or the pulse
  * can't be computed. Server component; wrap it in <Suspense>.
+ *
+ * «Dos tintas»: banda de tinta que sigue a la carta del día; la carta más sacada es lo único a color.
  */
 export async function CollectivePulse() {
   let pulse: Pulse;
@@ -27,62 +31,53 @@ export async function CollectivePulse() {
   const [first, ...rest] = pulse.cards;
 
   return (
-    <section aria-labelledby="collective-pulse-title" className="py-12 border-t border-slate-800/50">
-      <div className="container mx-auto px-4">
-        <Card variant="highlighted" className="max-w-3xl mx-auto p-6 sm:p-8 overflow-hidden">
-          <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="relative w-28 h-44 sm:w-32 sm:h-52 shrink-0 rounded-lg overflow-hidden border border-amber-500/30 shadow-xl shadow-amber-500/10">
-              <Image
-                src={first.imageUrl}
-                alt={cardName(first)}
-                fill
-                sizes="128px"
-                className="object-cover"
-                unoptimized
-              />
-            </div>
+    <Escena suelo="tinta" aria-labelledby="collective-pulse-title" className="portada-pulso">
+      <div className="portada-contenido">
+        <div className="grid items-center gap-6 border-t border-filete/15 py-12 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10">
+          {/* eslint-disable-next-line @next/next/no-img-element -- WebP autohospedada y ya optimizada (scripts/cartas.py) */}
+          <img
+            src={cartaImagen(first, "color")}
+            alt={cardName(first)}
+            width={MEDIDAS_CARTA.color.width}
+            height={MEDIDAS_CARTA.color.height}
+            loading="lazy"
+            decoding="async"
+            className="h-auto w-24 rounded-[10px] sm:w-28"
+          />
 
-            <div className="flex-1 min-w-0 text-center sm:text-left">
-              <p className="flex items-center justify-center sm:justify-start gap-2 text-xs uppercase tracking-[0.2em] text-amber-400/80">
-                <span aria-hidden="true" className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 motion-safe:animate-ping" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
-                </span>
-                {t("kicker")}
-              </p>
+          <div className="grid min-w-0 gap-3">
+            <Etiqueta>{t("kicker")}</Etiqueta>
+            <h2
+              id="collective-pulse-title"
+              className="font-titulo text-[clamp(1.6rem,1.2rem+1.4vw,2.4rem)] leading-[1.1] text-papel"
+            >
+              {t.rich("title", {
+                card: cardName(first),
+                hl: (chunks) => <span className="text-rosa-luz">{chunks}</span>,
+              })}
+            </h2>
 
-              <h2
-                id="collective-pulse-title"
-                className="text-2xl sm:text-3xl font-bold text-slate-100 mt-2 text-balance"
-              >
-                {t.rich("title", {
-                  card: cardName(first),
-                  hl: (chunks) => <span className="text-amber-300">{chunks}</span>,
-                })}
-              </h2>
+            <p className="text-niebla">{t("share", { percentage: first.percent })}</p>
 
-              <p className="text-slate-400 mt-2">{t("share", { percentage: first.percent })}</p>
+            {rest.length > 0 && (
+              <div className="grid gap-2">
+                <p className="font-dato text-xs tracking-[0.12em] text-niebla uppercase">{t("also")}</p>
+                <ul className="flex flex-wrap gap-2">
+                  {rest.map((card) => (
+                    <li key={card.name}>
+                      <Badge variant="primary">
+                        {cardName(card)} · {card.percent}%
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-              {rest.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm text-slate-500 mb-2">{t("also")}</p>
-                  <ul className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                    {rest.map((card) => (
-                      <li key={card.name}>
-                        <Badge variant="primary">
-                          {cardName(card)} · {card.percent}%
-                        </Badge>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <p className="text-xs text-slate-500 mt-4">{t("anonymous")}</p>
-            </div>
+            <p className="text-sm text-niebla italic">{t("anonymous")}</p>
           </div>
-        </Card>
+        </div>
       </div>
-    </section>
+    </Escena>
   );
 }

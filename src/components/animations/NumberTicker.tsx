@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useSpring, useTransform, useInView } from "framer-motion";
+import { motion, useSpring, useTransform, useInView, useReducedMotion } from "framer-motion";
 
 interface NumberTickerProps {
   value: number;
@@ -11,14 +11,15 @@ interface NumberTickerProps {
   decimalPlaces?: number;
 }
 
+/** Cuenta hasta `value` al entrar en pantalla. Con reduced-motion muestra el número final, quieto. */
 export function NumberTicker({
   value,
   direction = "up",
   delay = 0,
   className = "",
-  decimalPlaces = 0,
 }: NumberTickerProps) {
   const ref = useRef<HTMLSpanElement>(null);
+  const reducido = useReducedMotion();
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -32,6 +33,11 @@ export function NumberTicker({
   );
 
   useEffect(() => {
+    if (reducido) {
+      springValue.jump(direction === "up" ? value : 0);
+      setHasAnimated(true);
+      return;
+    }
     if (isInView && !hasAnimated) {
       const timeout = setTimeout(() => {
         springValue.set(direction === "up" ? value : 0);
@@ -40,7 +46,7 @@ export function NumberTicker({
 
       return () => clearTimeout(timeout);
     }
-  }, [isInView, hasAnimated, delay, springValue, value, direction]);
+  }, [reducido, isInView, hasAnimated, delay, springValue, value, direction]);
 
   return (
     <motion.span ref={ref} className={className}>

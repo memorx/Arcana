@@ -56,7 +56,6 @@ const renderPage = async (source: "app" | "manual") => {
       nameEs: "La Torre",
       arcana: "MAJOR",
       suit: null,
-      imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg",
       meaningUpright: "",
       meaningReversed: "",
       meaningUprightEn: null,
@@ -114,7 +113,7 @@ describe("reading page additions from Lote E (F-66)", () => {
     await renderPage("app");
 
     const title = screen.getByText("reading.interpretation");
-    const header = title.closest("h3")!.parentElement!;
+    const header = title.closest("h2")!.parentElement!;
     // The global next-intl mock returns the key
     expect(header).toContainElement(screen.getByRole("button", { name: "play" }));
   });

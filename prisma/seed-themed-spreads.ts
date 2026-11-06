@@ -9,14 +9,14 @@ const themedSpreads = [
     description:
       "Explore your romantic life and relationships with this focused 5-card spread",
     descriptionEs:
-      "Explora tu vida romantica y relaciones con esta tirada de 5 cartas",
+      "Explora tu vida romántica y relaciones con esta tirada de 5 cartas",
     cardCount: 5,
     creditCost: 2,
     positions: [
       {
         position: 1,
         name: "Your Heart",
-        nameEs: "Tu Corazon",
+        nameEs: "Tu Corazón",
         description: "How you feel about love right now",
       },
       {
@@ -28,13 +28,13 @@ const themedSpreads = [
       {
         position: 3,
         name: "The Connection",
-        nameEs: "La Conexion",
+        nameEs: "La Conexión",
         description: "What brings or keeps you together",
       },
       {
         position: 4,
         name: "Challenges",
-        nameEs: "Desafios",
+        nameEs: "Desafíos",
         description: "Obstacles to overcome",
       },
       {
@@ -52,14 +52,14 @@ const themedSpreads = [
     description:
       "Get guidance for your professional path with insights into your current position and potential",
     descriptionEs:
-      "Obten guia para tu camino profesional con perspectivas sobre tu posicion actual y potencial",
+      "Obtén guía para tu camino profesional con perspectivas sobre tu posición actual y potencial",
     cardCount: 5,
     creditCost: 2,
     positions: [
       {
         position: 1,
         name: "Current Position",
-        nameEs: "Posicion Actual",
+        nameEs: "Posición Actual",
         description: "Where you are now professionally",
       },
       {
@@ -77,7 +77,7 @@ const themedSpreads = [
       {
         position: 4,
         name: "Action to Take",
-        nameEs: "Accion a Tomar",
+        nameEs: "Acción a Tomar",
         description: "Your recommended next step",
       },
       {
@@ -91,11 +91,11 @@ const themedSpreads = [
   },
   {
     name: "Year Ahead",
-    nameEs: "El Ano que Viene",
+    nameEs: "El Año que Viene",
     description:
       "A comprehensive 12-card spread revealing themes and energies for each month ahead",
     descriptionEs:
-      "Una tirada completa de 12 cartas revelando temas y energias para cada mes",
+      "Una tirada completa de 12 cartas revelando temas y energías para cada mes",
     cardCount: 12,
     creditCost: 4,
     positions: [

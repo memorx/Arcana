@@ -43,8 +43,8 @@ describe("cn (className utility)", () => {
 
   it("handles complex tailwind merging", () => {
     // Override text color
-    const result = cn("text-red-500", "text-blue-500");
-    expect(result).toBe("text-blue-500");
+    const result = cn("text-rosa-texto", "text-tinta");
+    expect(result).toBe("text-tinta");
   });
 
   it("handles responsive classes", () => {
@@ -53,7 +53,7 @@ describe("cn (className utility)", () => {
   });
 
   it("handles hover and focus states", () => {
-    const result = cn("bg-blue-500", "hover:bg-blue-600", "focus:bg-blue-700");
-    expect(result).toBe("bg-blue-500 hover:bg-blue-600 focus:bg-blue-700");
+    const result = cn("bg-papel", "hover:bg-papel-hondo", "focus:bg-rosa-luz");
+    expect(result).toBe("bg-papel hover:bg-papel-hondo focus:bg-rosa-luz");
   });
 });

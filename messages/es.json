@@ -1,7 +1,7 @@
 {
   "common": {
     "loading": "Cargando...",
-    "error": "Algo salio mal",
+    "error": "Algo salió mal",
     "errorTryAgain": "Error. Intenta de nuevo.",
     "back": "Volver",
     "continue": "Continuar",
@@ -22,136 +22,123 @@
       "message": "Las cartas se confundieron. Por favor, intenta de nuevo.",
       "tryAgain": "Intentar de nuevo",
       "goHome": "Ir al inicio"
-    }
+    },
+    "cardsCredit": "Cartas: Pamela Colman Smith, 1909 · dominio público"
   },
   "nav": {
     "home": "Inicio",
     "dashboard": "Mi espacio",
     "newReading": "Nueva lectura",
     "history": "Historial",
-    "credits": "Creditos",
-    "login": "Iniciar sesion",
+    "credits": "Créditos",
+    "login": "Iniciar sesión",
     "register": "Registrarse",
-    "logout": "Cerrar sesion",
-    "dailyCard": "Carta del Dia",
-    "collection": "Coleccion",
-    "subscribe": "Oraculo Diario",
-    "profile": "Mi Perfil",
-    "referral": "Invitar Amigos",
-    "settings": "Configuracion",
+    "logout": "Cerrar sesión",
+    "dailyCard": "Carta del día",
+    "collection": "Colección",
+    "subscribe": "Oráculo Diario",
+    "profile": "Mi perfil",
+    "referral": "Invitar amigos",
+    "settings": "Configuración",
     "achievements": "Logros",
-    "challenges": "Desafios",
-    "closeMenu": "Cerrar menu",
-    "openMenu": "Abrir menu de usuario",
+    "challenges": "Desafíos",
+    "closeMenu": "Cerrar menú",
+    "openMenu": "Abrir menú de usuario",
     "blueprint": "Mi Mapa Arcano",
     "calendar": "Calendario",
     "insights": "Mi historia",
-    "compatibility": "Lectura de dos"
+    "compatibility": "Lectura de dos",
+    "mainNav": "Navegación principal",
+    "openNav": "Abrir menú",
+    "closeNav": "Cerrar menú",
+    "navMenu": "Menú",
+    "yourArcana": "Tu Arcana",
+    "account": "Tu cuenta",
+    "language": "Idioma"
   },
   "landing": {
-    "readingCounter": "lecturas realizadas",
-    "dailyCard": {
-      "title": "Tu Carta del Dia",
-      "cta": "Registrate para una lectura completa",
-      "ctaAuthenticated": "Obtener lectura completa"
-    },
-    "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "t1": {
-        "name": "Maria G.",
-        "text": "Las lecturas son sorprendentemente precisas. Me ayudo a tomar una decision importante."
-      },
-      "t2": {
-        "name": "Carlos R.",
-        "text": "Uso Arcana todas las mananas. Mi carta del dia me da perspectiva para el dia."
-      },
-      "t3": {
-        "name": "Ana L.",
-        "text": "Esceptica al principio, pero las interpretaciones son muy profundas y personalizadas."
-      }
-    },
-    "hero": {
-      "title": "Descubre tu destino",
-      "subtitle": "Las cartas del tarot guardan secretos ancestrales. Deja que revelen los mensajes que el universo tiene para ti.",
-      "cta": "Comenzar Lectura",
-      "ctaSecondary": "Crear Cuenta Gratis",
-      "ctaAuthenticated": "Ir a Mi Espacio",
-      "trustBadge": "3 lecturas gratuitas al registrarte - Sin tarjeta de credito"
-    },
-    "howItWorks": {
-      "title": "Como funciona?",
-      "subtitle": "Tu lectura de tarot en cuatro simples pasos",
-      "step1": {
-        "title": "Elige tu tirada",
-        "description": "Selecciona entre 4 tipos de tiradas segun la profundidad que busques."
-      },
-      "step2": {
-        "title": "Enfoca tu intencion",
-        "description": "Formula tu pregunta o situacion con claridad y concentracion."
-      },
-      "step3": {
-        "title": "Revela las cartas",
-        "description": "Las cartas se seleccionan y revelan una a una para ti."
-      },
-      "step4": {
-        "title": "Recibe tu guia",
-        "description": "Obten una interpretacion profunda que conecta las cartas con tu pregunta."
-      }
-    },
-    "features": {
-      "title": "Por que elegir Arcana",
-      "cards": {
-        "title": "78 Cartas Completas",
-        "description": "Mazo tradicional Rider-Waite con interpretaciones profundas en espanol."
-      },
-      "spreads": {
-        "title": "Multiples Tiradas",
-        "description": "Desde la clasica de 3 cartas hasta la poderosa Cruz Celta de 10."
-      },
-      "ai": {
-        "title": "IA Interpretativa",
-        "description": "Lecturas personalizadas que conectan las cartas con tu pregunta."
-      }
-    },
-    "spreadsSection": {
-      "title": "Tipos de Tirada",
-      "subtitle": "Desde consultas rapidas hasta analisis profundos, tenemos la tirada perfecta para cada pregunta.",
-      "viewAll": "Ver todas las tiradas"
-    },
     "faq": {
-      "title": "Preguntas Frecuentes",
+      "title": "Preguntas frecuentes",
       "subtitle": "Todo lo que necesitas saber sobre las lecturas de tarot",
-      "q1": "Que es una lectura de tarot?",
-      "a1": "Una lectura de tarot es una practica ancestral de autoconocimiento donde las cartas actuan como espejos de tu situacion actual, ayudandote a reflexionar sobre tus circunstancias, emociones y posibles caminos a seguir. No predice el futuro de forma determinista, sino que ofrece perspectivas y guia.",
-      "q2": "Como funciona la interpretacion con IA?",
-      "a2": "Nuestra IA ha sido entrenada con conocimiento profundo del simbolismo del tarot tradicional. Analiza la combinacion especifica de cartas que aparecen en tu lectura, sus posiciones y orientaciones, para ofrecerte una interpretacion coherente y personalizada que conecta con tu pregunta original.",
-      "q3": "Mis lecturas son privadas?",
-      "a3": "Absolutamente. Tus lecturas son completamente privadas y solo tu puedes acceder a ellas. No compartimos tu informacion con terceros y puedes eliminar tu historial en cualquier momento. Tu viaje espiritual es solo tuyo."
+      "q1": "¿Qué es una lectura de tarot?",
+      "a1": "Una lectura de tarot es una práctica ancestral de autoconocimiento donde las cartas actúan como espejos de tu situación actual, ayudándote a reflexionar sobre tus circunstancias, emociones y posibles caminos a seguir. No predice el futuro de forma determinista, sino que ofrece perspectivas y guía.",
+      "q2": "¿Cómo funciona la interpretación con IA?",
+      "a2": "Nuestra IA ha sido entrenada con conocimiento profundo del simbolismo del tarot tradicional. Analiza la combinación específica de cartas que aparecen en tu lectura, sus posiciones y orientaciones, para ofrecerte una interpretación coherente y personalizada que conecta con tu pregunta original.",
+      "q3": "¿Mis lecturas son privadas?",
+      "a3": "Absolutamente. Tus lecturas son completamente privadas y solo tú puedes acceder a ellas. No compartimos tu información con terceros y puedes eliminar tu historial en cualquier momento. Tu viaje espiritual es solo tuyo."
     },
-    "cta": {
-      "title": "Comienza tu viaje espiritual",
-      "subtitle": "Registrate ahora y recibe 3 lecturas gratuitas. Descubre lo que las cartas tienen preparado para ti.",
-      "button": "Crear Cuenta Gratis",
-      "titleAuthenticated": "Listo para tu proxima lectura?",
-      "subtitleAuthenticated": "Las cartas esperan revelarte nuevos mensajes.",
-      "buttonAuthenticated": "Comenzar Nueva Lectura"
-    },
-    "dailyOracle": {
-      "badge": "Nuevo",
-      "title": "Tu Carta del Dia, Cada Manana",
-      "description": "Comienza cada dia con guia cosmica. Recibe una carta de tarot personalizada en tu correo, interpretada especificamente para tu signo zodiacal y enfoque de vida.",
-      "feature1": "Personalizada a tu signo zodiacal",
-      "feature2": "1 lectura completa gratis al mes",
-      "feature3": "Cancela cuando quieras",
-      "cta": "Comenzar Oraculo Diario",
-      "emailPreview": "Tu carta del dia te espera...",
-      "emailTime": "Entregada a tu hora preferida"
+    "portada": {
+      "grabados": {
+        "etiqueta": "Tarot con IA · 78 grabados de 1909",
+        "pincel": "Pregunta",
+        "tesis1": "Las cartas son de 1909.",
+        "tesis2": "Quien las lee hoy es una IA.",
+        "tesis3": "La pregunta sigue siendo tuya.",
+        "cta": "Haz tu lectura",
+        "verHoy": "Ver la carta de hoy",
+        "irEspacio": "Ir a mi espacio",
+        "nota": "3 lecturas gratis al registrarte · sin tarjeta"
+      },
+      "grabado": {
+        "etiqueta": "Del grabado a la IA",
+        "titulo": "Un grabado de 1909 se vuelve una lectura escrita para ti.",
+        "bajada": "Pamela Colman Smith dibujó las 78 cartas en 1909. Arcana las baraja, tú escribes tu pregunta y la IA lee cómo dialogan entre sí y con tu momento. Un espejo, no una bola de cristal.",
+        "alt": "El Loco, grabado de Pamela Colman Smith, 1909",
+        "lectura1": "El Loco abre tu lectura con un paso al vacío que no es descuido: es confianza. Tu pregunta habla de empezar algo sin tener el mapa completo.",
+        "lectura2": "Esta carta no te promete que saldrá bien; te pregunta qué cargas en ese hatillo que ya no necesitas llevar.",
+        "firma": "Lectura de ejemplo · Arcana"
+      },
+      "carta": {
+        "etiqueta": "La carta de hoy · {tonalli}",
+        "titulo": "Una carta al día, para empezar con una pregunta.",
+        "estado": "La carta de hoy está boca abajo. Tócala para voltearla.",
+        "posicion": "carta de hoy",
+        "fecha": "Carta del día · {fecha}",
+        "complemento": "Cada mañana la tuya llega escrita para ti, con una pregunta para llevarte.",
+        "firma": "Mensaje de ejemplo · Arcana",
+        "cta": "Recíbela cada mañana"
+      },
+      "masQueTarot": {
+        "etiqueta": "Cinco formas de leerte",
+        "blueprint": "Arma el tuyo",
+        "calendar": "Ver hoy",
+        "compatibility": "Leer el vínculo",
+        "manual": "Usar mi mazo",
+        "historia": {
+          "titulo": "Mi historia",
+          "descripcion": "Arcana recuerda tus lecturas: las cartas que se repiten y tu mes en cartas.",
+          "cta": "Ver mi historia"
+        }
+      },
+      "hoy": {
+        "etiqueta": "El día de hoy en el tonalpohualli",
+        "titulo": "Hoy es {tonalli}, {nombre}.",
+        "trecena": "Trecena",
+        "senor": "Señor de la noche",
+        "luna": "Luna",
+        "lunaValor": "{fase} · {luz}%",
+        "diaPersonal": "Tu día personal",
+        "alRegistrarte": "Al registrarte",
+        "enCalendario": "En tu calendario",
+        "signos": "Los veinte signos del tonalpohualli",
+        "signoHoy": "hoy"
+      },
+      "faq": {
+        "etiqueta": "Antes de preguntar"
+      },
+      "turno": {
+        "pincel": "Tu turno",
+        "titulo": "Tu turno",
+        "texto": "Escribe tu pregunta. Las cartas ya están barajadas.",
+        "cta": "Haz tu lectura · 3 gratis",
+        "ctaSesion": "Haz tu lectura"
+      }
     }
   },
   "auth": {
-    "email": "Correo electronico",
-    "password": "Contrasena",
-    "confirmPassword": "Confirmar contrasena",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
     "name": "Nombre",
     "namePlaceholder": "Tu nombre",
     "nameOptional": "Nombre (opcional)",
@@ -159,38 +146,39 @@
     "loginSubtitle": "Ingresa a tu cuenta para continuar",
     "registerTitle": "Crea tu cuenta",
     "registerSubtitle": "Comienza con 3 lecturas gratuitas",
-    "noAccount": "No tienes cuenta?",
-    "hasAccount": "Ya tienes cuenta?",
-    "loginButton": "Iniciar Sesion",
-    "registerButton": "Crear Cuenta",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "loginButton": "Iniciar sesión",
+    "registerButton": "Crear cuenta",
     "termsText": "Al registrarte aceptas nuestros",
-    "termsLink": "terminos de servicio",
+    "termsLink": "términos de servicio",
     "andText": "y",
-    "privacyLink": "politica de privacidad",
+    "privacyLink": "política de privacidad",
     "continueWithGoogle": "Continuar con Google",
     "orContinueWith": "o continuar con",
-    "forgotPassword": "Olvidaste tu contrasena?",
-    "forgotPasswordTitle": "Recupera tu contrasena",
-    "forgotPasswordSubtitle": "Ingresa tu email y te enviaremos un enlace para restablecer tu contrasena",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "forgotPasswordTitle": "Recupera tu contraseña",
+    "forgotPasswordSubtitle": "Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña",
     "sendResetLink": "Enviar enlace",
     "resetLinkSent": "Revisa tu email",
-    "resetLinkSentSubtitle": "Si existe una cuenta con ese email, hemos enviado un enlace para restablecer tu contrasena.",
+    "resetLinkSentSubtitle": "Si existe una cuenta con ese email, hemos enviado un enlace para restablecer tu contraseña.",
     "backToLogin": "Volver al login",
-    "resetPasswordTitle": "Crea una nueva contrasena",
-    "resetPasswordSubtitle": "Ingresa tu nueva contrasena a continuacion",
-    "newPassword": "Nueva contrasena",
-    "confirmNewPassword": "Confirmar nueva contrasena",
-    "resetPassword": "Restablecer contrasena",
-    "passwordResetSuccess": "Contrasena restablecida",
-    "passwordResetSuccessSubtitle": "Ya puedes iniciar sesion con tu nueva contrasena",
+    "resetPasswordTitle": "Crea una nueva contraseña",
+    "resetPasswordSubtitle": "Ingresa tu nueva contraseña a continuación",
+    "newPassword": "Nueva contraseña",
+    "confirmNewPassword": "Confirmar nueva contraseña",
+    "resetPassword": "Restablecer contraseña",
+    "passwordResetSuccess": "Contraseña restablecida",
+    "passwordResetSuccessSubtitle": "Ya puedes iniciar sesión con tu nueva contraseña",
     "errors": {
-      "invalidCredentials": "Credenciales invalidas",
-      "emailExists": "Este email ya esta registrado",
-      "weakPassword": "La contrasena debe tener al menos 6 caracteres",
-      "passwordMismatch": "Las contrasenas no coinciden",
-      "invalidEmail": "Email invalido",
+      "invalidCredentials": "Credenciales inválidas",
+      "emailExists": "Este email ya está registrado",
+      "weakPassword": "La contraseña debe tener al menos 6 caracteres",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "invalidEmail": "Email inválido",
       "createAccount": "Error al crear la cuenta",
-      "loginAfterRegister": "Cuenta creada pero hubo un error al iniciar sesion"
+      "loginAfterRegister": "Cuenta creada pero hubo un error al iniciar sesión",
+      "generic": "Algo salió mal"
     },
     "passwordReset": {
       "subject": "Restablece tu contraseña - Arcana",
@@ -199,29 +187,39 @@
       "button": "Restablecer contraseña",
       "expiry": "Este enlace expirará en 1 hora.",
       "ignore": "Si no solicitaste esto, ignora este email."
-    }
+    },
+    "sheetLogin": "Tu cuenta",
+    "sheetRegister": "Cuenta nueva",
+    "sheetRecover": "Recuperar acceso",
+    "invalidLinkTitle": "Enlace no válido",
+    "invalidLinkSubtitle": "Este enlace para restablecer tu contraseña no es válido o ya venció.",
+    "requestNewLink": "Pedir un enlace nuevo"
   },
   "dashboard": {
     "welcome": "Hola, {name}",
+    "welcomeDefault": "Tu cuenta",
     "welcomeSubtitle": "Bienvenido a tu espacio de lecturas",
     "streak": {
-      "days": "dias seguidos",
-      "best": "Mejor: {count} dias"
+      "days": "días seguidos",
+      "best": "Mejor: {count} días",
+      "title": "Racha",
+      "empty": "Tu racha empieza con tu próxima lectura."
     },
     "freeReadings": "{count, plural, one {# lectura gratis} other {# lecturas gratis}}",
-    "freeReadingsLabel": "Lecturas Gratis",
-    "credits": "{count} creditos",
-    "credit": "credito",
-    "creditPlural": "creditos",
-    "creditsLabel": "Creditos",
-    "totalReadingsLabel": "Total Lecturas",
-    "noCredits": "Sin creditos",
-    "buyCredits": "Comprar creditos",
-    "startNewReading": "Iniciar Nueva Lectura",
-    "recentReadings": "Lecturas Recientes",
-    "noReadings": "Aun no has realizado ninguna lectura",
+    "freeReadingsLabel": "Lecturas gratis",
+    "credits": "{count} créditos",
+    "credit": "crédito",
+    "creditPlural": "créditos",
+    "streakReward": "{count, plural, one {+# crédito} other {+# créditos}}",
+    "creditsLabel": "Créditos",
+    "totalReadingsLabel": "Total de lecturas",
+    "noCredits": "Sin créditos",
+    "buyCredits": "Comprar créditos",
+    "startNewReading": "Iniciar nueva lectura",
+    "recentReadings": "Lecturas recientes",
+    "noReadings": "Aún no has realizado ninguna lectura",
     "firstReading": "Hacer mi primera lectura",
-    "startReading": "Nueva Lectura",
+    "startReading": "Nueva lectura",
     "viewAll": "Ver todas",
     "free": "Gratis",
     "freeShort": "gratis",
@@ -229,82 +227,88 @@
     "completeProfile": "Completa tu perfil",
     "completeProfileDesc": "Agrega tu fecha de nacimiento para lecturas personalizadas",
     "setupProfile": "Configurar",
-    "dailyOracleTitle": "Oraculo Diario",
-    "dailyOracleDesc": "Recibe una carta personalizada en tu correo cada manana",
-    "viewDaily": "Carta de Hoy",
-    "todayCardDone": "Carta de Hoy ✓",
+    "dailyOracleTitle": "Oráculo Diario",
+    "dailyOracleDesc": "Recibe una carta personalizada en tu correo cada mañana",
+    "viewDaily": "Carta de hoy",
+    "todayCardDone": "Carta de hoy ✓",
     "subscribeCta": "Suscribirse $79 MXN/mes",
-    "referralTitle": "Invita amigos, gana creditos",
-    "referralDesc": "Obten 2 creditos por cada amigo que se registre",
-    "inviteFriends": "Invitar Amigos",
+    "referralTitle": "Invita amigos, gana créditos",
+    "referralDesc": "Obtén 2 créditos por cada amigo que se registre",
+    "inviteFriends": "Invitar amigos",
     "explore": {
       "title": "Explora"
+    },
+    "mesa": {
+      "etiqueta": "Mi espacio",
+      "pincel": "Tu mesa",
+      "notaRecientes": "Los grabados de la mesa son las cartas de tus últimas lecturas.",
+      "notaFijas": "Cuando hagas tus lecturas, sus cartas quedarán en esta mesa."
     }
   },
   "reading": {
-    "selectSpread": "Elige tu Tirada",
+    "selectSpread": "Elige tu tirada",
     "spreadCategories": {
-      "classic": "Tiradas Clasicas",
-      "themed": "Tiradas Tematicas"
+      "classic": "Tiradas clásicas",
+      "themed": "Tiradas temáticas"
     },
     "notes": {
-      "title": "Mis Reflexiones",
-      "placeholder": "Que significo esta lectura para ti? Que decisiones tomaste?",
-      "hint": "Tus notas se guardan automaticamente mientras escribes",
+      "title": "Mis reflexiones",
+      "placeholder": "¿Qué significó esta lectura para ti? ¿Qué decisiones tomaste?",
+      "hint": "Tus notas se guardan automáticamente mientras escribes",
       "saving": "Guardando...",
       "saved": "Guardado"
     },
     "selectSpreadSubtitle": "Selecciona el tipo de lectura que mejor se adapte a tu pregunta",
     "cards": "{count} cartas",
-    "cost": "{count} credito",
-    "costPlural": "{count} creditos",
+    "cost": "{count} crédito",
+    "costPlural": "{count} créditos",
     "free": "Gratis",
-    "freeWithReading": "Usaras 1 lectura gratis",
+    "freeWithReading": "Usarás 1 lectura gratis",
     "freeReadingsLeft": "{count} lectura{count, plural, one {} other {s}} gratis",
     "freeReadingsLabel": "lecturas gratis",
     "freeReadingLabel": "lectura gratis",
-    "creditsAvailableLabel": "creditos disponibles",
-    "creditsAvailable": "{count} creditos disponibles",
-    "intentionTitle": "Tu Intencion",
-    "intentionSubtitle": "Formula tu pregunta o describe la situacion sobre la que deseas recibir guia. Cuanto mas clara sea tu intencion, mas precisa sera la lectura.",
-    "intentionPlaceholder": "Ej: Que necesito saber sobre mi situacion laboral actual? / Busco claridad sobre mi relacion...",
-    "intentionHint": "{count} / 10 caracteres minimo",
-    "intentionTooShort": "Tu intencion debe tener al menos 10 caracteres",
-    "startReading": "Comenzar Lectura",
+    "creditsAvailableLabel": "créditos disponibles",
+    "creditsAvailable": "{count} créditos disponibles",
+    "intentionTitle": "Tu intención",
+    "intentionSubtitle": "Formula tu pregunta o describe la situación sobre la que deseas recibir guía. Cuanto más clara sea tu intención, más precisa será la lectura.",
+    "intentionPlaceholder": "Ej: ¿Qué necesito saber sobre mi situación laboral actual? / Busco claridad sobre mi relación...",
+    "intentionHint": "{count} / 10 caracteres mínimo",
+    "intentionTooShort": "Tu intención debe tener al menos 10 caracteres",
+    "startReading": "Comenzar lectura",
     "changeSpread": "Cambiar tirada",
     "shuffling": "Barajando las cartas...",
-    "shufflingSubtitle": "Concentrandote en tu intencion mientras las cartas se mezclan",
-    "revealing": "Las Cartas se Revelan",
-    "revealingSubtitle": "Observa como cada carta toma su lugar...",
+    "shufflingSubtitle": "Concentrándote en tu intención mientras las cartas se mezclan",
+    "revealing": "Las cartas se revelan",
+    "revealingSubtitle": "Observa cómo cada carta toma su lugar...",
     "allRevealed": "Todas las cartas han sido reveladas",
     "tapToReveal": "Toca una carta para revelarla",
     "tapCard": "Toca",
     "cardsRevealedCount": "{count} de {total} cartas reveladas",
-    "allCardsRevealed": "Todas las cartas reveladas!",
-    "viewInterpretation": "Ver Interpretacion",
-    "yourReading": "Tu Lectura",
-    "yourIntention": "Tu Intencion",
-    "interpretation": "Interpretacion",
-    "position": "Posicion {number}",
+    "allCardsRevealed": "¡Todas las cartas reveladas!",
+    "viewInterpretation": "Ver interpretación",
+    "yourReading": "Tu lectura",
+    "yourIntention": "Tu intención",
+    "interpretation": "Interpretación",
+    "position": "Posición {number}",
     "positions": "Posiciones:",
-    "more": "+{count} mas",
+    "more": "+{count} más",
     "reversed": "Invertida",
     "upright": "Al derecho",
-    "viewSaved": "Ver Lectura Guardada",
-    "newReading": "Nueva Lectura",
+    "viewSaved": "Ver lectura guardada",
+    "newReading": "Nueva lectura",
     "anotherReading": "Hacer otra lectura",
     "backToHistory": "Volver al historial",
     "backToSpreads": "Volver a tiradas",
-    "cardsRevealed": "Las Cartas Reveladas",
+    "cardsRevealed": "Las cartas reveladas",
     "meaning": "Significado:",
-    "needCredits": "Creditos insuficientes",
-    "needCreditsMessage": "Necesitas {cost} creditos para esta lectura.",
-    "currentCredits": "Actualmente tienes {credits} creditos",
+    "needCredits": "Créditos insuficientes",
+    "needCreditsMessage": "Necesitas {cost} créditos para esta lectura.",
+    "currentCredits": "Actualmente tienes {credits} créditos",
     "andFreeReadings": "y {count} lecturas gratis",
-    "needMoreCredits": "Necesitas {count} creditos mas",
-    "buyCreditsQuestion": "Necesitas mas creditos para hacer lecturas avanzadas?",
-    "buyCreditsLink": "Comprar creditos",
-    "buyCredits": "Comprar Creditos",
+    "needMoreCredits": "Necesitas {count} créditos más",
+    "buyCreditsQuestion": "¿Necesitas más créditos para hacer lecturas avanzadas?",
+    "buyCreditsLink": "Comprar créditos",
+    "buyCredits": "Comprar créditos",
     "loadError": "No se pudo cargar el tipo de tirada",
     "createError": "Error al crear la lectura",
     "interpretationUnavailable": "No pudimos escribir tu interpretación ahora. No se te cobró nada; inténtalo de nuevo en un momento.",
@@ -312,27 +316,33 @@
     "retry": "Intentar de nuevo",
     "viewHistory": "Ver historial",
     "share": "Compartir",
-    "shareReading": "Compartir Lectura",
-    "shareDescription": "Haz publica esta lectura para que otros puedan verla",
-    "makePublic": "Hacer Publica",
-    "makePrivate": "Hacer Privada",
-    "copyLink": "Copiar Enlace",
-    "linkCopied": "Enlace copiado!",
-    "publicReading": "Lectura publica",
+    "shareReading": "Compartir lectura",
+    "shareDescription": "Haz pública esta lectura para que otros puedan verla",
+    "makePublic": "Hacer pública",
+    "makePrivate": "Hacer privada",
+    "copyLink": "Copiar enlace",
+    "linkCopied": "¡Enlace copiado!",
+    "publicReading": "Lectura pública",
     "privateReading": "Lectura privada",
     "sharedBy": "Compartido por",
-    "anonymous": "Anonimo",
+    "sharedTitle": "La lectura de {name}",
+    "sharedTitleAnonymous": "Una lectura compartida",
+    "anonymous": "Anónimo",
     "shareCta": {
       "title": "¿Quieres tu propia lectura?",
       "subtitle": "Regístrate ahora y obtén 3 lecturas gratis"
-    }
+    },
+    "ask": "Pregunta",
+    "yourTurn": "Tu turno",
+    "close": "Cerrar",
+    "shareLink": "Enlace para compartir"
   },
   "credits": {
-    "title": "Comprar Creditos",
-    "subtitle": "Los creditos te permiten realizar lecturas de tarot. Cada tipo de tirada tiene un costo diferente segun su profundidad.",
+    "title": "Comprar créditos",
+    "subtitle": "Los créditos te permiten realizar lecturas de tarot. Cada tipo de tirada tiene un costo diferente según su profundidad.",
     "currentBalance": "Tu balance actual",
-    "popular": "Mas popular",
-    "creditsUnit": "creditos",
+    "popular": "Más popular",
+    "creditsUnit": "créditos",
     "readings": "{range} lecturas",
     "buy": "Comprar",
     "processing": "Procesando...",
@@ -345,40 +355,46 @@
     },
     "success": {
       "title": "Pago exitoso",
-      "subtitle": "Gracias por tu compra. Tus creditos ya estan disponibles.",
-      "creditsAdded": "Creditos agregados",
+      "subtitle": "Gracias por tu compra. Tus créditos ya están disponibles.",
+      "creditsAdded": "Créditos agregados",
       "amountPaid": "Monto pagado",
       "startReading": "Hacer una lectura",
-      "viewCredits": "Ver mis creditos"
+      "viewCredits": "Ver mis créditos",
+      "verifying": "Verificando tu pago…"
     },
     "error": {
       "title": "Error en el pago",
       "subtitle": "No pudimos verificar tu pago",
-      "sessionNotFound": "No se encontro la sesion de pago",
-      "sessionError": "Error al obtener sesion",
+      "sessionNotFound": "No se encontró la sesión de pago",
+      "sessionError": "Error al obtener sesión",
       "verifyError": "Error al verificar el pago",
       "retry": "Volver a intentar"
-    }
+    },
+    "eyebrow": "Créditos",
+    "costsTitle": "Lo que cuesta cada tirada",
+    "packagesTitle": "Elige un paquete",
+    "costCredits": "{count, plural, one {# crédito} other {# créditos}}"
   },
   "history": {
-    "title": "Historial de Lecturas",
+    "title": "Historial de lecturas",
     "readingCount": "{count} lectura{count, plural, one {} other {s}} en total",
     "readingTotal": "lectura en total",
     "readingsTotal": "lecturas en total",
-    "empty": "No tienes lecturas aun",
-    "emptyTitle": "No tienes lecturas aun",
+    "empty": "No tienes lecturas aún",
+    "emptyTitle": "No tienes lecturas aún",
     "emptySubtitle": "Comienza tu viaje espiritual con tu primera lectura de tarot",
     "startReading": "Hacer mi primera lectura",
-    "newReading": "Nueva Lectura"
+    "newReading": "Nueva lectura",
+    "etiqueta": "Tu archivo"
   },
   "spreads": {
     "threeCard": {
       "name": "Tres Cartas",
-      "description": "Pasado, Presente, Futuro"
+      "description": "Pasado, presente, futuro"
     },
     "simpleCross": {
       "name": "Cruz Simple",
-      "description": "Vision multidimensional"
+      "description": "Visión multidimensional"
     },
     "horseshoe": {
       "name": "Herradura",
@@ -386,106 +402,108 @@
     },
     "celticCross": {
       "name": "Cruz Celta",
-      "description": "Analisis profundo"
+      "description": "Análisis profundo"
     }
   },
   "footer": {
     "tagline": "Lecturas de tarot con inteligencia artificial",
     "rights": "Todos los derechos reservados",
-    "explore": "Explorar Cartas",
+    "explore": "Explorar cartas",
     "blog": "Blog",
-    "dailyOracle": "Oraculo Diario",
+    "dailyOracle": "Oráculo Diario",
     "legal": {
       "about": "Acerca de",
       "privacy": "Privacidad",
-      "terms": "Terminos"
+      "terms": "Términos"
     }
   },
   "legal": {
     "about": {
       "title": "Sobre Arcana",
-      "intro": "Arcana es una plataforma moderna de lecturas de tarot que combina la sabiduria ancestral con inteligencia artificial para ofrecer guia espiritual personalizada.",
+      "intro": "Arcana es una plataforma moderna de lecturas de tarot que combina la sabiduría ancestral con inteligencia artificial para ofrecer guía espiritual personalizada.",
       "mission": {
-        "title": "Nuestra Mision",
-        "content": "Creemos que el tarot es una herramienta poderosa para la reflexion personal y el crecimiento. Nuestra mision es hacer esta practica ancestral accesible para todos, proporcionando interpretaciones profundas que resuenen con tu situacion unica."
+        "title": "Nuestra misión",
+        "content": "Creemos que el tarot es una herramienta poderosa para la reflexión personal y el crecimiento. Nuestra misión es hacer esta práctica ancestral accesible para todos, proporcionando interpretaciones profundas que resuenen con tu situación única."
       },
       "how": {
-        "title": "Como Funciona",
-        "content": "Nuestra plataforma utiliza IA avanzada para analizar las cartas de tu lectura y proporcionar interpretaciones que conecten con tu pregunta o intencion especifica. Cada lectura es unica y personalizada para tu situacion."
+        "title": "Cómo funciona",
+        "content": "Nuestra plataforma utiliza IA avanzada para analizar las cartas de tu lectura y proporcionar interpretaciones que conecten con tu pregunta o intención específica. Cada lectura es única y personalizada para tu situación."
       },
       "disclaimer": {
-        "title": "Aviso Legal",
-        "content": "Las lecturas de tarot estan destinadas unicamente a fines de entretenimiento y reflexion personal. No deben utilizarse como sustituto de asesoramiento profesional en asuntos legales, financieros, medicos o psicologicos."
-      }
+        "title": "Aviso legal",
+        "content": "Las lecturas de tarot están destinadas únicamente a fines de entretenimiento y reflexión personal. No deben utilizarse como sustituto de asesoramiento profesional en asuntos legales, financieros, médicos o psicológicos."
+      },
+      "eyebrow": "Quiénes somos"
     },
     "terms": {
-      "title": "Terminos de Servicio",
-      "lastUpdated": "Ultima actualizacion: Diciembre 2024",
+      "title": "Términos de servicio",
+      "lastUpdated": "Última actualización: Diciembre 2024",
       "acceptance": {
-        "title": "Aceptacion de Terminos",
-        "content": "Al acceder y utilizar Arcana, aceptas estar sujeto a estos Terminos de Servicio. Si no estas de acuerdo con estos terminos, por favor no utilices nuestro servicio."
+        "title": "Aceptación de términos",
+        "content": "Al acceder y utilizar Arcana, aceptas estar sujeto a estos Términos de Servicio. Si no estás de acuerdo con estos términos, por favor no utilices nuestro servicio."
       },
       "service": {
-        "title": "Descripcion del Servicio",
-        "content": "Arcana ofrece lecturas de tarot impulsadas por inteligencia artificial con fines de entretenimiento y reflexion personal. Nuestro servicio no esta destinado a proporcionar asesoramiento profesional de ningun tipo."
+        "title": "Descripción del servicio",
+        "content": "Arcana ofrece lecturas de tarot impulsadas por inteligencia artificial con fines de entretenimiento y reflexión personal. Nuestro servicio no está destinado a proporcionar asesoramiento profesional de ningún tipo."
       },
       "accounts": {
-        "title": "Cuentas de Usuario",
+        "title": "Cuentas de usuario",
         "content": "Eres responsable de mantener la confidencialidad de tus credenciales de cuenta. Aceptas notificarnos inmediatamente sobre cualquier uso no autorizado de tu cuenta."
       },
       "credits": {
-        "title": "Creditos y Pagos",
-        "content": "Los creditos comprados en nuestra plataforma no son reembolsables. Los creditos no expiran pero pueden estar sujetos a actualizaciones de terminos. Las lecturas gratuitas se proporcionan como oferta promocional y pueden modificarse o discontinuarse en cualquier momento."
+        "title": "Créditos y pagos",
+        "content": "Los créditos comprados en nuestra plataforma no son reembolsables. Los créditos no expiran pero pueden estar sujetos a actualizaciones de términos. Las lecturas gratuitas se proporcionan como oferta promocional y pueden modificarse o discontinuarse en cualquier momento."
       },
       "conduct": {
-        "title": "Conducta del Usuario",
+        "title": "Conducta del usuario",
         "content": "Aceptas no hacer mal uso de nuestro servicio, intentar obtener acceso no autorizado a nuestros sistemas o utilizar el servicio para fines ilegales."
       },
       "changes": {
-        "title": "Cambios en los Terminos",
-        "content": "Nos reservamos el derecho de modificar estos terminos en cualquier momento. El uso continuado del servicio despues de los cambios constituye la aceptacion de los nuevos terminos."
+        "title": "Cambios en los términos",
+        "content": "Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado del servicio después de los cambios constituye la aceptación de los nuevos términos."
       }
     },
     "privacy": {
-      "title": "Politica de Privacidad",
-      "lastUpdated": "Ultima actualizacion: Diciembre 2024",
-      "intro": "Tu privacidad es importante para nosotros. Esta politica explica como recopilamos, usamos y protegemos tu informacion.",
+      "title": "Política de privacidad",
+      "lastUpdated": "Última actualización: Diciembre 2024",
+      "intro": "Tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tu información.",
       "collection": {
-        "title": "Informacion que Recopilamos",
-        "content": "Recopilamos la informacion que nos proporcionas directamente, incluyendo tu direccion de correo electronico, nombre (opcional) y las lecturas que realizas. Tambien recopilamos datos de uso para mejorar nuestro servicio."
+        "title": "Información que recopilamos",
+        "content": "Recopilamos la información que nos proporcionas directamente, incluyendo tu dirección de correo electrónico, nombre (opcional) y las lecturas que realizas. También recopilamos datos de uso para mejorar nuestro servicio."
       },
       "use": {
-        "title": "Como Usamos tu Informacion",
-        "content": "Utilizamos tu informacion para proporcionar y mejorar nuestro servicio, procesar transacciones, enviarte actualizaciones (si lo deseas) y responder a tus consultas."
+        "title": "Cómo usamos tu información",
+        "content": "Utilizamos tu información para proporcionar y mejorar nuestro servicio, procesar transacciones, enviarte actualizaciones (si lo deseas) y responder a tus consultas."
       },
       "storage": {
-        "title": "Almacenamiento de Datos",
-        "content": "Tus lecturas se almacenan de forma segura y solo tu puedes acceder a ellas. Utilizamos medidas de seguridad estandar de la industria para proteger tus datos."
+        "title": "Almacenamiento de datos",
+        "content": "Tus lecturas se almacenan de forma segura y solo tú puedes acceder a ellas. Utilizamos medidas de seguridad estándar de la industria para proteger tus datos."
       },
       "sharing": {
-        "title": "Compartir Informacion",
-        "content": "No vendemos ni compartimos tu informacion personal con terceros, excepto cuando sea necesario para proporcionar nuestro servicio (por ejemplo, procesamiento de pagos) o segun lo requiera la ley."
+        "title": "Compartir información",
+        "content": "No vendemos ni compartimos tu información personal con terceros, excepto cuando sea necesario para proporcionar nuestro servicio (por ejemplo, procesamiento de pagos) o según lo requiera la ley."
       },
       "cookies": {
         "title": "Cookies",
-        "content": "Utilizamos cookies para mantener tu sesion y recordar tus preferencias. Puedes desactivar las cookies en la configuracion de tu navegador, pero esto puede afectar la funcionalidad de nuestro servicio."
+        "content": "Utilizamos cookies para mantener tu sesión y recordar tus preferencias. Puedes desactivar las cookies en la configuración de tu navegador, pero esto puede afectar la funcionalidad de nuestro servicio."
       },
       "rights": {
-        "title": "Tus Derechos",
-        "content": "Tienes derecho a acceder, corregir o eliminar tu informacion personal. Tambien puedes eliminar tu historial de lecturas en cualquier momento desde la configuracion de tu cuenta."
+        "title": "Tus derechos",
+        "content": "Tienes derecho a acceder, corregir o eliminar tu información personal. También puedes eliminar tu historial de lecturas en cualquier momento desde la configuración de tu cuenta."
       },
       "contact": {
-        "title": "Contactanos",
-        "content": "Si tienes alguna pregunta sobre esta Politica de Privacidad, por favor contactanos."
+        "title": "Contáctanos",
+        "content": "Si tienes alguna pregunta sobre esta Política de Privacidad, por favor contáctanos."
       }
-    }
+    },
+    "back": "Volver al inicio"
   },
   "metadata": {
-    "title": "Arcana - Lecturas de Tarot con IA",
+    "title": "Arcana - Lecturas de tarot con IA",
     "description": "Descubre lo que las cartas tienen para ti. Lecturas de tarot personalizadas con inteligencia artificial."
   },
   "cards": {
-    "title": "Explora el Tarot",
+    "title": "Explora el tarot",
     "subtitle": "Descubre las 78 cartas del mazo Rider-Waite y sus significados",
     "filters": {
       "all": "Todas",
@@ -493,25 +511,30 @@
       "wands": "Bastos",
       "cups": "Copas",
       "swords": "Espadas",
-      "pentacles": "Oros"
+      "pentacles": "Oros",
+      "label": "Filtrar por palo"
     },
     "searchPlaceholder": "Buscar por nombre o palabra clave...",
     "showing": "Mostrando {count} cartas",
     "noResults": "No se encontraron cartas",
     "clearFilters": "Limpiar filtros",
     "cta": {
-      "title": "Listo para una lectura?",
+      "title": "¿Listo para una lectura?",
       "subtitle": "Descubre lo que las cartas tienen preparado para ti",
-      "button": "Comenzar Lectura"
-    }
+      "button": "Comenzar lectura"
+    },
+    "kicker": "78 grabados · Pamela Colman Smith, 1909",
+    "searchLabel": "Buscar una carta",
+    "searchButton": "Buscar",
+    "sectionCount": "{count} cartas"
   },
   "cardDetail": {
     "backToCards": "Volver a las cartas",
-    "keywords": "Palabras Clave",
+    "keywords": "Palabras clave",
     "appearsIn": "Aparece frecuentemente en lecturas sobre",
-    "upright": "Significado al Derecho",
+    "upright": "Significado al derecho",
     "uprightSubtitle": "Cuando esta carta aparece al derecho",
-    "reversed": "Significado Invertido",
+    "reversed": "Significado invertido",
     "reversedSubtitle": "Cuando esta carta aparece invertida",
     "focusAreas": {
       "love": "Amor",
@@ -520,142 +543,162 @@
       "general": "General"
     },
     "cta": {
-      "title": "Que significa {card} para ti?",
-      "subtitle": "Obtén una lectura personalizada que conecte esta carta con tu situacion unica",
-      "button": "Comenzar Lectura"
+      "title": "¿Qué significa {card} para ti?",
+      "subtitle": "Obtén una lectura personalizada que conecte esta carta con tu situación única",
+      "button": "Comenzar lectura"
     }
   },
   "subscribe": {
-    "title": "Oraculo Diario",
-    "subtitle": "Tu carta del dia, cada manana en tu inbox",
-    "description": "Recibe una carta de tarot personalizada cada dia, interpretada especificamente para tu signo zodiacal y area de enfoque.",
+    "title": "Oráculo Diario",
+    "subtitle": "Tu carta del día, cada mañana en tu correo",
+    "description": "Recibe una carta de tarot personalizada cada día, interpretada específicamente para tu signo zodiacal y área de enfoque.",
     "price": "$79 MXN/mes",
     "features": {
       "personalized": "Personalizada a tu signo zodiacal",
-      "focusArea": "Alineada con tu area de vida",
+      "focusArea": "Alineada con tu área de vida",
       "freeReading": "1 lectura completa gratis al mes",
       "cancelAnytime": "Cancela cuando quieras"
     },
-    "cta": "Comenzar mi Oraculo",
+    "cta": "Comenzar mi oráculo",
     "setupFirst": "Completa tu perfil para personalizar tus lecturas",
-    "alreadySubscribed": "Ya estas suscrito!",
-    "manageSubscription": "Gestionar Suscripcion",
-    "cancelSubscription": "Cancelar Suscripcion",
+    "alreadySubscribed": "¡Ya estás suscrito!",
+    "manageSubscription": "Gestionar suscripción",
+    "cancelSubscription": "Cancelar suscripción",
     "reactivate": "Reactivar",
     "activeUntil": "Activa hasta {date}",
     "success": {
-      "title": "Bienvenido al Oraculo Diario!",
-      "subtitle": "Tu suscripcion ya esta activa",
-      "nextSteps": "Recibiras tu primera carta diaria manana a tu hora preferida.",
+      "title": "¡Bienvenido al Oráculo Diario!",
+      "subtitle": "Tu suscripción ya está activa",
+      "nextSteps": "Recibirás tu primera carta diaria mañana a tu hora preferida.",
       "goToDaily": "Ver la carta de hoy",
-      "goToDashboard": "Ir al Dashboard",
+      "goToDashboard": "Ir a mi espacio",
       "active": "Activa",
       "tryAgain": "Intentar de nuevo",
       "noSession": "No se encontró sesión",
       "sessionNotFound": "Sesión no encontrada",
-      "verifyError": "Error al verificar suscripción"
+      "verifyError": "Error al verificar suscripción",
+      "verifying": "Confirmando tu suscripción…",
+      "errorTitle": "No pudimos confirmar tu suscripción"
     },
-    "orPayWithCredits": "o paga con creditos",
-    "payWithCredits": "Pagar con creditos",
-    "creditsPerMonth": "creditos/mes",
-    "subscribeWithCredits": "Suscribirse con Creditos",
-    "needMoreCredits": "Necesitas {count} creditos mas",
-    "buyCredits": "Comprar creditos",
-    "paidWithCredits": "Pagado con creditos",
-    "renewsAutomatically": "Se renueva automaticamente si tienes creditos suficientes",
-    "subscriptionError": "Error procesando suscripcion. Intenta de nuevo."
+    "orPayWithCredits": "o paga con créditos",
+    "payWithCredits": "Pagar con créditos",
+    "creditsPerMonth": "créditos/mes",
+    "subscribeWithCredits": "Suscribirse con créditos",
+    "needMoreCredits": "Necesitas {count} créditos más",
+    "buyCredits": "Comprar créditos",
+    "paidWithCredits": "Pagado con créditos",
+    "renewsAutomatically": "Se renueva automáticamente si tienes créditos suficientes",
+    "subscriptionError": "Error procesando suscripción. Intenta de nuevo.",
+    "eyebrow": "Suscripción mensual",
+    "included": "Incluye",
+    "cancelsAtPeriodEnd": "Se cancela al terminar el periodo",
+    "editProfile": "Editar perfil",
+    "securePayment": "Pagos seguros procesados por Stripe"
   },
   "profile": {
-    "title": "Completa tu Perfil",
-    "subtitle": "Ayudanos a personalizar tus lecturas diarias",
-    "fullName": "Nombre Completo",
+    "title": "Completa tu perfil",
+    "subtitle": "Ayúdanos a personalizar tus lecturas diarias",
+    "fullName": "Nombre completo",
     "fullNamePlaceholder": "Tu nombre completo",
-    "birthDate": "Fecha de Nacimiento",
-    "birthTime": "Hora de Nacimiento (opcional)",
-    "birthTimeTooltip": "Se usa para calcular tu ascendente y lecturas aun mas personalizadas",
-    "focusArea": "Area de Enfoque",
-    "focusAreaDescription": "En que area de tu vida te gustaria recibir guia?",
-    "emailTime": "Hora del Email",
-    "emailTimeDescription": "A que hora te gustaria recibir tu carta diaria?",
-    "zodiacSign": "Tu Signo Zodiacal",
-    "save": "Guardar Perfil",
+    "birthDate": "Fecha de nacimiento",
+    "birthTime": "Hora de nacimiento (opcional)",
+    "birthTimeTooltip": "Se usa para calcular tu ascendente y lecturas aún más personalizadas",
+    "focusArea": "Área de enfoque",
+    "focusAreaDescription": "¿En qué área de tu vida te gustaría recibir guía?",
+    "emailTime": "Hora del correo",
+    "emailTimeDescription": "¿A qué hora te gustaría recibir tu carta diaria?",
+    "zodiacSign": "Tu signo zodiacal",
+    "save": "Guardar perfil",
     "saving": "Guardando...",
-    "saved": "Perfil guardado!",
+    "saved": "¡Perfil guardado!",
     "continue": "Continuar a suscripción",
     "focusAreas": {
-      "general": "Guia General",
-      "love": "Amor y Relaciones",
-      "career": "Carrera y Finanzas",
-      "spirituality": "Espiritualidad y Crecimiento",
-      "health": "Salud y Bienestar"
+      "general": "Guía general",
+      "love": "Amor y relaciones",
+      "career": "Carrera y finanzas",
+      "spirituality": "Espiritualidad y crecimiento",
+      "health": "Salud y bienestar"
+    },
+    "eyebrow": "Tu perfil",
+    "emailTimeUtc": "Los horarios están en UTC. Ciudad de México es UTC-6.",
+    "meta": {
+      "title": "Tu perfil",
+      "description": "Completa tu perfil para personalizar tus lecturas de tarot con tu signo y tus preferencias."
     }
   },
   "daily": {
-    "title": "Tu Carta Diaria",
-    "todayCard": "Carta de Hoy",
-    "noCardYet": "Tu carta de hoy aun no ha sido sacada",
-    "cardWillArrive": "Llegara a las {time} a tu inbox",
-    "viewInterpretation": "Ver Interpretacion Completa",
-    "history": "Cartas Recientes",
-    "last7days": "Ultimos 7 dias",
-    "noSubscription": "Suscribete al Oraculo Diario",
-    "noSubscriptionDesc": "Recibe cartas diarias personalizadas en tu inbox",
+    "title": "Tu carta diaria",
+    "todayCard": "Carta de hoy",
+    "noCardYet": "Tu carta de hoy aún no ha sido sacada",
+    "cardWillArrive": "Llegará a las {time} a tu correo",
+    "viewInterpretation": "Ver interpretación completa",
+    "history": "Cartas recientes",
+    "last7days": "Últimos 7 días",
+    "noSubscription": "Suscríbete al Oráculo Diario",
+    "noSubscriptionDesc": "Recibe cartas diarias personalizadas en tu correo",
     "subscribeNow": "Suscribirme",
-    "preview": "Vista Previa",
+    "preview": "Vista previa",
     "reversed": "Invertida",
     "sentAt": "Enviada a las {time}",
-    "creditsExhausted": "Suscripción Expirada",
+    "creditsExhausted": "Suscripción expirada",
     "creditsExhaustedDesc": "Tu suscripción con créditos ha expirado. Agrega más créditos o vuelve a suscribirte para seguir recibiendo lecturas diarias.",
-    "buyCredits": "Comprar Créditos",
-    "resubscribe": "Volver a Suscribirse"
+    "buyCredits": "Comprar créditos",
+    "resubscribe": "Volver a suscribirse",
+    "pincel": "Hoy",
+    "boca": "Tu carta de hoy está boca abajo. Tócala para voltearla."
   },
   "referral": {
-    "title": "Invita Amigos, Gana Creditos",
+    "title": "Invita amigos, gana créditos",
     "subtitle": "Comparte la magia de Arcana y ambos reciben recompensas",
-    "howItWorks": "Como funciona",
-    "step1": "Comparte tu enlace unico con amigos",
+    "howItWorks": "Cómo funciona",
+    "step1": "Comparte tu enlace único con amigos",
     "step2": "Ellos se registran usando tu enlace",
-    "step3": "Ambos reciben 3 creditos gratis!",
-    "yourLink": "Tu Enlace de Referidos",
+    "step3": "¡Ambos reciben 3 créditos gratis!",
+    "yourLink": "Tu enlace de referidos",
     "copy": "Copiar",
-    "copied": "Copiado!",
+    "copied": "¡Copiado!",
     "friendsReferred": "Amigos referidos",
-    "creditsEarned": "Creditos ganados",
-    "shareText": "Descubre lecturas de tarot con IA en Arcana! Registrate con mi enlace y ambos obtenemos 3 creditos gratis: {link}",
-    "twitterText": "He estado usando Arcana para lecturas de tarot y es increible! Registrate con mi enlace y ambos obtenemos creditos gratis",
-    "limit": "Maximo 10 referidos por usuario",
-    "loginRequired": "Inicio de Sesion Requerido",
-    "loginRequiredDesc": "Por favor inicia sesion para acceder a tu enlace de referidos"
+    "creditsEarned": "Créditos ganados",
+    "shareText": "¡Descubre lecturas de tarot con IA en Arcana! Regístrate con mi enlace y ambos obtenemos 3 créditos gratis: {link}",
+    "twitterText": "¡He estado usando Arcana para lecturas de tarot y es increíble! Regístrate con mi enlace y ambos obtenemos créditos gratis",
+    "limit": "Máximo 10 referidos por usuario",
+    "loginRequired": "Inicio de sesión requerido",
+    "loginRequiredDesc": "Por favor inicia sesión para acceder a tu enlace de referidos",
+    "eyebrow": "Invita a alguien",
+    "yourCode": "Tu código",
+    "linkLabel": "Enlace para compartir"
   },
   "pwa": {
     "installTitle": "Instala Arcana",
-    "installPrompt": "Agrega a tu pantalla de inicio para acceso rapido y funciones offline!",
-    "install": "Instalar App",
-    "later": "Despues"
+    "installPrompt": "¡Agrega a tu pantalla de inicio para acceso rápido y funciones offline!",
+    "install": "Instalar app",
+    "later": "Después"
   },
   "blog": {
-    "title": "Guias e Insights del Tarot",
-    "subtitle": "Aprende sobre lectura del tarot, significados de cartas y guia espiritual",
-    "article": "Articulo",
-    "readMore": "Leer mas",
-    "noPosts": "Aun no hay articulos publicados. Vuelve pronto!",
+    "title": "Guías e insights del tarot",
+    "subtitle": "Aprende sobre lectura del tarot, significados de cartas y guía espiritual",
+    "article": "Artículo",
+    "readMore": "Leer más",
+    "noPosts": "Aún no hay artículos publicados. ¡Vuelve pronto!",
     "backToBlog": "Volver al blog",
-    "ctaTitle": "Listo para tu Lectura?",
-    "ctaDescription": "Pon tu conocimiento en practica con una lectura de tarot personalizada",
-    "ctaButton": "Comenzar Lectura Gratis"
+    "ctaTitle": "¿Listo para tu lectura?",
+    "ctaDescription": "Pon tu conocimiento en práctica con una lectura de tarot personalizada",
+    "ctaButton": "Comenzar lectura gratis",
+    "eyebrow": "Blog de Arcana"
   },
   "streakReward": {
-    "title": "Recompensa de Racha!",
-    "days": "{count} dias de racha!",
+    "title": "¡Recompensa de racha!",
+    "days": "¡{count} días de racha!",
     "earned": "Has ganado",
-    "credits": "creditos",
-    "keepGoing": "Sigue asi! Tu dedicacion esta dando frutos.",
-    "continue": "Genial!",
-    "nextMilestone": "Proxima recompensa en {days} dias",
-    "allCompleted": "Todos los hitos completados!"
+    "credits": "créditos",
+    "keepGoing": "¡Sigue así! Tu dedicación está dando frutos.",
+    "continue": "¡Genial!",
+    "nextMilestone": "Próxima recompensa en {days} días",
+    "allCompleted": "¡Todos los hitos completados!",
+    "pincel": "Racha"
   },
   "collection": {
-    "title": "Tu Coleccion",
+    "title": "Tu colección",
     "progress": "{count} de {total} cartas descubiertas",
     "majorArcana": "Arcanos Mayores",
     "wands": "Bastos",
@@ -663,122 +706,139 @@
     "swords": "Espadas",
     "pentacles": "Oros",
     "locked": "Sigue haciendo lecturas para descubrir esta carta",
-    "newCard": "Nueva carta descubierta!",
-    "newCards": "Descubriste {count} cartas nuevas!",
-    "recentlyDiscovered": "Descubiertas Recientemente",
-    "addedToCollection": "Agregada a tu coleccion!",
+    "newCard": "¡Nueva carta descubierta!",
+    "newCards": "¡Descubriste {count} cartas nuevas!",
+    "recentlyDiscovered": "Descubiertas recientemente",
+    "addedToCollection": "¡Agregada a tu colección!",
     "continue": "Continuar",
-    "viewAll": "Ver Todas",
+    "viewAll": "Ver todas",
     "noCardsYet": "Haz una lectura para descubrir cartas",
     "filters": {
-      "all": "Todas"
+      "all": "Todas",
+      "label": "Filtrar la colección"
     },
     "cta": {
-      "title": "Completa tu Coleccion",
-      "subtitle": "Haz mas lecturas para descubrir las 78 cartas",
-      "button": "Iniciar Lectura"
-    }
+      "title": "Completa tu colección",
+      "subtitle": "Haz más lecturas para descubrir las 78 cartas",
+      "button": "Iniciar lectura"
+    },
+    "kicker": "Índice de grabados · 1909",
+    "counterOf": "de {total}",
+    "undiscovered": "Por descubrir",
+    "legend": "Las cartas en tinta tenue aún no salen en tus lecturas."
   },
   "achievements": {
     "title": "Logros",
     "progress": "{unlocked} de {total} desbloqueados",
     "unlocked": "Desbloqueado",
     "locked": "Bloqueado",
-    "credits": "creditos",
-    "latest": "Ultimo",
+    "credits": "créditos",
+    "reward": "{count, plural, one {+# crédito} other {+# créditos}}",
+    "latest": "Último",
     "next": "Siguiente",
-    "viewAll": "Ver Todos",
-    "allCompleted": "Todos los logros completados!",
+    "viewAll": "Ver todos",
+    "allCompleted": "¡Todos los logros completados!",
     "categories": {
       "readings": "Lecturas",
-      "collection": "Coleccion",
+      "collection": "Colección",
       "streak": "Rachas",
-      "time": "Por Tiempo",
-      "subscription": "Suscripcion",
-      "golden": "Cartas Doradas"
+      "time": "Por tiempo",
+      "subscription": "Suscripción",
+      "golden": "Cartas doradas"
     },
     "unlockModal": {
-      "title": "Logro Desbloqueado!",
-      "earned": "Has ganado {credits} creditos"
+      "title": "¡Logro desbloqueado!",
+      "earned": "Has ganado {credits} créditos",
+      "pincel": "Logro"
     },
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "kicker": "Archivo de sellos",
+    "inProgress": "En curso",
+    "of": "{count} de {total}",
+    "counterOf": "de {total} desbloqueados"
   },
   "goldenCards": {
-    "title": "CARTA DORADA!",
-    "titleMultiple": "{count} CARTAS DORADAS!",
-    "subtitle": "Un tesoro raro ha aparecido!",
+    "title": "¡CARTA DORADA!",
+    "titleMultiple": "¡{count} CARTAS DORADAS!",
+    "subtitle": "¡Un tesoro raro ha aparecido!",
     "new": "Nueva",
-    "creditsEarned": "Ganaste creditos gratis!",
-    "credits": "creditos",
-    "addedToCollection": "Agregada a tu coleccion dorada!",
+    "creditsEarned": "¡Ganaste créditos gratis!",
+    "credits": "créditos",
+    "addedToCollection": "¡Agregada a tu colección dorada!",
     "continue": "Continuar",
-    "collectionTitle": "Coleccion Dorada",
+    "collectionTitle": "Colección dorada",
     "collectionProgress": "{count} de {total} cartas doradas",
     "totalFound": "Total de cartas doradas encontradas: {count}",
     "goldenBadge": "Dorada",
     "golden": "Dorada",
-    "goldenCardsShort": "Cartas Doradas",
+    "goldenCardsShort": "Cartas doradas",
     "chance": "1% de probabilidad por carta"
   },
   "levels": {
     "level": "Nivel",
     "total": "total",
-    "viewProgress": "Ver Progreso",
+    "viewProgress": "Ver progreso",
     "nextLevel": "Siguiente",
-    "maxLevel": "Nivel maximo alcanzado!",
-    "levelUp": "Subiste de Nivel!",
-    "newLevel": "Ahora eres {level}!",
+    "maxLevel": "¡Nivel máximo alcanzado!",
+    "levelUp": "¡Subiste de nivel!",
+    "newLevel": "¡Ahora eres {level}!",
     "reward": "Recompensa",
-    "credits": "creditos",
-    "keepGoing": "Sigue asi! Tu viaje continua.",
-    "maxLevelMessage": "Has alcanzado la cima de la maestria!",
+    "credits": "créditos",
+    "keepGoing": "¡Sigue así! Tu viaje continúa.",
+    "maxLevelMessage": "¡Has alcanzado la cima de la maestría!",
     "continue": "Continuar",
     "names": {
       "novice": "Novato",
       "apprentice": "Aprendiz",
       "adept": "Adepto",
       "master": "Maestro",
-      "oracle": "Oraculo"
-    }
+      "oracle": "Oráculo"
+    },
+    "viewAchievements": "Ver logros"
   },
   "challenges": {
-    "title": "Desafios",
+    "title": "Desafíos",
     "weekly": "Semanales",
     "monthly": "Mensuales",
     "completed": "Completado",
-    "inProgress": "En Progreso",
-    "credits": "creditos",
+    "inProgress": "En progreso",
+    "credits": "créditos",
+    "reward": "{count, plural, one {+# crédito} other {+# créditos}}",
     "resetsIn": "Reinicia en {time}",
-    "noChallenges": "No hay desafios disponibles",
-    "viewAll": "Ver Todos",
-    "allCompleted": "Todos los desafios completados!",
+    "noChallenges": "No hay desafíos disponibles",
+    "viewAll": "Ver todos",
+    "allCompleted": "¡Todos los desafíos completados!",
     "completedModal": {
-      "title": "Desafio Completado!",
-      "earned": "Has ganado {credits} creditos de desafios"
+      "title": "¡Desafío completado!",
+      "earned": "Has ganado {credits} créditos de desafíos",
+      "pincel": "Cumplido"
     },
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "tabsLabel": "Periodo de los desafíos",
+    "of": "{count} de {total}"
   },
   "sound": {
     "enable": "Activar sonidos",
     "disable": "Desactivar sonidos"
   },
   "settings": {
-    "title": "Configuracion",
-    "accountInfo": "Informacion de la Cuenta",
-    "email": "Correo electronico",
+    "title": "Configuración",
+    "accountInfo": "Información de la cuenta",
+    "email": "Correo electrónico",
     "name": "Nombre",
     "memberSince": "Miembro desde",
-    "dangerZone": "Zona de Peligro",
-    "deleteAccount": "Eliminar Cuenta",
-    "deleteWarning": "Esto eliminara permanentemente tu cuenta y todos tus datos incluyendo lecturas, perfil y suscripcion.",
-    "deleteConfirmTitle": "Estas seguro?",
+    "dangerZone": "Zona de peligro",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteWarning": "Esto eliminará permanentemente tu cuenta y todos tus datos incluyendo lecturas, perfil y suscripción.",
+    "deleteConfirmTitle": "¿Estás seguro?",
     "deleteConfirmText": "Escribe ELIMINAR para confirmar",
     "deleteConfirmWord": "ELIMINAR",
     "deleteConfirmPlaceholder": "Escribe ELIMINAR",
     "deleting": "Eliminando...",
     "cancel": "Cancelar",
     "deleteError": "Error al eliminar la cuenta. Por favor intenta de nuevo.",
-    "notAuthenticated": "Debes iniciar sesion para acceder a la configuracion."
+    "notAuthenticated": "Debes iniciar sesión para acceder a la configuración.",
+    "eyebrow": "Tu cuenta"
   },
   "blueprint": {
     "meta": {
@@ -880,7 +940,8 @@
         "cooldown": "Tu síntesis se actualizó hace muy poco. Podrás generar una nueva en {minutes, plural, one {# minuto} other {# minutos}}.",
         "profile": "Primero necesitamos tu fecha de nacimiento. Completa tu perfil y regresa.",
         "generic": "Algo salió mal. Inténtalo de nuevo."
-      }
+      },
+      "eyebrow": "Escrita por IA"
     },
     "share": {
       "title": "Comparte tu mapa",
@@ -998,7 +1059,9 @@
       "noProfileCta": "Agrega tu fecha de nacimiento a tu perfil para ver tu día personal.",
       "noProfileButton": "Completar perfil"
     },
-    "about": "Sobre el tonalpohualli"
+    "about": "Sobre el tonalpohualli",
+    "etiqueta": "Tonalpohualli · luna · día personal",
+    "signos": "Los veinte signos del tonalpohualli"
   },
   "energies": {
     "title": "Energías de hoy",
@@ -1040,7 +1103,7 @@
       "empty": "No hay lecturas en los últimos {days} días.",
       "chartLabel": "Reparto por palo: {values}",
       "names": {
-        "MAJOR": "Arcanos mayores",
+        "MAJOR": "Arcanos Mayores",
         "WANDS": "Bastos",
         "CUPS": "Copas",
         "SWORDS": "Espadas",
@@ -1273,7 +1336,8 @@
       "title": "Tus lecturas de dos",
       "empty": "Aquí aparecerán tus lecturas de dos.",
       "noName": "Sin nombre",
-      "bornOn": "Nació el {date}"
+      "bornOn": "Nació el {date}",
+      "count": "{count, plural, one {# lectura} other {# lecturas}}"
     },
     "detail": {
       "back": "Lecturas de dos",
@@ -1283,7 +1347,8 @@
       "cardsTitle": "Tres cartas para el vínculo",
       "readingTitle": "La lectura",
       "newReading": "Nueva lectura de dos",
-      "summaryUnavailable": "Los detalles por sistema de esta lectura no están disponibles."
+      "summaryUnavailable": "Los detalles por sistema de esta lectura no están disponibles.",
+      "readingEyebrow": "Escrita por IA"
     },
     "systems": {
       "western": "Zodiaco occidental",
@@ -1303,6 +1368,26 @@
       "me": "Tú",
       "partner": "La otra persona",
       "bond": "El vínculo"
-    }
+    },
+    "eyebrow": "Dos mapas · tres cartas"
+  },
+  "hora": {
+    "hoy": "Hoy",
+    "fechaLarga": "{diaSemana, select, 0 {dom} 1 {lun} 2 {mar} 3 {mié} 4 {jue} 5 {vie} other {sáb}} {dia} {mes, select, 1 {ene} 2 {feb} 3 {mar} 4 {abr} 5 {may} 6 {jun} 7 {jul} 8 {ago} 9 {sep} 10 {oct} 11 {nov} other {dic}} {anio}",
+    "fechaCorta": "{dia} {mes, select, 1 {ene} 2 {feb} 3 {mar} 4 {abr} 5 {may} 6 {jun} 7 {jul} 8 {ago} 9 {sep} 10 {oct} 11 {nov} other {dic}}",
+    "tonalli": "{numero} {signo} ({nombre})",
+    "senor": "Señor de la noche: {nombre}",
+    "luna": "{fase} {luz}%",
+    "lunaCorta": "Luna {luz}%"
+  },
+  "carta": {
+    "pista": "Toca para voltear",
+    "pistaCorta": "Toca",
+    "invertida": "invertida",
+    "desliza": "Desliza ↓",
+    "reverso": "Reverso de carta Arcana",
+    "voltear": "Voltear la carta",
+    "voltearPosicion": "Voltear la carta: {posicion}",
+    "voltearTodas": "Voltear todas"
   }
 }

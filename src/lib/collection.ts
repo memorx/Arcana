@@ -90,6 +90,8 @@ export async function getCollectionStats(userId: string): Promise<{
 
 export interface RecentlyDiscoveredCard {
   id: string;
+  /** /cards/[slug] looks cards up by slug, not by id. */
+  slug: string | null;
   name: string;
   nameEs: string;
   imageUrl: string;
@@ -112,6 +114,7 @@ export async function getRecentlyDiscovered(
       card: {
         select: {
           id: true,
+          slug: true,
           name: true,
           nameEs: true,
           imageUrl: true,

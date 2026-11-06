@@ -1,8 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, Badge } from "@/components/ui";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { ImagenDelArticulo } from "./contenido";
 
 export const metadata = {
   title: "Blog - Tarot Insights & Guides",
@@ -19,83 +19,79 @@ export default async function BlogPage() {
   });
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-slate-100 mb-4">
-          {t("title")}
-        </h1>
-        <p className="text-slate-400 text-lg">
-          {t("subtitle")}
-        </p>
-      </div>
+    <div className="grid gap-[clamp(40px,7vh,64px)]">
+      {/* Encabezado */}
+      <header className="grid max-w-[760px] gap-3.5">
+        <Etiqueta>{t("eyebrow")}</Etiqueta>
+        <h1 className="text-[clamp(2.2rem,1.5rem+2.4vw,3.6rem)] leading-[1.04]">{t("title")}</h1>
+        <p className="max-w-[52ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] text-grafito">{t("subtitle")}</p>
+      </header>
 
-      {/* Posts Grid */}
+      {/* Índice editorial: filetes, número de entrada en mono, el grabado de cada artículo */}
       {posts.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <p className="text-slate-400">{t("noPosts")}</p>
-          </CardContent>
-        </Card>
+        <p className="border-y border-tinta py-12 text-center text-grafito">{t("noPosts")}</p>
       ) : (
-        <div className="space-y-8">
-          {posts.map((post) => {
+        <ol className="border-t border-tinta">
+          {posts.map((post, i) => {
             const title = locale === "en" ? post.title : post.titleEs;
             const excerpt = locale === "en" ? post.excerpt : post.excerptEs;
 
             return (
-              <Link key={post.id} href={`/blog/${post.slug}`}>
-                <Card variant="interactive" className="overflow-hidden">
-                  <div className="flex flex-col md:flex-row">
-                    {/* Cover Image */}
-                    <div className="md:w-1/3 h-48 md:h-auto relative bg-gradient-to-br from-purple-900/50 to-slate-900 flex items-center justify-center">
-                      {post.coverImage ? (
-                        <Image
-                          src={post.coverImage}
-                          alt={title}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="text-6xl text-purple-500/30">&#9788;</div>
-                      )}
-                    </div>
+              <li
+                key={post.id}
+                className="group relative flex items-start gap-[clamp(16px,4vw,48px)] border-b border-tinta/25 py-[clamp(24px,4vw,36px)]"
+              >
+                <div className="grid min-w-0 flex-1 gap-3">
+                  <p className="font-dato text-xs leading-[1.4] tracking-[0.12em] text-grafito uppercase">
+                    <span aria-hidden="true" className="mr-3 text-rosa-texto">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {t("article")}
+                    {post.publishedAt && (
+                      <>
+                        {" · "}
+                        <time dateTime={post.publishedAt.toISOString()}>
+                          {new Date(post.publishedAt).toLocaleDateString(locale === "en" ? "en-US" : "es-ES", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </time>
+                      </>
+                    )}
+                  </p>
 
-                    {/* Content */}
-                    <CardContent className="flex-1 p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Badge variant="primary">{t("article")}</Badge>
-                        {post.publishedAt && (
-                          <span className="text-xs text-slate-500">
-                            {new Date(post.publishedAt).toLocaleDateString(
-                              locale === "en" ? "en-US" : "es-ES",
-                              { month: "long", day: "numeric", year: "numeric" }
-                            )}
-                          </span>
-                        )}
-                      </div>
+                  <h2 className="max-w-[30ch] text-[clamp(1.45rem,1.15rem+1.1vw,2.1rem)] leading-[1.12]">
+                    {/* Toda la fila es clicable; el nombre accesible del enlace es sólo el título */}
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="decoration-rosa decoration-1 underline-offset-[0.18em] after:absolute after:inset-0 after:z-10 group-hover:underline"
+                    >
+                      {title}
+                    </Link>
+                  </h2>
 
-                      <h2 className="text-xl font-semibold text-slate-100 mb-2 group-hover:text-purple-400 transition-colors">
-                        {title}
-                      </h2>
+                  <p className="line-clamp-3 max-w-[60ch] text-grafito">{excerpt}</p>
 
-                      <p className="text-slate-400 line-clamp-3">
-                        {excerpt}
-                      </p>
+                  <p aria-hidden="true" className="font-dato text-[0.6875rem] tracking-[0.12em] text-rosa-texto uppercase">
+                    {t("readMore")} →
+                  </p>
+                </div>
 
-                      <div className="mt-4 text-purple-400 text-sm font-medium flex items-center gap-1">
-                        {t("readMore")}
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </CardContent>
-                  </div>
-                </Card>
-              </Link>
+                {/* Portada del post si la tiene; si no, su grabado en tinta (decorativo). La misma regla que el artículo. */}
+                <div className="w-[72px] shrink-0 sm:w-[104px] md:w-[132px]">
+                  <ImagenDelArticulo
+                    slug={post.slug}
+                    portada={post.coverImage}
+                    sizes="132px"
+                    perezosa
+                    claseGrabado="rounded-[3px] mix-blend-multiply transition-transform duration-500 ease-tinta motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:-rotate-1"
+                  />
+                </div>
+              </li>
             );
           })}
-        </div>
+        </ol>
       )}
     </div>
   );

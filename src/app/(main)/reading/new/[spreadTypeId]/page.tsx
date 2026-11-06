@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useRef, use, type ComponentProps } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Modal, ModalHeader, ModalBody, TarotCardStatic, CardBack } from "@/components/ui";
+import { Button, buttonClasses, Modal, ModalHeader, ModalBody } from "@/components/ui";
+import { CartaQuemable } from "@/components/tinta/CartaQuemable";
+import { TransicionPincel } from "@/components/tinta/TransicionPincel";
+import { MesaDeGrabados } from "@/components/tinta/MesaDeGrabados";
+import { Escena } from "@/components/tinta/Escena";
+import { Etiqueta } from "@/components/tinta/Etiqueta";
+import { Pincel } from "@/components/tinta/Pincel";
+import { CARTAS, slugCarta } from "@/lib/cartas";
+import { cn } from "@/lib/utils";
+import { Tirada, CartaFija, FiguraTirada, type PosicionTirada } from "@/components/reading/Tirada";
+import { IntencionCita, Interpretacion, entreComillas } from "@/components/reading/LecturaPliego";
+import { numeroRomano } from "@/components/reading/disposicion";
+import { useMedia } from "@/components/reading/useMedia";
 import { StreakRewardModal } from "@/components/dashboard/StreakRewardModal";
 import { NewCardDiscoveredModal } from "@/components/reading/NewCardDiscoveredModal";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -38,7 +50,6 @@ interface CardData {
   meaningReversed: string;
   meaningUprightEn: string | null;
   meaningReversedEn: string | null;
-  imageUrl: string;
 }
 
 interface PositionInfo {
@@ -57,16 +68,8 @@ interface ReadingCard {
   positionInfo: PositionInfo;
 }
 
-interface GoldenCardInfo {
-  id: string;
-  name: string;
-  nameEs: string;
-  imageUrl: string;
-  arcana: string;
-  suit: string | null;
-  isNew: boolean;
-  creditsAwarded: number;
-}
+/** Lo que manda la API para el modal de cartas doradas (el tipo lo pone el modal). */
+type GoldenCardInfo = ComponentProps<typeof GoldenCardModal>["cards"][number];
 
 interface StreakRewardInfo {
   milestone: number;
@@ -79,20 +82,7 @@ interface StreakInfo {
   reward: StreakRewardInfo | null;
 }
 
-interface DiscoveredCardInfo {
-  id: string;
-  name: string;
-  nameEs: string;
-  imageUrl: string;
-  arcana: string;
-  suit: string | null;
-  keywords: string[];
-  meaningUpright: string;
-  meaningReversed: string;
-  meaningUprightEn: string | null;
-  meaningReversedEn: string | null;
-  isReversed: boolean;
-}
+type DiscoveredCardInfo = ComponentProps<typeof NewCardDiscoveredModal>["cards"][number];
 
 interface UnlockedAchievementInfo {
   id: string;
@@ -143,6 +133,21 @@ interface ReadingResult {
 
 type Step = "intention" | "shuffling" | "revealing" | "interpretation";
 
+/** Barajar: 16 grabados (dos bandas de 8) que se reacomodan mientras la API arma la tirada. */
+const GRABADOS_AL_BARAJAR = 16;
+
+function revolver<T>(lista: readonly T[]): T[] {
+  const copia = [...lista];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+const titulo1 = "font-titulo text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]";
+const nombreCarta = "font-titulo text-[clamp(1rem,0.9rem+0.5vw,1.4rem)] leading-[1.15]";
+
 export default function ReadingFlowPage({
   params,
 }: {
@@ -151,6 +156,7 @@ export default function ReadingFlowPage({
   const { spreadTypeId } = use(params);
   const t = useTranslations("reading");
   const tCommon = useTranslations("common");
+  const tCarta = useTranslations("carta");
   const locale = useLocale();
 
   const [spreadType, setSpreadType] = useState<SpreadType | null>(null);
@@ -164,6 +170,8 @@ export default function ReadingFlowPage({
   const [readingResult, setReadingResult] = useState<ReadingResult | null>(null);
   const [revealedCards, setRevealedCards] = useState<number[]>([]);
   const [allRevealed, setAllRevealed] = useState(false);
+  // «Voltear todas»: todas las cartas pasan a revelada (cada una avisa al terminar de quemarse)
+  const [revealAll, setRevealAll] = useState(false);
   const [userCredits, setUserCredits] = useState<number>(0);
   const [freeReadings, setFreeReadings] = useState<number>(0);
   const [showCreditsModal, setShowCreditsModal] = useState(false);
@@ -179,6 +187,22 @@ export default function ReadingFlowPage({
   const [showChallengesModal, setShowChallengesModal] = useState(false);
   const [goldenCards, setGoldenCards] = useState<GoldenCardInfo[]>([]);
   const [showGoldenModal, setShowGoldenModal] = useState(false);
+  // Barajar: los grabados de la mesa y la vuelta (cada vuelta se reacomodan)
+  const [shuffleSlugs, setShuffleSlugs] = useState<string[]>([]);
+  const [shuffleTurn, setShuffleTurn] = useState(0);
+
+  const narrow = useMedia("(max-width: 639.98px)");
+  // Each step opens at the top with the focus on its title (not on the first render)
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const stepRendered = useRef(false);
+  useEffect(() => {
+    if (!stepRendered.current) {
+      stepRendered.current = true;
+      return;
+    }
+    window.scrollTo({ top: 0 });
+    headingRef.current?.focus({ preventScroll: true });
+  }, [step]);
 
   // Fetch spread type and user credits on mount
   useEffect(() => {
@@ -208,19 +232,28 @@ export default function ReadingFlowPage({
     fetchData();
   }, [spreadTypeId, t]);
 
-  // Handle manual card reveal
-  const handleRevealCard = (position: number) => {
-    if (revealedCards.includes(position)) return;
+  // While shuffling the engravings rearrange every 700 ms (not with reduced motion)
+  useEffect(() => {
+    if (step !== "shuffling") return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
+    const id = window.setInterval(() => {
+      setShuffleSlugs((prev) => revolver(prev));
+      setShuffleTurn((n) => n + 1);
+    }, 700);
+    return () => window.clearInterval(id);
+  }, [step]);
 
-    setRevealedCards((prev) => {
-      const newRevealed = [...prev, position];
-      // Check if all cards are now revealed
-      if (readingResult && newRevealed.length === readingResult.cards.length) {
-        setTimeout(() => setAllRevealed(true), 500);
-      }
-      return newRevealed;
-    });
+  // A card finished revealing (tap, keyboard or «voltear todas»)
+  const handleRevealCard = (position: number) => {
+    setRevealedCards((prev) => (prev.includes(position) ? prev : [...prev, position]));
   };
+
+  // When every card is revealed, half a second later the reading is complete (starts the modal chain)
+  useEffect(() => {
+    if (!readingResult || allRevealed || revealedCards.length !== readingResult.cards.length) return;
+    const timer = setTimeout(() => setAllRevealed(true), 500);
+    return () => clearTimeout(timer);
+  }, [revealedCards, readingResult, allRevealed]);
 
   // Show golden cards modal after all cards are revealed (first in chain - most exciting!)
   useEffect(() => {
@@ -300,6 +333,7 @@ export default function ReadingFlowPage({
     setError("");
     setAiError(null);
     setIsSubmitting(true);
+    setShuffleSlugs(revolver(CARTAS.map((c) => c.slug)).slice(0, GRABADOS_AL_BARAJAR));
     setStep("shuffling");
 
     // Simulate shuffling animation
@@ -382,21 +416,21 @@ export default function ReadingFlowPage({
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto py-12 text-center">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-slate-800 rounded w-1/3 mx-auto" />
-          <div className="h-4 bg-slate-800 rounded w-2/3 mx-auto" />
-        </div>
+      <div role="status" aria-label={tCommon("loading")} className="grid max-w-[760px] gap-4">
+        <div className="h-3 w-40 bg-papel-hondo motion-safe:animate-pulse" />
+        <div className="h-12 w-2/3 bg-papel-hondo motion-safe:animate-pulse" />
+        <div className="h-4 w-full max-w-md bg-papel-hondo motion-safe:animate-pulse" />
       </div>
     );
   }
 
   if (error && !spreadType) {
     return (
-      <div className="max-w-4xl mx-auto py-12 text-center">
-        <p className="text-red-400 mb-4">{error}</p>
-        <Link href="/reading/new">
-          <Button variant="secondary">{t("backToSpreads")}</Button>
+      <div className="grid max-w-[760px] justify-items-start gap-6">
+        <Etiqueta>{t("selectSpread")}</Etiqueta>
+        <h1 className="font-titulo text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1] text-letra-error">{error}</h1>
+        <Link href="/reading/new" className={buttonClasses({ variant: "linea" })}>
+          {t("backToSpreads")}
         </Link>
       </div>
     );
@@ -404,331 +438,272 @@ export default function ReadingFlowPage({
 
   if (!spreadType) return null;
 
+  const spreadName = getLocalizedName(spreadType);
+  const cost = freeReadings > 0
+    ? t("freeWithReading")
+    : spreadType.creditCost !== 1
+      ? t("costPlural", { count: spreadType.creditCost })
+      : t("cost", { count: spreadType.creditCost });
+
+  // The cards of the result in position order, with the name of each position
+  const orderedCards = readingResult
+    ? [...readingResult.cards].sort((a, b) => Number(a.position) - Number(b.position))
+    : [];
+  const spreadPositions: PosicionTirada[] = orderedCards.map((c) => ({
+    numero: Number(c.position),
+    nombre: c.positionInfo ? getLocalizedName(c.positionInfo) : t("position", { number: c.position }),
+  }));
+  // Small cards (short hint, smaller canvas) on phones and in the year spread (12); the horseshoe (7) and the Celtic
+  // Cross (10, 176 px columns on desktop) burn with the medium canvas.
+  const smallCards = narrow || orderedCards.length > 10;
+
+  const nameUnder = (cardData: ReadingCard, visible: boolean) => (
+    <p
+      aria-hidden={!visible || undefined}
+      className={cn("min-h-[2.3em]", nombreCarta, visible && "motion-safe:animate-entra")}
+    >
+      {visible && (
+        <>
+          {getLocalizedName(cardData.card)}
+          {cardData.isReversed && (
+            <span className="mt-1 block font-dato text-[0.625rem] leading-[1.4] tracking-[0.12em] text-letra-acento uppercase">
+              {t("reversed")}
+            </span>
+          )}
+        </>
+      )}
+    </p>
+  );
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       {/* Step 1: Intention */}
       {step === "intention" && (
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="text-center">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+          {/* The spread: what it is and its positions */}
+          <div className="grid content-start gap-5">
             <Link
               href="/reading/new"
-              className="text-slate-400 hover:text-slate-300 text-sm mb-4 inline-flex items-center gap-1"
+              className="inline-flex min-h-11 items-center gap-2 justify-self-start font-dato text-xs tracking-[0.1em] text-letra-suave uppercase hover:text-letra"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <span aria-hidden="true">←</span>
               {t("changeSpread")}
             </Link>
-            <h1 className="text-3xl font-bold text-slate-100 mt-2">
-              {getLocalizedName(spreadType)}
+            <Etiqueta>
+              {t("cards", { count: spreadType.cardCount })} · {cost}
+            </Etiqueta>
+            <h1 ref={headingRef} tabIndex={-1} className={cn(titulo1, "focus:outline-none")}>
+              {spreadName}
             </h1>
-            <p className="text-slate-400 mt-2">{t("cards", { count: spreadType.cardCount })}</p>
-          </div>
-
-          {/* Spread Info */}
-          <Card>
-            <CardContent className="p-6">
-              <p className="text-slate-300 mb-4">{getLocalizedDescription(spreadType)}</p>
-              <div className="flex flex-wrap gap-2">
-                {spreadType.positions.map((pos) => (
-                  <span
-                    key={pos.position}
-                    className="text-xs bg-slate-800 text-slate-400 px-3 py-1.5 rounded-full"
-                  >
-                    {pos.position}. {getLocalizedName(pos)}
-                  </span>
+            <p className="max-w-[46ch] text-letra-suave">{getLocalizedDescription(spreadType)}</p>
+            <FiguraTirada total={spreadType.cardCount} nombreTirada={spreadType.name} className="text-letra" />
+            <ol className="grid gap-1.5 border-t border-filete/20 pt-4 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.1em] uppercase sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+              {[...spreadType.positions]
+                .sort((a, b) => Number(a.position) - Number(b.position))
+                .map((pos) => (
+                  <li key={pos.position} className="break-words">
+                    <span aria-hidden="true" className="text-letra-suave">
+                      {numeroRomano(Number(pos.position))} ·{" "}
+                    </span>
+                    {getLocalizedName(pos)}
+                  </li>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Intention Form */}
-          <Card variant="highlighted">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-amber-400">&#128161;</span>
-                {t("intentionTitle")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-400 text-sm mb-4">
-                {t("intentionSubtitle")}
-              </p>
-
-              <textarea
-                value={intention}
-                onChange={(e) => setIntention(e.target.value)}
-                placeholder={t("intentionPlaceholder")}
-                className="w-full h-32 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 resize-none"
-              />
-
-              <div className="flex items-center justify-between mt-4">
-                <span className="text-xs text-slate-500">
-                  {t("intentionHint", { count: intention.length })}
-                </span>
-                {error && <span className="text-xs text-red-400">{error}</span>}
-              </div>
-
-              {aiError && (
-                <div
-                  role="alert"
-                  className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3"
-                >
-                  <p className="text-sm text-amber-200">
-                    {aiError === "unavailable"
-                      ? t("interpretationUnavailable")
-                      : t("interpretationRefused")}
-                  </p>
-                </div>
-              )}
-
-              <Button
-                onClick={handleStartReading}
-                disabled={intention.length < 10 || isSubmitting}
-                isLoading={isSubmitting}
-                className="w-full mt-4"
-                size="lg"
-              >
-                {aiError ? t("retry") : t("startReading")}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Step 2: Shuffling */}
-      {step === "shuffling" && (
-        <div className="py-20 text-center space-y-8">
-          <h2 className="text-2xl font-bold text-slate-100">
-            {t("shuffling")}
-          </h2>
-          <p className="text-slate-400">
-            {t("shufflingSubtitle")}
-          </p>
-
-          {/* Shuffling animation */}
-          <div className="flex justify-center items-center gap-2 py-12">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="w-16 h-24 bg-gradient-to-br from-purple-800/50 to-purple-900/50 rounded-lg border border-purple-500/30 animate-bounce"
-                style={{
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: "0.6s",
-                }}
-              >
-                <div className="h-full flex items-center justify-center text-2xl text-purple-400/50">
-                  &#10022;
-                </div>
-              </div>
-            ))}
+            </ol>
           </div>
 
-          <p className="text-slate-500 text-sm italic">
-            &quot;{intention}&quot;
-          </p>
-        </div>
-      )}
-
-      {/* Step 3: Revealing */}
-      {step === "revealing" && readingResult && (
-        <div className="space-y-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-100 mb-2">
-              {t("revealing")}
+          {/* The intention, as a sheet */}
+          <div className="grid content-start gap-4 border-t-[3px] border-rosa pt-6">
+            <Pincel aria-hidden="true" className="text-[clamp(3.25rem,2rem+4vw,5.5rem)]">
+              {t("ask")}
+            </Pincel>
+            <h2 className="font-titulo text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.1]">
+              <label htmlFor="intencion-lectura">{t("intentionTitle")}</label>
             </h2>
-            <p className="text-slate-400">
-              {allRevealed
-                ? t("allCardsRevealed")
-                : t("tapToReveal")}
+            <p id="intencion-ayuda" className="max-w-[60ch] text-letra-suave">
+              {t("intentionSubtitle")}
             </p>
-            {!allRevealed && (
-              <p className="text-purple-400 text-sm mt-2">
-                {t("cardsRevealedCount", {
-                  count: revealedCards.length,
-                  total: readingResult.cards.length,
-                })}
-              </p>
+
+            <textarea
+              id="intencion-lectura"
+              aria-describedby="intencion-ayuda intencion-cuenta"
+              value={intention}
+              onChange={(e) => setIntention(e.target.value)}
+              placeholder={t("intentionPlaceholder")}
+              className="mt-2 block min-h-40 w-full resize-y rounded-none border-0 border-y border-filete/40 bg-transparent px-0 py-4 font-lectura text-[1.15rem] leading-[1.55] text-letra italic placeholder:text-letra-suave placeholder:not-italic focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none sm:text-[1.25rem]"
+            />
+
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+              <span id="intencion-cuenta" className="font-dato text-[0.6875rem] tracking-[0.06em] text-letra-suave">
+                {t("intentionHint", { count: intention.length })}
+              </span>
+              {error && <span className="text-sm text-letra-error">{error}</span>}
+            </div>
+
+            {aiError && (
+              <div role="alert" className="border-l-2 border-rosa bg-papel-hondo px-4 py-3">
+                <p className="text-[0.9375rem] leading-[1.5]">
+                  {aiError === "unavailable"
+                    ? t("interpretationUnavailable")
+                    : t("interpretationRefused")}
+                </p>
+              </div>
             )}
+
+            <Button
+              onClick={handleStartReading}
+              disabled={intention.length < 10 || isSubmitting}
+              isLoading={isSubmitting}
+              className="mt-2 w-full"
+              size="lg"
+            >
+              {aiError ? t("retry") : t("startReading")}
+            </Button>
           </div>
+        </div>
+      )}
 
-          {/* Cards Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {readingResult.cards.map((cardData) => {
-              const isRevealed = revealedCards.includes(Number(cardData.position));
+      {/* Step 2: Shuffling — the engravings rearrange on a band of ink */}
+      {step === "shuffling" && (
+        <Escena suelo="tinta" as="div" className="barajar rounded-sm">
+          <div key={shuffleTurn} className="barajar-mesa">
+            <MesaDeGrabados slugs={shuffleSlugs} columnas={8} filas={2} />
+          </div>
+          <div role="status" className="barajar-texto grid max-w-[760px] gap-3 p-[clamp(20px,4vw,48px)]">
+            <Etiqueta>{spreadName}</Etiqueta>
+            <h1 ref={headingRef} tabIndex={-1} className={cn(titulo1, "focus:outline-none")}>
+              {t("shuffling")}
+            </h1>
+            <p className="text-letra-suave">{t("shufflingSubtitle")}</p>
+            <p className="mt-2 max-w-[46ch] border-l-2 border-rosa pl-4 font-lectura text-[1.1rem] leading-[1.45] break-words italic">
+              {entreComillas(intention, locale)}
+            </p>
+          </div>
+        </Escena>
+      )}
 
+      {/* Step 3: Revealing — the paper burns to show each card */}
+      {step === "revealing" && readingResult && (
+        <div className="grid gap-[clamp(28px,5vh,56px)]">
+          <TransicionPincel />
+          <header className="grid max-w-[760px] gap-3.5">
+            <Etiqueta>
+              {spreadName} · {t("cards", { count: orderedCards.length })}
+            </Etiqueta>
+            <h1 ref={headingRef} tabIndex={-1} className={cn(titulo1, "focus:outline-none")}>
+              {t("revealing")}
+            </h1>
+            <p className="max-w-[46ch] border-l-2 border-rosa pl-[18px] font-lectura text-[clamp(1.15rem,1rem+0.5vw,1.4rem)] leading-[1.45] break-words italic">
+              {entreComillas(readingResult.reading.intention, locale)}
+            </p>
+          </header>
+
+          <Tirada
+            posiciones={spreadPositions}
+            nombreTirada={readingResult.reading.spreadType?.name ?? spreadType.name}
+            etiqueta={t("cards", { count: orderedCards.length })}
+            carta={(posicion, i) => {
+              const cardData = orderedCards[i];
+              const position = Number(cardData.position);
               return (
-                <div
-                  key={cardData.position}
-                  className="transition-all duration-300"
-                >
-                  <Card className="overflow-hidden h-full">
-                    <div className="bg-gradient-to-r from-purple-900/30 to-amber-900/20 px-4 py-2 border-b border-slate-800">
-                      <p className="text-xs text-slate-400">
-                        {t("position", { number: cardData.position })}
-                      </p>
-                      <p className="text-sm font-medium text-slate-200">
-                        {cardData.positionInfo && getLocalizedName(cardData.positionInfo)}
-                      </p>
-                    </div>
-                    <CardContent className="p-4 flex flex-col items-center">
-                      {isRevealed ? (
-                        <>
-                          <TarotCardStatic
-                            card={{
-                              name: cardData.card.name,
-                              nameEs: cardData.card.nameEs,
-                              arcana: cardData.card.arcana as "MAJOR" | "MINOR",
-                              suit: cardData.card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null,
-                              number: parseInt(cardData.card.id.split("_").pop() || "0") || 0,
-                              imageUrl: cardData.card.imageUrl,
-                            }}
-                            isReversed={cardData.isReversed}
-                            isGolden={cardData.isGolden}
-                            showReversedBadge={false}
-                            size="md"
-                            locale={locale}
-                            className="mb-3"
-                          />
-                          <div className="text-center">
-                            <h3 className="font-semibold text-slate-100">
-                              {getLocalizedName(cardData.card)}
-                            </h3>
-                            {cardData.isReversed && (
-                              <Badge variant="warning" className="mt-1">
-                                {t("reversed")}
-                              </Badge>
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        <div
-                          onClick={() => handleRevealCard(Number(cardData.position))}
-                          className="cursor-pointer transition-all duration-200 hover:scale-105 hover:brightness-110 active:scale-95"
-                        >
-                          <CardBack className="w-20 h-[120px]" />
-                          <p className="text-xs text-purple-400/70 mt-2 text-center animate-pulse">
-                            {t("tapCard")}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
+                <CartaQuemable
+                  key={cardData.card.id}
+                  carta={{ nombre: getLocalizedName(cardData.card), slug: slugCarta(cardData.card.name) }}
+                  invertida={cardData.isReversed}
+                  revelada={revealAll || revealedCards.includes(position)}
+                  onRevelada={() => handleRevealCard(position)}
+                  etiqueta={tCarta("voltearPosicion", { posicion: posicion.nombre })}
+                  tamano={smallCards ? "chica" : "media"}
+                  dorada={cardData.isGolden}
+                  prioridad={i < 3}
+                />
               );
-            })}
-          </div>
+            }}
+            pie={(_, i) => nameUnder(orderedCards[i], revealedCards.includes(Number(orderedCards[i].position)))}
+          />
 
-          {allRevealed && (
-            <div className="text-center pt-4">
-              <Button onClick={() => setStep("interpretation")} size="lg">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+            {/* One <button> (same key) that goes from «Voltear todas» to «Ver interpretación»: while the cards burn it
+                is aria-disabled, not disabled (a disabled button drops the keyboard focus to <body>), so the focus
+                stays on it and lands on «Ver interpretación» when the reading is complete. */}
+            {allRevealed ? (
+              <Button
+                key="accion-tirada"
+                onClick={() => setStep("interpretation")}
+                size="lg"
+                className="motion-safe:animate-entra"
+              >
                 {t("viewInterpretation")}
               </Button>
-            </div>
-          )}
+            ) : (
+              <Button
+                key="accion-tirada"
+                variant="linea"
+                aria-disabled={revealAll || undefined}
+                onClick={() => {
+                  if (!revealAll) setRevealAll(true);
+                }}
+                className="aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                {tCarta("voltearTodas")}
+              </Button>
+            )}
+            <p className="grid gap-1 font-dato text-xs leading-[1.4] tracking-[0.06em]">
+              <span aria-live="polite">
+                {t("cardsRevealedCount", {
+                  count: revealedCards.length,
+                  total: orderedCards.length,
+                })}
+              </span>
+              <span className="text-letra-suave">{allRevealed ? t("allCardsRevealed") : t("tapToReveal")}</span>
+            </p>
+          </div>
         </div>
       )}
 
       {/* Step 4: Interpretation */}
       {step === "interpretation" && readingResult && (
-        <div className="space-y-8">
-          <div className="text-center">
-            <Badge variant="primary" className="mb-2">
-              {getLocalizedName(readingResult.reading.spreadType)}
-            </Badge>
-            <h1 className="text-3xl font-bold text-slate-100">
+        <div className="grid gap-[clamp(32px,6vh,64px)]">
+          <header className="grid max-w-[760px] gap-3.5">
+            <Etiqueta>
+              {getLocalizedName(readingResult.reading.spreadType ?? spreadType)} ·{" "}
+              {new Date(readingResult.reading.createdAt).toLocaleDateString(locale === "en" ? "en-US" : "es-MX", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </Etiqueta>
+            <h1 ref={headingRef} tabIndex={-1} className={cn(titulo1, "focus:outline-none")}>
               {t("yourReading")}
             </h1>
-          </div>
+            <IntencionCita titulo={t("yourIntention")} intencion={readingResult.reading.intention} locale={locale} />
+          </header>
 
-          {/* Intention */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <span className="text-amber-400">&#10022;</span>
-                {t("yourIntention")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-300 italic">
-                &quot;{readingResult.reading.intention}&quot;
-              </p>
-            </CardContent>
-          </Card>
+          <Tirada
+            compacta
+            posiciones={spreadPositions}
+            nombreTirada={readingResult.reading.spreadType?.name ?? spreadType.name}
+            etiqueta={t("cardsRevealed")}
+            carta={(_, i) => (
+              <CartaFija
+                carta={orderedCards[i].card}
+                alt={getLocalizedName(orderedCards[i].card)}
+                invertida={orderedCards[i].isReversed}
+                dorada={orderedCards[i].isGolden}
+              />
+            )}
+            pie={(_, i) => nameUnder(orderedCards[i], true)}
+          />
 
-          {/* Cards Summary */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {readingResult.cards.map((cardData) => (
-                <Card key={cardData.position} className="overflow-hidden">
-                  <div className="bg-gradient-to-r from-purple-900/30 to-amber-900/20 px-4 py-2 border-b border-slate-800">
-                    <p className="text-xs text-slate-400">
-                      {cardData.positionInfo && getLocalizedName(cardData.positionInfo)}
-                    </p>
-                  </div>
-                  <CardContent className="p-4 flex flex-col items-center">
-                    <TarotCardStatic
-                      card={{
-                        name: cardData.card.name,
-                        nameEs: cardData.card.nameEs,
-                        arcana: cardData.card.arcana as "MAJOR" | "MINOR",
-                        suit: cardData.card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null,
-                        number: parseInt(cardData.card.id.split("_").pop() || "0") || 0,
-                        imageUrl: cardData.card.imageUrl,
-                      }}
-                      isReversed={cardData.isReversed}
-                      isGolden={cardData.isGolden}
-                      showReversedBadge={false}
-                      size="sm"
-                      locale={locale}
-                      className="mb-2"
-                    />
-                    <div className="text-center">
-                      <h3 className="font-medium text-slate-100 text-sm">
-                        {getLocalizedName(cardData.card)}
-                      </h3>
-                      {cardData.isReversed && (
-                        <span className="text-xs text-orange-400">{t("reversed")}</span>
-                      )}
-                      {cardData.isGolden && (
-                        <span className="text-xs text-amber-400 ml-1">&#10024;</span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-            ))}
-          </div>
-
-          {/* Interpretation */}
-          <Card variant="highlighted">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-amber-400">&#9788;</span>
-                {t("interpretation")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-invert prose-slate max-w-none">
-                {readingResult.reading.interpretation
-                  .split("\n")
-                  .map((paragraph, i) => (
-                    <p key={i} className="text-slate-300 mb-4 last:mb-0 whitespace-pre-wrap">
-                      {paragraph}
-                    </p>
-                  ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <div className="flex justify-center gap-4">
-            <Link href={`/reading/${readingResult.reading.id}`}>
-              <Button variant="secondary">{t("viewSaved")}</Button>
-            </Link>
-            <Link href="/reading/new">
-              <Button>{t("newReading")}</Button>
-            </Link>
-          </div>
+          <Interpretacion titulo={t("interpretation")} texto={readingResult.reading.interpretation}>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Link href={`/reading/${readingResult.reading.id}`} className={buttonClasses({ variant: "linea" })}>
+                {t("viewSaved")}
+              </Link>
+              <Link href="/reading/new" className={buttonClasses()}>
+                {t("newReading")}
+              </Link>
+            </div>
+          </Interpretacion>
         </div>
       )}
 
@@ -738,18 +713,15 @@ export default function ReadingFlowPage({
         onClose={() => setShowCreditsModal(false)}
       >
         <ModalHeader>
-          <h2 className="text-xl font-bold text-slate-100">{t("needCredits")}</h2>
+          <h2 className="font-titulo text-2xl leading-tight text-letra">{t("needCredits")}</h2>
         </ModalHeader>
         <ModalBody>
-          <div className="space-y-4">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-amber-500/20 rounded-full flex items-center justify-center">
-                <span className="text-3xl">&#128176;</span>
-              </div>
-              <p className="text-slate-300 mb-2">
+          <div className="grid gap-6">
+            <div className="grid gap-2">
+              <p className="font-lectura text-letra">
                 {t("needCreditsMessage", { cost: spreadType?.creditCost })}
               </p>
-              <p className="text-slate-400 text-sm">
+              <p className="font-dato text-xs leading-[1.5] tracking-[0.06em] text-letra-suave">
                 {t("currentCredits", { credits: userCredits })}
                 {freeReadings > 0 && (
                   <> {t("andFreeReadings", { count: freeReadings })}</>
@@ -757,14 +729,12 @@ export default function ReadingFlowPage({
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 pt-4">
-              <Link href="/credits" className="w-full">
-                <Button className="w-full" size="lg">
-                  {t("buyCredits")}
-                </Button>
+            <div className="grid gap-3">
+              <Link href="/credits" className={buttonClasses({ size: "lg", className: "w-full" })}>
+                {t("buyCredits")}
               </Link>
               <Button
-                variant="ghost"
+                variant="fantasma"
                 onClick={() => setShowCreditsModal(false)}
                 className="w-full"
               >
