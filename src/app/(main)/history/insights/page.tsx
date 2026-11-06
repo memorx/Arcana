@@ -135,7 +135,7 @@ export default async function InsightsPage() {
         {stats.map((stat) => (
           <div key={stat.label} className="min-w-0 bg-suelo px-1 py-4 sm:px-6 sm:py-5">
             <dt className={ROTULO}>{stat.label}</dt>
-            <dd className="mt-2 font-titulo text-[clamp(1.75rem,1.3rem+1.6vw,2.75rem)] leading-none text-letra tabular-nums">
+            <dd className="mt-2 font-dato text-[clamp(1.75rem,1.3rem+1.6vw,2.75rem)] leading-none tracking-[-0.04em] text-letra tabular-nums">
               {stat.value}
             </dd>
           </div>

@@ -97,6 +97,17 @@ describe("Dashboard wiring (F-82)", () => {
     expect(follows(banner, screen.getByRole("heading", { level: 1 }))).toBe(true);
   });
 
+  it("the counters strip is data: free readings, credits and readings in Martian Mono, not Gloock", async () => {
+    const { container } = render(await DashboardPage());
+
+    const cifras = [...container.querySelectorAll("dl dd")];
+    expect(cifras.map((dd) => dd.textContent)).toEqual(["0", "4", "0"]);
+    for (const dd of cifras) {
+      expect(dd).toHaveClass("font-dato");
+      expect(dd).not.toHaveClass("font-titulo");
+    }
+  });
+
   it("opens the editorial grid with today's energies and the Arcana Map side by side", async () => {
     render(await DashboardPage());
 
