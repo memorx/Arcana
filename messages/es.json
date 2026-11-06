@@ -333,7 +333,11 @@
     "shareCta": {
       "title": "¿Quieres tu propia lectura?",
       "subtitle": "Regístrate ahora y obtén 3 lecturas gratis"
-    }
+    },
+    "ask": "Pregunta",
+    "yourTurn": "Tu turno",
+    "close": "Cerrar",
+    "shareLink": "Enlace para compartir"
   },
   "credits": {
     "title": "Comprar Creditos",

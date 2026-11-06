@@ -1,0 +1,141 @@
+/* Arcana · «Dos tintas» — la lectura (lote L2).
+ *
+ * La tirada se revela sobre papel, como design/maqueta/lectura.html: cada posición con su nombre en mono encima y
+ * el nombre de la carta en Gloock debajo. Aquí sólo vive la disposición (de 1 a 12 cartas, con sus figuras) y el
+ * movimiento de barajar; la tipografía y el color van en clases de Tailwind en los componentes.
+ * Fuera de capa, como tinta.css: las áreas de la cuadrícula ganan sin pelear con utilidades.
+ * Movimiento: sólo transform/opacity, `both`, apagado con reduced-motion; nada depende de una animación para verse.
+ */
+
+/* ======================================================================
+   <Tirada> · disposición
+   Móvil (< 640 px): rejilla de 3 en el orden de las posiciones (la cruz simple conserva su figura).
+   ====================================================================== */
+.tirada {
+  --tirada-escala: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--tirada-cols-movil, 3), minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 40px) clamp(10px, 2.6vw, 40px);
+  align-items: start;
+  justify-content: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tirada-pos { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.tirada-pos > * { min-width: 0; }
+/* El nombre de la posición ocupa siempre dos renglones, pegado a la carta: si uno se parte («Esperanzas y miedos»),
+   las cartas de la misma fila siguen alineadas. */
+.tirada-nombre { display: flex; align-items: flex-end; min-height: 2.6em; overflow-wrap: anywhere; }
+.tirada--una .tirada-nombre { min-height: 0; }
+/* Tiradas densas (y la versión de consulta): nombres de posición y de carta más compactos. */
+.tirada--celta .tirada-nombre,
+.tirada--herradura .tirada-nombre,
+.tirada--anio .tirada-nombre,
+.tirada--rejilla .tirada-nombre,
+.tirada--compacta .tirada-nombre { letter-spacing: .05em; }
+.tirada--celta .tirada-pie > p,
+.tirada--herradura .tirada-pie > p,
+.tirada--anio .tirada-pie > p,
+.tirada--rejilla .tirada-pie > p,
+.tirada--compacta .tirada-pie > p { font-size: clamp(.9375rem, .88rem + .2vw, 1.0625rem); }
+
+.tirada--una { grid-template-columns: minmax(0, 240px); }
+.tirada--fila[data-total="2"],
+.tirada--fila[data-total="4"] { --tirada-cols-movil: 2; }
+.tirada--compacta.tirada--una { grid-template-columns: minmax(0, 180px); }
+
+/* Cruz simple: 1 presente al centro, 2 pasado, 3 futuro, 4 abajo, 5 arriba. */
+.tirada--cruz {
+  grid-template-areas:
+    ".  c5 ."
+    "c2 c1 c3"
+    ".  c4 .";
+}
+.tirada--cruz .tirada-pos[data-pos="1"] { grid-area: c1; }
+.tirada--cruz .tirada-pos[data-pos="2"] { grid-area: c2; }
+.tirada--cruz .tirada-pos[data-pos="3"] { grid-area: c3; }
+.tirada--cruz .tirada-pos[data-pos="4"] { grid-area: c4; }
+.tirada--cruz .tirada-pos[data-pos="5"] { grid-area: c5; }
+
+@media (min-width: 640px) {
+  .tirada {
+    grid-template-columns: repeat(var(--tirada-cols, 3), minmax(0, calc(var(--tirada-carta, 220px) * var(--tirada-escala))));
+  }
+  .tirada--una { --tirada-cols: 1; --tirada-carta: 300px; }
+  .tirada--fila .tirada-nombre, .tirada--cruz .tirada-nombre { min-height: 0; }
+  .tirada--compacta.tirada--una { grid-template-columns: minmax(0, 200px); }
+  .tirada--fila { --tirada-cols: var(--tirada-total, 3); --tirada-carta: 300px; }
+  .tirada--fila[data-total="4"] { --tirada-carta: 240px; }
+  .tirada--fila[data-total="5"] { --tirada-carta: 200px; }
+  .tirada--cruz { --tirada-cols: 3; --tirada-carta: 170px; }
+  .tirada--herradura { --tirada-cols: 7; --tirada-carta: 150px; }
+  .tirada--anio { --tirada-cols: 4; --tirada-carta: 160px; }
+  .tirada--rejilla { grid-template-columns: repeat(auto-fill, minmax(110px, calc(150px * var(--tirada-escala)))); }
+
+  /* Herradura: un arco, el centro arriba y las puntas abajo. */
+  .tirada--herradura .tirada-pos { margin-top: calc(var(--arco, 0) * clamp(14px, 2.4vw, 34px) * var(--tirada-escala)); }
+
+  /* Cruz Celta: la cruz (con el desafío bajo el presente) y el báculo a la derecha, de abajo arriba. */
+  .tirada--celta {
+    row-gap: clamp(16px, 2vw, 24px);
+    grid-template-columns:
+      repeat(3, minmax(0, calc(128px * var(--tirada-escala))))
+      minmax(0, calc(24px * var(--tirada-escala)))
+      minmax(0, calc(128px * var(--tirada-escala)));
+    grid-template-areas:
+      ".  c5 .  .  c10"
+      "c3 c1 c4 .  c9"
+      ".  c2 .  .  c8"
+      ".  c6 .  .  c7";
+  }
+  .tirada--celta .tirada-pos[data-pos="1"] { grid-area: c1; }
+  .tirada--celta .tirada-pos[data-pos="2"] { grid-area: c2; }
+  .tirada--celta .tirada-pos[data-pos="3"] { grid-area: c3; }
+  .tirada--celta .tirada-pos[data-pos="4"] { grid-area: c4; }
+  .tirada--celta .tirada-pos[data-pos="5"] { grid-area: c5; }
+  .tirada--celta .tirada-pos[data-pos="6"] { grid-area: c6; }
+  .tirada--celta .tirada-pos[data-pos="7"] { grid-area: c7; }
+  .tirada--celta .tirada-pos[data-pos="8"] { grid-area: c8; }
+  .tirada--celta .tirada-pos[data-pos="9"] { grid-area: c9; }
+  .tirada--celta .tirada-pos[data-pos="10"] { grid-area: c10; }
+}
+@media (min-width: 1024px) {
+  .tirada--anio { --tirada-cols: 6; --tirada-carta: 150px; }
+}
+
+/* Versión de consulta (la interpretación y la lectura guardada): la misma figura, más chica. */
+.tirada--compacta { --tirada-escala: .62; }
+.tirada--compacta.tirada--fila[data-total="2"],
+.tirada--compacta.tirada--fila[data-total="3"] { --tirada-escala: .6; }
+
+/* ======================================================================
+   <CartaFija> · la carta ya revelada (sin botón), con las medidas de <CartaQuemable>
+   ====================================================================== */
+.carta-fija {
+  position: relative; display: block; width: 100%; aspect-ratio: 300 / 520; margin: 0;
+  border-radius: 12px; overflow: hidden; background: var(--color-tinta, #0E0D0C);
+  box-shadow: 0 24px 48px -28px rgb(0 0 0 / .6);
+}
+.tirada--compacta .carta-fija { border-radius: 8px; box-shadow: 0 16px 32px -22px rgb(0 0 0 / .55); }
+.carta-fija img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.carta-fija--invertida img { transform: rotate(180deg); }
+
+/* ======================================================================
+   Barajar: la mesa de grabados se reacomoda (2.5 s, sólo con movimiento)
+   ====================================================================== */
+.barajar { position: relative; overflow: clip; min-height: clamp(280px, 48vh, 440px); display: grid; align-items: end; }
+.barajar-mesa { position: absolute; inset: 0; }
+.barajar::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(0deg, rgb(14 13 12 / .96) 0%, rgb(14 13 12 / .82) 42%, rgb(14 13 12 / .35) 100%);
+}
+.barajar-texto { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .barajar-mesa { animation: barajar-reacomodo .7s cubic-bezier(.16, 1, .3, 1) both; }
+}
+@keyframes barajar-reacomodo {
+  from { opacity: .35; transform: translate3d(0, -3%, 0) rotate(1.2deg) scale(1.04); }
+  to { opacity: 1; transform: none; }
+}
