@@ -2,10 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { MEDIDAS_CARTA } from "@/lib/cartas";
 import { ContenidoArticulo, grabadoDelArticulo } from "../contenido";
-import { EnlaceBoton } from "../enlace-boton";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -109,9 +109,9 @@ export default async function BlogPostPage({ params }: PageProps) {
         </h2>
         <p className="text-grafito">{t("ctaDescription")}</p>
         <div>
-          <EnlaceBoton href="/register" size="lg">
+          <Link href="/register" className={buttonClasses({ size: "lg" })}>
             {t("ctaButton")}
-          </EnlaceBoton>
+          </Link>
         </div>
       </section>
     </article>

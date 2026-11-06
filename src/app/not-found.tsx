@@ -1,6 +1,7 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Header, Footer } from "@/components/layout";
-import { EnlaceBoton } from "@/app/(main)/blog/enlace-boton";
+import { buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { ReversoCarta } from "@/components/tinta/ReversoCarta";
 
@@ -28,9 +29,9 @@ export default async function NotFound() {
             <h1 className="max-w-[18ch] text-[clamp(2rem,1.4rem+2.2vw,3.4rem)] leading-[1.06]">
               {t("notFound.message")}
             </h1>
-            <EnlaceBoton href="/" size="lg" className="mt-2">
+            <Link href="/" className={buttonClasses({ size: "lg", className: "mt-2" })}>
               {t("notFound.goHome")}
-            </EnlaceBoton>
+            </Link>
           </div>
         </div>
       </main>
