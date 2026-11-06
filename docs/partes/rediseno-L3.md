@@ -1,15 +1,16 @@
 ## Parte L3 · Día y mesa (rediseño «Dos tintas», Fase 2)
 
-Rama `rediseno/f2-L3` (worktree `C:/Users/guill/dev/arcana-lotes/f2-L3`), sobre `rediseno/dos-tintas` (fusionada dos veces:
-`6a30e3b`, la red de desbordes estricta, y `ee0fc20`/`643eaf1`, specs del menú y acentos). 6 nov 2026. Sin `git push`. Sólo
-la base local `arcana_e2e_l3` (siempre vía `scripts/e2e-db.mjs`: `dev` y `serve`); nunca `npm run dev`, `db push` ni seeds a
-mano; el clúster no se detuvo. `npm run build` leyó producción sólo para el sitemap (como en I1).
+Rama `rediseno/f2-L3` (worktree `C:/Users/guill/dev/arcana-lotes/f2-L3`), sobre `rediseno/dos-tintas`, fusionada tres veces
+(`6a30e3b` red de desbordes estricta; `643eaf1`/`ee0fc20` acentos y specs del menú; `99fb06e`/`46bd861`/`143d449`
+`buttonClasses` sin "use client" y la red fijada). 6 nov 2026. Sin `git push`. Sólo la base local `arcana_e2e_l3` (siempre
+vía `scripts/e2e-db.mjs`: `dev` y `serve`); nunca `npm run dev`, `db push` ni seeds a mano; el clúster no se detuvo.
+`npm run build` leyó producción sólo para el sitemap (como en I1).
 
 ### Hecho
 
 | Ficha | Commit | Qué |
 |---|---|---|
-| Dashboard como mesa | `fee33e0`, `12ec0fa` | Banda de tinta arriba (`Escena` + `MesaDeGrabados columnas={8} filas={2}`, ≤ 16 grabados) con las cartas de las 6 lecturas más recientes (si no hay, una mesa fija de 16), velo de tinta, «Mi espacio», pincel «Tu mesa», el saludo (único `h1`), `HoraDelDia` larga y «Nueva lectura». Debajo, sobre papel: tira de contadores y **retícula editorial con filetes** (hueco de 1 px sobre `bg-filete/25`, sin tarjetas con sombra): energías de hoy · Mapa Arcano · lecturas recientes (con abanico de grabados `-mesa`) · racha · nivel · retos · carta del mes · colección · logros · oráculo diario; luego Explora (glifos de la maqueta) y las tiradas, y referidos. Estados vacíos de `nuevo`: mesa fija con su nota, «Aún no has realizado ninguna lectura» + «Hacer mi primera lectura» con un reverso, «Tu racha empieza con tu próxima lectura» (la celda de racha ya no desaparece). Widgets reescritos a tokens: barras en dos tintas con `role="progressbar"`, luna dibujada (`LunaGlifo`), sin emojis (logros, retos, niveles, tonalli), títulos `h2`, enlaces de dato con 44 px. `StreakRewardModal` (pincel «Racha», sin confeti de colores) y `BirthdayBanner` restilizados. |
+| Dashboard como mesa | `fee33e0`, `12ec0fa`, `619243e` | Banda de tinta arriba (`Escena` + `MesaDeGrabados columnas={8} filas={2}`, ≤ 16 grabados) con las cartas de las 6 lecturas más recientes (si no hay, una mesa fija de 16), velo de tinta, «Mi espacio», pincel «Tu mesa», el saludo (único `h1`), `HoraDelDia` larga y «Nueva lectura». Debajo, sobre papel: tira de contadores y **retícula editorial con filetes** (hueco de 1 px sobre `bg-filete/25`, sin tarjetas con sombra): energías de hoy · Mapa Arcano · lecturas recientes (con abanico de grabados `-mesa`) · racha · nivel · retos · carta del mes · colección · logros · oráculo diario; luego Explora (glifos de la maqueta) y las tiradas, y referidos. Estados vacíos de `nuevo`: mesa fija con su nota, «Aún no has realizado ninguna lectura» + «Hacer mi primera lectura» con un reverso, «Tu racha empieza con tu próxima lectura» (la celda de racha ya no desaparece). Widgets reescritos a tokens: barras en dos tintas con `role="progressbar"`, luna dibujada (`LunaGlifo`), sin emojis (logros, retos, niveles, tonalli), títulos `h2`, enlaces de dato con 44 px. `StreakRewardModal` (pincel «Racha», sin confeti de colores) y `BirthdayBanner` restilizados. |
 | **DEFECTO `/progress`** | `fee33e0` | `LevelWidget` enlaza a `/achievements` («Ver logros», `LEVEL_PROGRESS_HREF`); borradas las dos filas `PROGRESO_404` de `DEFECTOS` en `e2e/responsivo.spec.ts`. |
 | `/daily` sobre tinta | `6e9490c` | Escena de tinta: «Carta de hoy · 2 Tochtli», pincel «Hoy», `h1`, y la carta del día como `CartaQuemable tamano="grande"` (`key={card.id}`, `prioridad`, `etiqueta={t("carta.voltearPosicion",{posicion})}`, `revelada` controlada + `onRevelada`); `TransicionPincel` una vez al entrar. Al quemarse: nombre (`h2`), invertida, la interpretación en Newsreader y la hora de envío. Los cuatro estados de suscripción intactos (sin suscripción con vista previa y «Suscribirme», créditos agotados, esperando la primera carta, con carta). Energías del día en el formato «El día de hoy» y los días anteriores como grabados en tinta. |
 | `/calendar` en dos tintas | `2d277f6` | Cabecera con etiqueta mono y `h1` Gloock; tira de tinta con los 20 signos del tonalpohualli (hoy en rosa) que corre lenta, se pausa con puntero/foco y queda quieta con reduced-motion (`data-recorta`). Retícula de filetes: número del día en Gloock (`text-base`/`sm:text-xl`, ya no `text-xs`), luna en dos tintas, tonalli desde `sm`, día personal en rosa; **hoy** con regla rosa arriba y número rosa, el seleccionado invertido en tinta. Celdas ≥ 46 × 56 px a 360. Teclado intacto. Panel del día como lámina en papel. |
@@ -29,7 +30,10 @@ Grep en mis archivos de las 18 familias viejas, `text-white`, `prose*` e `imageU
 
 ### Handoffs
 
-- **F1-A / integrador · `buttonClasses()` no se puede llamar desde un server component**: vive en `ui/button.tsx`, que es `"use client"`; en runtime Next da «Attempted to call buttonClasses() from the server». Lo resolví con `src/components/dashboard/EnlaceBoton.tsx` (client, `<Link className={buttonClasses(...)}>`), usado en mis páginas de servidor. Propuesta: mover `buttonClasses` a un módulo sin `"use client"` (p. ej. `ui/button-classes.ts`, reexportado) para que todos los lotes lo llamen desde el servidor; entonces `EnlaceBoton` se puede borrar.
+- **`buttonClasses()` desde server components**: tronaba en runtime («Attempted to call buttonClasses() from the server»);
+  lo esquivé un rato con un `EnlaceBoton` client y, al llegar `99fb06e` a la base, lo borré (`619243e`): mis páginas de
+  servidor vuelven a usar `buttonClasses` de `@/components/ui` y cargan sin error en Chromium (pase responsivo y flujos sobre
+  el build nuevo).
 - **F1-B · `ReversoCarta`**: `.reverso-carta { height: 100% }` está fuera de capa y gana a `h-auto`; para usarla suelta hay que darle una caja con `aspect-[300/520]` (así lo hice).
 - **L4 · `BlueprintBadges`** (celda del Mapa Arcano en el dashboard) sigue con `amber/purple/emerald`; es archivo de L4.
 - **L5 · logros**: «Ver logros» del nivel lleva a `/achievements`; si L5 quiere, una sección de nivel/XP en esa página le daría sentido completo.
@@ -53,17 +57,17 @@ Grep en mis archivos de las 18 familias viejas, `text-white`, `prose*` e `imageU
 - Las palabras a pincel elegidas (arriba, punto 8).
 - ¿Quiere una página de progreso de nivel? Hoy «Ver logros» lleva a `/achievements`.
 
-### Comandos y resultados (finales, sobre `083040c`)
+### Comandos y resultados (finales, sobre `619243e`, build e2e rehecho tras el último merge)
 
 | Comando | Resultado |
 |---|---|
-| `ARCANA_E2E_REUSE=1 ARCANA_E2E_DEFECTOS=0 npx playwright test e2e/responsivo.spec.ts --grep "dashboard\|daily\|calendar\|history"` (servidor `node scripts/e2e-db.mjs serve`: reset de `arcana_e2e_l3`, build en `.next-e2e`, `next start` :3013) | **179 passed, 0 failed** (3.9 min): 5 anchos, `@en` a 390, movimiento reducido, sin JS y WebKit 390 de `/calendar` |
-| `npx playwright test e2e/flujos/carta-del-dia.spec.ts e2e/flujos/calendario.spec.ts e2e/flujos/historia.spec.ts` | **5 passed** |
-| `npx playwright test e2e/flujos/registro.spec.ts e2e/flujos/lectura.spec.ts e2e/auth.spec.ts` (tocan dashboard e historial) | 21 passed, 1 skipped (Google apagado) |
+| `ARCANA_E2E_REUSE=1 ARCANA_E2E_DEFECTOS=0 npx playwright test e2e/responsivo.spec.ts --grep "dashboard\|daily\|calendar\|history"` (servidor `node scripts/e2e-db.mjs serve`: reset de `arcana_e2e_l3`, build en `.next-e2e`, `next start` :3013) | **179 passed, 0 failed** (3.2 min): 5 anchos, `@en` a 390, movimiento reducido, sin JS y WebKit 390 de `/calendar`. Con la tabla vacía de mis filas no hay `fixme` en mis rutas |
+| `npx playwright test e2e/flujos/{carta-del-dia,calendario,historia,registro}.spec.ts e2e/red-desbordes.spec.ts` | **9 passed** |
+| `npx playwright test e2e/flujos/lectura.spec.ts e2e/auth.spec.ts` (tocan dashboard e historial; corrida anterior al último merge) | 21 passed (con registro), 1 skipped (Google apagado) |
 | `npx tsc --noEmit` | 0 errores |
 | `npm run lint` | **0 errores**, 16 avisos (todos previos y ajenos) |
 | `npm test` | `check-messages: ok (1032 keys)` · **102 suites / 1,391 pruebas, todo verde** |
-| `npm run build` | ver abajo |
+| `npm run build` | exit 0, «Compiled successfully» (31 s); `/dashboard`, `/daily`, `/calendar`, `/history`, `/history/insights` dinámicas (ƒ) |
 
 ### Capturas
 
