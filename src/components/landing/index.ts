@@ -1,3 +1,10 @@
-export { ReadingCounter } from "./ReadingCounter";
-export { DailyCardPreview } from "./DailyCardPreview";
-export { Testimonials } from "./Testimonials";
+export { EscenaGrabados, MESA_PORTADA } from "./EscenaGrabados";
+export { EscenaDelGrabado, GRABADO_PORTADA } from "./EscenaDelGrabado";
+export { EscenaCartaDelDia } from "./EscenaCartaDelDia";
+export type { TextosCartaDelDia } from "./EscenaCartaDelDia";
+export { EscenaMasQueTarot } from "./EscenaMasQueTarot";
+export { EscenaHoy } from "./EscenaHoy";
+export { PreguntasFrecuentes } from "./PreguntasFrecuentes";
+export { EscenaTuTurno } from "./EscenaTuTurno";
+export { RevelarAlScroll } from "./RevelarAlScroll";
+export { cartaDelDia, primeraFrase } from "./cartaDelDia";

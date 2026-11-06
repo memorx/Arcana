@@ -7,12 +7,12 @@ test.describe("Reading Flow - Unauthenticated", () => {
   test("clicking start reading redirects to login", async ({ page }) => {
     await page.goto("/");
 
-    // Click on start reading CTA
-    const ctaButton = page.getByRole("link", { name: /comenzar lectura|start reading/i }).first();
+    // Click on the reading CTA ("Haz tu lectura": a guest is sent to sign up first)
+    const ctaButton = page.getByRole("link", { name: /haz tu lectura|get your reading/i }).first();
     await ctaButton.click();
 
-    // Should redirect to login
-    await expect(page).toHaveURL(/\/login/);
+    // Should land on an auth page (sign up for guests; /reading/new itself redirects to login)
+    await expect(page).toHaveURL(/\/(register|login)/);
   });
 });
 

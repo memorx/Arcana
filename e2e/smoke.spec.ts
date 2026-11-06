@@ -20,7 +20,7 @@ test.describe("Smoke Tests - Public Pages", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     // CTA buttons should exist
-    await expect(page.getByRole("link", { name: /comenzar|start|get started/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /haz tu lectura|get your reading|comenzar|start/i }).first()).toBeVisible();
   });
 
   test("login page loads and has form", async ({ page }) => {
