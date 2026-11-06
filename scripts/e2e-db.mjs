@@ -212,10 +212,9 @@ function start(env) {
   }
 
   if (clusterRunning(env)) {
-    if (pgIsReady(env)) {
-      log(`cluster already running on 127.0.0.1:${PG_PORT}`);
-      return;
-    }
+    if (!pgIsReady(env)) fail(`the cluster in ${PGDATA} is running but does not answer on ${PG_PORT}; see ${PG_LOG}`);
+    log(`cluster already running on 127.0.0.1:${PG_PORT}`);
+    return;
   } else if (pgIsReady(env, 5)) {
     fail(`port ${PG_PORT} is answering but not from ${PGDATA}: another server is using it.`);
   }

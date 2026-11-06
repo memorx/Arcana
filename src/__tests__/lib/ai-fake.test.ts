@@ -28,6 +28,12 @@ import { buildMonthlyRecapPrompt } from "@/lib/ai/monthly-recap";
 import { splitSynthesis } from "@/components/blueprint/synthesis-blocks";
 import { computeCompatibility, toTextBlocks } from "@/lib/compatibility";
 import { getArcanaBlueprint } from "@/lib/systems";
+import {
+  FAKE_FRASE_DIARIA,
+  FAKE_FRASE_LECTURA,
+  FAKE_FRASE_SINTESIS,
+  FAKE_TITULO_VINCULO,
+} from "../../../e2e/flujos/comun";
 
 const ENV_KEYS = ["ARCANA_AI_FAKE", "VERCEL", "NODE_ENV"] as const;
 const saved: Record<string, string | undefined> = {};
@@ -181,5 +187,13 @@ describe("fakeCompletion: shape and language per feature", () => {
         expect(text).not.toMatch(/[*#_`]/);
       }
     }
+  });
+
+  it("contains the phrases the e2e flows look for (e2e/flujos/comun.ts)", () => {
+    expect(FAKE_AI_TEXTS.es.reading).toContain(FAKE_FRASE_LECTURA.es);
+    expect(FAKE_AI_TEXTS.en.reading).toContain(FAKE_FRASE_LECTURA.en);
+    expect(FAKE_AI_TEXTS.es.daily).toContain(FAKE_FRASE_DIARIA.es);
+    expect(FAKE_AI_TEXTS.es.synthesis).toContain(FAKE_FRASE_SINTESIS.es);
+    expect(FAKE_AI_TEXTS.es.compatibility).toContain(FAKE_TITULO_VINCULO.es);
   });
 });
