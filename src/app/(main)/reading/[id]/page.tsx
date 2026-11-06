@@ -3,16 +3,14 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Badge, buttonClasses, ShareButton } from "@/components/ui";
+import { Tirada, CartaFija, type PosicionTirada } from "@/components/reading/Tirada";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Badge,
-  SavedReadingCard,
-  ShareButton,
-} from "@/components/ui";
+  IntencionCita,
+  Interpretacion,
+  SignificadosCartas,
+  type SignificadoCarta,
+} from "@/components/reading/LecturaPliego";
 import { PersonalNotes } from "@/components/reading/PersonalNotes";
 import { FollowUpChat } from "@/components/reading/FollowUpChat";
 import { ReadAloud } from "@/components/reading/ReadAloud";
@@ -81,141 +79,101 @@ export default async function ReadingPage({ params }: PageProps) {
 
   const spreadName = locale === "en" ? reading.spreadType.name : reading.spreadType.nameEs;
 
+  // The cards that can be shown (card and position found), in position order
+  const shown = [...readingCards]
+    .sort((a, b) => Number(a.position) - Number(b.position))
+    .flatMap((readingCard) => {
+      const card = cardsMap.get(readingCard.cardId);
+      const position = positions.find((p) => Number(p.position) === Number(readingCard.position));
+      return card && position ? [{ readingCard, card, position }] : [];
+    });
+  const spreadPositions: PosicionTirada[] = shown.map(({ position }) => ({
+    numero: Number(position.position),
+    nombre: locale === "en" ? position.name : position.nameEs,
+  }));
+  const meanings: SignificadoCarta[] = shown.map(({ readingCard, card, position }) => ({
+    numero: Number(position.position),
+    posicion: locale === "en" ? position.name : position.nameEs,
+    nombre: locale === "en" ? card.name : card.nameEs,
+    invertida: readingCard.isReversed,
+    significado: readingCard.isReversed
+      ? locale === "en" && card.meaningReversedEn
+        ? card.meaningReversedEn
+        : card.meaningReversed
+      : locale === "en" && card.meaningUprightEn
+        ? card.meaningUprightEn
+        : card.meaningUpright,
+    claves: card.keywords,
+  }));
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <article className="grid gap-[clamp(40px,7vh,72px)]">
       {/* Header */}
-      <div className="mb-8">
+      <header className="grid max-w-[760px] gap-4">
         <Link
           href="/history"
-          className="text-slate-400 hover:text-slate-300 text-sm mb-4 inline-flex items-center gap-1"
+          className="inline-flex min-h-11 items-center gap-2 justify-self-start font-dato text-xs tracking-[0.1em] text-letra-suave uppercase hover:text-letra"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          <span aria-hidden="true">←</span>
           {t("backToHistory")}
         </Link>
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-2">
-          <div>
-            <div className="flex flex-wrap items-center gap-3 mb-2">
-              <Badge variant="primary">{spreadName}</Badge>
-              {reading.source === "manual" && (
-                <Badge variant="secondary">
-                  <span aria-hidden="true" className="mr-1">&#127924;</span>
-                  {tManual("badge")}
-                </Badge>
-              )}
-              <span className="text-sm text-slate-500">
-                {new Date(reading.createdAt).toLocaleDateString(
-                  locale === "en" ? "en-US" : "es-ES",
-                  {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }
-                )}
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-slate-100">{t("yourReading")}</h1>
-          </div>
-          <Link href="/reading/new">
-            <Button variant="secondary">{t("newReading")}</Button>
-          </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="primary">{spreadName}</Badge>
+          {reading.source === "manual" && <Badge variant="secondary">{tManual("badge")}</Badge>}
+          <span className="font-dato text-[0.6875rem] tracking-[0.08em] text-letra-suave">
+            {new Date(reading.createdAt).toLocaleDateString(
+              locale === "en" ? "en-US" : "es-ES",
+              {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            )}
+          </span>
         </div>
-      </div>
+        <h1 className="font-titulo text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]">{t("yourReading")}</h1>
+        <IntencionCita titulo={t("yourIntention")} intencion={reading.intention} locale={locale} className="mt-2" />
+      </header>
 
-      {/* Intention */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <span className="text-amber-400">&#10022;</span>
-            {t("yourIntention")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-slate-300 italic">&quot;{reading.intention}&quot;</p>
-        </CardContent>
-      </Card>
-
-      {/* Cards Grid */}
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold text-slate-100 mb-4">
+      {/* The cards, in the figure of the spread, and what each one says */}
+      <section aria-labelledby="cartas-titulo" className="grid gap-8">
+        <h2 id="cartas-titulo" className="font-titulo text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-[1.05]">
           {t("cardsRevealed")}
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {readingCards.map((readingCard) => {
-            const card = cardsMap.get(readingCard.cardId);
-            const position = positions.find(
-              (p) => Number(p.position) === Number(readingCard.position)
-            );
-
-            if (!card || !position) return null;
-
-            // Extract number from card id (e.g., "major_0" -> 0, "wands_5" -> 5)
-            const cardNumber = parseInt(card.id.split("_").pop() || "0") || 0;
-
-            return (
-              <SavedReadingCard
-                key={readingCard.position}
-                card={{
-                  id: card.id,
-                  name: card.name,
-                  nameEs: card.nameEs,
-                  arcana: card.arcana,
-                  suit: card.suit,
-                  number: cardNumber,
-                  imageUrl: card.imageUrl,
-                  meaningUpright: card.meaningUpright,
-                  meaningReversed: card.meaningReversed,
-                  meaningUprightEn: card.meaningUprightEn,
-                  meaningReversedEn: card.meaningReversedEn,
-                  keywords: card.keywords,
-                }}
-                position={position}
-                isReversed={readingCard.isReversed}
-                locale={locale}
-                translations={{
-                  position: t("position", { number: position.position }),
-                  reversed: t("reversed"),
-                  meaning: t("meaning"),
-                }}
+        {shown.length > 0 && (
+          <Tirada
+            posiciones={spreadPositions}
+            nombreTirada={reading.spreadType.name}
+            etiqueta={t("cards", { count: shown.length })}
+            carta={(_, i) => (
+              <CartaFija
+                carta={shown[i].card}
+                alt={locale === "en" ? shown[i].card.name : shown[i].card.nameEs}
+                invertida={shown[i].readingCard.isReversed}
+                prioridad={i < 3}
               />
-            );
-          })}
-        </div>
+            )}
+            pie={(_, i) => (
+              <p className="font-titulo text-[clamp(1rem,0.9rem+0.5vw,1.4rem)] leading-[1.15]">
+                {locale === "en" ? shown[i].card.name : shown[i].card.nameEs}
+              </p>
+            )}
+          />
+        )}
+        {meanings.length > 0 && (
+          <SignificadosCartas cartas={meanings} textos={{ reversed: t("reversed"), meaning: t("meaning") }} />
+        )}
       </section>
 
       {/* Interpretation */}
-      <Card variant="highlighted">
-        <CardHeader className="flex flex-wrap items-center justify-between gap-3">
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-amber-400">&#9788;</span>
-            {t("interpretation")}
-          </CardTitle>
-          <ReadAloud text={reading.interpretation} locale={locale} />
-        </CardHeader>
-        <CardContent>
-          <div className="prose prose-invert prose-slate max-w-none">
-            {reading.interpretation.split("\n").map((paragraph, i) => (
-              <p key={i} className="text-slate-300 mb-4 last:mb-0">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <Interpretacion
+        titulo={t("interpretation")}
+        texto={reading.interpretation}
+        accion={<ReadAloud text={reading.interpretation} locale={locale} />}
+      />
 
       {/* How the reading resonated (asks after 24 h; shows the rating once given) */}
       <ResonanceCheck
@@ -241,9 +199,9 @@ export default async function ReadingPage({ params }: PageProps) {
       />
 
       {/* Actions */}
-      <div className="flex justify-center gap-4 mt-8">
-        <Link href="/reading/new">
-          <Button>{t("anotherReading")}</Button>
+      <div className="flex flex-wrap items-center gap-3 border-t border-filete/20 pt-8">
+        <Link href="/reading/new" className={buttonClasses()}>
+          {t("anotherReading")}
         </Link>
         <ShareButton
           readingId={id}
@@ -257,12 +215,14 @@ export default async function ReadingPage({ params }: PageProps) {
             linkCopied: t("linkCopied"),
             publicReading: t("publicReading"),
             privateReading: t("privateReading"),
+            shareLink: t("shareLink"),
+            close: t("close"),
           }}
         />
-        <Link href="/history">
-          <Button variant="secondary">{t("viewHistory")}</Button>
+        <Link href="/history" className={buttonClasses({ variant: "linea" })}>
+          {t("viewHistory")}
         </Link>
       </div>
-    </div>
+    </article>
   );
 }

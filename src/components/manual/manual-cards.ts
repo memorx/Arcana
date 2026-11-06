@@ -3,6 +3,7 @@
  * filter, and turning the chosen slots into the POST /api/reading/manual payload.
  * No React here so they can be tested on their own.
  */
+import { cartaImagen, type VarianteCarta } from "@/lib/cartas";
 
 export type Suit = "WANDS" | "CUPS" | "SWORDS" | "PENTACLES";
 
@@ -13,7 +14,6 @@ export interface DeckCard {
   arcana: "MAJOR" | "MINOR";
   suit: Suit | null;
   number: number;
-  imageUrl: string;
 }
 
 export type DeckFilter = "all" | "major" | Suit;
@@ -32,22 +32,15 @@ export interface ManualCardPayload {
   isReversed: boolean;
 }
 
-const WIKIMEDIA_COMMONS = /^(https:\/\/upload\.wikimedia\.org\/wikipedia\/commons)\/([0-9a-f])\/([0-9a-f]{2})\/([^/?#]+)$/;
-
 /**
- * Wikimedia's own resized copy of a Commons image:
- * `…/commons/a/ab/X.jpg` → `…/commons/thumb/a/ab/X.jpg/120px-X.jpg`.
- * Any other URL (or one that is already a thumbnail) comes back unchanged.
+ * The engraving of a card in the picker, self-hosted (public/cartas): the light grey `mesa`
+ * variant (≈ 12 KB) for the index of the 78, and the inked `tinta` variant once the card is
+ * placed in a position of the spread.
  */
-export function thumbUrl(url: string, width: number): string {
-  const match = WIKIMEDIA_COMMONS.exec(url);
-  if (!match) return url;
-  const [, base, a, ab, file] = match;
-  return `${base}/thumb/${a}/${ab}/${file}/${width}px-${file}`;
+export function thumbnailOf(card: Pick<DeckCard, "name">, placed = false): string {
+  const variant: VarianteCarta = placed ? "tinta" : "mesa";
+  return cartaImagen(card.name, variant);
 }
-
-/** Width of the card thumbnails (one of Wikimedia's standard thumbnail sizes). */
-export const THUMB_WIDTH = 120;
 
 /** Lowercase, without accents (á→a, ñ→n) and trimmed, so "Torre", "torre" and "TÓRRE" match. */
 export function normalizeText(value: string): string {

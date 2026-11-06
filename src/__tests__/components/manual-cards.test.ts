@@ -6,41 +6,34 @@ import {
   isComplete,
   nextEmptySlot,
   normalizeText,
-  thumbUrl,
+  thumbnailOf,
   type DeckCard,
 } from "@/components/manual/manual-cards";
 
 const deck: DeckCard[] = [
-  { id: "major_16", name: "The Tower", nameEs: "La Torre", arcana: "MAJOR", suit: null, number: 16, imageUrl: "x" },
-  { id: "major_19", name: "The Sun", nameEs: "El Sol", arcana: "MAJOR", suit: null, number: 19, imageUrl: "x" },
-  { id: "cups_3", name: "Three of Cups", nameEs: "Tres de Copas", arcana: "MINOR", suit: "CUPS", number: 3, imageUrl: "x" },
-  { id: "cups_13", name: "Queen of Cups", nameEs: "Reina de Copas", arcana: "MINOR", suit: "CUPS", number: 13, imageUrl: "x" },
-  { id: "pentacles_3", name: "Three of Pentacles", nameEs: "Tres de Oros", arcana: "MINOR", suit: "PENTACLES", number: 3, imageUrl: "x" },
-  { id: "swords_1", name: "Ace of Swords", nameEs: "As de Espadas", arcana: "MINOR", suit: "SWORDS", number: 1, imageUrl: "x" },
+  { id: "major_16", name: "The Tower", nameEs: "La Torre", arcana: "MAJOR", suit: null, number: 16 },
+  { id: "major_19", name: "The Sun", nameEs: "El Sol", arcana: "MAJOR", suit: null, number: 19 },
+  { id: "cups_3", name: "Three of Cups", nameEs: "Tres de Copas", arcana: "MINOR", suit: "CUPS", number: 3 },
+  { id: "cups_13", name: "Queen of Cups", nameEs: "Reina de Copas", arcana: "MINOR", suit: "CUPS", number: 13 },
+  { id: "pentacles_3", name: "Three of Pentacles", nameEs: "Tres de Oros", arcana: "MINOR", suit: "PENTACLES", number: 3 },
+  { id: "swords_1", name: "Ace of Swords", nameEs: "As de Espadas", arcana: "MINOR", suit: "SWORDS", number: 1 },
 ];
 
 const ids = (cards: DeckCard[]) => cards.map((c) => c.id);
 
 describe("manual deck helpers (F-61)", () => {
-  describe("thumbUrl", () => {
-    it("turns a Commons image into Wikimedia's resized copy", () => {
-      expect(
-        thumbUrl("https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg", 120)
-      ).toBe("https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/RWS_Tarot_00_Fool.jpg/120px-RWS_Tarot_00_Fool.jpg");
-      expect(thumbUrl("https://upload.wikimedia.org/wikipedia/commons/a/ab/Cups03.jpg", 250)).toBe(
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Cups03.jpg/250px-Cups03.jpg"
-      );
+  describe("thumbnailOf", () => {
+    it("uses the small self-hosted engraving of each card (no Wikimedia)", () => {
+      expect(thumbnailOf({ name: "The Fool" })).toBe("/cartas/rws-tarot-00-fool-mesa.webp");
+      expect(thumbnailOf({ name: "Three of Cups" })).toBe("/cartas/cups03-mesa.webp");
     });
 
-    it("returns any other URL unchanged", () => {
-      const urls = [
-        "/cards/fool.jpg",
-        "https://example.com/wikipedia/commons/9/90/Fool.jpg",
-        "https://upload.wikimedia.org/wikipedia/en/9/90/Fool.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Fool.jpg/120px-Fool.jpg",
-        "",
-      ];
-      for (const url of urls) expect(thumbUrl(url, 120)).toBe(url);
+    it("inks the engraving once the card is placed in the spread", () => {
+      expect(thumbnailOf({ name: "The Tower" }, true)).toBe("/cartas/rws-tarot-16-tower-tinta.webp");
+    });
+
+    it("falls back to the card back for a name that isn't one of the 78", () => {
+      expect(thumbnailOf({ name: "Not a card" })).toBe("/cartas/reverso.svg");
     });
   });
 

@@ -3,7 +3,7 @@
 import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Badge, Button, Card, CardContent } from "@/components/ui";
+import { Badge, Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import {
   FOLLOWUP_COST,
@@ -28,6 +28,12 @@ export interface FollowUpChatProps {
   credits: number;
   locale: string;
 }
+
+/** La pregunta, como la intención: cursiva con el filete rosa. */
+const PREGUNTA =
+  "border-l-2 border-rosa pl-4 font-lectura text-[1.0625rem] leading-[1.5] break-words italic sm:text-[1.125rem]";
+const ENLACE =
+  "inline-flex min-h-11 items-center font-dato text-xs font-medium tracking-[0.1em] text-letra-acento uppercase underline-offset-[0.3em] hover:underline";
 
 type ChatError = "unavailable" | "refused" | "credits" | "limit" | "rate" | "generic";
 
@@ -122,133 +128,126 @@ export function FollowUpChat({ readingId, initialFollowUps, credits: initialCred
   };
 
   return (
-    <Card className="mt-8">
-      <CardContent className="p-4 sm:p-6">
-        <div className="mb-2 flex items-start justify-between gap-3">
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-slate-100">
-            <span aria-hidden="true" className="text-xl">&#128172;</span>
+    <section aria-labelledby={`${fieldId}-titulo`} className="grid max-w-[760px] gap-5 border-t border-filete/20 pt-8">
+      <div className="grid gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h2 id={`${fieldId}-titulo`} className="font-titulo text-[clamp(1.4rem,1.15rem+0.8vw,1.8rem)] leading-[1.1]">
             {t("title")}
-          </h3>
+          </h2>
           <Badge variant="primary" className="shrink-0" aria-label={t("counterLabel", { used, limit: FOLLOWUP_LIMIT })}>
             {t("counter", { used, limit: FOLLOWUP_LIMIT })}
           </Badge>
         </div>
-        <p className="mb-4 text-sm text-slate-400">
+        <p className="max-w-[60ch] text-[0.9375rem] leading-[1.5] text-letra-suave">
           {t("subtitle", { limit: FOLLOWUP_LIMIT, cost: FOLLOWUP_COST })}
         </p>
+      </div>
 
-        {(followUps.length > 0 || isSending) && (
-          <ol className="mb-4 space-y-4" aria-live="polite" aria-busy={isSending}>
-            {followUps.map((item) => (
-              <li key={item.id} className="space-y-2">
-                <div className="flex justify-end">
-                  <p className="max-w-[85%] rounded-2xl rounded-br-sm border border-purple-500/30 bg-purple-500/15 px-4 py-2 text-sm text-purple-100">
-                    <span className="sr-only">{t("yourQuestion")}: </span>
-                    {item.question}
-                  </p>
-                </div>
-                <div className="max-w-[95%] rounded-2xl rounded-bl-sm border border-slate-700 bg-slate-800/50 px-4 py-3">
-                  <span className="sr-only">{t("answerLabel")}: </span>
-                  {paragraphs(item.answer).map((p, i) => (
-                    <p key={i} className="mb-3 text-sm leading-relaxed text-slate-300 last:mb-0">
-                      {p}
-                    </p>
-                  ))}
-                  <p className="mt-2 text-[11px] text-slate-500">
-                    {item.creditsCharged > 0 ? t("paid", { count: item.creditsCharged }) : t("free")}
-                  </p>
-                </div>
-              </li>
-            ))}
-
-            {pendingQuestion !== null && (
-              <li className="space-y-2">
-                <div className="flex justify-end">
-                  <p className="max-w-[85%] rounded-2xl rounded-br-sm border border-purple-500/30 bg-purple-500/15 px-4 py-2 text-sm text-purple-100">
-                    {pendingQuestion}
-                  </p>
-                </div>
-                <div role="status" className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-slate-700 bg-slate-800/50 px-4 py-3 text-sm text-slate-400">
-                  <span aria-hidden="true" className="flex gap-1">
-                    {[0, 1, 2].map((i) => (
-                      <span
-                        key={i}
-                        className="h-1.5 w-1.5 rounded-full bg-amber-400/80 motion-safe:animate-pulse"
-                        style={{ animationDelay: `${i * 0.2}s` }}
-                      />
-                    ))}
-                  </span>
-                  {t("sending")}
-                </div>
-              </li>
-            )}
-          </ol>
-        )}
-
-        {limitReached ? (
-          <p className="rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-3 text-sm text-slate-400">
-            {t("limitReached", { limit: FOLLOWUP_LIMIT })}
-          </p>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <label htmlFor={fieldId} className="block text-sm font-medium text-slate-300">
-              {t("yourQuestion")}
-            </label>
-            <textarea
-              id={fieldId}
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={handleKeyDown}
-              maxLength={FOLLOWUP_QUESTION_MAX_LENGTH}
-              rows={3}
-              disabled={isSending}
-              placeholder={t("placeholder")}
-              className="w-full resize-y rounded-xl border border-slate-700 bg-slate-800/50 p-3 text-sm text-slate-200 placeholder-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-60"
-            />
-
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-              <p className={cn(nextCost > 0 ? "text-amber-300" : "text-emerald-300")}>
-                {nextCost > 0
-                  ? t("costPaid", { cost: nextCost, credits })
-                  : t("costFree")}
+      {(followUps.length > 0 || isSending) && (
+        <ol className="grid gap-8" aria-live="polite" aria-busy={isSending}>
+          {followUps.map((item) => (
+            <li key={item.id} className="grid gap-3">
+              <p className={PREGUNTA}>
+                <span className="sr-only">{t("yourQuestion")}: </span>
+                {item.question}
               </p>
-              <span className="text-slate-500" aria-hidden="true">
-                {t("charCount", { count: question.length, max: FOLLOWUP_QUESTION_MAX_LENGTH })}
-              </span>
-            </div>
+              <div className="grid gap-3 pl-[18px]">
+                <span className="sr-only">{t("answerLabel")}: </span>
+                {paragraphs(item.answer).map((p, i) => (
+                  <p key={i} className="font-lectura leading-[1.7] break-words">
+                    {p}
+                  </p>
+                ))}
+                <p className="font-dato text-[0.625rem] tracking-[0.1em] text-letra-suave uppercase">
+                  {item.creditsCharged > 0 ? t("paid", { count: item.creditsCharged }) : t("free")}
+                </p>
+              </div>
+            </li>
+          ))}
 
-            {cantPay && error !== "credits" && (
-              <p className="text-sm text-slate-300">
-                {t("noCredits")}{" "}
-                <Link href="/credits" className="font-medium text-amber-400 hover:text-amber-300">
+          {pendingQuestion !== null && (
+            <li className="grid gap-3">
+              <p className={PREGUNTA}>{pendingQuestion}</p>
+              <div role="status" className="flex items-center gap-2 pl-[18px] font-dato text-xs tracking-[0.06em] text-letra-suave">
+                <span aria-hidden="true" className="flex gap-1">
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="size-1.5 rounded-full bg-rosa motion-safe:animate-pulse"
+                      style={{ animationDelay: `${i * 0.2}s` }}
+                    />
+                  ))}
+                </span>
+                {t("sending")}
+              </div>
+            </li>
+          )}
+        </ol>
+      )}
+
+      {limitReached ? (
+        <p className="border-t border-filete/20 pt-4 text-[0.9375rem] text-letra-suave">
+          {t("limitReached", { limit: FOLLOWUP_LIMIT })}
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} className="grid gap-3">
+          <label htmlFor={fieldId} className="font-dato text-[0.6875rem] tracking-[0.1em] text-letra-suave uppercase">
+            {t("yourQuestion")}
+          </label>
+          <textarea
+            id={fieldId}
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={handleKeyDown}
+            maxLength={FOLLOWUP_QUESTION_MAX_LENGTH}
+            rows={3}
+            disabled={isSending}
+            placeholder={t("placeholder")}
+            className="block w-full resize-y rounded-none border-0 border-y border-filete/40 bg-transparent px-0 py-3 font-lectura text-[1.0625rem] leading-[1.6] text-letra placeholder:text-letra-suave focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none disabled:opacity-60"
+          />
+
+          <div className="flex flex-wrap items-center justify-between gap-2 font-dato text-[0.6875rem] tracking-[0.04em]">
+            <p className={cn(nextCost > 0 ? "text-letra-acento" : "text-letra-exito")}>
+              {nextCost > 0
+                ? t("costPaid", { cost: nextCost, credits })
+                : t("costFree")}
+            </p>
+            <span className="text-letra-suave" aria-hidden="true">
+              {t("charCount", { count: question.length, max: FOLLOWUP_QUESTION_MAX_LENGTH })}
+            </span>
+          </div>
+
+          {cantPay && error !== "credits" && (
+            <p className="text-[0.9375rem]">
+              {t("noCredits")}{" "}
+              <Link href="/credits" className={ENLACE}>
+                {t("buyCredits")} &rarr;
+              </Link>
+            </p>
+          )}
+
+          {error && (
+            <div role="alert" className="border-l-2 border-rosa bg-papel-hondo px-4 py-3">
+              <p className="text-[0.9375rem] leading-[1.5]">{t(`errors.${error}`, { limit: FOLLOWUP_LIMIT })}</p>
+              {error === "credits" && (
+                <Link href="/credits" className={cn(ENLACE, "mt-1")}>
                   {t("buyCredits")} &rarr;
                 </Link>
-              </p>
-            )}
-
-            {error && (
-              <div role="alert" className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-                <p className="text-sm text-amber-200">{t(`errors.${error}`, { limit: FOLLOWUP_LIMIT })}</p>
-                {error === "credits" && (
-                  <Link href="/credits" className="mt-2 inline-block text-sm font-medium text-amber-400 hover:text-amber-300">
-                    {t("buyCredits")} &rarr;
-                  </Link>
-                )}
-              </div>
-            )}
-
-            <div className="flex justify-end">
-              <Button type="submit" isLoading={isSending} disabled={!trimmed || cantPay}>
-                {error === "unavailable"
-                  ? t("retry")
-                  : nextCost > 0
-                    ? t("submitPaid", { cost: nextCost })
-                    : t("submit")}
-              </Button>
+              )}
             </div>
-          </form>
-        )}
-      </CardContent>
-    </Card>
+          )}
+
+          <div className="flex justify-end">
+            <Button type="submit" isLoading={isSending} disabled={!trimmed || cantPay}>
+              {error === "unavailable"
+                ? t("retry")
+                : nextCost > 0
+                  ? t("submitPaid", { cost: nextCost })
+                  : t("submit")}
+            </Button>
+          </div>
+        </form>
+      )}
+    </section>
   );
 }

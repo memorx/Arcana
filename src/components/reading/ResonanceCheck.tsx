@@ -3,12 +3,16 @@
 import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent } from "@/components/ui";
+import { Badge, Button } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
 /** Same limits as POST /api/readings/[id]/resonance. */
 const NOTE_MAX = 500;
 const MIN_AGE_MS = 24 * 60 * 60 * 1000;
 const STARS = [1, 2, 3, 4, 5] as const;
+
+const SECCION = "grid max-w-[760px] gap-5 border-t border-filete/20 pt-8";
+const TITULO = "font-titulo text-[clamp(1.4rem,1.15rem+0.8vw,1.8rem)] leading-[1.1]";
 
 export interface ResonanceCheckProps {
   readingId: string;
@@ -77,41 +81,33 @@ export function ResonanceCheck({ readingId, createdAt, resonance, resonanceNote,
   // The saved rating doesn't depend on the clock, so it renders on the server too.
   if (saved) {
     return (
-      <section aria-labelledby={headingId} className="mt-8">
-        <Card className="border-purple-500/30">
-          <CardContent className="p-6">
-            <h3 id={headingId} className="text-lg font-semibold text-slate-100 mb-3">
-              {t("title")}
-            </h3>
-            <div className="flex flex-wrap items-center gap-3">
-              <span
-                className="flex gap-0.5 text-amber-400"
-                role="img"
-                aria-label={t("result", { score: saved.score })}
-              >
-                {STARS.map((n) => (
-                  <StarIcon key={n} filled={n <= saved.score} className="w-5 h-5" />
-                ))}
-              </span>
-              <span className="text-slate-200 font-medium">{t("result", { score: saved.score })}</span>
-            </div>
-            {saved.note && (
-              <p className="mt-3 text-slate-300 italic whitespace-pre-line break-words">
-                &ldquo;{saved.note}&rdquo;
-              </p>
-            )}
-            {justSaved && (
-              <p role="status" className="mt-4 text-sm text-emerald-300 flex flex-wrap items-center gap-2">
-                <span>{t("thanks")}</span>
-                {justSaved.xp > 0 && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    {t("xp", { xp: justSaved.xp })}
-                  </span>
-                )}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+      <section aria-labelledby={headingId} className={SECCION}>
+        <h2 id={headingId} className={TITULO}>
+          {t("title")}
+        </h2>
+        <div className="flex flex-wrap items-center gap-3">
+          <span
+            className="flex gap-0.5 text-letra-acento"
+            role="img"
+            aria-label={t("result", { score: saved.score })}
+          >
+            {STARS.map((n) => (
+              <StarIcon key={n} filled={n <= saved.score} className="size-5" />
+            ))}
+          </span>
+          <span className="font-dato text-xs tracking-[0.1em] uppercase">{t("result", { score: saved.score })}</span>
+        </div>
+        {saved.note && (
+          <p className="max-w-[60ch] border-l-2 border-rosa pl-4 font-lectura whitespace-pre-line break-words italic">
+            &ldquo;{saved.note}&rdquo;
+          </p>
+        )}
+        {justSaved && (
+          <p role="status" className="flex flex-wrap items-center gap-2 text-[0.9375rem] text-letra-exito">
+            <span>{t("thanks")}</span>
+            {justSaved.xp > 0 && <Badge variant="primary">{t("xp", { xp: justSaved.xp })}</Badge>}
+          </p>
+        )}
       </section>
     );
   }
@@ -119,17 +115,13 @@ export function ResonanceCheck({ readingId, createdAt, resonance, resonanceNote,
   // Rated somewhere else (another tab): no form; the refresh brings the rating.
   if (alreadyRated) {
     return (
-      <section aria-labelledby={headingId} className="mt-8">
-        <Card className="border-purple-500/30">
-          <CardContent className="p-6">
-            <h3 id={headingId} className="text-lg font-semibold text-slate-100 mb-2">
-              {t("title")}
-            </h3>
-            <p role="status" className="text-sm text-slate-300">
-              {t("alreadySaved")}
-            </p>
-          </CardContent>
-        </Card>
+      <section aria-labelledby={headingId} className={SECCION}>
+        <h2 id={headingId} className={TITULO}>
+          {t("title")}
+        </h2>
+        <p role="status" className="text-[0.9375rem] text-letra-suave">
+          {t("alreadySaved")}
+        </p>
       </section>
     );
   }
@@ -182,73 +174,75 @@ export function ResonanceCheck({ readingId, createdAt, resonance, resonanceNote,
   }
 
   return (
-    <section aria-labelledby={headingId} className="mt-8">
-      <Card className="border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-slate-900/50">
-        <CardContent className="p-6">
-          <h3 id={headingId} className="text-lg font-semibold text-slate-100">
-            {t("question")}
-          </h3>
-          <p className="text-sm text-slate-400 mt-1">{t("readingFrom", { date: readingDate })}</p>
+    <section aria-labelledby={headingId} className={cn(SECCION, "border-t-[3px] border-t-rosa")}>
+      <div className="grid gap-1">
+        <h2 id={headingId} className={TITULO}>
+          {t("question")}
+        </h2>
+        <p className="font-dato text-[0.6875rem] tracking-[0.08em] text-letra-suave">{t("readingFrom", { date: readingDate })}</p>
+      </div>
 
-          <div
-            role="group"
-            aria-label={t("starsGroup")}
-            className="mt-4 flex items-center gap-1"
-            onMouseLeave={() => setHovered(null)}
-          >
-            {STARS.map((n) => (
-              <button
-                key={n}
-                type="button"
-                aria-label={t("starLabel", { count: n })}
-                aria-pressed={score === n}
-                onClick={() => setScore(n)}
-                onMouseEnter={() => setHovered(n)}
-                disabled={saving}
-                className={`w-11 h-11 flex items-center justify-center rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 motion-safe:transition-transform motion-safe:hover:scale-110 disabled:cursor-not-allowed ${
-                  n <= shown ? "text-amber-400" : "text-slate-600 hover:text-slate-500"
-                }`}
-              >
-                <StarIcon filled={n <= shown} className="w-8 h-8" />
-              </button>
-            ))}
-          </div>
-          <div className="flex justify-between max-w-[14rem] text-xs text-slate-500 mt-1 px-1" aria-hidden="true">
-            <span>{t("scaleLow")}</span>
-            <span>{t("scaleHigh")}</span>
-          </div>
+      <div>
+        <div
+          role="group"
+          aria-label={t("starsGroup")}
+          className="flex flex-wrap items-center gap-1"
+          onMouseLeave={() => setHovered(null)}
+        >
+          {STARS.map((n) => (
+            <button
+              key={n}
+              type="button"
+              aria-label={t("starLabel", { count: n })}
+              aria-pressed={score === n}
+              onClick={() => setScore(n)}
+              onMouseEnter={() => setHovered(n)}
+              disabled={saving}
+              className={`flex size-11 items-center justify-center rounded-full motion-safe:transition-transform motion-safe:hover:scale-110 disabled:cursor-not-allowed ${
+                n <= shown ? "text-letra-acento" : "text-letra-suave hover:text-letra"
+              }`}
+            >
+              <StarIcon filled={n <= shown} className="size-7" />
+            </button>
+          ))}
+        </div>
+        <div className="mt-1 flex max-w-[14rem] justify-between px-1 font-dato text-[0.625rem] tracking-[0.08em] text-letra-suave uppercase" aria-hidden="true">
+          <span>{t("scaleLow")}</span>
+          <span>{t("scaleHigh")}</span>
+        </div>
+      </div>
 
-          <label htmlFor={noteId} className="block text-sm text-slate-300 mt-5 mb-2">
-            {t("noteLabel")}
-          </label>
-          <textarea
-            id={noteId}
-            value={note}
-            onChange={(e) => setNote(e.target.value.slice(0, NOTE_MAX))}
-            maxLength={NOTE_MAX}
-            rows={3}
-            placeholder={t("notePlaceholder")}
-            disabled={saving}
-            className="w-full p-3 bg-slate-800/50 border border-slate-700 rounded-xl text-slate-200 placeholder-slate-500 resize-y focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          />
-          <p className="text-xs text-slate-500 text-right mt-1">
-            {t("noteCount", { count: note.length, max: NOTE_MAX })}
-          </p>
+      <div className="grid gap-2">
+        <label htmlFor={noteId} className="font-dato text-[0.6875rem] tracking-[0.1em] text-letra-suave uppercase">
+          {t("noteLabel")}
+        </label>
+        <textarea
+          id={noteId}
+          value={note}
+          onChange={(e) => setNote(e.target.value.slice(0, NOTE_MAX))}
+          maxLength={NOTE_MAX}
+          rows={3}
+          placeholder={t("notePlaceholder")}
+          disabled={saving}
+          className="block w-full resize-y rounded-none border-0 border-y border-filete/40 bg-transparent px-0 py-3 font-lectura text-[1.0625rem] leading-[1.6] text-letra placeholder:text-letra-suave focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none disabled:opacity-60"
+        />
+        <p className="text-right font-dato text-[0.6875rem] text-letra-suave">
+          {t("noteCount", { count: note.length, max: NOTE_MAX })}
+        </p>
+      </div>
 
-          {error && (
-            <p role="alert" className="mt-3 text-sm text-red-300">
-              {t(error)}
-            </p>
-          )}
+      {error && (
+        <p role="alert" className="text-[0.9375rem] text-letra-error">
+          {t(error)}
+        </p>
+      )}
 
-          <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
-            <Button onClick={submit} isLoading={saving} disabled={score === null} className="w-full sm:w-auto">
-              {saving ? t("saving") : t("submit")}
-            </Button>
-            <span className="text-xs text-slate-500">{t("xpHint")}</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button onClick={submit} isLoading={saving} disabled={score === null}>
+          {saving ? t("saving") : t("submit")}
+        </Button>
+        <span className="font-dato text-[0.6875rem] tracking-[0.08em] text-letra-suave">{t("xpHint")}</span>
+      </div>
     </section>
   );
 }

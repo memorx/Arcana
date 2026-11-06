@@ -18,10 +18,10 @@ jest.mock("next-intl", () => ({
 }));
 
 const deck: DeckCard[] = [
-  { id: "major_0", name: "The Fool", nameEs: "El Loco", arcana: "MAJOR", suit: null, number: 0, imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
-  { id: "major_16", name: "The Tower", nameEs: "La Torre", arcana: "MAJOR", suit: null, number: 16, imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg" },
-  { id: "cups_3", name: "Three of Cups", nameEs: "Tres de Copas", arcana: "MINOR", suit: "CUPS", number: 3, imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Cups03.jpg" },
-  { id: "swords_1", name: "Ace of Swords", nameEs: "As de Espadas", arcana: "MINOR", suit: "SWORDS", number: 1, imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Swords01.jpg" },
+  { id: "major_0", name: "The Fool", nameEs: "El Loco", arcana: "MAJOR", suit: null, number: 0 },
+  { id: "major_16", name: "The Tower", nameEs: "La Torre", arcana: "MAJOR", suit: null, number: 16 },
+  { id: "cups_3", name: "Three of Cups", nameEs: "Tres de Copas", arcana: "MINOR", suit: "CUPS", number: 3 },
+  { id: "swords_1", name: "Ace of Swords", nameEs: "As de Espadas", arcana: "MINOR", suit: "SWORDS", number: 1 },
 ];
 
 const twoCardSpread: ManualSpread = {
@@ -133,21 +133,18 @@ describe("CardPicker (F-61)", () => {
     expect(tabbable()[0]).toHaveAccessibleName("pickCard As de Espadas");
   });
 
-  it("uses Wikimedia's 120 px thumbnails and falls back to the original image", () => {
+  it("shows the self-hosted engravings (grey, inked once placed) and falls back to the name", () => {
     const { container } = render(
-      <CardPicker cards={[deck[0]]} takenAt={{}} activeCardId={null} onPick={jest.fn()} locale="es" />
+      <CardPicker cards={[deck[0], deck[1]]} takenAt={{ major_16: 2 }} activeCardId={null} onPick={jest.fn()} locale="es" />
     );
 
-    const img = container.querySelector("img")!;
-    expect(img.getAttribute("src")).toBe(
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/RWS_Tarot_00_Fool.jpg/120px-RWS_Tarot_00_Fool.jpg"
-    );
+    const [free, placed] = Array.from(container.querySelectorAll("img"));
+    expect(free.getAttribute("src")).toBe("/cartas/rws-tarot-00-fool-mesa.webp");
+    expect(placed.getAttribute("src")).toBe("/cartas/rws-tarot-16-tower-tinta.webp");
 
-    fireEvent.error(img);
-    expect(container.querySelector("img")!.getAttribute("src")).toBe(deck[0].imageUrl);
-
-    fireEvent.error(container.querySelector("img")!);
-    expect(container.querySelector("img")).toBeNull();
+    fireEvent.error(free);
+    expect(container.querySelectorAll("img")).toHaveLength(1);
+    expect(screen.getAllByText("El Loco").length).toBeGreaterThan(0);
   });
 
   it("moves focus between cards with the arrow keys", () => {

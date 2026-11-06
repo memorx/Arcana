@@ -126,43 +126,10 @@ const RUTAS: Ruta[] = [
  * and WebKit; re-measured after the Fase 1 integration with ARCANA_E2E_DEFECTOS=0), by route
  * label and check. Each one is a test.fixme with its reason and the lot that owns the screen;
  * that lot deletes the entry when it fixes it (Fase 2) and the integrator checks that this
- * table ends up empty.
+ * table ends up empty. Empty since the Fase 3 integration (6 Nov 2026): every redesign row was
+ * fixed by its lot. A new known defect goes here with its owner, never as a silent skip.
  */
-const DEFECTOS: Record<string, Defectos> = {
-  "/share/[shareId]": {
-    maqueta: [
-      {
-        motivo:
-          "L2 · la fila de sellos (tirada, «Compartido por», fecha) no tiene flex-wrap: con los Badge nuevos (mono en mayúsculas) se sale a 390 y 360",
-        anchos: [390, 360],
-      },
-    ],
-    sinjs: [
-      {
-        motivo: "L2 · la misma fila de sellos sin flex-wrap se sale a 390 y 360 también sin JS",
-        anchos: [390, 360],
-      },
-    ],
-  },
-  "/reading/[id]": {
-    maqueta: [
-      {
-        motivo:
-          "L2 · la fila final «Hacer otra lectura» · compartir · «Ver historial» (flex sin wrap, <Link><Button/></Link>) no cabe a 390 y 360 con los botones nuevos en mono",
-        anchos: [390, 360],
-      },
-    ],
-  },
-  "/reading/new (vacío)": {
-    maqueta: [
-      {
-        motivo:
-          "L2 · los sellos «3 lecturas gratis» y «0 créditos disponibles» (Badge con text-sm) en una fila sin flex-wrap se salen a 390 y 360",
-        anchos: [390, 360],
-      },
-    ],
-  },
-};
+const DEFECTOS: Record<string, Defectos> = {};
 
 for (const nombre of Object.keys(DEFECTOS)) {
   if (!RUTAS.some((r) => r.nombre === nombre)) throw new Error(`DEFECTOS names a route that is not in RUTAS: ${nombre}`);

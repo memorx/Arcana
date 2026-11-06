@@ -415,7 +415,11 @@
     "shareCta": {
       "title": "Want your own reading?",
       "subtitle": "Sign up now and get 3 free readings"
-    }
+    },
+    "ask": "Ask",
+    "yourTurn": "Your turn",
+    "close": "Close",
+    "shareLink": "Share link"
   },
   "credits": {
     "title": "Buy Credits",
