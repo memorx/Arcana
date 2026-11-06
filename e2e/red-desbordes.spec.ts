@@ -1,9 +1,9 @@
 /**
- * The overflow net of the responsive pass (medirMaqueta in helpers/responsivo.ts) on a
- * fixed page, so a change to its rule cannot quietly make it pass everything again.
+ * The nets of the responsive pass (medirMaqueta and negritasSinteticas in helpers/responsivo.ts)
+ * on fixed pages, so a change to their rules cannot quietly make them pass everything again.
  */
 import { expect, test } from "@playwright/test";
-import { medirMaqueta } from "./helpers/responsivo";
+import { medirMaqueta, negritasSinteticas } from "./helpers/responsivo";
 
 const ANCHO = 360;
 const PAGINA = `<!doctype html>
@@ -33,4 +33,19 @@ test("overflow hidden/clip only excuses decoration or data-recorta; a scroller a
     expect.stringMatching(/^h2#titulo\.ancho .*«Un título que no cabe a 360 px» \(recortado por section#escena\.escena/),
     expect.stringMatching(/^button#boton\.ancho .*«Un botón cortado» \(recortado por div#tarjeta\.tarjeta/),
   ]);
+});
+
+const NEGRITAS = `<!doctype html>
+<style>
+  body { margin: 0; font: 16px/1.4 Newsreader, Georgia, serif; }
+  .titulo { font-family: Gloock, serif; }
+  .sin-sintesis { font-synthesis-weight: none; }
+</style>
+<p>Texto <strong>fuerte</strong>, <b class="sin-sintesis">sin síntesis</b>, <span style="font-weight: 500">medio</span>,
+<strong class="titulo">rótulo en Gloock</strong> y <span style="font-weight: 600" hidden>oculto</span>.</p>
+`;
+
+test("synthetic bold: only Newsreader at >= 600 is reported (not 500, not Gloock, not font-synthesis-weight: none)", async ({ page }) => {
+  await page.setContent(NEGRITAS);
+  expect(await negritasSinteticas(page)).toEqual(["strong «fuerte» (700)"]);
 });

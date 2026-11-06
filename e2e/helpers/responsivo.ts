@@ -243,6 +243,32 @@ export async function textoInvisible(page: Page): Promise<string[]> {
 }
 
 /**
+ * Visible text set in Newsreader at weight 600 or more. The site loads Newsreader only as a static 400 (roman and
+ * italic; PLAN 2026-11-05 §5.7, note of 6 Nov 2026), so the browser would fake that bold by smearing the 400:
+ * emphasis goes in Gloock (font-titulo) or Martian Mono (font-dato, variable). Weights under 600 are not reported:
+ * they render the 400 face, browsers only synthesize bold from 600 up. `font-synthesis-weight: none` excuses it.
+ */
+export async function negritasSinteticas(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const salida: string[] = [];
+    for (const el of document.body.querySelectorAll("*")) {
+      const propio = [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim());
+      if (!propio) continue;
+      const cs = getComputedStyle(el);
+      if (cs.display === "none" || cs.visibility === "hidden" || Number(cs.fontWeight) < 600) continue;
+      if (cs.getPropertyValue("font-synthesis-weight") === "none") continue;
+      const familia = cs.fontFamily.split(",")[0].replace(/["']/g, "").trim();
+      if (familia.toLowerCase() !== "newsreader") continue;
+      const r = el.getBoundingClientRect();
+      if (r.width <= 1 || r.height <= 1) continue;
+      const texto = (el.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 40);
+      salida.push(`${el.tagName.toLowerCase()} «${texto}» (${cs.fontWeight})`);
+    }
+    return salida.slice(0, 10);
+  });
+}
+
+/**
  * Console errors and uncaught page errors while the test runs. Ignored: favicon noise;
  * when the route is expected to answer 404, the browser's own "Failed to load resource"
  * line for that document; and `conocidos`, known defects listed in responsivo.spec.ts.

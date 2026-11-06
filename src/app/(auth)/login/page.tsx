@@ -101,7 +101,7 @@ function LoginForm() {
 
       <p className="mt-8 border-t border-tinta/15 pt-5 text-center text-grafito">
         {t("noAccount")}{" "}
-        <Link href="/register" className={`${ENLACE_PLIEGO} font-medium`}>
+        <Link href="/register" className={ENLACE_PLIEGO}>
           {t("registerButton")}
         </Link>
       </p>

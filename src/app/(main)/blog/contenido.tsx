@@ -82,11 +82,14 @@ export function bloquesDelArticulo(texto: string, titulo?: string): Bloque[] {
   return bloques;
 }
 
-/** `**negritas**` dentro de un renglón. */
+/**
+ * `**negritas**` dentro de un renglón. En el blog marcan rótulos («**Bastos**:», «**Mejor para**:»), así que van en
+ * Gloock, la letra de los títulos: Newsreader sólo se carga en 400 y una negrita suya saldría sintética.
+ */
 function enLinea(texto: string): ReactNode[] {
   return texto.split(/(\*\*[^*]+\*\*)/g).map((parte, i) =>
     parte.startsWith("**") && parte.endsWith("**") && parte.length > 4 ? (
-      <strong key={i} className="font-semibold text-tinta">
+      <strong key={i} className="font-titulo font-normal text-tinta">
         {parte.slice(2, -2)}
       </strong>
     ) : (

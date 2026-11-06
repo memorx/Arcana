@@ -19,6 +19,8 @@ const gloock = Gloock({
 
 // Estática 400 + itálica 400 (22 + 24 KB) en vez de la variable opsz+wght (132 + 147 KB): el sitio sólo
 // la usa a 15–24 px y en peso 400, y Lantern cuenta cada byte de fuente en el FCP y el LCP simulados.
+// Sin negritas en Newsreader (saldrían sintéticas): el énfasis va en Gloock o en Martian Mono, y la red
+// responsiva (negritasSinteticas en e2e/helpers/responsivo.ts) avisa si algo pide Newsreader ≥ 600.
 const newsreader = Newsreader({
   weight: "400",
   subsets: ["latin"],

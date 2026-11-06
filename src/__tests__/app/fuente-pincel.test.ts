@@ -167,8 +167,9 @@ function archivosTsx(dir: string, salida: string[] = []): string[] {
 describe("subset de Water Brush (palabra a pincel)", () => {
   it("el cmap se lee: letras, acentos del español, ¿?¡!,. y el espacio; nada de cifras", () => {
     const esperados = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚÑÜáéíóúñü¿?¡!,.";
-    expect([...enSubset].sort((a, b) => a - b)).toEqual([...esperados].map((c) => c.codePointAt(0)).sort((a, b) => a - b));
-    expect(enSubset.has("0".codePointAt(0)!)).toBe(false);
+    const codigos = [...esperados].map((c) => c.codePointAt(0) ?? -1);
+    expect([...enSubset].sort((a, b) => a - b)).toEqual(codigos.sort((a, b) => a - b));
+    expect(enSubset.has(0x30)).toBe(false); // «0»
   });
 
   it("lleva su copyright y su licencia (OFL, sin «Reserved Font Name»), dentro del archivo y en OFL.txt", () => {
