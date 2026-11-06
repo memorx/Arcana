@@ -6,7 +6,6 @@
  * de una tirada (`/reading/new/*`, paso «revealing») y a `/daily` (plan §5.4); para repetirla, cambia su `key`.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import "./tinta.css";
 
 export interface TransicionPincelProps {
   /** Se llama al terminar el barrido (o de inmediato si no hay movimiento). */

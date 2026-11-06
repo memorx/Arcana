@@ -254,5 +254,8 @@
   }
 }
 
+/* Componentes firma y carta dorada (dueño del contenido: F1-B). Se importa sólo aquí: ningún componente lo importa. */
+@import "../components/tinta/tinta.css";
+
 /* Remapeo temporal de la paleta vieja (§5.3). La Fase 3 lo quita borrando esta línea. */
 @import "./remapeo-paleta.css";

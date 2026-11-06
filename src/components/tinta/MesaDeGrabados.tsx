@@ -11,7 +11,6 @@
  */
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { CARTAS, cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
-import "./tinta.css";
 
 export interface MesaDeGrabadosProps {
   /** Slugs de `@/lib/cartas`, en orden de lectura por columnas. Si faltan, se repiten; vacío = las 78. */

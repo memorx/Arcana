@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { cartaImagen, slugCarta } from "@/lib/cartas";
 import { CardPlaceholder, CardBack } from "./CardPlaceholder";
-import "@/components/tinta/tinta.css"; // carta dorada: golden-card-border / golden-card-glow / golden-shimmer-effect
 
 interface TarotCardProps {
   card: {

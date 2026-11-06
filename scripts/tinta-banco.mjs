@@ -159,6 +159,8 @@ await esbuild.build({
   plugins: [calzas],
   logLevel: "warning",
 });
+// En la app tinta.css entra una sola vez desde globals.css (ningún componente lo importa); aquí se sirve como banco.css.
+fs.copyFileSync(path.join(RAIZ, "src/components/tinta/tinta.css"), path.join(OBRA, "banco.css"));
 
 // ---------------------------------------------------------------------------------------------------------------------
 // 2. Tailwind con los tokens de §2.1

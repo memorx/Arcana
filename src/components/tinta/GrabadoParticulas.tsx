@@ -13,7 +13,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
-import "./tinta.css";
 
 export interface GrabadoParticulasProps {
   /** El grabado que se deshace (variante `tinta`). */

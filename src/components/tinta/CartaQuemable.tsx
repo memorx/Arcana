@@ -17,7 +17,6 @@ import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react
 import { useTranslations } from "next-intl";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { ReversoCarta, pintarReverso } from "./ReversoCarta";
-import "./tinta.css";
 
 export type TamanoCarta = "chica" | "media" | "grande";
 

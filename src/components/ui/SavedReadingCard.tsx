@@ -58,7 +58,6 @@ export function SavedReadingCard({ card, position, isReversed, locale, translati
               arcana: card.arcana as "MAJOR" | "MINOR",
               suit: card.suit as "WANDS" | "CUPS" | "SWORDS" | "PENTACLES" | null,
               number: card.number,
-              imageUrl: card.imageUrl,
             }}
             isReversed={isReversed}
             showReversedBadge={false}
