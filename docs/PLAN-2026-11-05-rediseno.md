@@ -267,6 +267,14 @@ nuevos, con `useReducedMotion` donde esté.
 - `next/font`: Gloock 400; Newsreader variable (`opsz`, `wght`, itálica); Martian Mono variable; Water Brush 400 con
   `adjustFontFallback: false`. Si `--font-titulo` referencia otra variable va en **`@theme inline`**; las clases
   `.variable` van en `<html>`.
+  - **Nota del 6 nov 2026 (decisión de Fable por rendimiento, lote F4-C):** Newsreader pasa a **estática 400**
+    (`weight: "400"`, normal e itálica, sin `axes`): 22.5 + 24.4 KB en vez de 132 + 147 KB de la variable, porque
+    Lighthouse móvil simulado cuenta esos bytes antes del FCP/LCP (la portada bajó de 98–99 a 69–71). Sin `wght` no hay
+    negritas en Newsreader: el énfasis va en Gloock (las `**negritas**` del blog) o en Martian Mono, y la red
+    responsiva reporta cualquier texto en Newsreader ≥ 600 (`negritasSinteticas`). Water Brush deja
+    `next/font/google` y es un **subset local** (`src/app/fuentes/water-brush-letras.woff2`, 35 KB en vez de 65: A–Z,
+    a–z, ÁÉÍÓÚÑÜ/áéíóúñü, ¿?¡!,. y el espacio), con su `OFL.txt`; lo regenera `scripts/fuente-pincel.py` y
+    `src/__tests__/app/fuente-pincel.test.ts` comprueba contra su cmap que cada palabra a pincel quepa.
 - `export const viewport = { themeColor: "#0E0D0C", colorScheme: "light" }` y `color-scheme: light` en `:root`;
   `manifest.json` con `theme_color #0E0D0C` y `background_color #ECEAE6`; OG/favicon/íconos en dos tintas (F1-B).
 - `Modal`: trampa de foco, foco inicial, `aria-labelledby`, bloqueo de scroll, foco de regreso al disparador. Test:
