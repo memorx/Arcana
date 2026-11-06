@@ -81,6 +81,7 @@ export function Header() {
   const [freeReadings, setFreeReadings] = useState<number | null>(null);
   const [userLevel, setUserLevel] = useState<number>(1);
   const t = useTranslations("nav");
+  const tFooter = useTranslations("footer");
   const tDashboard = useTranslations("dashboard");
   const tLevels = useTranslations("levels");
 
@@ -394,7 +395,14 @@ export function Header() {
 
             <nav aria-label={t("mainNav")} className="px-gutter pt-6 pb-8">
               <ul className="grid gap-1">
-                {(autenticado ? PRINCIPALES : [{ href: "/calendar", key: "calendar" as const }]).map((e) => (
+                {(autenticado
+                  ? PRINCIPALES.map((e) => ({ href: e.href, texto: t(e.key) }))
+                  : [
+                      { href: "/calendar", texto: t("calendar") },
+                      { href: "/cards", texto: tFooter("explore") },
+                      { href: "/blog", texto: tFooter("blog") },
+                    ]
+                ).map((e) => (
                   <li key={e.href}>
                     <Link
                       href={e.href}
@@ -402,7 +410,7 @@ export function Header() {
                       aria-current={actual(e.href)}
                       className="inline-flex min-h-12 items-center font-titulo text-[clamp(1.75rem,1.2rem+2.4vw,2.4rem)] leading-tight transition-colors hover:text-rosa-luz aria-[current=page]:text-rosa-luz"
                     >
-                      {t(e.key)}
+                      {e.texto}
                     </Link>
                   </li>
                 ))}

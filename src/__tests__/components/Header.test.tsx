@@ -195,6 +195,8 @@ describe("Header in two inks (F1-A)", () => {
     const menu = screen.getByRole("dialog");
     expect(within(menu).getByRole("link", { name: "calendar" })).toHaveAttribute("href", "/calendar");
     expect(within(menu).getByRole("link", { name: "register" })).toHaveAttribute("href", "/register");
+    expect(within(menu).getByRole("link", { name: "explore" })).toHaveAttribute("href", "/cards");
+    expect(within(menu).getByRole("link", { name: "blog" })).toHaveAttribute("href", "/blog");
     expect(within(menu).queryByRole("link", { name: "dashboard" })).toBeNull();
     // the header behind is hidden, so only the menu's log in link is reachable
     expect(screen.getByRole("link", { name: "login" })).toHaveAttribute("href", "/login");

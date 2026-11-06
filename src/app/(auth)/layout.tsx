@@ -21,7 +21,12 @@ export default function AuthLayout({
             Arcana
           </Link>
           <HoraDelDia variante="larga" className="ml-auto hidden text-right text-niebla lg:block" />
-          <HoraDelDia variante="corta" className="ml-auto min-w-0 text-right text-[0.625rem] text-niebla lg:hidden" />
+        </div>
+        {/* En pantallas chicas la hora va en su propia fila, debajo de la marca */}
+        <div className="border-t border-papel/10 lg:hidden">
+          <div className="mx-auto max-w-escena px-gutter py-1.5 text-niebla">
+            <HoraDelDia variante="corta" className="text-[0.625rem] md:text-center" />
+          </div>
         </div>
       </header>
 
