@@ -3,8 +3,7 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Badge, ShareButton } from "@/components/ui";
-import { EnlaceBoton } from "@/components/reading/EnlaceBoton";
+import { Badge, buttonClasses, ShareButton } from "@/components/ui";
 import { Tirada, CartaFija, type PosicionTirada } from "@/components/reading/Tirada";
 import {
   IntencionCita,
@@ -201,9 +200,9 @@ export default async function ReadingPage({ params }: PageProps) {
 
       {/* Actions */}
       <div className="flex flex-wrap items-center gap-3 border-t border-filete/20 pt-8">
-        <EnlaceBoton href="/reading/new">
+        <Link href="/reading/new" className={buttonClasses()}>
           {t("anotherReading")}
-        </EnlaceBoton>
+        </Link>
         <ShareButton
           readingId={id}
           translations={{
@@ -220,9 +219,9 @@ export default async function ReadingPage({ params }: PageProps) {
             close: t("close"),
           }}
         />
-        <EnlaceBoton href="/history" variant="linea">
+        <Link href="/history" className={buttonClasses({ variant: "linea" })}>
           {t("viewHistory")}
-        </EnlaceBoton>
+        </Link>
       </div>
     </article>
   );

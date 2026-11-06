@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Badge } from "@/components/ui";
-import { EnlaceBoton } from "@/components/reading/EnlaceBoton";
+import { Badge, buttonClasses } from "@/components/ui";
 import { Header, Footer } from "@/components/layout";
 import { Escena } from "@/components/tinta/Escena";
 import { Pincel } from "@/components/tinta/Pincel";
@@ -115,9 +115,9 @@ export default async function SharedReadingPage({ params }: PageProps) {
             </div>
             <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
               <h1 className="font-titulo text-[clamp(2rem,1.4rem+2vw,3.2rem)] leading-[1.05]">{t("yourReading")}</h1>
-              <EnlaceBoton href="/register" variant="linea">
+              <Link href="/register" className={buttonClasses({ variant: "linea" })}>
                 {t("anotherReading")}
-              </EnlaceBoton>
+              </Link>
             </div>
             <IntencionCita titulo={t("yourIntention")} intencion={reading.intention} locale={locale} className="mt-2 max-w-[760px]" />
           </header>
@@ -166,9 +166,9 @@ export default async function SharedReadingPage({ params }: PageProps) {
               {t("shareCta.title")}
             </h2>
             <p className="max-w-[46ch] text-letra-suave">{t("shareCta.subtitle")}</p>
-            <EnlaceBoton href="/register" size="lg">
+            <Link href="/register" className={buttonClasses({ size: "lg" })}>
               {t("anotherReading")}
-            </EnlaceBoton>
+            </Link>
           </div>
         </Escena>
       </main>
