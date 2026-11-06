@@ -1,29 +1,6 @@
 import type { ReactNode } from "react";
-import { Card, CardContent } from "@/components/ui";
 import { cn } from "@/lib/utils";
-
-type Accent = "amber" | "purple" | "emerald";
-
-const ACCENT_STYLES: Record<Accent, { symbol: string; eyebrow: string; chip: string; glow: string }> = {
-  amber: {
-    symbol: "from-amber-500/25 to-amber-900/10 border-amber-500/30 text-amber-200",
-    eyebrow: "text-amber-400/90",
-    chip: "border-amber-500/20 bg-amber-500/5 text-amber-100/90",
-    glow: "from-amber-500/10",
-  },
-  purple: {
-    symbol: "from-purple-500/25 to-purple-900/10 border-purple-500/30 text-purple-200",
-    eyebrow: "text-purple-300/90",
-    chip: "border-purple-500/20 bg-purple-500/5 text-purple-100/90",
-    glow: "from-purple-500/10",
-  },
-  emerald: {
-    symbol: "from-emerald-500/25 to-emerald-900/10 border-emerald-500/30 text-emerald-200",
-    eyebrow: "text-emerald-300/90",
-    chip: "border-emerald-500/20 bg-emerald-500/5 text-emerald-100/90",
-    glow: "from-emerald-500/10",
-  },
-};
+import { GlifoSistema } from "./BlueprintBadges";
 
 export interface SystemCardDetail {
   label: string;
@@ -34,6 +11,20 @@ export interface SystemCardProps {
   /** Emoji, or a short text mark ("5", "V") when `symbolIsText`. */
   symbol: string;
   symbolIsText?: boolean;
+  /**
+   * "sello" (default): the symbol in a small ring next to the title.
+   * "grande": the symbol is the lámina's figure, a large Gloock numeral in pink
+   * (the life path number).
+   */
+  symbolSize?: "sello" | "grande";
+  /** Plate number in the series ("I", "II"…), printed before the system name. */
+  numeral?: string;
+  /**
+   * "columna" (default): everything stacked. "doble": for a plate that spans
+   * the full row, from 768 px the text goes left and `children` (the birth
+   * cards) right, so a single card does not leave half the plate empty.
+   */
+  disposicion?: "columna" | "doble";
   /** System name: "Zodiaco occidental". */
   eyebrow: string;
   /** The person's sign in that system: "Cáncer". */
@@ -43,16 +34,26 @@ export interface SystemCardProps {
   description?: string;
   details?: SystemCardDetail[];
   footnote?: string;
-  accent?: Accent;
+  /** No longer used: «Dos tintas» has one accent. Kept so callers keep compiling. */
+  accent?: "amber" | "purple" | "emerald";
   className?: string;
   /** Extra content under the description (e.g. the birth cards). */
   children?: ReactNode;
 }
 
-/** One system of the Arcana Map: symbol, name, the person's sign, traits and description. */
+/**
+ * One system of the Arcana Map as a printed plate (lámina): plate number and
+ * system in mono, the person's sign in Gloock, the traits as a line of data,
+ * the description in Newsreader and the details as a `dl` (labels in mono,
+ * values in Gloock), like «El día de hoy» on the home page. No box of its own:
+ * the grid that holds the plates draws the rules between them.
+ */
 export function SystemCard({
   symbol,
   symbolIsText = false,
+  symbolSize = "sello",
+  numeral,
+  disposicion = "columna",
   eyebrow,
   title,
   subtitle,
@@ -60,67 +61,108 @@ export function SystemCard({
   description,
   details = [],
   footnote,
-  accent = "purple",
   className,
   children,
 }: SystemCardProps) {
-  const styles = ACCENT_STYLES[accent];
+  const grande = symbolSize === "grande";
+  const doble = disposicion === "doble";
 
-  return (
-    <Card className={cn("relative h-full overflow-hidden", className)}>
-      <div
-        aria-hidden="true"
-        className={cn(
-          "pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br to-transparent blur-2xl",
-          styles.glow
-        )}
-      />
-      <CardContent className="relative flex h-full flex-col gap-4 p-5 sm:p-6">
-        <header className="flex items-start gap-4">
+  const texto = (
+    <>
+      <header className={cn("flex gap-4", grande ? "items-end" : "items-start")}>
+        {grande ? (
           <span
             aria-hidden="true"
-            className={cn(
-              "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br",
-              symbolIsText ? "font-serif text-2xl font-semibold" : "text-3xl",
-              styles.symbol
-            )}
+            data-figura
+            className="shrink-0 font-titulo text-[clamp(4.75rem,3.6rem+4vw,7.5rem)] leading-[0.78] text-rosa"
           >
             {symbol}
           </span>
-          <div className="min-w-0">
-            <p className={cn("text-xs font-medium uppercase tracking-[0.18em]", styles.eyebrow)}>{eyebrow}</p>
-            <h3 className="mt-1 text-xl font-semibold leading-snug text-slate-100">{title}</h3>
-            {subtitle && <p className="mt-0.5 text-sm text-slate-400">{subtitle}</p>}
-          </div>
-        </header>
-
-        {traits.length > 0 && (
-          <ul className="flex flex-wrap gap-1.5">
-            {traits.map((trait) => (
-              <li key={trait} className={cn("rounded-full border px-2.5 py-0.5 text-xs", styles.chip)}>
-                {trait}
-              </li>
-            ))}
-          </ul>
+        ) : (
+          <span className="grid size-14 shrink-0 place-items-center rounded-full border border-filete text-[1.65rem]">
+            <GlifoSistema symbol={symbol} isText={symbolIsText} className={symbolIsText ? "text-[1.35rem]" : undefined} />
+          </span>
         )}
+        <div className="min-w-0">
+          <p className="font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase">
+            {numeral && (
+              <span aria-hidden="true" className="text-letra-acento">
+                {numeral} ·{" "}
+              </span>
+            )}
+            {eyebrow}
+          </p>
+          <h3 className="mt-1.5 text-[clamp(1.45rem,1.2rem+0.8vw,1.85rem)] leading-[1.1] break-words">{title}</h3>
+          {subtitle && (
+            <p className="mt-1.5 font-dato text-[0.6875rem] leading-[1.5] tracking-[0.08em] text-letra-suave uppercase">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </header>
 
-        {description && <p className="text-sm leading-relaxed text-slate-300">{description}</p>}
+      {traits.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5">
+          {traits.map((trait) => (
+            <li
+              key={trait}
+              className="rounded-full border border-filete/30 px-2.5 py-0.5 font-dato text-[0.625rem] leading-[1.5] tracking-[0.1em] text-letra-suave uppercase"
+            >
+              {trait}
+            </li>
+          ))}
+        </ul>
+      )}
 
-        {children}
+      {description && <p className="max-w-[62ch] text-[1rem] leading-[1.6]">{description}</p>}
+    </>
+  );
 
-        {details.length > 0 && (
-          <dl className="mt-auto grid grid-cols-1 gap-x-4 gap-y-2 border-t border-slate-800 pt-4 text-sm min-[420px]:grid-cols-2">
-            {details.map((detail) => (
-              <div key={detail.label} className="min-w-0">
-                <dt className="text-xs text-slate-500">{detail.label}</dt>
-                <dd className="text-slate-200">{detail.value}</dd>
-              </div>
-            ))}
-          </dl>
+  const pie = (
+    <>
+      {details.length > 0 && (
+        <dl className="mt-auto grid grid-cols-1 gap-x-6 gap-y-4 border-t border-filete/25 pt-5 min-[420px]:grid-cols-2">
+          {details.map((detail) => (
+            <div key={detail.label} className="min-w-0">
+              <dt className="font-dato text-[0.625rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase">
+                {detail.label}
+              </dt>
+              <dd className="mt-1 font-titulo text-[1.15rem] leading-[1.2] break-words">{detail.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {footnote && (
+        <p className="border-l-2 border-rosa pl-4 text-[0.9375rem] leading-[1.55] text-letra-suave italic">
+          {footnote}
+        </p>
+      )}
+    </>
+  );
+
+  if (doble) {
+    return (
+      <div
+        className={cn(
+          "grid h-full gap-x-12 gap-y-6 bg-suelo p-5 text-letra sm:p-7 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-16",
+          className
         )}
+      >
+        <div className="flex min-w-0 flex-col gap-5">
+          {texto}
+          {pie}
+        </div>
+        {children && <div className="min-w-0">{children}</div>}
+      </div>
+    );
+  }
 
-        {footnote && <p className="text-xs leading-relaxed text-slate-500">{footnote}</p>}
-      </CardContent>
-    </Card>
+  return (
+    <div className={cn("flex h-full flex-col gap-5 bg-suelo p-5 text-letra sm:p-7", className)}>
+      {texto}
+      {children}
+      {pie}
+    </div>
   );
 }

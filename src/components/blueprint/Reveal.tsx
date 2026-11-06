@@ -22,7 +22,7 @@ export function Reveal({
 }) {
   return (
     <div
-      className={cn("motion-safe:animate-[blueprint-rise_0.6s_cubic-bezier(0.25,0.1,0.25,1)_both]", className)}
+      className={cn("motion-safe:animate-[blueprint-rise_0.6s_cubic-bezier(0.16,1,0.3,1)_both]", className)}
       style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {/* React hoists this to <head> once per page (href + precedence). */}

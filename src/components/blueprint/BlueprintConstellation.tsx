@@ -16,41 +16,30 @@ const POINTS = Array.from({ length: 5 }, (_, k) => {
 });
 
 /**
- * Decorative figure: the five systems on a pentagon, joined to the person in
- * the center. Hidden from assistive tech (the badges list carries the data).
+ * The Mapa Arcano glyph of the home page («Más que tarot»), engraved large:
+ * the five systems on a pentagon drawn in ink, joined to the person, who is
+ * the one pink mark in the center. Still (no spinning ring). Hidden from
+ * assistive tech: the badges list carries the data. Without badges it draws
+ * the empty map (the state before the profile exists).
  */
 export function BlueprintConstellation({ badges, center, className }: BlueprintConstellationProps) {
   const polygon = POINTS.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
 
   return (
-    <div aria-hidden="true" className={cn("relative aspect-square w-44 sm:w-52 shrink-0", className)}>
-      <div className="absolute inset-[6%] rounded-full bg-purple-600/10 blur-2xl" />
-      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full overflow-visible">
-        <defs>
-          <linearGradient id="blueprint-constellation-stroke" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#a855f7" />
-            <stop offset="100%" stopColor="#f59e0b" />
-          </linearGradient>
-        </defs>
-        <g className="origin-center motion-safe:animate-[spin_120s_linear_infinite]">
-          <circle
-            cx="50"
-            cy="50"
-            r="47"
-            fill="none"
-            stroke="url(#blueprint-constellation-stroke)"
-            strokeOpacity="0.35"
-            strokeWidth="0.4"
-            strokeDasharray="1 3"
-          />
-        </g>
-        <polygon
-          points={polygon}
+    <div aria-hidden="true" className={cn("relative aspect-square w-48 shrink-0 text-letra sm:w-60", className)}>
+      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
+        <circle cx="50" cy="50" r="48.5" fill="none" stroke="currentColor" strokeOpacity="0.28" strokeWidth="0.35" />
+        <circle
+          cx="50"
+          cy="50"
+          r="45.5"
           fill="none"
-          stroke="url(#blueprint-constellation-stroke)"
-          strokeOpacity="0.55"
-          strokeWidth="0.6"
+          stroke="currentColor"
+          strokeOpacity="0.5"
+          strokeWidth="0.35"
+          strokeDasharray="0.4 2.2"
         />
+        <polygon points={polygon} fill="none" stroke="currentColor" strokeWidth="0.45" />
         {POINTS.map((p, i) => (
           <line
             key={i}
@@ -58,27 +47,27 @@ export function BlueprintConstellation({ badges, center, className }: BlueprintC
             y1="50"
             x2={p.x}
             y2={p.y}
-            stroke="url(#blueprint-constellation-stroke)"
-            strokeOpacity="0.3"
-            strokeWidth="0.4"
+            stroke="currentColor"
+            strokeOpacity="0.55"
+            strokeWidth="0.35"
           />
         ))}
       </svg>
 
-      {badges.slice(0, 5).map((badge, i) => (
-        <span
-          key={badge.id}
-          className="absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-xl shadow-[0_0_18px_rgba(168,85,247,0.25)] sm:h-11 sm:w-11"
-          style={{ left: `${POINTS[i].x}%`, top: `${POINTS[i].y}%` }}
-        >
-          <BadgeSymbol
-            badge={badge}
-            className={badge.symbolIsText ? "h-7 min-w-7 border-0 text-sm" : undefined}
-          />
-        </span>
-      ))}
+      {POINTS.map((p, i) => {
+        const badge = badges[i];
+        return (
+          <span
+            key={badge?.id ?? i}
+            className="absolute flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-filete bg-suelo text-lg sm:size-12 sm:text-xl"
+            style={{ left: `${POINTS[i].x}%`, top: `${POINTS[i].y}%` }}
+          >
+            {badge && <BadgeSymbol badge={badge} />}
+          </span>
+        );
+      })}
 
-      <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-amber-400/40 bg-gradient-to-br from-purple-700/60 to-amber-700/40 text-2xl font-semibold text-amber-100 shadow-[0_0_28px_rgba(245,158,11,0.25)]">
+      <span className="absolute top-1/2 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-rosa font-titulo text-[1.75rem] leading-none text-papel sm:size-16 sm:text-[2rem]">
         {center}
       </span>
     </div>

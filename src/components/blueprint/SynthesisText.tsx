@@ -9,8 +9,9 @@ interface SynthesisTextProps {
 }
 
 /**
- * The synthesis in paragraphs (the first one, the portrait, a little larger)
- * and the closing questions in their own numbered box. Server and client safe.
+ * The synthesis as a printed sheet in Newsreader (the portrait, the first
+ * paragraph, a little larger) and the closing questions apart, in italics,
+ * under a rule, numbered in pink. Server and client safe.
  */
 export function SynthesisText({ text, lang, questionsTitle }: SynthesisTextProps) {
   const blocks = splitSynthesis(text);
@@ -18,28 +19,34 @@ export function SynthesisText({ text, lang, questionsTitle }: SynthesisTextProps
   const questions = blocks.filter((b) => b.kind === "question");
 
   return (
-    <article lang={lang} className="space-y-4">
+    <article lang={lang} className="grid max-w-[66ch] gap-[1.1em] font-lectura text-letra hyphens-auto">
       {paragraphs.map((block, i) => (
         <p
           key={i}
-          className={i === 0 ? "text-lg leading-relaxed text-slate-100" : "leading-relaxed text-slate-300"}
+          className={
+            i === 0
+              ? "text-[clamp(1.25rem,1.1rem+0.5vw,1.45rem)] leading-[1.5]"
+              : "text-[1.125rem] leading-[1.7]"
+          }
         >
           {block.text}
         </p>
       ))}
       {questions.length > 0 && (
-        <aside className="mt-6 rounded-xl border border-amber-500/20 bg-slate-950/40 p-4 sm:p-5">
-          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-amber-400">{questionsTitle}</h3>
-          <ol className="mt-3 space-y-3">
+        <aside className="mt-3 border-t border-filete/25 pt-6">
+          <h3 className="font-dato text-[0.6875rem] leading-[1.4] tracking-[0.12em] text-letra-suave uppercase">
+            {questionsTitle}
+          </h3>
+          <ol className="mt-4 grid gap-4">
             {questions.map((block, i) => (
-              <li key={i} className="flex gap-3 text-slate-200">
+              <li key={i} className="flex gap-4 text-[1.1875rem] leading-[1.55]">
                 <span
                   aria-hidden="true"
-                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-amber-500/40 text-xs text-amber-300"
+                  className="w-5 shrink-0 pt-[0.35em] font-dato text-[0.75rem] leading-none text-letra-acento"
                 >
                   {i + 1}
                 </span>
-                <span className="italic leading-relaxed">{block.text}</span>
+                <span className="italic">{block.text}</span>
               </li>
             ))}
           </ol>
