@@ -40,6 +40,20 @@ describe("Card", () => {
     expect(screen.getByTestId("card")).toHaveClass("cursor-pointer", "hover:border-rosa");
   });
 
+  it("interactive: the 2 px lift slides (Tailwind 4's -translate-y-* sets `translate`, so the transition lists it)", () => {
+    render(
+      <Card variant="interactive" data-testid="card">
+        Interactive
+      </Card>
+    );
+    const card = screen.getByTestId("card");
+    expect(card).toHaveClass("hover:-translate-y-0.5");
+    const transicion = card.className.split(" ").find((c) => c.startsWith("transition-["));
+    expect(transicion?.slice("transition-[".length, -1).split(",")).toEqual(
+      expect.arrayContaining(["translate", "border-color"])
+    );
+  });
+
   it("applies custom className", () => {
     render(
       <Card className="custom-class" data-testid="card">

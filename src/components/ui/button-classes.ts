@@ -30,7 +30,7 @@ const ALIAS = {
 } as const;
 
 const BASE =
-  "inline-flex cursor-pointer items-center justify-center gap-[0.9em] rounded-full border border-transparent text-center font-dato font-medium leading-[1.15] tracking-[0.1em] uppercase no-underline transition-[transform,background-color,color,border-color] duration-300 ease-tinta hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex cursor-pointer items-center justify-center gap-[0.9em] rounded-full border border-transparent text-center font-dato font-medium leading-[1.15] tracking-[0.1em] uppercase no-underline transition-[translate,background-color,color,border-color] duration-300 ease-tinta hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50";
 
 const VARIANTES = {
   primario: "bg-rosa-luz text-tinta hover:bg-brasa",
