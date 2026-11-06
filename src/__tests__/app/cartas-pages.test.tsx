@@ -91,7 +91,7 @@ describe("/cards", () => {
       expect.objectContaining({ orderBy: [{ arcana: "asc" }, { suit: "asc" }, { number: "asc" }] })
     );
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Explora el Tarot");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/^explora el tarot$/i);
     for (const nombre of ["Arcanos Mayores", "Bastos", "Copas", "Espadas", "Oros"]) {
       expect(screen.getByRole("heading", { level: 2, name: nombre })).toBeInTheDocument();
     }
@@ -103,7 +103,7 @@ describe("/cards", () => {
     for (const img of container.querySelectorAll("section li img")) {
       expect(img.getAttribute("src")).toMatch(/^\/cartas\/[a-z0-9-]+-tinta\.webp$/);
     }
-    expect(screen.getByRole("link", { name: "Comenzar Lectura" })).toHaveAttribute("href", "/reading/new");
+    expect(screen.getByRole("link", { name: /^comenzar lectura$/i })).toHaveAttribute("href", "/reading/new");
   });
 
   it("los filtros son enlaces (sirven sin JS) con aria-current; ?palo=cups pinta sólo Copas", async () => {
@@ -200,17 +200,17 @@ describe("/cards/[slug]", () => {
     expect(img).toHaveAttribute("src", "/cartas/rws-tarot-17-star-color.webp");
     expect(container.innerHTML).not.toMatch(/wikimedia/);
 
-    const claves = screen.getByRole("heading", { level: 2, name: "Palabras Clave" }).closest("section")!;
+    const claves = screen.getByRole("heading", { level: 2, name: /^palabras clave$/i }).closest("section")!;
     expect(within(claves).getAllByRole("listitem").map((li) => li.textContent)).toEqual(ESTRELLA.keywords);
 
-    expect(screen.getByRole("heading", { level: 2, name: "Significado al Derecho" }).closest("section")).toHaveTextContent(
+    expect(screen.getByRole("heading", { level: 2, name: /^significado al derecho$/i }).closest("section")).toHaveTextContent(
       "Esperanza tras la tormenta."
     );
-    expect(screen.getByRole("heading", { level: 2, name: "Significado Invertido" }).closest("section")).toHaveTextContent(
+    expect(screen.getByRole("heading", { level: 2, name: /^significado invertido$/i }).closest("section")).toHaveTextContent(
       "Desaliento pasajero."
     );
     expect(screen.getByRole("link", { name: /Volver a las cartas/ })).toHaveAttribute("href", "/cards");
-    expect(screen.getByRole("link", { name: "Comenzar Lectura" })).toHaveAttribute("href", "/reading/new");
+    expect(screen.getByRole("link", { name: /^comenzar lectura$/i })).toHaveAttribute("href", "/reading/new");
     expect(container.innerHTML).not.toMatch(/(slate|purple|amber|red)-\d{2,3}|text-white|prose/);
   });
 

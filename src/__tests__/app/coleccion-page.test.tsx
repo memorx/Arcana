@@ -65,7 +65,7 @@ describe("/collection", () => {
     const { container } = render(<CollectionPage />);
     await screen.findByRole("heading", { level: 2, name: "Arcanos Mayores" });
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Tu Colección");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/^tu colección$/i);
     expect(container.querySelector("[data-contador]")?.textContent?.replace(/\s+/g, " ").trim()).toBe("3 de 78");
 
     const barra = screen.getByRole("progressbar", { name: "3 de 78 cartas descubiertas" });
@@ -142,7 +142,7 @@ describe("/collection", () => {
     expect(screen.queryByRole("heading", { level: 2, name: "Bastos" })).toBeNull();
     expect(container.querySelectorAll("li[data-carta]")).toHaveLength(14);
 
-    fireEvent.click(within(grupo).getByRole("button", { name: /Cartas Doradas/ }));
+    fireEvent.click(within(grupo).getByRole("button", { name: /cartas doradas/i }));
     expect(container.querySelectorAll("li[data-carta]")).toHaveLength(1);
     expect(container.querySelector("li[data-carta]")).toHaveAttribute("data-carta", "dorada");
   });
@@ -159,9 +159,9 @@ describe("/collection", () => {
     expect(container.querySelector("[data-contador]")?.textContent?.replace(/\s+/g, " ").trim()).toBe("0 de 78");
     expect(container.querySelectorAll("li[data-carta='por-descubrir']")).toHaveLength(78);
     expect(container.querySelectorAll(".golden-card-glow")).toHaveLength(0);
-    expect(screen.getByRole("link", { name: "Iniciar Lectura" })).toHaveAttribute("href", "/reading/new");
+    expect(screen.getByRole("link", { name: /^iniciar lectura$/i })).toHaveAttribute("href", "/reading/new");
 
-    fireEvent.click(screen.getByRole("button", { name: /Cartas Doradas/ }));
+    fireEvent.click(screen.getByRole("button", { name: /cartas doradas/i }));
     expect(screen.getByText("1% de probabilidad por carta")).toBeInTheDocument();
   });
 
@@ -180,6 +180,6 @@ describe("/collection", () => {
   it("si la API falla, no se rompe", async () => {
     responder({ error: "Unauthorized" });
     render(<CollectionPage />);
-    expect(await screen.findByRole("link", { name: "Iniciar Lectura" })).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /^iniciar lectura$/i })).toBeInTheDocument();
   });
 });

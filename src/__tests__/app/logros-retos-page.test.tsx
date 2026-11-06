@@ -107,7 +107,7 @@ describe("/achievements", () => {
   it("las cartas doradas también tienen su archivo (las cuenta el total)", async () => {
     responder(LOGROS);
     render(<AchievementsPage />);
-    expect(await screen.findByRole("heading", { level: 2, name: "Cartas Doradas" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: /^cartas doradas$/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Primer Oro" })).toBeInTheDocument();
   });
 });
@@ -185,7 +185,7 @@ describe("/challenges", () => {
     expect(lleno).toHaveAttribute("data-logrado", "true");
 
     const enCurso = screen.getByRole("heading", { level: 2, name: "Variedad" }).closest("li")!;
-    expect(within(enCurso).getByText("En Progreso")).toBeInTheDocument();
+    expect(within(enCurso).getByText(/^en progreso$/i)).toBeInTheDocument();
     const barra = within(enCurso).getByRole("progressbar", { name: "Variedad" });
     expect(barra).toHaveAttribute("aria-valuenow", "2");
     expect(barra).toHaveAttribute("aria-valuetext", "2 de 3");

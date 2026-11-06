@@ -150,10 +150,9 @@ export default function ProfileSetupPage() {
     }
   };
 
-  const getLocalizedFocusArea = (value: string) => {
-    const area = FOCUS_AREAS.find((a) => a.value === value);
-    return locale === "en" ? area?.labelEn : area?.labelEs;
-  };
+  // Labels from messages (profile.focusAreas.*), so Spanish follows the sentence case of the rest of the app.
+  const getLocalizedFocusArea = (value: string) =>
+    FOCUS_AREAS.some((a) => a.value === value) ? t(`focusAreas.${value}`) : undefined;
 
   if (isLoading) {
     const bloque = "rounded-sm bg-papel-hondo motion-safe:animate-pulse";
@@ -263,7 +262,7 @@ export default function ProfileSetupPage() {
                         aria-hidden="true"
                         className={cn("size-2 shrink-0 rounded-full", activo ? "bg-rosa" : "border border-current/50")}
                       />
-                      {locale === "en" ? area.labelEn : area.labelEs}
+                      {t(`focusAreas.${area.value}`)}
                     </button>
                   );
                 })}

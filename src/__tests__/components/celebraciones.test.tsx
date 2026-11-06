@@ -31,7 +31,7 @@ const PALETA_VIEJA =
   /(slate|purple|violet|indigo|fuchsia|pink|amber|yellow|orange|red|rose|emerald|green|teal|blue|sky|cyan)-\d{2,3}|text-white|bg-gradient/;
 
 /** El diálogo abierto está sobre tinta y su nombre accesible es el h2 visible. */
-function dialogoNombradoPor(titulo: string) {
+function dialogoNombradoPor(titulo: string | RegExp) {
   const dialogo = screen.getByRole("dialog", { name: titulo });
   expect(dialogo).toHaveClass("suelo-tinta");
   const h2 = screen.getByRole("heading", { level: 2, name: titulo });
@@ -54,7 +54,7 @@ describe("AchievementUnlockedModal", () => {
   it("h2, cada logro con su sello y el total de créditos; Continuar cierra", () => {
     const onClose = jest.fn();
     render(<AchievementUnlockedModal isOpen onClose={onClose} achievements={logros} />);
-    dialogoNombradoPor("¡Logro Desbloqueado!");
+    dialogoNombradoPor(/^¡logro desbloqueado!$/i);
 
     expect(screen.getByRole("heading", { level: 3, name: "Primera Lectura" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Madrugador" })).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe("ChallengeCompletedModal", () => {
         challenges={[{ id: "c1", key: "weekly_explorer", name: "Weekly Explorer", nameEs: "Explorador Semanal", icon: "🔍", creditReward: 3 }]}
       />
     );
-    dialogoNombradoPor("¡Desafío Completado!");
+    dialogoNombradoPor(/^¡desafío completado!$/i);
 
     const chispas = document.querySelector("[data-chispas]")!;
     expect(chispas).toHaveAttribute("aria-hidden", "true");
@@ -103,7 +103,7 @@ describe("LevelUpModal", () => {
     render(
       <LevelUpModal isOpen onClose={jest.fn()} newLevel={3} levelName="Adept" levelNameEs="Adepto" levelIcon="🔮" creditsAwarded={5} />
     );
-    dialogoNombradoPor("¡Subiste de Nivel!");
+    dialogoNombradoPor(/^¡subiste de nivel!$/i);
 
     expect(screen.getByText("III")).toBeInTheDocument();
     expect(screen.getByText("¡Ahora eres Adepto!")).toBeInTheDocument();
