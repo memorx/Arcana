@@ -49,7 +49,7 @@ export async function recorrer(page: Page): Promise<void> {
 export interface Maqueta {
   /** Pixels the page can actually scroll sideways (0 = none). */
   scrollHorizontal: number;
-  /** Outermost rendered elements that stick out of the viewport without a clipping ancestor. */
+  /** Outermost rendered elements that stick out of the viewport and no ancestor excuses (see medirMaqueta). */
   fueraDePantalla: string[];
   /** Rendered <img> that did not load (naturalWidth 0). */
   imagenesRotas: string[];
@@ -57,8 +57,21 @@ export interface Maqueta {
 
 /**
  * Horizontal overflow, elements off screen and broken images.
- * "Clipped by an ancestor" = some ancestor below <body> has overflow-x hidden, clip,
- * auto or scroll (a scroller also keeps its content from widening the page).
+ *
+ * An element that sticks out of the viewport is reported unless an ancestor below
+ * <body> excuses it:
+ * - an ancestor with overflow-x `auto` or `scroll` always excuses it: the content is
+ *   reachable by scrolling that box and does not widen the page (note that a vertical
+ *   scroller, e.g. `overflow-y: auto`, computes overflow-x to `auto` too);
+ * - an ancestor with overflow-x `hidden` or `clip` excuses it ONLY if
+ *   (a) the element is decorative: inside `[aria-hidden="true"]`, or an `img[alt=""]`; or
+ *   (b) that ancestor opts in with the attribute `data-recorta` (a marquee, a carousel:
+ *       a box whose job is to cut what sticks out).
+ *   Otherwise a clipped element is a defect: a title or a button cut by an `Escena`
+ *   (`overflow: clip`) or a card with `overflow-hidden` is text the user cannot read.
+ *   The report then says which ancestor cut it («recortado por …»).
+ * - an ancestor that is not rendered (display none, visibility hidden, sr-only clip)
+ *   or that was already reported excuses it as well (one report per overflow).
  * <html> and <body> never count as that ancestor: an overflow-x:hidden on the body
  * would otherwise hide any overflow.
  */
@@ -92,7 +105,11 @@ export async function medirMaqueta(page: Page): Promise<Maqueta> {
       cs.clip === "rect(0px, 0px, 0px, 0px)" ||
       /inset\(50%\)/.test(cs.clipPath);
 
-    const recortaX = (cs: CSSStyleDeclaration) => /^(hidden|clip|auto|scroll)$/.test(cs.overflowX);
+    /** Scrollers: what sticks out of them is reachable by scrolling. */
+    const desplazaX = (cs: CSSStyleDeclaration) => /^(auto|scroll)$/.test(cs.overflowX);
+    /** Boxes that cut what sticks out: excuse only decoration or a box with data-recorta. */
+    const recortaX = (cs: CSSStyleDeclaration) => /^(hidden|clip)$/.test(cs.overflowX);
+    const corto = (el: Element) => describir(el).replace(/ «.*$/, "");
 
     const reportados = new Set<Element>();
     const fueraDePantalla: string[] = [];
@@ -104,21 +121,30 @@ export async function medirMaqueta(page: Page): Promise<Maqueta> {
       const cs = getComputedStyle(el);
       if (oculto(cs)) continue;
 
+      const decorativo = !!el.closest('[aria-hidden="true"]') || el.matches('img[alt=""]');
       let excusado = false;
+      let recortadoPor: Element | null = null;
       for (let a = el.parentElement; a && a !== document.body && a !== doc; a = a.parentElement) {
         if (reportados.has(a)) {
           excusado = true;
           break;
         }
         const acs = getComputedStyle(a);
-        if (oculto(acs) || recortaX(acs)) {
+        if (oculto(acs) || desplazaX(acs)) {
           excusado = true;
           break;
+        }
+        if (recortaX(acs)) {
+          if (decorativo || a.hasAttribute("data-recorta")) {
+            excusado = true;
+            break;
+          }
+          recortadoPor ??= a;
         }
       }
       if (excusado) continue;
       reportados.add(el);
-      fueraDePantalla.push(describir(el));
+      fueraDePantalla.push(`${describir(el)}${recortadoPor ? ` (recortado por ${corto(recortadoPor)})` : ""}`);
     }
 
     const imagenesRotas = [...document.images]
