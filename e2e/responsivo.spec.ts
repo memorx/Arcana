@@ -121,28 +121,19 @@ const RUTAS: Ruta[] = [
 
 /**
  * Known defects of today's UI (measured 5 Nov 2026 on the five widths, es and en, Chromium
- * and WebKit), by route label and check. Each one is a test.fixme with its reason and the lot
- * that owns the screen; that lot deletes the entry when it fixes it (Fase 2) and the
- * integrator checks that this table ends up empty.
+ * and WebKit; re-measured after the Fase 1 integration with ARCANA_E2E_DEFECTOS=0), by route
+ * label and check. Each one is a test.fixme with its reason and the lot that owns the screen;
+ * that lot deletes the entry when it fixes it (Fase 2) and the integrator checks that this
+ * table ends up empty.
  */
-const CABECERA_360: Defecto = {
-  motivo:
-    "F1-A · cabecera de invitado a 360: idioma + «Iniciar sesion» + «Registrarse» se salen de la pantalla (div.flex.items-center.gap-3, x 94→370 de 360)",
-  anchos: [360],
-};
 const SIN_H1_AUTH: Defecto = { motivo: "L6 · sin h1: el título del formulario es el h3 de CardTitle" };
 const SIN_H1_LEGAL: Defecto = { motivo: "L6 · páginas legales sin h1: los títulos son h3" };
+const PROGRESO_404 = {
+  patron: /status of 404 .* @ \/progress\?/,
+  motivo: "L3 · LevelWidget enlaza a /progress, que no existe: el prefetch da 404 en consola",
+};
 
 const DEFECTOS: Record<string, Defectos> = {
-  "portada /": {
-    maqueta: [CABECERA_360],
-    reducido: [
-      {
-        motivo:
-          "L1 · tres orbes decorativos (div.absolute.top-20.left-10 y hermanos) con animation: float infinita ignoran prefers-reduced-motion",
-      },
-    ],
-  },
   "/login": { encabezados: [SIN_H1_AUTH] },
   "/register": { encabezados: [SIN_H1_AUTH] },
   "/forgot-password": { encabezados: [SIN_H1_AUTH] },
@@ -150,47 +141,58 @@ const DEFECTOS: Record<string, Defectos> = {
   "/about": { encabezados: [SIN_H1_LEGAL] },
   "/privacy": { encabezados: [SIN_H1_LEGAL] },
   "/terms": { encabezados: [SIN_H1_LEGAL] },
-  "/blog": { maqueta: [CABECERA_360] },
   "/blog/[slug]": {
-    maqueta: [CABECERA_360],
     encabezados: [
       { motivo: "L6 · dos h1: el título de la cabecera del post y el «# » inicial del contenido convertido en h1" },
     ],
   },
-  "/cards": { maqueta: [CABECERA_360] },
-  "/cards/[slug]": { maqueta: [CABECERA_360] },
-  "/calendar": { maqueta: [CABECERA_360] },
-  "/dashboard": {
-    consola: [
-      {
-        patron: /status of 404 .* @ \/progress\?/,
-        motivo: "L3 · LevelWidget enlaza a /progress, que no existe: el prefetch da 404 en consola",
-      },
-    ],
-  },
-  "/dashboard (vacío)": {
-    consola: [
-      {
-        patron: /status of 404 .* @ \/progress\?/,
-        motivo: "L3 · LevelWidget enlaza a /progress, que no existe: el prefetch da 404 en consola",
-      },
-    ],
-  },
-  "/collection": {
-    reducido: [
+  "/share/[shareId]": {
+    maqueta: [
       {
         motivo:
-          "L5/F1-B · golden-glow-collection y golden-shimmer-sweep-collection (cartas doradas) son infinitas e ignoran prefers-reduced-motion",
+          "L2 · la fila de sellos (tirada, «Compartido por», fecha) no tiene flex-wrap: con los Badge nuevos (mono en mayúsculas) se sale a 390 y 360",
+        anchos: [390, 360],
+      },
+    ],
+    sinjs: [
+      {
+        motivo: "L2 · la misma fila de sellos sin flex-wrap se sale a 390 y 360 también sin JS",
+        anchos: [390, 360],
+      },
+    ],
+  },
+  "/dashboard": { consola: [PROGRESO_404] },
+  "/reading/[id]": {
+    maqueta: [
+      {
+        motivo:
+          "L2 · la fila final «Hacer otra lectura» · compartir · «Ver historial» (flex sin wrap, <Link><Button/></Link>) no cabe a 390 y 360 con los botones nuevos en mono",
+        anchos: [390, 360],
       },
     ],
   },
   "/subscribe/success (sin session_id)": { encabezados: [{ motivo: "L6 · sin session_id la página no muestra h1" }] },
+  "/dashboard (vacío)": { consola: [PROGRESO_404] },
+  "/reading/new (vacío)": {
+    maqueta: [
+      {
+        motivo:
+          "L2 · los sellos «3 lecturas gratis» y «0 créditos disponibles» (Badge con text-sm) en una fila sin flex-wrap se salen a 390 y 360",
+        anchos: [390, 360],
+      },
+    ],
+  },
 };
 
-for (const r of RUTAS) r.defectos = DEFECTOS[r.nombre] ?? {};
 for (const nombre of Object.keys(DEFECTOS)) {
   if (!RUTAS.some((r) => r.nombre === nombre)) throw new Error(`DEFECTOS names a route that is not in RUTAS: ${nombre}`);
 }
+/**
+ * ARCANA_E2E_DEFECTOS=0 ignores the table (no fixme, no filtered console errors): the
+ * integrator's way to see which entries a lot already fixed and must be deleted.
+ */
+const IGNORAR_DEFECTOS = process.env.ARCANA_E2E_DEFECTOS === "0";
+for (const r of RUTAS) r.defectos = IGNORAR_DEFECTOS ? {} : (DEFECTOS[r.nombre] ?? {});
 
 // ---------------------------------------------------------------------------
 
