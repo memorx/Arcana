@@ -3,7 +3,7 @@ import path from "node:path";
 import { DATOS_GENERADOS, type DatosGenerados } from "../fixtures/usuarios";
 
 /** The e2e server (`next start -p 3000` from scripts/e2e-db.mjs serve). */
-export const BASE_URL = "http://localhost:3000";
+export const BASE_URL = `http://localhost:${process.env.ARCANA_E2E_WEB_PORT || "3000"}`;
 
 /** Folder for the per-worker storageState files (gitignored). */
 export const AUTH_DIR = path.join(process.cwd(), "e2e", ".auth");

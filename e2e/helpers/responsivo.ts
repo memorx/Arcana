@@ -220,7 +220,7 @@ export function vigilarConsola(
     if (msg.type() !== "error") return;
     const texto = msg.text();
     const origen = msg.location().url ?? "";
-    const ruta = origen.replace(/^https?:\/\/localhost:3000/, "");
+    const ruta = origen.replace(/^https?:\/\/localhost:\d+/, "");
     if (/favicon/i.test(texto) || /favicon/i.test(origen)) return;
     if (documento404 && /status of 404/.test(texto) && ruta.split("?")[0] === documento404) return;
     const linea = `${texto.slice(0, 300)}${ruta ? ` @ ${ruta}` : ""}`;

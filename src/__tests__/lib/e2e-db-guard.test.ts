@@ -82,11 +82,11 @@ describe("scripts/e2e-db.mjs guards", () => {
     expect(output).not.toContain(PROD_SECRET);
   });
 
-  it("aborts when the database is not arcana_e2e (reset drops it)", () => {
+  it("aborts when the database is not arcana_e2e or arcana_e2e_<lote> (reset drops it)", () => {
     const other = "postgresql://postgres@127.0.0.1:54329/postgres";
     const { code, output } = check({ ".env": PROD_ENV, ".env.e2e": e2eFile({ DATABASE_URL: other }) });
     expect(code).toBe(1);
-    expect(output).toMatch(/must use the database "arcana_e2e"/);
+    expect(output).toMatch(/must use a database named arcana_e2e or arcana_e2e_<lote>/);
   });
 
   it("aborts when a key of .env is missing in .env.e2e, naming it without its value", () => {
@@ -148,5 +148,30 @@ describe("scripts/e2e-db.mjs guards", () => {
     expect(example).toMatch(/^ANTHROPIC_API_KEY=sk-ant-e2e-invalid$/m);
     expect(example).toMatch(/^ARCANA_DIST_DIR=\.next-e2e$/m);
     expect(example).not.toMatch(/supabase\.(co|com)/);
+  });
+});
+
+
+describe("per-lote databases and ports (Phase 2 runs lots in parallel)", () => {
+  const lote = "postgresql://postgres@127.0.0.1:54329/arcana_e2e_l2";
+  const base = { ...GOOD_E2E, DATABASE_URL: lote, DIRECT_URL: lote, ARCANA_E2E_WEB_PORT: "3012", NEXTAUTH_URL: "http://localhost:3012" };
+  const env = (o: Record<string, string>) => Object.entries(o).map(([k, v]) => `${k}=${v}`).join("\n");
+
+  it("accepts arcana_e2e_<lote> with its own port", () => {
+    const r = check({ ".env": PROD_ENV, ".env.e2e": env(base) });
+    expect(r.code).toBe(0);
+  });
+  it("rejects any other database name on the local cluster", () => {
+    const otra = "postgresql://postgres@127.0.0.1:54329/postgres";
+    const r = check({ ".env": PROD_ENV, ".env.e2e": env({ ...base, DATABASE_URL: otra, DIRECT_URL: otra }) });
+    expect(r.code).not.toBe(0);
+  });
+  it("rejects DATABASE_URL and DIRECT_URL on different databases", () => {
+    const r = check({ ".env": PROD_ENV, ".env.e2e": env({ ...base, DIRECT_URL: LOCAL }) });
+    expect(r.code).not.toBe(0);
+  });
+  it("rejects a port outside 3000-3099 and a NEXTAUTH_URL on another port", () => {
+    expect(check({ ".env": PROD_ENV, ".env.e2e": env({ ...base, ARCANA_E2E_WEB_PORT: "5432" }) }).code).not.toBe(0);
+    expect(check({ ".env": PROD_ENV, ".env.e2e": env({ ...base, NEXTAUTH_URL: "http://localhost:3000" }) }).code).not.toBe(0);
   });
 });

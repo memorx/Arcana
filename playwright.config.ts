@@ -20,7 +20,7 @@ for (const name of ["DATABASE_URL", "DIRECT_URL"]) {
   }
 }
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = `http://localhost:${process.env.ARCANA_E2E_WEB_PORT || "3000"}`;
 
 /** Only the responsive pass runs at every width; flows and the older specs run at 1440. */
 const RESPONSIVO = /responsivo\.spec\.ts$/;

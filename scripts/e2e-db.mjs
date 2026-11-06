@@ -32,8 +32,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 const LOCAL_DB_URL = /@(localhost|127\.0\.0\.1):54329\//;
 const PG_PORT = 54329;
-const DB_NAME = "arcana_e2e";
-const APP_PORT = 3000;
+// One cluster, one database per worktree: arcana_e2e or arcana_e2e_<lote> (lowercase, digits, underscore).
+// Each worktree also gets its own web port (ARCANA_E2E_WEB_PORT, 3000-3099) so Phase 2 lots can run e2e at the same time.
+const DB_NAME_RE = /^arcana_e2e(_[a-z0-9]{1,16})?$/;
+let DB_NAME = "arcana_e2e";
+let APP_PORT = 3000;
 
 /** Files Next, the Prisma CLI or @prisma/client may load on their own. */
 const INHERITABLE_ENV_FILES = [".env", ".env.local", ".env.production", ".env.production.local", "prisma/.env"];
@@ -105,8 +108,20 @@ function loadE2eEnv(root = ROOT) {
     }
   }
   const dbName = new URL(e2e.DATABASE_URL).pathname.replace(/^\//, "");
-  if (dbName !== DB_NAME) {
-    fail(`DATABASE_URL in .env.e2e must use the database "${DB_NAME}" (reset drops and recreates it).`);
+  if (!DB_NAME_RE.test(dbName)) {
+    fail(`DATABASE_URL in .env.e2e must use a database named arcana_e2e or arcana_e2e_<lote> (reset drops and recreates it).`);
+  }
+  if (new URL(e2e.DIRECT_URL).pathname.replace(/^\//, "") !== dbName) {
+    fail("DATABASE_URL and DIRECT_URL in .env.e2e must use the same database.");
+  }
+  DB_NAME = dbName;
+  const puerto = Number(e2e.ARCANA_E2E_WEB_PORT || 3000);
+  if (!Number.isInteger(puerto) || puerto < 3000 || puerto > 3099) {
+    fail("ARCANA_E2E_WEB_PORT in .env.e2e must be an integer between 3000 and 3099.");
+  }
+  APP_PORT = puerto;
+  if (e2e.NEXTAUTH_URL && e2e.NEXTAUTH_URL !== `http://localhost:${puerto}`) {
+    fail(`NEXTAUTH_URL in .env.e2e must be http://localhost:${puerto} (same port as ARCANA_E2E_WEB_PORT).`);
   }
 
   const missing = new Set();
