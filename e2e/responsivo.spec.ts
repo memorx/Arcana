@@ -222,7 +222,8 @@ async function revisarEncabezados(page: import("@playwright/test").Page, r: Ruta
   await expect(page.getByRole("heading", { level: 1 }), "exactly one h1").toHaveCount(1);
 
   const arbol = await page.locator("body").ariaSnapshot();
-  expect(arbol, "the accessibility tree keeps the h1").toMatch(/- heading .*\[level=1\]/);
+  // The YAML snapshot quotes the whole line when the name has a colon: - 'heading "A: B" [level=1]'
+  expect(arbol, "the accessibility tree keeps the h1").toMatch(/- '?heading .*\[level=1\]/);
 
   const escondidos = await page.evaluate(() =>
     [...document.querySelectorAll("h1, h2, h3, h4, h5, h6")]

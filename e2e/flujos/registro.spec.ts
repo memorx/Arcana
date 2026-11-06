@@ -42,8 +42,8 @@ test.describe.serial("registro, inicio y cierre de sesión", () => {
     await page.getByLabel(/contrase[ñn]a|password/i).fill(CONTRASENA_E2E);
     await page.locator("form").getByRole("button", { name: /iniciar sesi[oó]n|sign in/i }).click();
 
-    // Lands on the callbackUrl
-    await expect(page).toHaveURL(/\/history/, { timeout: 20_000 });
+    // Lands on the callbackUrl (by pathname: the starting URL /login?callbackUrl=/history already matches /\/history/)
+    await expect(page).toHaveURL((url) => url.pathname === "/history", { timeout: 20_000 });
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     // Signed in, /login sends you to the dashboard
