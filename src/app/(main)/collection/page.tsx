@@ -325,7 +325,7 @@ function CartaDelIndice({
         <span className={cn("relative block rounded-[6px]", card.isGolden && "golden-card-glow")}>
           <span
             className={cn(
-              "relative block aspect-[7/12] overflow-hidden rounded-[6px] border transition-[transform,border-color] duration-300 ease-tinta group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0",
+              "relative block aspect-[7/12] overflow-hidden rounded-[6px] border transition-[translate,border-color] duration-300 ease-tinta group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0",
               card.isGolden ? "golden-card-border border-2" : "border-tinta/20 group-hover:border-rosa"
             )}
           >
