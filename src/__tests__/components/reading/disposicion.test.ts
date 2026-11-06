@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+// Pure functions; node environment because the fake AI texts come from @/lib/ai/config (Anthropic SDK).
 import {
   arcoDe,
   disposicionDe,
