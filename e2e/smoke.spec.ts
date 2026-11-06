@@ -260,16 +260,16 @@ test.describe("Smoke Tests - Responsive Design", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
 
-    // Desktop nav should be hidden on mobile
-    const desktopNav = page.locator("nav.hidden.md\\:flex, nav.md\\:flex.hidden");
+    // The header's desktop nav exists but is hidden on mobile (toHaveCount: an absent
+    // nav would pass toBeHidden and prove nothing)
+    const desktopNav = page.locator("header nav[aria-label]");
+    await expect(desktopNav).toHaveCount(1);
     await expect(desktopNav).toBeHidden();
 
-    // Either hamburger menu visible or responsive nav
-    const mobileMenuButton = page.locator('[aria-label*="menu"], button:has(svg)').first();
-
-    // At least one navigation method should be available
-    const hasNav = await mobileMenuButton.isVisible() || await page.getByRole("navigation").isVisible();
-    expect(hasNav).toBe(true);
+    // The hamburger takes its place and controls the mobile menu, closed for now
+    const mobileMenuButton = page.locator('header button[aria-controls="menu-movil"]');
+    await expect(mobileMenuButton).toBeVisible();
+    await expect(mobileMenuButton).toHaveAttribute("aria-expanded", "false");
   });
 
   test("forms are usable on mobile", async ({ page }) => {
