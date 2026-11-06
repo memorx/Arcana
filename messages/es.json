@@ -577,7 +577,8 @@
       "wands": "Bastos",
       "cups": "Copas",
       "swords": "Espadas",
-      "pentacles": "Oros"
+      "pentacles": "Oros",
+      "label": "Filtrar por palo"
     },
     "searchPlaceholder": "Buscar por nombre o palabra clave...",
     "showing": "Mostrando {count} cartas",
@@ -587,7 +588,11 @@
       "title": "¿Listo para una lectura?",
       "subtitle": "Descubre lo que las cartas tienen preparado para ti",
       "button": "Comenzar Lectura"
-    }
+    },
+    "kicker": "78 grabados · Pamela Colman Smith, 1909",
+    "searchLabel": "Buscar una carta",
+    "searchButton": "Buscar",
+    "sectionCount": "{count} cartas"
   },
   "cardDetail": {
     "backToCards": "Volver a las cartas",
@@ -764,13 +769,18 @@
     "viewAll": "Ver Todas",
     "noCardsYet": "Haz una lectura para descubrir cartas",
     "filters": {
-      "all": "Todas"
+      "all": "Todas",
+      "label": "Filtrar la colección"
     },
     "cta": {
       "title": "Completa tu Colección",
       "subtitle": "Haz más lecturas para descubrir las 78 cartas",
       "button": "Iniciar Lectura"
-    }
+    },
+    "kicker": "Índice de grabados · 1909",
+    "counterOf": "de {total}",
+    "undiscovered": "Por descubrir",
+    "legend": "Las cartas en tinta tenue aún no salen en tus lecturas."
   },
   "achievements": {
     "title": "Logros",
@@ -792,9 +802,14 @@
     },
     "unlockModal": {
       "title": "¡Logro Desbloqueado!",
-      "earned": "Has ganado {credits} créditos"
+      "earned": "Has ganado {credits} créditos",
+      "pincel": "Logro"
     },
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "kicker": "Archivo de sellos",
+    "inProgress": "En curso",
+    "of": "{count} de {total}",
+    "counterOf": "de {total} desbloqueados"
   },
   "goldenCards": {
     "title": "¡CARTA DORADA!",
@@ -848,9 +863,12 @@
     "allCompleted": "¡Todos los desafíos completados!",
     "completedModal": {
       "title": "¡Desafío Completado!",
-      "earned": "Has ganado {credits} créditos de desafíos"
+      "earned": "Has ganado {credits} créditos de desafíos",
+      "pincel": "Cumplido"
     },
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "tabsLabel": "Periodo de los desafíos",
+    "of": "{count} de {total}"
   },
   "sound": {
     "enable": "Activar sonidos",

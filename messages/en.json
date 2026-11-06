@@ -577,7 +577,8 @@
       "wands": "Wands",
       "cups": "Cups",
       "swords": "Swords",
-      "pentacles": "Pentacles"
+      "pentacles": "Pentacles",
+      "label": "Filter by suit"
     },
     "searchPlaceholder": "Search by name or keyword...",
     "showing": "Showing {count} cards",
@@ -587,7 +588,11 @@
       "title": "Ready for a reading?",
       "subtitle": "Discover what the cards have in store for you",
       "button": "Start Reading"
-    }
+    },
+    "kicker": "78 engravings · Pamela Colman Smith, 1909",
+    "searchLabel": "Search for a card",
+    "searchButton": "Search",
+    "sectionCount": "{count} cards"
   },
   "cardDetail": {
     "backToCards": "Back to cards",
@@ -764,13 +769,18 @@
     "viewAll": "View All",
     "noCardsYet": "Start a reading to discover cards",
     "filters": {
-      "all": "All"
+      "all": "All",
+      "label": "Filter the collection"
     },
     "cta": {
       "title": "Complete Your Collection",
       "subtitle": "Do more readings to discover all 78 cards",
       "button": "Start Reading"
-    }
+    },
+    "kicker": "Index of engravings · 1909",
+    "counterOf": "of {total}",
+    "undiscovered": "Not yet discovered",
+    "legend": "Cards in faint ink haven't come up in your readings yet."
   },
   "achievements": {
     "title": "Achievements",
@@ -792,9 +802,14 @@
     },
     "unlockModal": {
       "title": "Achievement Unlocked!",
-      "earned": "You earned {credits} credits"
+      "earned": "You earned {credits} credits",
+      "pincel": "Earned"
     },
-    "continue": "Continue"
+    "continue": "Continue",
+    "kicker": "Archive of seals",
+    "inProgress": "In progress",
+    "of": "{count} of {total}",
+    "counterOf": "of {total} unlocked"
   },
   "goldenCards": {
     "title": "GOLDEN CARD!",
@@ -848,9 +863,12 @@
     "allCompleted": "All challenges completed!",
     "completedModal": {
       "title": "Challenge Complete!",
-      "earned": "You earned {credits} credits from challenges"
+      "earned": "You earned {credits} credits from challenges",
+      "pincel": "Done"
     },
-    "continue": "Continue"
+    "continue": "Continue",
+    "tabsLabel": "Challenge period",
+    "of": "{count} of {total}"
   },
   "sound": {
     "enable": "Enable sounds",
