@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useId } from "react";
 import { useTranslations } from "next-intl";
-import { Card, CardContent } from "@/components/ui";
 
 interface PersonalNotesProps {
   readingId: string;
@@ -11,6 +10,7 @@ interface PersonalNotesProps {
 
 export function PersonalNotes({ readingId, initialNotes }: PersonalNotesProps) {
   const t = useTranslations("reading");
+  const fieldId = useId();
   const [notes, setNotes] = useState(initialNotes || "");
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -47,36 +47,38 @@ export function PersonalNotes({ readingId, initialNotes }: PersonalNotesProps) {
   }, [notes, initialNotes, saveNotes]);
 
   return (
-    <Card className="mt-8">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-            <span className="text-xl">&#128221;</span>
-            {t("notes.title")}
-          </h3>
-          <div className="text-xs text-slate-500">
-            {saving ? (
-              <span className="flex items-center gap-1">
-                <span className="animate-pulse">&#9679;</span>
-                {t("notes.saving")}
-              </span>
-            ) : lastSaved ? (
-              <span className="text-green-500">&#10003; {t("notes.saved")}</span>
-            ) : null}
-          </div>
-        </div>
-
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder={t("notes.placeholder")}
-          className="w-full min-h-[150px] p-4 bg-slate-800/50 border border-slate-700 rounded-xl text-slate-200 placeholder-slate-500 resize-y focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-        />
-
-        <p className="mt-2 text-xs text-slate-500">
-          {t("notes.hint")}
+    <section aria-labelledby={`${fieldId}-titulo`} className="grid max-w-[760px] gap-4 border-t border-filete/20 pt-8">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id={`${fieldId}-titulo`} className="font-titulo text-[clamp(1.4rem,1.15rem+0.8vw,1.8rem)] leading-[1.1]">
+          <label htmlFor={fieldId}>{t("notes.title")}</label>
+        </h2>
+        <p className="font-dato text-[0.6875rem] tracking-[0.08em] text-letra-suave" aria-live="polite">
+          {saving ? (
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-rosa motion-safe:animate-pulse" />
+              {t("notes.saving")}
+            </span>
+          ) : lastSaved ? (
+            <span className="text-letra-exito">
+              <span aria-hidden="true">✓ </span>
+              {t("notes.saved")}
+            </span>
+          ) : null}
         </p>
-      </CardContent>
-    </Card>
+      </div>
+
+      <textarea
+        id={fieldId}
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder={t("notes.placeholder")}
+        aria-describedby={`${fieldId}-pista`}
+        className="block min-h-[150px] w-full resize-y rounded-none border-0 border-y border-filete/40 bg-transparent px-0 py-3 font-lectura text-[1.0625rem] leading-[1.6] text-letra placeholder:text-letra-suave focus:border-rosa focus:shadow-[0_1px_0_0_var(--color-rosa)] focus:outline-none"
+      />
+
+      <p id={`${fieldId}-pista`} className="font-dato text-[0.6875rem] leading-[1.5] tracking-[0.04em] text-letra-suave">
+        {t("notes.hint")}
+      </p>
+    </section>
   );
 }

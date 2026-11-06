@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { buttonClasses } from "@/components/ui";
 
 export interface ReadAloudProps {
   /** Text to read (paragraphs separated by line breaks; light markdown is stripped). */
@@ -212,13 +213,13 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
     setStatus("idle");
   };
 
-  const buttonClass =
-    "inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-slate-700 bg-slate-900/60 text-sm font-medium text-slate-200 hover:border-purple-500/50 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 motion-safe:transition-colors";
+  // Píldoras de línea del suelo donde caiga (papel en la lectura), 44 px de alto.
+  const buttonClass = buttonClasses({ variant: "linea", size: "sm" });
 
   return (
     <div role="group" aria-label={t("label")} className={cn("flex items-center gap-2", className)}>
       {status === "playing" ? (
-        <button ref={primaryRef} type="button" onClick={pause} aria-label={t("pause")} className={cn(buttonClass, "px-3")}>
+        <button ref={primaryRef} type="button" onClick={pause} aria-label={t("pause")} className={buttonClass}>
           <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M7 5h3v14H7zM14 5h3v14h-3z" />
           </svg>
@@ -230,7 +231,7 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
           type="button"
           onClick={status === "paused" ? resume : play}
           aria-label={status === "paused" ? t("resume") : t("play")}
-          className={cn(buttonClass, "px-3")}
+          className={buttonClass}
         >
           <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z" />
@@ -240,7 +241,7 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
       )}
 
       {status !== "idle" && (
-        <button type="button" onClick={stop} aria-label={t("stop")} className={cn(buttonClass, "w-9")}>
+        <button type="button" onClick={stop} aria-label={t("stop")} className={cn(buttonClass, "w-11 px-0")}>
           <svg aria-hidden="true" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 6h12v12H6z" />
           </svg>
@@ -252,7 +253,7 @@ export function ReadAloud({ text, locale, className }: ReadAloudProps) {
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="w-1 rounded-sm bg-amber-400/80 motion-safe:animate-pulse"
+              className="w-1 rounded-sm bg-rosa motion-safe:animate-pulse"
               style={{ height: `${[60, 100, 40][i]}%`, animationDelay: `${i * 0.15}s` }}
             />
           ))}
