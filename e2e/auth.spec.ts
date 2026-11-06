@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./helpers/sesion";
 
 test.describe("Authentication - Login", () => {
   test.beforeEach(async ({ page }) => {
@@ -7,7 +7,7 @@ test.describe("Authentication - Login", () => {
 
   test("should display login form", async ({ page }) => {
     await expect(page.getByLabel(/email|correo/i)).toBeVisible();
-    await expect(page.getByLabel(/password|contraseña/i)).toBeVisible();
+    await expect(page.getByLabel(/password|contrase[ñn]a/i)).toBeVisible();
     await expect(
       page.getByRole("button", { name: /iniciar sesion|sign in/i })
     ).toBeVisible();
@@ -15,7 +15,7 @@ test.describe("Authentication - Login", () => {
 
   test("should show error for invalid credentials", async ({ page }) => {
     await page.getByLabel(/email|correo/i).fill("invalid@example.com");
-    await page.getByLabel(/password|contraseña/i).fill("wrongpassword");
+    await page.getByLabel(/password|contrase[ñn]a/i).fill("wrongpassword");
     await page
       .getByRole("button", { name: /iniciar sesion|sign in/i })
       .click();
@@ -44,6 +44,8 @@ test.describe("Authentication - Login", () => {
   });
 
   test("should have Google sign-in button", async ({ page }) => {
+    // The button only exists when NEXT_PUBLIC_GOOGLE_ENABLED is "true" at build time (off in .env.e2e)
+    test.skip(process.env.NEXT_PUBLIC_GOOGLE_ENABLED !== "true", "Google sign-in is disabled in this build");
     await expect(
       page.getByRole("button", { name: /google/i })
     ).toBeVisible();
