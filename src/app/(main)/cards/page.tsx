@@ -1,10 +1,10 @@
+import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui";
+import { Card, buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { IndiceCartas, type CartaDelIndice } from "./IndiceCartas";
 import { esPalo, type Palo } from "./indice";
-import { EnlaceBoton } from "./EnlaceBoton";
 
 interface Props {
   searchParams?: Promise<{ [clave: string]: string | string[] | undefined }>;
@@ -56,9 +56,9 @@ export default async function CardsPage({ searchParams }: Props) {
       <Card variant="highlighted" className="grid justify-items-start gap-4 p-[clamp(20px,4vw,40px)]">
         <h2 className="text-[clamp(1.5rem,1.2rem+1vw,2.1rem)] leading-[1.1]">{t("cta.title")}</h2>
         <p className="max-w-[52ch] text-letra-suave">{t("cta.subtitle")}</p>
-        <EnlaceBoton href="/reading/new" size="lg">
+        <Link href="/reading/new" className={buttonClasses({ size: "lg" })}>
           {t("cta.button")}
-        </EnlaceBoton>
+        </Link>
       </Card>
     </div>
   );

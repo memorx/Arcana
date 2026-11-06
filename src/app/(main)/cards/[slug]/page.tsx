@@ -3,11 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { Card, Badge } from "@/components/ui";
+import { Card, Badge, buttonClasses } from "@/components/ui";
 import { Etiqueta } from "@/components/tinta/Etiqueta";
 import { cartaImagen, MEDIDAS_CARTA } from "@/lib/cartas";
 import { numeroRomano } from "../indice";
-import { EnlaceBoton } from "../EnlaceBoton";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -221,9 +220,9 @@ export default async function CardDetailPage({ params }: Props) {
           {t("cta.title", { card: displayName })}
         </h2>
         <p className="max-w-[52ch] text-letra-suave">{t("cta.subtitle")}</p>
-        <EnlaceBoton href="/reading/new" size="lg">
+        <Link href="/reading/new" className={buttonClasses({ size: "lg" })}>
           {t("cta.button")}
-        </EnlaceBoton>
+        </Link>
       </Card>
     </div>
   );
