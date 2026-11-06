@@ -2,7 +2,8 @@ declare module "next-pwa" {
   import { NextConfig } from "next";
 
   interface RuntimeCachingEntry {
-    urlPattern: RegExp | string;
+    /** A function is serialized into sw.js: it must not use anything from its closure. */
+    urlPattern: RegExp | string | ((context: { url: URL; request: Request; sameOrigin: boolean }) => boolean);
     handler: "CacheFirst" | "CacheOnly" | "NetworkFirst" | "NetworkOnly" | "StaleWhileRevalidate";
     options?: {
       cacheName?: string;
