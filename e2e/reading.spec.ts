@@ -34,9 +34,9 @@ test.describe("Spread Selection Page", () => {
     await page.goto("/reading/new");
 
     // Each spread should show its cost
-    await expect(page.getByText(/^1 credito|^1 credit/i).first()).toBeVisible();
-    await expect(page.getByText(/^2 creditos|^2 credits/i).first()).toBeVisible();
-    await expect(page.getByText(/^3 creditos|^3 credits/i).first()).toBeVisible();
+    await expect(page.getByText(/^1 cr[eé]dito|^1 credit/i).first()).toBeVisible();
+    await expect(page.getByText(/^2 cr[eé]ditos|^2 credits/i).first()).toBeVisible();
+    await expect(page.getByText(/^3 cr[eé]ditos|^3 credits/i).first()).toBeVisible();
   });
 
   test.describe("new account", () => {
@@ -78,7 +78,7 @@ test.describe("Reading Page Structure", () => {
 
     // Intention section
     await expect(
-      page.getByRole("heading", { name: /intencion|intention/i })
+      page.getByRole("heading", { name: /intenci[oó]n|intention/i })
     ).toBeVisible();
 
     // Cards section
@@ -88,7 +88,7 @@ test.describe("Reading Page Structure", () => {
 
     // Interpretation section
     await expect(
-      page.getByRole("heading", { name: /interpretacion|interpretation/i })
+      page.getByRole("heading", { name: /interpretaci[oó]n|interpretation/i })
     ).toBeVisible();
   });
 });
