@@ -45,6 +45,12 @@ export function Footer() {
           <span>{tCommon("cardsCredit")}</span>
         </div>
       </div>
+      <p className="credito-izalith m-0 px-4 pb-4 pt-3.5 text-center text-xs opacity-90">
+        Made by{" "}
+        <a href="https://www.izalith.co" target="_blank" rel="noopener" className="underline underline-offset-2">
+          Izalith
+        </a>
+      </p>
     </footer>
   );
 }
